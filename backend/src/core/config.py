@@ -5,7 +5,7 @@ Core configuration management for Gastric ADCI Platform
 import os
 from functools import lru_cache
 from typing import List, Optional
-from pydantic import BaseSettings, validator
+from pydantic_settings import BaseSettings
 from pydantic.networks import AnyHttpUrl
 
 

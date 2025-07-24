@@ -34,17 +34,28 @@ class Action(str, Enum):
     COMMENT = "comment"
     FORK = "fork"
 
-class Role(str, Enum):
+class Role:
     """System roles with hierarchical permissions"""
-    PATIENT = "patient"
-    NURSE = "nurse"
-    PHYSICIAN = "physician"
-    SURGEON = "surgeon"
-    ONCOLOGIST = "oncologist"
-    RESEARCHER = "researcher"
-    ADMINISTRATOR = "administrator"
-    SUPER_ADMIN = "super_admin"
-    AUDITOR = "auditor"
+    def __init__(self, name: str, parent: 'Role' = None):
+        self.name = name
+        self.parent = parent
+
+    def has_permission(self, action: str) -> bool:
+        """Check if the role or its parent has permission for the action."""
+        permissions = {
+            "admin": ["view", "edit", "delete"],
+            "manager": ["view", "edit"],
+            "clinician": ["view"],
+        }
+        if action in permissions.get(self.name, []):
+            return True
+        if self.parent:
+            return self.parent.has_permission(action)
+        return False
+
+admin_role = Role("admin")
+manager_role = Role("manager", parent=admin_role)
+clinician_role = Role("clinician", parent=manager_role)
 
 @dataclass
 class Permission:

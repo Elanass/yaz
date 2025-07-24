@@ -52,5 +52,21 @@ services:
       timeout: 10s
       retries: 3
 
+  backend:
+    build:
+      context: ./backend
+    env_file:
+      - ./config/development.env
+    ports:
+      - "8000:8000"
+    depends_on:
+      - db
+
+  frontend:
+    build:
+      context: ./frontend
+    ports:
+      - "80:80"
+
 volumes:
   postgres_data:

@@ -1,0 +1,19 @@
+{
+  "name": "Gastric ADCI Platform",
+  "image": "python:3.10-slim",
+  "features": {
+    "docker-in-docker": "latest"
+  },
+  "postCreateCommand": "pip install -r requirements.txt",
+  "mounts": [
+    "source=/var/run/docker.sock,target=/var/run/docker.sock,type=bind"
+  ],
+  "customizations": {
+    "vscode": {
+      "extensions": [
+        "ms-python.python",
+        "ms-azuretools.vscode-docker"
+      ]
+    }
+  }
+}

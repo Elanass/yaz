@@ -1,0 +1,39 @@
+/* Layout styles for vertical and horizontal scroll */
+
+body {
+    font-family: Arial, sans-serif;
+    margin: 0;
+    padding: 0;
+    display: flex;
+    flex-direction: column;
+    height: 100vh;
+    overflow: hidden;
+}
+
+#vertical-scroll {
+    flex: 1;
+    overflow-y: auto;
+    display: flex;
+    flex-direction: column;
+    padding: 1rem;
+    background-color: #f8f9fa;
+}
+
+#horizontal-scroll {
+    display: flex;
+    overflow-x: auto;
+    gap: 1rem;
+    padding: 1rem;
+    background-color: #ffffff;
+    border-top: 1px solid #dee2e6;
+}
+
+.card {
+    flex: 0 0 auto;
+    width: 300px;
+    padding: 1rem;
+    border: 1px solid #dee2e6;
+    border-radius: 8px;
+    background-color: #ffffff;
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+}

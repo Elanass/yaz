@@ -13,9 +13,7 @@ from ...core.security import get_current_user, rbac_manager
 from ...core.logging import clinical_logger, performance_logger
 from ...db.database import get_async_session
 from ...services.decision_engine_service import DecisionEngineService
-from ...engines.adci_engine import ADCIEngine
-from ...engines.gastrectomy_engine import GastrectomyEngine
-from ...engines.flot_engine import FLOTEngine
+from ...engines.decision_engine import get_engine, list_engines
 
 router = APIRouter()
 
@@ -221,55 +219,35 @@ async def batch_process_decisions(
         )
 
 
-@router.get("/engines")
+@router.get("/engines", response_model=Dict[str, Any])
 async def get_available_engines(
     current_user: dict = Depends(get_current_user)
 ):
     """Get list of available decision engines"""
     
+    # Check permissions
     if not rbac_manager.has_permission(current_user.get("role"), "access_decision_engines"):
         raise HTTPException(
             status_code=status.HTTP_403_FORBIDDEN,
             detail="Insufficient permissions to access decision engines"
         )
     
-    return {
-        "engines": [
-            {
-                "name": "adci",
-                "display_name": "ADCI (Adaptive Decision Confidence Index)",
-                "description": "Adaptive decision support with confidence scoring",
-                "version": "2.1.0",
-                "indication": "Gastric cancer treatment decisions",
-                "parameters": [
-                    "tumor_stage", "histology", "biomarkers", "performance_status",
-                    "comorbidities", "patient_preferences"
-                ]
-            },
-            {
-                "name": "gastrectomy",
-                "display_name": "Gastrectomy Planning Engine",
-                "description": "Surgical approach and technique recommendations",
-                "version": "1.5.2",
-                "indication": "Gastric resection procedures",
-                "parameters": [
-                    "tumor_location", "tumor_size", "depth_invasion", "nodal_status",
-                    "surgical_risk", "surgeon_experience"
-                ]
-            },
-            {
-                "name": "flot",
-                "display_name": "FLOT Protocol Engine",
-                "description": "Perioperative chemotherapy optimization",
-                "version": "1.3.1",
-                "indication": "Perioperative chemotherapy for gastric cancer",
-                "parameters": [
-                    "staging", "operability", "molecular_markers", "performance_status",
-                    "renal_function", "cardiac_function"
-                ]
-            }
-        ]
-    }
+    try:
+        engines = list_engines()
+        
+        return {
+            "engines": engines,
+            "total_engines": len(engines),
+            "timestamp": datetime.now().isoformat()
+        }
+        
+    except Exception as e:
+        clinical_logger.error("Failed to get available engines", 
+                            user_id=current_user["sub"], error=str(e))
+        raise HTTPException(
+            status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
+            detail="Failed to get available engines"
+        )
 
 
 @router.get("/engines/{engine_name}/parameters")
@@ -390,16 +368,7 @@ async def get_engine_usage_analytics(
 
 async def _get_decision_engine(engine_name: str):
     """Get decision engine instance"""
-    engines = {
-        "adci": ADCIEngine,
-        "gastrectomy": GastrectomyEngine,
-        "flot": FLOTEngine
-    }
-    
-    if engine_name not in engines:
-        raise ValueError(f"Unknown engine: {engine_name}")
-    
-    return engines[engine_name]()
+    return get_engine(engine_name)
 
 
 def _assess_complexity(parameters: Dict[str, Any]) -> str:
