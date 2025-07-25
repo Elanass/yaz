@@ -1,0 +1,85 @@
+{% extends "layout.html" %}
+
+{% block title %}Clinical Assistance Bot | Gastric ADCI Platform{% endblock %}
+
+{% block head_content %}
+<link rel="stylesheet" href="/static/css/assistance_bot.css">
+{% endblock %}
+
+{% block content %}
+<div class="clinical-assistant-container">
+    <div class="clinical-assistant-header">
+        <h1>Clinical Assistance Bot</h1>
+        <p class="assistant-description">
+            Ask questions about gastric cancer protocols, surgical approaches, ADCI framework, or patient management.
+            The clinical assistance bot provides evidence-based responses for healthcare professionals.
+        </p>
+    </div>
+
+    <div class="clinical-assistant-content">
+        <div class="query-section">
+            <form id="bot-question-form" class="bot-form">
+                <div class="form-group">
+                    <label for="user-question">Clinical Question:</label>
+                    <textarea id="user-question" class="form-control" rows="3" placeholder="Ask about FLOT protocol, gastrectomy approaches, ERAS protocols, tumor staging, or ADCI methodology..."></textarea>
+                </div>
+                
+                <div class="form-group">
+                    <label for="user-role">Your Role:</label>
+                    <select id="user-role" class="form-control">
+                        <option value="clinician">Clinician (General)</option>
+                        <option value="surgeon">Surgeon</option>
+                        <option value="oncologist">Oncologist</option>
+                        <option value="nurse">Nurse</option>
+                        <option value="researcher">Researcher</option>
+                    </select>
+                </div>
+                
+                <button type="submit" id="ask-bot-button" class="btn btn-primary">
+                    <i class="fas fa-search-plus"></i> Ask Clinical Question
+                </button>
+            </form>
+        </div>
+
+        <div class="response-section">
+            <div id="bot-loading" class="loading-indicator" style="display: none;">
+                <div class="spinner"></div>
+                <p>Processing clinical query...</p>
+            </div>
+            
+            <div class="response-content">
+                <div class="response-header">
+                    <h3>Clinical Response</h3>
+                    <div id="confidence-container" class="confidence-container" style="display: none;">
+                        <span class="confidence-label">Confidence:</span>
+                        <span id="bot-confidence" class="confidence medium">90%</span>
+                    </div>
+                </div>
+                
+                <div class="response-body">
+                    <p id="bot-response" class="bot-response">
+                        Ask a clinical question to receive evidence-based guidance.
+                    </p>
+                </div>
+                
+                <div id="sources-container" class="sources-container" style="display: none;">
+                    <h4>Evidence Sources:</h4>
+                    <ul id="bot-sources" class="source-list"></ul>
+                </div>
+                
+                <div class="follow-up-container">
+                    <h4>Follow-up Questions:</h4>
+                    <div id="follow-up-suggestions" class="follow-up-suggestions"></div>
+                </div>
+            </div>
+        </div>
+    </div>
+    
+    <!-- Hidden field to maintain conversation context -->
+    <input type="hidden" id="conversation-context" value="[]">
+</div>
+{% endblock %}
+
+{% block scripts %}
+<script src="/static/js/assistance_bot.js"></script>
+{% endblock %}

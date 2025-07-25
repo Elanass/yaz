@@ -1,0 +1,245 @@
+{% extends "layout.html" %}
+
+{% block title %}ADCI Platform - DICOM Viewer{% endblock %}
+
+{% block head %}
+<!-- DICOM Viewer specific libraries -->
+<link rel="stylesheet" href="/static/css/pwa.css">
+<script src="https://unpkg.com/cornerstone-core/dist/cornerstone.min.js"></script>
+<script src="https://unpkg.com/cornerstone-math/dist/cornerstoneMath.min.js"></script>
+<script src="https://unpkg.com/cornerstone-tools/dist/cornerstoneTools.min.js"></script>
+<script src="https://unpkg.com/dicom-parser/dist/dicomParser.min.js"></script>
+<script src="https://unpkg.com/cornerstone-wado-image-loader/dist/cornerstoneWADOImageLoader.min.js"></script>
+<script src="https://unpkg.com/itk-wasm/dist/umd/itk-wasm.js"></script>
+<script src="https://unpkg.com/vtk.js"></script>
+{% endblock %}
+
+{% block content %}
+<div class="dicom-container">
+    <div class="dicom-header">
+        <h1>DICOM MPR/3D Visualization</h1>
+        <div class="dicom-toolbar">
+            <div class="tool-group">
+                <button id="btn-wwwc" class="btn btn-sm btn-tool" title="Window Width/Level">
+                    <i class="fas fa-adjust"></i>
+                </button>
+                <button id="btn-pan" class="btn btn-sm btn-tool" title="Pan">
+                    <i class="fas fa-hand-paper"></i>
+                </button>
+                <button id="btn-zoom" class="btn btn-sm btn-tool" title="Zoom">
+                    <i class="fas fa-search-plus"></i>
+                </button>
+                <button id="btn-stack-scroll" class="btn btn-sm btn-tool" title="Stack Scroll">
+                    <i class="fas fa-layer-group"></i>
+                </button>
+            </div>
+            <div class="tool-group">
+                <button id="btn-length" class="btn btn-sm btn-tool" title="Length Measurement">
+                    <i class="fas fa-ruler"></i>
+                </button>
+                <button id="btn-angle" class="btn btn-sm btn-tool" title="Angle Measurement">
+                    <i class="fas fa-ruler-combined"></i>
+                </button>
+                <button id="btn-annotation" class="btn btn-sm btn-tool" title="Annotation">
+                    <i class="fas fa-comment-medical"></i>
+                </button>
+                <button id="btn-bidirectional" class="btn btn-sm btn-tool" title="Bidirectional Tool">
+                    <i class="fas fa-arrows-alt-h"></i>
+                </button>
+            </div>
+            <div class="tool-group">
+                <button id="btn-reset" class="btn btn-sm btn-tool" title="Reset View">
+                    <i class="fas fa-sync"></i>
+                </button>
+                <button id="btn-invert" class="btn btn-sm btn-tool" title="Invert">
+                    <i class="fas fa-adjust fa-flip-horizontal"></i>
+                </button>
+                <button id="btn-probe" class="btn btn-sm btn-tool" title="Probe">
+                    <i class="fas fa-eye-dropper"></i>
+                </button>
+                <button id="btn-mpr-toggle" class="btn btn-sm btn-primary" title="Toggle MPR">
+                    <i class="fas fa-cube"></i> MPR
+                </button>
+                <button id="btn-3d-toggle" class="btn btn-sm btn-primary" title="Toggle 3D">
+                    <i class="fas fa-cubes"></i> 3D
+                </button>
+            </div>
+        </div>
+        <div class="patient-info">
+            <div class="patient-badge" id="patient-name"><i class="fas fa-user-circle"></i> <span>Patient: Loading...</span></div>
+            <div class="patient-badge" id="study-date"><i class="fas fa-calendar-alt"></i> <span>Date: Loading...</span></div>
+            <div class="patient-badge" id="modality"><i class="fas fa-x-ray"></i> <span>Modality: Loading...</span></div>
+            <div class="patient-badge" id="series-desc"><i class="fas fa-tag"></i> <span>Series: Loading...</span></div>
+        </div>
+    </div>
+    
+    <div class="dicom-viewport-container">
+        <!-- Single view mode -->
+        <div id="single-view-container">
+            <div id="cornerstone-viewport" class="cornerstone-viewport"></div>
+        </div>
+        
+        <!-- MPR view mode -->
+        <div id="mpr-view-container" style="display: none;">
+            <div id="axial-viewport" class="cornerstone-viewport">
+                <div class="viewport-label">Axial</div>
+            </div>
+            <div id="sagittal-viewport" class="cornerstone-viewport">
+                <div class="viewport-label">Sagittal</div>
+            </div>
+            <div id="coronal-viewport" class="cornerstone-viewport">
+                <div class="viewport-label">Coronal</div>
+            </div>
+            <div id="3d-viewport" class="cornerstone-viewport">
+                <div class="viewport-label">3D Volume</div>
+            </div>
+        </div>
+    </div>
+    
+    <div class="dicom-footer">
+        <div class="series-browser">
+            <h3>Series</h3>
+            <div id="thumbnail-container" class="thumbnail-container"></div>
+        </div>
+        <div class="collaboration-status">
+            <div id="collab-badge" class="collaboration-badge offline">
+                <i class="fas fa-users"></i> Collaboration: Offline
+            </div>
+            <button id="btn-share-view" class="btn btn-sm btn-secondary" disabled>
+                <i class="fas fa-share-alt"></i> Share View
+            </button>
+        </div>
+    </div>
+</div>
+
+<!-- DICOM File Input (hidden, activated by button) -->
+<input type="file" id="select-dicom-file" multiple style="display: none;" accept=".dcm">
+
+<!-- Loading Overlay -->
+<div id="loading-overlay" class="loading-overlay">
+    <div class="loading-content">
+        <div class="spinner"></div>
+        <div id="loading-text">Loading DICOM data...</div>
+    </div>
+</div>
+
+<!-- File Selection Modal -->
+<div class="modal fade" id="file-modal" tabindex="-1" aria-labelledby="fileModalLabel" aria-hidden="true">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title" id="fileModalLabel">Load DICOM Images</h5>
+                <button type="button" class="btn-close" data-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <div class="modal-body">
+                <div class="mb-3">
+                    <label for="dicom-source" class="form-label">Select Source:</label>
+                    <select id="dicom-source" class="form-select">
+                        <option value="local">Local Files</option>
+                        <option value="server">PACS/Server</option>
+                        <option value="demo">Demo Images</option>
+                    </select>
+                </div>
+                
+                <div id="local-source-options">
+                    <button id="btn-browse-files" class="btn btn-primary">
+                        <i class="fas fa-folder-open"></i> Browse Files
+                    </button>
+                    <div id="file-list" class="mt-3 file-list"></div>
+                </div>
+                
+                <div id="server-source-options" style="display: none;">
+                    <div class="mb-3">
+                        <label for="patient-id" class="form-label">Patient ID:</label>
+                        <input type="text" id="patient-id" class="form-control">
+                    </div>
+                    <div class="mb-3">
+                        <label for="study-uid" class="form-label">Study UID (optional):</label>
+                        <input type="text" id="study-uid" class="form-control">
+                    </div>
+                    <button id="btn-search-studies" class="btn btn-primary">
+                        <i class="fas fa-search"></i> Search Studies
+                    </button>
+                </div>
+                
+                <div id="demo-source-options" style="display: none;">
+                    <div class="demo-images">
+                        <div class="demo-image-item" data-demo-id="case1">
+                            <img src="/static/images/demo-ct-thumb.jpg" alt="Demo CT">
+                            <div>Gastric Adenocarcinoma CT</div>
+                        </div>
+                        <div class="demo-image-item" data-demo-id="case2">
+                            <img src="/static/images/demo-mr-thumb.jpg" alt="Demo MR">
+                            <div>Gastric MRI with Contrast</div>
+                        </div>
+                        <div class="demo-image-item" data-demo-id="case3">
+                            <img src="/static/images/demo-pet-thumb.jpg" alt="Demo PET/CT">
+                            <div>PET/CT Fusion Imaging</div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" data-dismiss="modal">Cancel</button>
+                <button id="btn-load-dicom" type="button" class="btn btn-primary">Load Images</button>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
+
+{% block scripts %}
+<script type="module" src="/static/js/pwa/dicom-viewer.js"></script>
+<script type="module">
+    // Trigger file modal on first load if no data is cached
+    document.addEventListener('DOMContentLoaded', function() {
+        // Check for cached DICOM data
+        if (!window.localStorage.getItem('dicom-last-loaded')) {
+            setTimeout(() => {
+                $('#file-modal').modal('show');
+            }, 500);
+        }
+        
+        // Source type change handler
+        document.getElementById('dicom-source').addEventListener('change', function() {
+            const sourceType = this.value;
+            document.getElementById('local-source-options').style.display = sourceType === 'local' ? 'block' : 'none';
+            document.getElementById('server-source-options').style.display = sourceType === 'server' ? 'block' : 'none';
+            document.getElementById('demo-source-options').style.display = sourceType === 'demo' ? 'block' : 'none';
+        });
+        
+        // Browse button handler
+        document.getElementById('btn-browse-files').addEventListener('click', function() {
+            document.getElementById('select-dicom-file').click();
+        });
+        
+        // File selection handler
+        document.getElementById('select-dicom-file').addEventListener('change', function(e) {
+            const fileList = document.getElementById('file-list');
+            fileList.innerHTML = '';
+            
+            for (let i = 0; i < this.files.length; i++) {
+                const file = this.files[i];
+                const fileItem = document.createElement('div');
+                fileItem.className = 'file-item';
+                fileItem.innerHTML = `
+                    <i class="fas fa-file-medical"></i>
+                    <span>${file.name}</span>
+                    <span class="file-size">${(file.size / 1024).toFixed(1)} KB</span>
+                `;
+                fileList.appendChild(fileItem);
+            }
+        });
+        
+        // Demo image selection
+        document.querySelectorAll('.demo-image-item').forEach(item => {
+            item.addEventListener('click', function() {
+                document.querySelectorAll('.demo-image-item').forEach(el => {
+                    el.classList.remove('selected');
+                });
+                this.classList.add('selected');
+            });
+        });
+    });
+</script>
+{% endblock %}

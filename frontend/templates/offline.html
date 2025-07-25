@@ -1,0 +1,56 @@
+{% extends "layout.html" %}
+
+{% block title %}ADCI Platform - Offline{% endblock %}
+
+{% block content %}
+<div class="offline-container">
+    <div class="offline-icon">
+        <i class="fas fa-wifi-slash fa-5x"></i>
+    </div>
+    <h1>You're Offline</h1>
+    <p class="offline-description">
+        You're currently offline. Please check your internet connection.
+    </p>
+    <p class="offline-message">
+        Don't worry, many features of the Gastric ADCI Platform are designed to work offline.
+        You can continue using cached data and functionality until your connection is restored.
+    </p>
+    
+    <div class="offline-features">
+        <h2>Available Offline</h2>
+        <ul>
+            <li><i class="fas fa-file-medical"></i> Cached patient records</li>
+            <li><i class="fas fa-book-medical"></i> Clinical protocols</li>
+            <li><i class="fas fa-x-ray"></i> Previously loaded DICOM images</li>
+            <li><i class="fas fa-heartbeat"></i> Post-op monitoring data entry</li>
+            <li><i class="fas fa-calculator"></i> ADCI calculations</li>
+        </ul>
+    </div>
+    
+    <div class="button-container">
+        <button class="btn btn-primary" onclick="window.location.href='/'">Return to Home</button>
+        <button class="btn btn-outline" onclick="window.location.reload()">Try Again</button>
+    </div>
+</div>
+{% endblock %}
+
+{% block scripts %}
+<script>
+    // Check connection status periodically
+    setInterval(() => {
+        if (navigator.onLine) {
+            document.querySelector('.offline-icon i').classList.remove('fa-wifi-slash');
+            document.querySelector('.offline-icon i').classList.add('fa-wifi');
+            document.querySelector('h1').textContent = 'Connection Restored!';
+            document.querySelector('.offline-description').textContent = 
+                'Your internet connection has been restored. You can now access all features.';
+        } else {
+            document.querySelector('.offline-icon i').classList.remove('fa-wifi');
+            document.querySelector('.offline-icon i').classList.add('fa-wifi-slash');
+            document.querySelector('h1').textContent = 'You\'re Offline';
+            document.querySelector('.offline-description').textContent = 
+                'You\'re currently offline. Please check your internet connection.';
+        }
+    }, 2000);
+</script>
+{% endblock %}

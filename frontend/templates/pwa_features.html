@@ -1,0 +1,218 @@
+{% extends "layout.html" %}
+
+{% block title %}ADCI Platform - PWA Features{% endblock %}
+
+{% block content %}
+<div class="pwa-container">
+    <div class="pwa-header">
+        <h1>Advanced PWA Features</h1>
+        <p class="pwa-description">
+            Healthcare-grade Progressive Web App features for clinical workflows
+        </p>
+    </div>
+
+    <div class="pwa-feature-grid">
+        <!-- DICOM Viewer -->
+        <div class="pwa-feature-card" id="dicom-container">
+            <div class="card-icon">
+                <i class="fas fa-x-ray"></i>
+            </div>
+            <h2>DICOM Viewer</h2>
+            <p>Advanced MPR/3D visualization for gastric imaging</p>
+            <div class="feature-actions">
+                <button class="btn btn-primary btn-sm" onclick="loadDicomViewer()">Open Viewer</button>
+                <button class="btn btn-outline btn-sm" hx-get="/pwa/dicom-info" hx-target="#modal-content" data-toggle="modal" data-target="#infoModal">Learn More</button>
+            </div>
+        </div>
+
+        <!-- WebRTC Collaboration -->
+        <div class="pwa-feature-card" id="collaboration-container">
+            <div class="card-icon">
+                <i class="fas fa-users"></i>
+            </div>
+            <h2>Team Collaboration</h2>
+            <p>Real-time telemedicine and surgical team collaboration</p>
+            <div class="feature-actions">
+                <button class="btn btn-primary btn-sm" onclick="startCollaboration()">Start Session</button>
+                <button class="btn btn-outline btn-sm" hx-get="/pwa/collab-info" hx-target="#modal-content" data-toggle="modal" data-target="#infoModal">Learn More</button>
+            </div>
+        </div>
+
+        <!-- AR Visualization -->
+        <div class="pwa-feature-card" id="ar-container">
+            <div class="card-icon">
+                <i class="fas fa-vr-cardboard"></i>
+            </div>
+            <h2>AR Visualization</h2>
+            <p>Augmented reality visualization for surgical planning</p>
+            <div class="feature-actions">
+                <button class="btn btn-primary btn-sm" onclick="startARVisualization()">Launch AR</button>
+                <button class="btn btn-outline btn-sm" hx-get="/pwa/ar-info" hx-target="#modal-content" data-toggle="modal" data-target="#infoModal">Learn More</button>
+            </div>
+        </div>
+
+        <!-- Post-Op Monitoring -->
+        <div class="pwa-feature-card" id="postOp-container">
+            <div class="card-icon">
+                <i class="fas fa-heartbeat"></i>
+            </div>
+            <h2>Post-Op Monitoring</h2>
+            <p>Real-time patient monitoring with offline support</p>
+            <div class="feature-actions">
+                <button class="btn btn-primary btn-sm" onclick="openMonitoring()">View Patients</button>
+                <button class="btn btn-outline btn-sm" hx-get="/pwa/monitoring-info" hx-target="#modal-content" data-toggle="modal" data-target="#infoModal">Learn More</button>
+            </div>
+        </div>
+
+        <!-- AI Analytics -->
+        <div class="pwa-feature-card" id="ai-container">
+            <div class="card-icon">
+                <i class="fas fa-brain"></i>
+            </div>
+            <h2>AI Analytics</h2>
+            <p>Predictive analytics with confidence intervals</p>
+            <div class="feature-actions">
+                <button class="btn btn-primary btn-sm" onclick="runAnalytics()">Run Analysis</button>
+                <button class="btn btn-outline btn-sm" hx-get="/pwa/ai-info" hx-target="#modal-content" data-toggle="modal" data-target="#infoModal">Learn More</button>
+            </div>
+        </div>
+
+        <!-- Instrument Tracking -->
+        <div class="pwa-feature-card" id="instruments-container">
+            <div class="card-icon">
+                <i class="fas fa-tools"></i>
+            </div>
+            <h2>Instrument Tracking</h2>
+            <p>Surgical instrument tracking with HIPAA compliance</p>
+            <div class="feature-actions">
+                <button class="btn btn-primary btn-sm" onclick="openInstrumentTracking()">Track Instruments</button>
+                <button class="btn btn-outline btn-sm" hx-get="/pwa/instrument-info" hx-target="#modal-content" data-toggle="modal" data-target="#infoModal">Learn More</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- PWA Status & Installation -->
+    <div class="pwa-status-section">
+        <div class="connection-status">
+            <span id="connection-indicator" class="online">
+                <i class="fas fa-wifi"></i> Online
+            </span>
+        </div>
+        <div class="install-prompt" id="install-container">
+            <button id="install-button" class="btn btn-success">
+                <i class="fas fa-download"></i> Install App
+            </button>
+        </div>
+    </div>
+</div>
+
+<!-- Modal for feature information -->
+<div class="modal fade" id="infoModal" tabindex="-1" aria-labelledby="infoModalLabel" aria-hidden="true">
+    <div class="modal-dialog modal-lg">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title" id="infoModalLabel">Feature Information</h5>
+                <button type="button" class="btn-close" data-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <div class="modal-body" id="modal-content">
+                <!-- Content will be loaded here -->
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" data-dismiss="modal">Close</button>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
+
+{% block scripts %}
+<script src="/static/js/pwa-integration.js" type="module"></script>
+<script>
+    // Initialize event listeners
+    document.addEventListener('DOMContentLoaded', function() {
+        // Handle network status changes
+        window.addEventListener('online', updateConnectionStatus);
+        window.addEventListener('offline', updateConnectionStatus);
+        updateConnectionStatus();
+        
+        // Set up install button
+        const installButton = document.getElementById('install-button');
+        const installContainer = document.getElementById('install-container');
+        let deferredPrompt;
+        
+        window.addEventListener('beforeinstallprompt', (e) => {
+            // Prevent the mini-infobar from appearing on mobile
+            e.preventDefault();
+            // Stash the event so it can be triggered later
+            deferredPrompt = e;
+            // Show the install button
+            installContainer.style.display = 'block';
+        });
+        
+        installButton.addEventListener('click', async () => {
+            if (!deferredPrompt) return;
+            
+            // Show the install prompt
+            deferredPrompt.prompt();
+            
+            // Wait for the user to respond to the prompt
+            const { outcome } = await deferredPrompt.userChoice;
+            
+            // We no longer need the prompt
+            deferredPrompt = null;
+            
+            // Hide the install button
+            if (outcome === 'accepted') {
+                installContainer.style.display = 'none';
+            }
+        });
+        
+        // Hide the install button if the app is already installed
+        window.addEventListener('appinstalled', () => {
+            installContainer.style.display = 'none';
+        });
+        
+        // Check if already installed
+        if (window.matchMedia('(display-mode: standalone)').matches) {
+            installContainer.style.display = 'none';
+        }
+    });
+    
+    // Update connection status indicator
+    function updateConnectionStatus() {
+        const indicator = document.getElementById('connection-indicator');
+        if (navigator.onLine) {
+            indicator.innerHTML = '<i class="fas fa-wifi"></i> Online';
+            indicator.className = 'online';
+        } else {
+            indicator.innerHTML = '<i class="fas fa-exclamation-triangle"></i> Offline';
+            indicator.className = 'offline';
+        }
+    }
+    
+    // Feature handlers
+    function loadDicomViewer() {
+        window.location.href = '/dicom';
+    }
+    
+    function startCollaboration() {
+        window.location.href = '/collaboration';
+    }
+    
+    function startARVisualization() {
+        window.location.href = '/ar-visualization';
+    }
+    
+    function openMonitoring() {
+        window.location.href = '/post-op';
+    }
+    
+    function runAnalytics() {
+        window.location.href = '/analytics';
+    }
+    
+    function openInstrumentTracking() {
+        window.location.href = '/instrument-tracking';
+    }
+</script>
+{% endblock %}

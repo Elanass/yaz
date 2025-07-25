@@ -28,7 +28,7 @@ from .models.protocol_version import ProtocolVersion
 from sqlalchemy.orm import Session
 
 # Import frontend integration
-from frontend.app import create_frontend_app
+from frontend.app_new import create_frontend_app
 
 # Additional imports for new features
 from models.patient import Patient

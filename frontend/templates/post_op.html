@@ -1,0 +1,774 @@
+{% extends "layout.html" %}
+
+{% block title %}ADCI Platform - Post-Op Monitoring{% endblock %}
+
+{% block head %}
+<link rel="stylesheet" href="/static/css/pwa.css">
+<script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+{% endblock %}
+
+{% block content %}
+<div class="post-op-container">
+    <div class="post-op-header">
+        <h1>Post-Operative Monitoring</h1>
+        <div class="sync-status">
+            <div id="sync-indicator" class="sync-badge synced">
+                <i class="fas fa-sync-alt"></i> Synced
+            </div>
+        </div>
+    </div>
+    
+    <div class="post-op-tabs">
+        <button class="tab-btn active" data-tab="patients-tab">
+            <i class="fas fa-users"></i> Patients
+        </button>
+        <button class="tab-btn" data-tab="dashboard-tab">
+            <i class="fas fa-chart-line"></i> Dashboard
+        </button>
+        <button class="tab-btn" data-tab="protocols-tab">
+            <i class="fas fa-clipboard-list"></i> ERAS Protocols
+        </button>
+        <button class="tab-btn" data-tab="alerts-tab">
+            <i class="fas fa-bell"></i> Alerts
+            <span class="alert-badge">3</span>
+        </button>
+    </div>
+    
+    <div class="post-op-content">
+        <!-- Patients Tab -->
+        <div id="patients-tab" class="tab-pane active">
+            <div class="patient-filter">
+                <div class="search-box">
+                    <input type="text" id="patient-search" placeholder="Search patients...">
+                    <i class="fas fa-search"></i>
+                </div>
+                <div class="filter-controls">
+                    <select id="filter-ward">
+                        <option value="">All Wards</option>
+                        <option value="surgical">Surgical</option>
+                        <option value="icu">ICU</option>
+                        <option value="step-down">Step-Down</option>
+                    </select>
+                    <select id="filter-procedure">
+                        <option value="">All Procedures</option>
+                        <option value="total-gastrectomy">Total Gastrectomy</option>
+                        <option value="distal-gastrectomy">Distal Gastrectomy</option>
+                        <option value="proximal-gastrectomy">Proximal Gastrectomy</option>
+                        <option value="wedge-resection">Wedge Resection</option>
+                    </select>
+                    <select id="filter-status">
+                        <option value="">All Statuses</option>
+                        <option value="stable">Stable</option>
+                        <option value="at-risk">At Risk</option>
+                        <option value="critical">Critical</option>
+                    </select>
+                </div>
+            </div>
+            
+            <div class="patients-list">
+                <!-- Patient Card 1 - Critical -->
+                <div class="patient-card critical" data-patient-id="P12345" data-days-post-op="2">
+                    <div class="patient-info">
+                        <div class="patient-name">
+                            <h3>John S., 57M</h3>
+                            <span class="patient-id">ID: P12345</span>
+                        </div>
+                        <div class="patient-details">
+                            <div class="detail-item">
+                                <i class="fas fa-procedures"></i>
+                                <span>Total Gastrectomy</span>
+                            </div>
+                            <div class="detail-item">
+                                <i class="fas fa-calendar-day"></i>
+                                <span>POD 2</span>
+                            </div>
+                            <div class="detail-item">
+                                <i class="fas fa-map-marker-alt"></i>
+                                <span>ICU Bed 3</span>
+                            </div>
+                        </div>
+                        <div class="vital-signs">
+                            <div class="vital critical">
+                                <span class="vital-name">HR</span>
+                                <span class="vital-value">118</span>
+                            </div>
+                            <div class="vital warning">
+                                <span class="vital-name">BP</span>
+                                <span class="vital-value">90/60</span>
+                            </div>
+                            <div class="vital normal">
+                                <span class="vital-name">SpO2</span>
+                                <span class="vital-value">94%</span>
+                            </div>
+                            <div class="vital warning">
+                                <span class="vital-name">Temp</span>
+                                <span class="vital-value">38.7°C</span>
+                            </div>
+                        </div>
+                        <div class="alert-summary">
+                            <span class="alert-indicator critical">
+                                <i class="fas fa-exclamation-circle"></i> Critical
+                            </span>
+                            <span class="last-updated">
+                                Updated: 15 min ago
+                            </span>
+                        </div>
+                    </div>
+                    <div class="patient-actions">
+                        <button class="btn btn-sm btn-primary">
+                            <i class="fas fa-chart-line"></i> View
+                        </button>
+                        <button class="btn btn-sm btn-outline">
+                            <i class="fas fa-clipboard-list"></i> ERAS
+                        </button>
+                        <button class="btn btn-sm btn-warning">
+                            <i class="fas fa-bell"></i> Alerts
+                        </button>
+                    </div>
+                </div>
+                
+                <!-- Patient Card 2 - Warning -->
+                <div class="patient-card warning" data-patient-id="P23456" data-days-post-op="1">
+                    <div class="patient-info">
+                        <div class="patient-name">
+                            <h3>Mary T., 63F</h3>
+                            <span class="patient-id">ID: P23456</span>
+                        </div>
+                        <div class="patient-details">
+                            <div class="detail-item">
+                                <i class="fas fa-procedures"></i>
+                                <span>Distal Gastrectomy</span>
+                            </div>
+                            <div class="detail-item">
+                                <i class="fas fa-calendar-day"></i>
+                                <span>POD 1</span>
+                            </div>
+                            <div class="detail-item">
+                                <i class="fas fa-map-marker-alt"></i>
+                                <span>Surgical Ward 2B</span>
+                            </div>
+                        </div>
+                        <div class="vital-signs">
+                            <div class="vital normal">
+                                <span class="vital-name">HR</span>
+                                <span class="vital-value">86</span>
+                            </div>
+                            <div class="vital normal">
+                                <span class="vital-name">BP</span>
+                                <span class="vital-value">125/80</span>
+                            </div>
+                            <div class="vital normal">
+                                <span class="vital-name">SpO2</span>
+                                <span class="vital-value">97%</span>
+                            </div>
+                            <div class="vital warning">
+                                <span class="vital-name">Pain</span>
+                                <span class="vital-value">7/10</span>
+                            </div>
+                        </div>
+                        <div class="alert-summary">
+                            <span class="alert-indicator warning">
+                                <i class="fas fa-exclamation-triangle"></i> At Risk
+                            </span>
+                            <span class="last-updated">
+                                Updated: 30 min ago
+                            </span>
+                        </div>
+                    </div>
+                    <div class="patient-actions">
+                        <button class="btn btn-sm btn-primary">
+                            <i class="fas fa-chart-line"></i> View
+                        </button>
+                        <button class="btn btn-sm btn-outline">
+                            <i class="fas fa-clipboard-list"></i> ERAS
+                        </button>
+                        <button class="btn btn-sm btn-warning">
+                            <i class="fas fa-bell"></i> Alerts
+                        </button>
+                    </div>
+                </div>
+                
+                <!-- Patient Card 3 - Stable -->
+                <div class="patient-card stable" data-patient-id="P34567" data-days-post-op="3">
+                    <div class="patient-info">
+                        <div class="patient-name">
+                            <h3>Robert J., 71M</h3>
+                            <span class="patient-id">ID: P34567</span>
+                        </div>
+                        <div class="patient-details">
+                            <div class="detail-item">
+                                <i class="fas fa-procedures"></i>
+                                <span>Partial Gastrectomy</span>
+                            </div>
+                            <div class="detail-item">
+                                <i class="fas fa-calendar-day"></i>
+                                <span>POD 3</span>
+                            </div>
+                            <div class="detail-item">
+                                <i class="fas fa-map-marker-alt"></i>
+                                <span>Surgical Ward 3A</span>
+                            </div>
+                        </div>
+                        <div class="vital-signs">
+                            <div class="vital normal">
+                                <span class="vital-name">HR</span>
+                                <span class="vital-value">78</span>
+                            </div>
+                            <div class="vital normal">
+                                <span class="vital-name">BP</span>
+                                <span class="vital-value">138/82</span>
+                            </div>
+                            <div class="vital normal">
+                                <span class="vital-name">SpO2</span>
+                                <span class="vital-value">98%</span>
+                            </div>
+                            <div class="vital normal">
+                                <span class="vital-name">Temp</span>
+                                <span class="vital-value">36.8°C</span>
+                            </div>
+                        </div>
+                        <div class="alert-summary">
+                            <span class="alert-indicator stable">
+                                <i class="fas fa-check-circle"></i> Stable
+                            </span>
+                            <span class="last-updated">
+                                Updated: 45 min ago
+                            </span>
+                        </div>
+                    </div>
+                    <div class="patient-actions">
+                        <button class="btn btn-sm btn-primary">
+                            <i class="fas fa-chart-line"></i> View
+                        </button>
+                        <button class="btn btn-sm btn-outline">
+                            <i class="fas fa-clipboard-list"></i> ERAS
+                        </button>
+                        <button class="btn btn-sm btn-warning">
+                            <i class="fas fa-bell"></i> Alerts
+                        </button>
+                    </div>
+                </div>
+                
+                <!-- Additional patient cards would be here -->
+            </div>
+            
+            <div class="add-patient">
+                <button id="btn-add-patient" class="btn btn-primary">
+                    <i class="fas fa-plus"></i> Add Patient
+                </button>
+            </div>
+        </div>
+        
+        <!-- Dashboard Tab -->
+        <div id="dashboard-tab" class="tab-pane">
+            <div class="dashboard-header">
+                <h2>Post-Op Monitoring Dashboard</h2>
+                <div class="dashboard-filters">
+                    <div class="date-range">
+                        <label for="date-range">Time Period:</label>
+                        <select id="date-range">
+                            <option value="today">Today</option>
+                            <option value="week" selected>Past Week</option>
+                            <option value="month">Past Month</option>
+                            <option value="custom">Custom Range</option>
+                        </select>
+                    </div>
+                    <div class="procedure-filter">
+                        <label for="dashboard-procedure">Procedure:</label>
+                        <select id="dashboard-procedure">
+                            <option value="all" selected>All Procedures</option>
+                            <option value="total-gastrectomy">Total Gastrectomy</option>
+                            <option value="distal-gastrectomy">Distal Gastrectomy</option>
+                            <option value="proximal-gastrectomy">Proximal Gastrectomy</option>
+                        </select>
+                    </div>
+                </div>
+            </div>
+            
+            <div class="dashboard-stats">
+                <div class="stat-card">
+                    <div class="stat-value">24</div>
+                    <div class="stat-label">Active Post-Op Patients</div>
+                </div>
+                <div class="stat-card">
+                    <div class="stat-value">3</div>
+                    <div class="stat-label">Critical Alerts</div>
+                </div>
+                <div class="stat-card">
+                    <div class="stat-value">87%</div>
+                    <div class="stat-label">ERAS Compliance</div>
+                </div>
+                <div class="stat-card">
+                    <div class="stat-value">5.2</div>
+                    <div class="stat-label">Avg. Length of Stay (days)</div>
+                </div>
+            </div>
+            
+            <div class="dashboard-charts">
+                <div class="chart-container">
+                    <h3>Post-Op Complications</h3>
+                    <canvas id="complications-chart"></canvas>
+                </div>
+                <div class="chart-container">
+                    <h3>ERAS Protocol Adherence</h3>
+                    <canvas id="eras-adherence-chart"></canvas>
+                </div>
+                <div class="chart-container">
+                    <h3>Early Warning Score Trends</h3>
+                    <canvas id="ews-chart"></canvas>
+                </div>
+                <div class="chart-container">
+                    <h3>Length of Stay by Procedure</h3>
+                    <canvas id="los-chart"></canvas>
+                </div>
+            </div>
+        </div>
+        
+        <!-- ERAS Protocols Tab -->
+        <div id="protocols-tab" class="tab-pane">
+            <div class="protocols-header">
+                <h2>ERAS Protocols</h2>
+                <div class="protocol-actions">
+                    <button class="btn btn-sm btn-primary">
+                        <i class="fas fa-plus"></i> New Protocol
+                    </button>
+                    <button class="btn btn-sm btn-outline">
+                        <i class="fas fa-file-export"></i> Export Data
+                    </button>
+                </div>
+            </div>
+            
+            <div class="protocols-list">
+                <div class="protocol-card">
+                    <div class="protocol-header">
+                        <h3>Enhanced Recovery After Gastrectomy</h3>
+                        <span class="protocol-version">v2.3</span>
+                    </div>
+                    <div class="protocol-stats">
+                        <div class="protocol-stat">
+                            <span class="stat-label">Compliance:</span>
+                            <span class="stat-value">87%</span>
+                        </div>
+                        <div class="protocol-stat">
+                            <span class="stat-label">Patients:</span>
+                            <span class="stat-value">18</span>
+                        </div>
+                        <div class="protocol-stat">
+                            <span class="stat-label">Avg. LOS Reduction:</span>
+                            <span class="stat-value">1.8 days</span>
+                        </div>
+                    </div>
+                    <div class="protocol-actions">
+                        <button class="btn btn-sm btn-primary">View</button>
+                        <button class="btn btn-sm btn-outline">Edit</button>
+                    </div>
+                </div>
+                
+                <div class="protocol-card">
+                    <div class="protocol-header">
+                        <h3>Total Gastrectomy ERAS</h3>
+                        <span class="protocol-version">v1.5</span>
+                    </div>
+                    <div class="protocol-stats">
+                        <div class="protocol-stat">
+                            <span class="stat-label">Compliance:</span>
+                            <span class="stat-value">92%</span>
+                        </div>
+                        <div class="protocol-stat">
+                            <span class="stat-label">Patients:</span>
+                            <span class="stat-value">12</span>
+                        </div>
+                        <div class="protocol-stat">
+                            <span class="stat-label">Avg. LOS Reduction:</span>
+                            <span class="stat-value">2.1 days</span>
+                        </div>
+                    </div>
+                    <div class="protocol-actions">
+                        <button class="btn btn-sm btn-primary">View</button>
+                        <button class="btn btn-sm btn-outline">Edit</button>
+                    </div>
+                </div>
+                
+                <div class="protocol-card">
+                    <div class="protocol-header">
+                        <h3>Distal Gastrectomy ERAS</h3>
+                        <span class="protocol-version">v2.0</span>
+                    </div>
+                    <div class="protocol-stats">
+                        <div class="protocol-stat">
+                            <span class="stat-label">Compliance:</span>
+                            <span class="stat-value">84%</span>
+                        </div>
+                        <div class="protocol-stat">
+                            <span class="stat-label">Patients:</span>
+                            <span class="stat-value">15</span>
+                        </div>
+                        <div class="protocol-stat">
+                            <span class="stat-label">Avg. LOS Reduction:</span>
+                            <span class="stat-value">1.5 days</span>
+                        </div>
+                    </div>
+                    <div class="protocol-actions">
+                        <button class="btn btn-sm btn-primary">View</button>
+                        <button class="btn btn-sm btn-outline">Edit</button>
+                    </div>
+                </div>
+            </div>
+        </div>
+        
+        <!-- Alerts Tab -->
+        <div id="alerts-tab" class="tab-pane">
+            <div class="alerts-header">
+                <h2>Clinical Alerts</h2>
+                <div class="alert-filters">
+                    <select id="alert-severity">
+                        <option value="all">All Severities</option>
+                        <option value="critical">Critical</option>
+                        <option value="warning">Warning</option>
+                        <option value="info">Informational</option>
+                    </select>
+                    <select id="alert-status">
+                        <option value="all">All Statuses</option>
+                        <option value="new">New</option>
+                        <option value="acknowledged">Acknowledged</option>
+                        <option value="resolved">Resolved</option>
+                    </select>
+                </div>
+            </div>
+            
+            <div class="alerts-list">
+                <div class="alert-item critical">
+                    <div class="alert-icon">
+                        <i class="fas fa-exclamation-circle"></i>
+                    </div>
+                    <div class="alert-content">
+                        <div class="alert-header">
+                            <h3>Abnormal Vital Signs</h3>
+                            <span class="alert-time">15 min ago</span>
+                        </div>
+                        <div class="alert-details">
+                            <p>Patient John S. (P12345) has tachycardia (HR 118) and hypotension (BP 90/60).</p>
+                        </div>
+                        <div class="alert-meta">
+                            <span class="alert-severity critical">Critical</span>
+                            <span class="alert-status new">New</span>
+                            <span class="alert-source">Vital Signs Monitor</span>
+                        </div>
+                    </div>
+                    <div class="alert-actions">
+                        <button class="btn btn-sm btn-primary">View Patient</button>
+                        <button class="btn btn-sm btn-outline">Acknowledge</button>
+                    </div>
+                </div>
+                
+                <div class="alert-item warning">
+                    <div class="alert-icon">
+                        <i class="fas fa-exclamation-triangle"></i>
+                    </div>
+                    <div class="alert-content">
+                        <div class="alert-header">
+                            <h3>Elevated Pain Score</h3>
+                            <span class="alert-time">30 min ago</span>
+                        </div>
+                        <div class="alert-details">
+                            <p>Patient Mary T. (P23456) reported pain score 7/10 despite scheduled analgesia.</p>
+                        </div>
+                        <div class="alert-meta">
+                            <span class="alert-severity warning">Warning</span>
+                            <span class="alert-status acknowledged">Acknowledged</span>
+                            <span class="alert-source">Nurse Assessment</span>
+                        </div>
+                    </div>
+                    <div class="alert-actions">
+                        <button class="btn btn-sm btn-primary">View Patient</button>
+                        <button class="btn btn-sm btn-outline">Resolve</button>
+                    </div>
+                </div>
+                
+                <div class="alert-item critical">
+                    <div class="alert-icon">
+                        <i class="fas fa-exclamation-circle"></i>
+                    </div>
+                    <div class="alert-content">
+                        <div class="alert-header">
+                            <h3>Elevated Temperature</h3>
+                            <span class="alert-time">45 min ago</span>
+                        </div>
+                        <div class="alert-details">
+                            <p>Patient John S. (P12345) has fever (38.7°C). Consider sepsis evaluation.</p>
+                        </div>
+                        <div class="alert-meta">
+                            <span class="alert-severity critical">Critical</span>
+                            <span class="alert-status acknowledged">Acknowledged</span>
+                            <span class="alert-source">Vital Signs Monitor</span>
+                        </div>
+                    </div>
+                    <div class="alert-actions">
+                        <button class="btn btn-sm btn-primary">View Patient</button>
+                        <button class="btn btn-sm btn-outline">Resolve</button>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+    
+    <div class="post-op-footer">
+        <div class="connection-status">
+            <div id="connection-indicator" class="connection-badge online">
+                <i class="fas fa-wifi"></i> Online
+            </div>
+        </div>
+        <div class="compliance-info">
+            <div class="compliance-badge">
+                <i class="fas fa-shield-alt"></i> HIPAA Compliant
+            </div>
+            <div class="audit-badge">
+                <i class="fas fa-clipboard-check"></i> Full Audit Trail
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Add Patient Modal -->
+<div class="modal fade" id="add-patient-modal" tabindex="-1" aria-labelledby="addPatientModalLabel" aria-hidden="true">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title" id="addPatientModalLabel">Add Post-Op Patient</h5>
+                <button type="button" class="btn-close" data-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <div class="modal-body">
+                <div class="mb-3">
+                    <label for="patient-id-input" class="form-label">Patient ID:</label>
+                    <input type="text" id="patient-id-input" class="form-control" placeholder="Enter patient ID">
+                </div>
+                <div class="mb-3">
+                    <label for="surgery-date" class="form-label">Surgery Date:</label>
+                    <input type="date" id="surgery-date" class="form-control">
+                </div>
+                <div class="mb-3">
+                    <label for="procedure-type" class="form-label">Procedure:</label>
+                    <select id="procedure-type" class="form-select">
+                        <option value="">Select Procedure</option>
+                        <option value="total-gastrectomy">Total Gastrectomy</option>
+                        <option value="distal-gastrectomy">Distal Gastrectomy</option>
+                        <option value="proximal-gastrectomy">Proximal Gastrectomy</option>
+                        <option value="wedge-resection">Wedge Resection</option>
+                    </select>
+                </div>
+                <div class="mb-3">
+                    <label for="eras-protocol" class="form-label">ERAS Protocol:</label>
+                    <select id="eras-protocol" class="form-select">
+                        <option value="">Select Protocol</option>
+                        <option value="enhanced-recovery-gastrectomy">Enhanced Recovery After Gastrectomy</option>
+                        <option value="total-gastrectomy-eras">Total Gastrectomy ERAS</option>
+                        <option value="distal-gastrectomy-eras">Distal Gastrectomy ERAS</option>
+                    </select>
+                </div>
+                <div class="mb-3">
+                    <label for="location" class="form-label">Current Location:</label>
+                    <select id="location" class="form-select">
+                        <option value="">Select Location</option>
+                        <option value="icu">ICU</option>
+                        <option value="step-down">Step-Down Unit</option>
+                        <option value="surgical-ward">Surgical Ward</option>
+                    </select>
+                </div>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" data-dismiss="modal">Cancel</button>
+                <button id="btn-save-patient" type="button" class="btn btn-primary">Add Patient</button>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
+
+{% block scripts %}
+<script type="module" src="/static/js/pwa/post-op-monitoring.js"></script>
+<script>
+    document.addEventListener('DOMContentLoaded', function() {
+        // Tab switching
+        document.querySelectorAll('.tab-btn').forEach(button => {
+            button.addEventListener('click', function() {
+                // Remove active class from all tabs
+                document.querySelectorAll('.tab-btn').forEach(btn => {
+                    btn.classList.remove('active');
+                });
+                document.querySelectorAll('.tab-pane').forEach(pane => {
+                    pane.classList.remove('active');
+                });
+                
+                // Add active class to clicked tab
+                this.classList.add('active');
+                document.getElementById(this.getAttribute('data-tab')).classList.add('active');
+            });
+        });
+        
+        // Add patient modal
+        document.getElementById('btn-add-patient').addEventListener('click', function() {
+            $('#add-patient-modal').modal('show');
+        });
+        
+        // Initialize charts when dashboard tab is shown
+        document.querySelector('.tab-btn[data-tab="dashboard-tab"]').addEventListener('click', function() {
+            initializeCharts();
+        });
+        
+        // Network status changes
+        window.addEventListener('online', updateConnectionStatus);
+        window.addEventListener('offline', updateConnectionStatus);
+        updateConnectionStatus();
+        
+        // Initialize charts
+        function initializeCharts() {
+            // Complications Chart
+            const complicationsCtx = document.getElementById('complications-chart').getContext('2d');
+            new Chart(complicationsCtx, {
+                type: 'bar',
+                data: {
+                    labels: ['Anastomotic Leak', 'Wound Infection', 'Pneumonia', 'Ileus', 'DVT/PE', 'Bleeding'],
+                    datasets: [{
+                        label: 'Incidence (%)',
+                        data: [2.3, 5.8, 4.2, 8.5, 1.2, 3.4],
+                        backgroundColor: 'rgba(37, 99, 235, 0.7)',
+                        borderColor: 'rgba(37, 99, 235, 1)',
+                        borderWidth: 1
+                    }]
+                },
+                options: {
+                    responsive: true,
+                    scales: {
+                        y: {
+                            beginAtZero: true,
+                            max: 10
+                        }
+                    }
+                }
+            });
+            
+            // ERAS Adherence Chart
+            const erasCtx = document.getElementById('eras-adherence-chart').getContext('2d');
+            new Chart(erasCtx, {
+                type: 'radar',
+                data: {
+                    labels: [
+                        'Pre-op Counseling', 
+                        'Carbohydrate Loading', 
+                        'No Prolonged Fasting',
+                        'Minimal Opioids',
+                        'Early Mobilization',
+                        'Early Oral Intake',
+                        'Drain Management',
+                        'Early Catheter Removal'
+                    ],
+                    datasets: [{
+                        label: 'Adherence (%)',
+                        data: [95, 82, 88, 76, 85, 72, 91, 89],
+                        backgroundColor: 'rgba(16, 185, 129, 0.2)',
+                        borderColor: 'rgba(16, 185, 129, 1)',
+                        borderWidth: 2,
+                        pointBackgroundColor: 'rgba(16, 185, 129, 1)'
+                    }]
+                },
+                options: {
+                    responsive: true,
+                    scales: {
+                        r: {
+                            angleLines: {
+                                display: true
+                            },
+                            suggestedMin: 0,
+                            suggestedMax: 100
+                        }
+                    }
+                }
+            });
+            
+            // EWS Chart
+            const ewsCtx = document.getElementById('ews-chart').getContext('2d');
+            new Chart(ewsCtx, {
+                type: 'line',
+                data: {
+                    labels: ['POD 0', 'POD 1', 'POD 2', 'POD 3', 'POD 4', 'POD 5', 'POD 6'],
+                    datasets: [{
+                        label: 'Average EWS',
+                        data: [4.2, 3.8, 2.9, 2.3, 1.8, 1.5, 1.2],
+                        fill: false,
+                        borderColor: 'rgba(239, 68, 68, 1)',
+                        tension: 0.1
+                    }]
+                },
+                options: {
+                    responsive: true,
+                    scales: {
+                        y: {
+                            beginAtZero: true,
+                            max: 10
+                        }
+                    }
+                }
+            });
+            
+            // Length of Stay Chart
+            const losCtx = document.getElementById('los-chart').getContext('2d');
+            new Chart(losCtx, {
+                type: 'bar',
+                data: {
+                    labels: ['Total Gastrectomy', 'Distal Gastrectomy', 'Proximal Gastrectomy', 'Wedge Resection'],
+                    datasets: [
+                        {
+                            label: 'With ERAS',
+                            data: [6.3, 5.2, 5.5, 3.1],
+                            backgroundColor: 'rgba(16, 185, 129, 0.7)'
+                        },
+                        {
+                            label: 'Without ERAS',
+                            data: [8.7, 7.5, 7.2, 4.8],
+                            backgroundColor: 'rgba(239, 68, 68, 0.7)'
+                        }
+                    ]
+                },
+                options: {
+                    responsive: true,
+                    scales: {
+                        y: {
+                            beginAtZero: true,
+                            title: {
+                                display: true,
+                                text: 'Days'
+                            }
+                        }
+                    }
+                }
+            });
+        }
+        
+        // Update connection status
+        function updateConnectionStatus() {
+            const indicator = document.getElementById('connection-indicator');
+            const syncIndicator = document.getElementById('sync-indicator');
+            
+            if (navigator.onLine) {
+                indicator.innerHTML = '<i class="fas fa-wifi"></i> Online';
+                indicator.className = 'connection-badge online';
+                
+                // Simulate sync
+                syncIndicator.innerHTML = '<i class="fas fa-sync-alt fa-spin"></i> Syncing...';
+                syncIndicator.className = 'sync-badge syncing';
+                
+                setTimeout(() => {
+                    syncIndicator.innerHTML = '<i class="fas fa-sync-alt"></i> Synced';
+                    syncIndicator.className = 'sync-badge synced';
+                }, 1500);
+            } else {
+                indicator.innerHTML = '<i class="fas fa-wifi-slash"></i> Offline';
+                indicator.className = 'connection-badge offline';
+                
+                syncIndicator.innerHTML = '<i class="fas fa-exclamation-triangle"></i> Offline Mode';
+                syncIndicator.className = 'sync-badge offline';
+            }
+        }
+    });
+</script>
+{% endblock %}

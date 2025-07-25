@@ -1,0 +1,995 @@
+{% extends "layout.html" %}
+
+{% block title %}ADCI Platform - AI Analytics{% endblock %}
+
+{% block head %}
+<link rel="stylesheet" href="/static/css/pwa.css">
+<script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/d3@7"></script>
+{% endblock %}
+
+{% block content %}
+<div class="ai-container">
+    <div class="ai-header">
+        <h1>AI Analytics & Predictive Modeling</h1>
+        <div class="ai-header-actions">
+            <div class="model-select">
+                <label for="model-type">Model:</label>
+                <select id="model-type">
+                    <option value="complication-risk">Complication Risk</option>
+                    <option value="los-prediction">Length of Stay</option>
+                    <option value="readmission-risk">Readmission Risk</option>
+                    <option value="survival-prediction">Survival Prediction</option>
+                    <option value="custom-model">Custom Model</option>
+                </select>
+            </div>
+            <button id="btn-run-analysis" class="btn btn-primary">
+                <i class="fas fa-play"></i> Run Analysis
+            </button>
+            <button id="btn-export-results" class="btn btn-outline" disabled>
+                <i class="fas fa-file-export"></i> Export Results
+            </button>
+        </div>
+    </div>
+    
+    <div class="ai-main">
+        <div class="input-panel">
+            <h2>Analysis Parameters</h2>
+            
+            <div class="parameter-section">
+                <h3>Patient Cohort</h3>
+                <div class="cohort-selector">
+                    <div class="radio-option">
+                        <input type="radio" id="cohort-all" name="cohort" value="all" checked>
+                        <label for="cohort-all">All Gastric Cancer Patients</label>
+                    </div>
+                    <div class="radio-option">
+                        <input type="radio" id="cohort-custom" name="cohort" value="custom">
+                        <label for="cohort-custom">Custom Cohort</label>
+                    </div>
+                    <div class="radio-option">
+                        <input type="radio" id="cohort-individual" name="cohort" value="individual">
+                        <label for="cohort-individual">Individual Patient</label>
+                    </div>
+                </div>
+                
+                <div id="cohort-filters" class="cohort-filters" style="display: none;">
+                    <div class="filter-group">
+                        <label>Cancer Stage:</label>
+                        <div class="checkbox-group">
+                            <div class="checkbox-option">
+                                <input type="checkbox" id="stage-i" checked>
+                                <label for="stage-i">Stage I</label>
+                            </div>
+                            <div class="checkbox-option">
+                                <input type="checkbox" id="stage-ii" checked>
+                                <label for="stage-ii">Stage II</label>
+                            </div>
+                            <div class="checkbox-option">
+                                <input type="checkbox" id="stage-iii" checked>
+                                <label for="stage-iii">Stage III</label>
+                            </div>
+                            <div class="checkbox-option">
+                                <input type="checkbox" id="stage-iv">
+                                <label for="stage-iv">Stage IV</label>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <div class="filter-group">
+                        <label>Procedure Type:</label>
+                        <div class="checkbox-group">
+                            <div class="checkbox-option">
+                                <input type="checkbox" id="proc-total" checked>
+                                <label for="proc-total">Total Gastrectomy</label>
+                            </div>
+                            <div class="checkbox-option">
+                                <input type="checkbox" id="proc-distal" checked>
+                                <label for="proc-distal">Distal Gastrectomy</label>
+                            </div>
+                            <div class="checkbox-option">
+                                <input type="checkbox" id="proc-proximal" checked>
+                                <label for="proc-proximal">Proximal Gastrectomy</label>
+                            </div>
+                            <div class="checkbox-option">
+                                <input type="checkbox" id="proc-wedge" checked>
+                                <label for="proc-wedge">Wedge Resection</label>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <div class="filter-group">
+                        <label>Age Group:</label>
+                        <div class="checkbox-group">
+                            <div class="checkbox-option">
+                                <input type="checkbox" id="age-under-50" checked>
+                                <label for="age-under-50"><50 years</label>
+                            </div>
+                            <div class="checkbox-option">
+                                <input type="checkbox" id="age-50-65" checked>
+                                <label for="age-50-65">50-65 years</label>
+                            </div>
+                            <div class="checkbox-option">
+                                <input type="checkbox" id="age-65-80" checked>
+                                <label for="age-65-80">65-80 years</label>
+                            </div>
+                            <div class="checkbox-option">
+                                <input type="checkbox" id="age-over-80" checked>
+                                <label for="age-over-80">>80 years</label>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <div class="filter-group">
+                        <label>Treatment Approach:</label>
+                        <div class="checkbox-group">
+                            <div class="checkbox-option">
+                                <input type="checkbox" id="treat-surgery-only" checked>
+                                <label for="treat-surgery-only">Surgery Only</label>
+                            </div>
+                            <div class="checkbox-option">
+                                <input type="checkbox" id="treat-neoadjuvant" checked>
+                                <label for="treat-neoadjuvant">Neoadjuvant + Surgery</label>
+                            </div>
+                            <div class="checkbox-option">
+                                <input type="checkbox" id="treat-adjuvant" checked>
+                                <label for="treat-adjuvant">Surgery + Adjuvant</label>
+                            </div>
+                            <div class="checkbox-option">
+                                <input type="checkbox" id="treat-sandwich" checked>
+                                <label for="treat-sandwich">Sandwich Therapy</label>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <button id="btn-apply-filters" class="btn btn-primary btn-sm">
+                        Apply Filters
+                    </button>
+                </div>
+                
+                <div id="patient-selector" class="patient-selector" style="display: none;">
+                    <div class="search-box">
+                        <input type="text" id="patient-search" placeholder="Search patient by ID or name...">
+                        <button id="btn-search-patient" class="btn btn-sm btn-outline">
+                            <i class="fas fa-search"></i>
+                        </button>
+                    </div>
+                    <div id="patient-results" class="patient-results"></div>
+                </div>
+            </div>
+            
+            <div class="parameter-section">
+                <h3>Model Configuration</h3>
+                
+                <div class="model-parameters">
+                    <div class="parameter-group">
+                        <label for="confidence-level">Confidence Level:</label>
+                        <select id="confidence-level">
+                            <option value="0.90">90%</option>
+                            <option value="0.95" selected>95%</option>
+                            <option value="0.99">99%</option>
+                        </select>
+                    </div>
+                    
+                    <div class="parameter-group">
+                        <label for="time-horizon">Time Horizon:</label>
+                        <select id="time-horizon">
+                            <option value="30">30 days</option>
+                            <option value="90" selected>90 days</option>
+                            <option value="180">6 months</option>
+                            <option value="365">1 year</option>
+                            <option value="1825">5 years</option>
+                        </select>
+                    </div>
+                    
+                    <div class="parameter-group">
+                        <label for="feature-importance">Show Feature Importance:</label>
+                        <div class="toggle-switch">
+                            <input type="checkbox" id="feature-importance" checked>
+                            <span class="slider round"></span>
+                        </div>
+                    </div>
+                    
+                    <div class="parameter-group">
+                        <label for="calibration-plot">Show Calibration Plot:</label>
+                        <div class="toggle-switch">
+                            <input type="checkbox" id="calibration-plot" checked>
+                            <span class="slider round"></span>
+                        </div>
+                    </div>
+                    
+                    <div class="parameter-group">
+                        <label for="advanced-options">Advanced Options:</label>
+                        <button id="btn-advanced-options" class="btn btn-sm btn-outline">
+                            <i class="fas fa-cog"></i> Configure
+                        </button>
+                    </div>
+                </div>
+            </div>
+            
+            <div class="parameter-section">
+                <h3>Compare With</h3>
+                
+                <div class="comparison-options">
+                    <div class="checkbox-option">
+                        <input type="checkbox" id="compare-baseline" checked>
+                        <label for="compare-baseline">Baseline Population</label>
+                    </div>
+                    <div class="checkbox-option">
+                        <input type="checkbox" id="compare-similar-cases">
+                        <label for="compare-similar-cases">Similar Cases</label>
+                    </div>
+                    <div class="checkbox-option">
+                        <input type="checkbox" id="compare-historical">
+                        <label for="compare-historical">Historical Trend</label>
+                    </div>
+                </div>
+            </div>
+        </div>
+        
+        <div class="results-panel">
+            <div id="results-placeholder" class="results-placeholder">
+                <i class="fas fa-chart-bar"></i>
+                <p>Configure your analysis parameters and click "Run Analysis" to see results.</p>
+                <p class="placeholder-hint">Analysis will run in a background thread for optimal performance.</p>
+            </div>
+            
+            <div id="analysis-results" class="analysis-results" style="display: none;">
+                <div class="results-header">
+                    <h2 id="results-title">Analysis Results</h2>
+                    <div class="model-meta">
+                        <div class="meta-item">
+                            <span class="meta-label">Model:</span>
+                            <span class="meta-value" id="meta-model">Complication Risk</span>
+                        </div>
+                        <div class="meta-item">
+                            <span class="meta-label">Patients:</span>
+                            <span class="meta-value" id="meta-patients">342</span>
+                        </div>
+                        <div class="meta-item">
+                            <span class="meta-label">Time Horizon:</span>
+                            <span class="meta-value" id="meta-horizon">90 days</span>
+                        </div>
+                        <div class="meta-item">
+                            <span class="meta-label">Generated:</span>
+                            <span class="meta-value" id="meta-date">July 25, 2025</span>
+                        </div>
+                    </div>
+                </div>
+                
+                <div class="results-metrics">
+                    <div class="metric-card">
+                        <div class="metric-value" id="metric-primary">-</div>
+                        <div class="metric-label" id="metric-primary-label">Risk Score</div>
+                        <div class="confidence-interval" id="metric-primary-ci"></div>
+                    </div>
+                    <div class="metric-card">
+                        <div class="metric-value" id="metric-secondary">-</div>
+                        <div class="metric-label" id="metric-secondary-label">Secondary Metric</div>
+                    </div>
+                    <div class="metric-card">
+                        <div class="metric-value" id="metric-tertiary">-</div>
+                        <div class="metric-label" id="metric-tertiary-label">Tertiary Metric</div>
+                    </div>
+                    <div class="metric-card">
+                        <div class="metric-value" id="metric-quaternary">-</div>
+                        <div class="metric-label" id="metric-quaternary-label">Quaternary Metric</div>
+                    </div>
+                </div>
+                
+                <div class="results-charts">
+                    <div class="chart-container">
+                        <h3 id="chart1-title">Risk Prediction</h3>
+                        <canvas id="chart1"></canvas>
+                    </div>
+                    <div class="chart-container">
+                        <h3 id="chart2-title">Feature Importance</h3>
+                        <canvas id="chart2"></canvas>
+                    </div>
+                    <div class="chart-container">
+                        <h3 id="chart3-title">Calibration Plot</h3>
+                        <canvas id="chart3"></canvas>
+                    </div>
+                    <div class="chart-container">
+                        <h3 id="chart4-title">Comparative Analysis</h3>
+                        <canvas id="chart4"></canvas>
+                    </div>
+                </div>
+                
+                <div class="results-interpretation">
+                    <h3>Clinical Interpretation</h3>
+                    <div class="interpretation-content" id="interpretation-text">
+                        <p>Analysis results will appear here after running the model.</p>
+                    </div>
+                </div>
+                
+                <div class="results-evidence">
+                    <h3>Evidence Base</h3>
+                    <div class="evidence-list" id="evidence-list">
+                        <!-- Evidence items will be populated here -->
+                    </div>
+                </div>
+            </div>
+            
+            <div id="analysis-loading" class="analysis-loading" style="display: none;">
+                <div class="loading-spinner"></div>
+                <h3>Running Analysis...</h3>
+                <div class="progress">
+                    <div class="progress-bar" id="analysis-progress" style="width: 0%"></div>
+                </div>
+                <p id="loading-status">Initializing model...</p>
+            </div>
+        </div>
+    </div>
+    
+    <div class="ai-footer">
+        <div class="model-info">
+            <div class="model-badge">
+                <i class="fas fa-brain"></i> Model: <span id="model-version">v2.3.5</span>
+            </div>
+            <div class="model-badge">
+                <i class="fas fa-calendar-check"></i> Last Updated: <span id="model-updated">June 15, 2025</span>
+            </div>
+            <div class="model-badge">
+                <i class="fas fa-database"></i> Training Data: <span id="model-data">12,587 patients</span>
+            </div>
+        </div>
+        <div class="ai-compliance">
+            <div class="compliance-badge">
+                <i class="fas fa-shield-alt"></i> HIPAA Compliant
+            </div>
+            <div class="compliance-badge">
+                <i class="fas fa-check-circle"></i> FDA Compliant
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Advanced Options Modal -->
+<div class="modal fade" id="advanced-options-modal" tabindex="-1" aria-labelledby="advancedOptionsModalLabel" aria-hidden="true">
+    <div class="modal-dialog modal-lg">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title" id="advancedOptionsModalLabel">Advanced Model Configuration</h5>
+                <button type="button" class="btn-close" data-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <div class="modal-body">
+                <div class="advanced-options-tabs">
+                    <button class="tab-btn active" data-tab="model-tab">Model Parameters</button>
+                    <button class="tab-btn" data-tab="features-tab">Feature Selection</button>
+                    <button class="tab-btn" data-tab="validation-tab">Validation</button>
+                    <button class="tab-btn" data-tab="output-tab">Output Options</button>
+                </div>
+                
+                <div class="advanced-options-content">
+                    <!-- Model Parameters Tab -->
+                    <div id="model-tab" class="tab-content active">
+                        <div class="mb-3">
+                            <label for="model-algorithm" class="form-label">Algorithm:</label>
+                            <select id="model-algorithm" class="form-select">
+                                <option value="xgboost" selected>XGBoost</option>
+                                <option value="random-forest">Random Forest</option>
+                                <option value="neural-network">Neural Network</option>
+                                <option value="cox-ph">Cox Proportional Hazards</option>
+                            </select>
+                        </div>
+                        <div class="mb-3">
+                            <label for="hyperparameter-tuning" class="form-label">Hyperparameter Tuning:</label>
+                            <select id="hyperparameter-tuning" class="form-select">
+                                <option value="none">None</option>
+                                <option value="grid-search">Grid Search</option>
+                                <option value="random-search" selected>Random Search</option>
+                                <option value="bayesian">Bayesian Optimization</option>
+                            </select>
+                        </div>
+                        <div class="mb-3">
+                            <label for="ensemble-method" class="form-label">Ensemble Method:</label>
+                            <select id="ensemble-method" class="form-select">
+                                <option value="none">None</option>
+                                <option value="bagging">Bagging</option>
+                                <option value="boosting" selected>Boosting</option>
+                                <option value="stacking">Stacking</option>
+                            </select>
+                        </div>
+                        <div class="mb-3">
+                            <label for="max-computation-time" class="form-label">Max Computation Time:</label>
+                            <select id="max-computation-time" class="form-select">
+                                <option value="30">30 seconds</option>
+                                <option value="60" selected>1 minute</option>
+                                <option value="300">5 minutes</option>
+                                <option value="600">10 minutes</option>
+                                <option value="unlimited">Unlimited</option>
+                            </select>
+                        </div>
+                    </div>
+                    
+                    <!-- Feature Selection Tab -->
+                    <div id="features-tab" class="tab-content">
+                        <div class="mb-3">
+                            <label class="form-label">Feature Categories:</label>
+                            <div class="feature-categories">
+                                <div class="feature-category">
+                                    <div class="form-check">
+                                        <input class="form-check-input" type="checkbox" id="feature-demographic" checked>
+                                        <label class="form-check-label" for="feature-demographic">
+                                            Demographics
+                                        </label>
+                                    </div>
+                                    <div class="feature-subcategories">
+                                        <div class="form-check">
+                                            <input class="form-check-input" type="checkbox" id="feature-age" checked>
+                                            <label class="form-check-label" for="feature-age">Age</label>
+                                        </div>
+                                        <div class="form-check">
+                                            <input class="form-check-input" type="checkbox" id="feature-gender" checked>
+                                            <label class="form-check-label" for="feature-gender">Gender</label>
+                                        </div>
+                                        <div class="form-check">
+                                            <input class="form-check-input" type="checkbox" id="feature-ethnicity" checked>
+                                            <label class="form-check-label" for="feature-ethnicity">Ethnicity</label>
+                                        </div>
+                                    </div>
+                                </div>
+                                
+                                <div class="feature-category">
+                                    <div class="form-check">
+                                        <input class="form-check-input" type="checkbox" id="feature-clinical" checked>
+                                        <label class="form-check-label" for="feature-clinical">
+                                            Clinical Factors
+                                        </label>
+                                    </div>
+                                    <div class="feature-subcategories">
+                                        <div class="form-check">
+                                            <input class="form-check-input" type="checkbox" id="feature-comorbidities" checked>
+                                            <label class="form-check-label" for="feature-comorbidities">Comorbidities</label>
+                                        </div>
+                                        <div class="form-check">
+                                            <input class="form-check-input" type="checkbox" id="feature-bmi" checked>
+                                            <label class="form-check-label" for="feature-bmi">BMI</label>
+                                        </div>
+                                        <div class="form-check">
+                                            <input class="form-check-input" type="checkbox" id="feature-performance" checked>
+                                            <label class="form-check-label" for="feature-performance">Performance Status</label>
+                                        </div>
+                                    </div>
+                                </div>
+                                
+                                <div class="feature-category">
+                                    <div class="form-check">
+                                        <input class="form-check-input" type="checkbox" id="feature-tumor" checked>
+                                        <label class="form-check-label" for="feature-tumor">
+                                            Tumor Characteristics
+                                        </label>
+                                    </div>
+                                    <div class="feature-subcategories">
+                                        <div class="form-check">
+                                            <input class="form-check-input" type="checkbox" id="feature-stage" checked>
+                                            <label class="form-check-label" for="feature-stage">Stage</label>
+                                        </div>
+                                        <div class="form-check">
+                                            <input class="form-check-input" type="checkbox" id="feature-grade" checked>
+                                            <label class="form-check-label" for="feature-grade">Grade</label>
+                                        </div>
+                                        <div class="form-check">
+                                            <input class="form-check-input" type="checkbox" id="feature-location" checked>
+                                            <label class="form-check-label" for="feature-location">Location</label>
+                                        </div>
+                                    </div>
+                                </div>
+                                
+                                <div class="feature-category">
+                                    <div class="form-check">
+                                        <input class="form-check-input" type="checkbox" id="feature-treatment" checked>
+                                        <label class="form-check-label" for="feature-treatment">
+                                            Treatment Factors
+                                        </label>
+                                    </div>
+                                    <div class="feature-subcategories">
+                                        <div class="form-check">
+                                            <input class="form-check-input" type="checkbox" id="feature-procedure" checked>
+                                            <label class="form-check-label" for="feature-procedure">Procedure Type</label>
+                                        </div>
+                                        <div class="form-check">
+                                            <input class="form-check-input" type="checkbox" id="feature-approach" checked>
+                                            <label class="form-check-label" for="feature-approach">Surgical Approach</label>
+                                        </div>
+                                        <div class="form-check">
+                                            <input class="form-check-input" type="checkbox" id="feature-adjuvant" checked>
+                                            <label class="form-check-label" for="feature-adjuvant">Adjuvant Therapy</label>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                        
+                        <div class="mb-3">
+                            <label for="feature-selection-method" class="form-label">Feature Selection Method:</label>
+                            <select id="feature-selection-method" class="form-select">
+                                <option value="none">None</option>
+                                <option value="rfe" selected>Recursive Feature Elimination</option>
+                                <option value="lasso">LASSO Regularization</option>
+                                <option value="pca">Principal Component Analysis</option>
+                            </select>
+                        </div>
+                    </div>
+                    
+                    <!-- Validation Tab -->
+                    <div id="validation-tab" class="tab-content">
+                        <div class="mb-3">
+                            <label for="validation-method" class="form-label">Validation Method:</label>
+                            <select id="validation-method" class="form-select">
+                                <option value="train-test">Train-Test Split</option>
+                                <option value="k-fold" selected>K-Fold Cross-Validation</option>
+                                <option value="leave-one-out">Leave-One-Out Cross-Validation</option>
+                                <option value="bootstrap">Bootstrap Validation</option>
+                            </select>
+                        </div>
+                        <div class="mb-3">
+                            <label for="k-folds" class="form-label">Number of Folds (for K-Fold):</label>
+                            <select id="k-folds" class="form-select">
+                                <option value="5">5</option>
+                                <option value="10" selected>10</option>
+                                <option value="15">15</option>
+                                <option value="20">20</option>
+                            </select>
+                        </div>
+                        <div class="mb-3">
+                            <label for="test-size" class="form-label">Test Set Size (for Train-Test):</label>
+                            <select id="test-size" class="form-select">
+                                <option value="0.1">10%</option>
+                                <option value="0.2" selected>20%</option>
+                                <option value="0.3">30%</option>
+                                <option value="0.4">40%</option>
+                            </select>
+                        </div>
+                        <div class="mb-3">
+                            <label for="evaluation-metrics" class="form-label">Evaluation Metrics:</label>
+                            <div class="evaluation-metrics">
+                                <div class="form-check">
+                                    <input class="form-check-input" type="checkbox" id="metric-auc" checked>
+                                    <label class="form-check-label" for="metric-auc">AUC-ROC</label>
+                                </div>
+                                <div class="form-check">
+                                    <input class="form-check-input" type="checkbox" id="metric-precision" checked>
+                                    <label class="form-check-label" for="metric-precision">Precision</label>
+                                </div>
+                                <div class="form-check">
+                                    <input class="form-check-input" type="checkbox" id="metric-recall" checked>
+                                    <label class="form-check-label" for="metric-recall">Recall</label>
+                                </div>
+                                <div class="form-check">
+                                    <input class="form-check-input" type="checkbox" id="metric-f1" checked>
+                                    <label class="form-check-label" for="metric-f1">F1 Score</label>
+                                </div>
+                                <div class="form-check">
+                                    <input class="form-check-input" type="checkbox" id="metric-calibration" checked>
+                                    <label class="form-check-label" for="metric-calibration">Calibration</label>
+                                </div>
+                                <div class="form-check">
+                                    <input class="form-check-input" type="checkbox" id="metric-brier" checked>
+                                    <label class="form-check-label" for="metric-brier">Brier Score</label>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <!-- Output Options Tab -->
+                    <div id="output-tab" class="tab-content">
+                        <div class="mb-3">
+                            <label class="form-label">Output Format:</label>
+                            <div class="form-check">
+                                <input class="form-check-input" type="checkbox" id="output-probability" checked>
+                                <label class="form-check-label" for="output-probability">
+                                    Probability
+                                </label>
+                            </div>
+                            <div class="form-check">
+                                <input class="form-check-input" type="checkbox" id="output-ci" checked>
+                                <label class="form-check-label" for="output-ci">
+                                    Confidence Intervals
+                                </label>
+                            </div>
+                            <div class="form-check">
+                                <input class="form-check-input" type="checkbox" id="output-features" checked>
+                                <label class="form-check-label" for="output-features">
+                                    Feature Importance
+                                </label>
+                            </div>
+                            <div class="form-check">
+                                <input class="form-check-input" type="checkbox" id="output-comparison" checked>
+                                <label class="form-check-label" for="output-comparison">
+                                    Comparative Analysis
+                                </label>
+                            </div>
+                            <div class="form-check">
+                                <input class="form-check-input" type="checkbox" id="output-explanation" checked>
+                                <label class="form-check-label" for="output-explanation">
+                                    Clinical Explanation
+                                </label>
+                            </div>
+                            <div class="form-check">
+                                <input class="form-check-input" type="checkbox" id="output-evidence" checked>
+                                <label class="form-check-label" for="output-evidence">
+                                    Evidence Citations
+                                </label>
+                            </div>
+                        </div>
+                        <div class="mb-3">
+                            <label for="output-format" class="form-label">Export Format:</label>
+                            <select id="output-format" class="form-select">
+                                <option value="pdf">PDF Report</option>
+                                <option value="csv">CSV Data</option>
+                                <option value="json">JSON</option>
+                                <option value="all" selected>All Formats</option>
+                            </select>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" data-dismiss="modal">Cancel</button>
+                <button id="btn-reset-defaults" type="button" class="btn btn-outline">Reset to Defaults</button>
+                <button id="btn-save-advanced" type="button" class="btn btn-primary">Apply Settings</button>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
+
+{% block scripts %}
+<script type="module" src="/static/js/pwa/ai-analytics.js"></script>
+<script>
+    document.addEventListener('DOMContentLoaded', function() {
+        // Show/hide cohort filters based on selection
+        document.querySelectorAll('input[name="cohort"]').forEach(input => {
+            input.addEventListener('change', function() {
+                document.getElementById('cohort-filters').style.display = 
+                    this.value === 'custom' ? 'block' : 'none';
+                document.getElementById('patient-selector').style.display = 
+                    this.value === 'individual' ? 'block' : 'none';
+            });
+        });
+        
+        // Advanced options modal
+        document.getElementById('btn-advanced-options').addEventListener('click', function() {
+            $('#advanced-options-modal').modal('show');
+        });
+        
+        // Tab switching in advanced options
+        document.querySelectorAll('.tab-btn').forEach(button => {
+            button.addEventListener('click', function() {
+                // Remove active class from all tabs
+                document.querySelectorAll('.tab-btn').forEach(btn => {
+                    btn.classList.remove('active');
+                });
+                document.querySelectorAll('.tab-content').forEach(content => {
+                    content.classList.remove('active');
+                });
+                
+                // Add active class to clicked tab and its content
+                this.classList.add('active');
+                document.getElementById(this.getAttribute('data-tab')).classList.add('active');
+            });
+        });
+        
+        // Run analysis
+        document.getElementById('btn-run-analysis').addEventListener('click', function() {
+            // Hide placeholder and show loading
+            document.getElementById('results-placeholder').style.display = 'none';
+            document.getElementById('analysis-results').style.display = 'none';
+            document.getElementById('analysis-loading').style.display = 'flex';
+            
+            // Update progress bar animation
+            let progress = 0;
+            const progressBar = document.getElementById('analysis-progress');
+            const loadingStatus = document.getElementById('loading-status');
+            const progressInterval = setInterval(() => {
+                progress += 5;
+                if (progress > 100) {
+                    clearInterval(progressInterval);
+                    
+                    // Show results
+                    document.getElementById('analysis-loading').style.display = 'none';
+                    document.getElementById('analysis-results').style.display = 'block';
+                    document.getElementById('btn-export-results').removeAttribute('disabled');
+                    
+                    // Initialize charts with mock data
+                    initializeCharts();
+                    
+                    // Update metrics with mock data
+                    updateMetrics();
+                    
+                    // Update evidence list
+                    updateEvidenceList();
+                    
+                    // Update interpretation
+                    updateInterpretation();
+                    
+                    return;
+                }
+                
+                progressBar.style.width = `${progress}%`;
+                
+                // Update loading status messages
+                if (progress < 20) {
+                    loadingStatus.textContent = 'Loading patient data...';
+                } else if (progress < 40) {
+                    loadingStatus.textContent = 'Initializing model...';
+                } else if (progress < 60) {
+                    loadingStatus.textContent = 'Processing features...';
+                } else if (progress < 80) {
+                    loadingStatus.textContent = 'Running prediction algorithm...';
+                } else {
+                    loadingStatus.textContent = 'Generating visualizations...';
+                }
+            }, 150);
+        });
+        
+        // Initialize charts with mock data
+        function initializeCharts() {
+            // Chart 1: Risk Prediction
+            const ctx1 = document.getElementById('chart1').getContext('2d');
+            new Chart(ctx1, {
+                type: 'bar',
+                data: {
+                    labels: ['Anastomotic Leak', 'SSI', 'Pneumonia', 'Cardiac', 'VTE', 'Renal'],
+                    datasets: [
+                        {
+                            label: 'Risk (%)',
+                            data: [8.3, 12.7, 5.4, 3.2, 2.8, 4.1],
+                            backgroundColor: 'rgba(37, 99, 235, 0.7)',
+                            borderColor: 'rgba(37, 99, 235, 1)',
+                            borderWidth: 1
+                        },
+                        {
+                            label: '95% CI Upper',
+                            data: [11.2, 15.9, 7.8, 5.1, 4.5, 6.3],
+                            backgroundColor: 'rgba(37, 99, 235, 0.1)',
+                            borderColor: 'rgba(37, 99, 235, 1)',
+                            borderWidth: 1,
+                            type: 'line',
+                            fill: false
+                        },
+                        {
+                            label: '95% CI Lower',
+                            data: [5.9, 9.8, 3.6, 1.8, 1.5, 2.4],
+                            backgroundColor: 'rgba(37, 99, 235, 0.1)',
+                            borderColor: 'rgba(37, 99, 235, 1)',
+                            borderWidth: 1,
+                            type: 'line',
+                            fill: '-1'
+                        }
+                    ]
+                },
+                options: {
+                    responsive: true,
+                    scales: {
+                        y: {
+                            beginAtZero: true,
+                            title: {
+                                display: true,
+                                text: 'Risk (%)'
+                            },
+                            max: 20
+                        }
+                    }
+                }
+            });
+            
+            // Chart 2: Feature Importance
+            const ctx2 = document.getElementById('chart2').getContext('2d');
+            new Chart(ctx2, {
+                type: 'horizontalBar',
+                data: {
+                    labels: ['Age > 75', 'Diabetes', 'ASA Score', 'Prior Surgery', 'Total Gastrectomy', 'BMI > 30', 'Stage III', 'Albumin < 3.5', 'Operative Time > 4h', 'Male Gender'],
+                    datasets: [{
+                        label: 'Feature Importance',
+                        data: [0.23, 0.18, 0.15, 0.12, 0.09, 0.08, 0.06, 0.04, 0.03, 0.02],
+                        backgroundColor: [
+                            'rgba(220, 38, 38, 0.8)',
+                            'rgba(234, 88, 12, 0.8)',
+                            'rgba(217, 119, 6, 0.8)',
+                            'rgba(202, 138, 4, 0.8)',
+                            'rgba(161, 98, 7, 0.8)',
+                            'rgba(77, 124, 15, 0.8)',
+                            'rgba(21, 128, 61, 0.8)',
+                            'rgba(8, 145, 178, 0.8)',
+                            'rgba(37, 99, 235, 0.8)',
+                            'rgba(91, 33, 182, 0.8)'
+                        ]
+                    }]
+                },
+                options: {
+                    indexAxis: 'y',
+                    responsive: true,
+                    scales: {
+                        x: {
+                            beginAtZero: true,
+                            title: {
+                                display: true,
+                                text: 'Relative Importance'
+                            }
+                        }
+                    }
+                }
+            });
+            
+            // Chart 3: Calibration Plot
+            const ctx3 = document.getElementById('chart3').getContext('2d');
+            new Chart(ctx3, {
+                type: 'scatter',
+                data: {
+                    datasets: [
+                        {
+                            label: 'Calibration Points',
+                            data: [
+                                {x: 0.05, y: 0.062},
+                                {x: 0.10, y: 0.114},
+                                {x: 0.15, y: 0.159},
+                                {x: 0.20, y: 0.187},
+                                {x: 0.25, y: 0.262},
+                                {x: 0.30, y: 0.324},
+                                {x: 0.35, y: 0.351},
+                                {x: 0.40, y: 0.388},
+                                {x: 0.45, y: 0.437},
+                                {x: 0.50, y: 0.526}
+                            ],
+                            backgroundColor: 'rgba(37, 99, 235, 0.7)',
+                            borderColor: 'rgba(37, 99, 235, 1)',
+                            pointRadius: 6
+                        },
+                        {
+                            label: 'Perfect Calibration',
+                            data: [
+                                {x: 0, y: 0},
+                                {x: 0.5, y: 0.5},
+                                {x: 1, y: 1}
+                            ],
+                            type: 'line',
+                            borderColor: 'rgba(107, 114, 128, 0.7)',
+                            borderDash: [5, 5],
+                            borderWidth: 2,
+                            fill: false,
+                            pointRadius: 0
+                        }
+                    ]
+                },
+                options: {
+                    responsive: true,
+                    scales: {
+                        x: {
+                            beginAtZero: true,
+                            title: {
+                                display: true,
+                                text: 'Predicted Probability'
+                            },
+                            max: 0.6
+                        },
+                        y: {
+                            beginAtZero: true,
+                            title: {
+                                display: true,
+                                text: 'Observed Frequency'
+                            },
+                            max: 0.6
+                        }
+                    }
+                }
+            });
+            
+            // Chart 4: Comparative Analysis
+            const ctx4 = document.getElementById('chart4').getContext('2d');
+            new Chart(ctx4, {
+                type: 'bar',
+                data: {
+                    labels: ['30 Day Mortality', 'Readmission', 'Major Complication', 'Reintervention'],
+                    datasets: [
+                        {
+                            label: 'Current Cohort',
+                            data: [2.3, 12.7, 15.4, 8.2],
+                            backgroundColor: 'rgba(37, 99, 235, 0.7)'
+                        },
+                        {
+                            label: 'Baseline Population',
+                            data: [3.8, 15.9, 18.2, 10.5],
+                            backgroundColor: 'rgba(220, 38, 38, 0.7)'
+                        }
+                    ]
+                },
+                options: {
+                    responsive: true,
+                    scales: {
+                        y: {
+                            beginAtZero: true,
+                            title: {
+                                display: true,
+                                text: 'Rate (%)'
+                            },
+                            max: 25
+                        }
+                    }
+                }
+            });
+        }
+        
+        // Update metrics with mock data
+        function updateMetrics() {
+            document.getElementById('metric-primary').textContent = '18.7%';
+            document.getElementById('metric-primary-label').textContent = 'Overall Complication Risk';
+            document.getElementById('metric-primary-ci').textContent = '95% CI: 15.3-22.1%';
+            
+            document.getElementById('metric-secondary').textContent = '5.2 days';
+            document.getElementById('metric-secondary-label').textContent = 'Predicted LOS';
+            
+            document.getElementById('metric-tertiary').textContent = '8.3%';
+            document.getElementById('metric-tertiary-label').textContent = 'Readmission Risk';
+            
+            document.getElementById('metric-quaternary').textContent = '0.81';
+            document.getElementById('metric-quaternary-label').textContent = 'Model C-Statistic';
+            
+            // Update model meta information
+            document.getElementById('meta-model').textContent = 'Complication Risk';
+            document.getElementById('meta-patients').textContent = '342';
+            document.getElementById('meta-horizon').textContent = '90 days';
+            document.getElementById('meta-date').textContent = new Date().toLocaleDateString();
+            
+            // Update results title
+            document.getElementById('results-title').textContent = 'Complication Risk Analysis';
+        }
+        
+        // Update evidence list
+        function updateEvidenceList() {
+            const evidenceList = document.getElementById('evidence-list');
+            evidenceList.innerHTML = `
+                <div class="evidence-item">
+                    <div class="evidence-citation">
+                        <span class="evidence-number">1</span>
+                        <span class="evidence-text">Woo Y, et al. (2023) "Predictive models for complications after gastrectomy for gastric cancer: A comprehensive validation study". <em>J Gastric Cancer</em>, 23(2):142-153.</span>
+                    </div>
+                    <div class="evidence-level">Evidence Level 1A</div>
+                </div>
+                <div class="evidence-item">
+                    <div class="evidence-citation">
+                        <span class="evidence-number">2</span>
+                        <span class="evidence-text">Kim JH, et al. (2024) "Machine learning approaches to predict postoperative complications after gastric cancer surgery". <em>Ann Surg Oncol</em>, 31(5):612-623.</span>
+                    </div>
+                    <div class="evidence-level">Evidence Level 1B</div>
+                </div>
+                <div class="evidence-item">
+                    <div class="evidence-citation">
+                        <span class="evidence-number">3</span>
+                        <span class="evidence-text">Park SH, et al. (2024) "Risk factors for anastomotic leakage after gastrectomy: A meta-analysis of 142 studies". <em>World J Surg</em>, 48(3):225-236.</span>
+                    </div>
+                    <div class="evidence-level">Evidence Level 1A</div>
+                </div>
+            `;
+        }
+        
+        // Update interpretation
+        function updateInterpretation() {
+            document.getElementById('interpretation-text').innerHTML = `
+                <p>The analysis indicates a <strong>moderate risk (18.7%)</strong> of developing at least one major complication within 90 days post-gastrectomy. This is <strong>lower than the baseline population risk</strong> (22.4%) but warrants clinical attention.</p>
+                
+                <p>Key risk factors identified include:</p>
+                <ul>
+                    <li><strong>Advanced age (>75 years)</strong>: Contributes 23% to the overall risk prediction</li>
+                    <li><strong>Diabetes</strong>: Significant factor especially for wound healing complications</li>
+                    <li><strong>High ASA score (III-IV)</strong>: Indicates pre-existing systemic disease impact</li>
+                </ul>
+                
+                <p>Among specific complications, <strong>surgical site infection (12.7%)</strong> and <strong>anastomotic leak (8.3%)</strong> represent the highest risks. The calibration plot shows the model is <strong>well-calibrated</strong> (slight overestimation in middle risk tiers).</p>
+                
+                <p>Based on these findings, consider:</p>
+                <ul>
+                    <li>Enhanced glycemic control protocol for diabetic patients</li>
+                    <li>Extended thromboprophylaxis given the VTE risk</li>
+                    <li>Early mobilization and respiratory protocols to reduce pneumonia risk</li>
+                    <li>Nutritional optimization if albumin levels are borderline</li>
+                </ul>
+                
+                <p>The model has good discriminative ability (C-statistic 0.81) and was validated on a cohort of 342 patients with similar demographic and clinical characteristics.</p>
+            `;
+        }
+    });
+</script>
+{% endblock %}
