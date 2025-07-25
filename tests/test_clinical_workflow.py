@@ -9,44 +9,53 @@ import json
 import sys
 from datetime import datetime
 from typing import Dict, Any
+import pytest
 
-# Test the 65-year-old T3N1M0 gastric adenocarcinoma patient workflow
-CLINICAL_TEST_CASE = {
-    "patient_id": "TEST_CLINICAL_001",
-    "age": 65,
-    "gender": "male",
-    "clinical_parameters": {
-        "tumor_stage": "T3N1M0",
-        "histology": "adenocarcinoma",
-        "tumor_location": "antrum",
-        "tumor_size_cm": 4.2,
-        "ecog_score": 1,
-        "karnofsky_score": 80,
-        "comorbidities": ["hypertension", "diabetes"],
-        "biomarkers": {
-            "her2": "negative",
-            "msi": "stable",
-            "pdl1": "unknown"
+@pytest.fixture
+def clinical_test_case():
+    return {
+        "patient_id": "TEST_CLINICAL_001",
+        "age": 65,
+        "gender": "male",
+        "clinical_parameters": {
+            "tumor_stage": "T3N1M0",
+            "histology": "adenocarcinoma",
+            "tumor_location": "antrum",
+            "tumor_size_cm": 4.2,
+            "ecog_score": 1,
+            "karnofsky_score": 80,
+            "comorbidities": ["hypertension", "diabetes"],
+            "biomarkers": {
+                "her2": "negative",
+                "msi": "stable",
+                "pdl1": "unknown"
+            },
+            "lab_values": {
+                "creatinine_mg_dl": 1.1,
+                "total_bilirubin_mg_dl": 0.8,
+                "alt_u_l": 45,
+                "hemoglobin_g_dl": 12.5,
+                "platelet_count": 280000
+            },
+            "prior_treatments": [],
+            "family_history": ["gastric_cancer_grandfather"],
+            "smoking_history": "former_smoker_quit_10_years",
+            "alcohol_use": "social"
         },
-        "lab_values": {
-            "creatinine_mg_dl": 1.1,
-            "total_bilirubin_mg_dl": 0.8,
-            "alt_u_l": 45,
-            "hemoglobin_g_dl": 12.5,
-            "platelet_count": 280000
-        },
-        "prior_treatments": [],
-        "family_history": ["gastric_cancer_grandfather"],
-        "smoking_history": "former_smoker_quit_10_years",
-        "alcohol_use": "social"
-    },
-    "clinical_context": {
-        "institution": "Memorial Cancer Center",
-        "urgency": "routine",
-        "multidisciplinary_team": ["medical_oncology", "surgical_oncology", "radiation_oncology"],
-        "treatment_goals": ["curative_intent", "quality_of_life_preservation"]
+        "clinical_context": {
+            "institution": "Memorial Cancer Center",
+            "urgency": "routine",
+            "multidisciplinary_team": ["medical_oncology", "surgical_oncology", "radiation_oncology"],
+            "treatment_goals": ["curative_intent", "quality_of_life_preservation"]
+        }
     }
-}
+
+
+def test_clinical_workflow(clinical_test_case):
+    assert clinical_test_case["age"] == 65
+    assert clinical_test_case["clinical_parameters"]["tumor_stage"] == "T3N1M0"
+    # Add more assertions to validate the clinical workflow
+
 
 class ClinicalWorkflowValidator:
     """Validates the complete clinical workflow"""

@@ -10,6 +10,7 @@ import json
 import sys
 import os
 from pathlib import Path
+import pytest
 
 # Add project root to Python path
 project_root = Path(__file__).parent
@@ -111,8 +112,7 @@ class ADCITestSuite:
             
             if response.status_code == 200:
                 result = response.json()
-                self.auth_token = result["access_token"]
-                print("✅ User login passed")
+                self.auth_token = result["access_token
                 return True
             else:
                 print(f"❌ User login failed: {response.status_code}")
