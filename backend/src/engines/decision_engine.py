@@ -13,6 +13,7 @@ import smtplib
 from email.mime.text import MIMEText
 from graphviz import Digraph
 
+from .plugins.plugin_interface import PluginInterface
 from .adci_engine import ADCIEngine
 from .gastrectomy_engine import GastrectomyEngine
 from .flot_engine import FLOTEngine
@@ -349,83 +350,35 @@ class DecisionEngine(ABC):
         return qol_metrics
 
 class DecisionEngineRegistry:
-    """Registry for managing decision engines"""
-    
+    """Central registry for all clinical decision engines"""
+
     def __init__(self):
-        self._engines: Dict[str, Type[DecisionEngine]] = {}
-        self._register_default_engines()
-    
-    def _register_default_engines(self):
-        """Register default engines"""
-        self.register("adci", ADCIEngine)
-        self.register("gastrectomy", GastrectomyEngine)
-        self.register("flot", FLOTEngine)
-    
-    def register(self, name: str, engine_class: Type[DecisionEngine]):
-        """Register a decision engine"""
-        self._engines[name] = engine_class
-    
-    def get_engine(self, name: str) -> DecisionEngine:
-        """Get an engine instance by name"""
-        if name not in self._engines:
-            raise ValueError(f"Unknown engine: {name}")
-        
-        return self._engines[name]()
-    
-    def list_engines(self) -> Dict[str, Dict[str, Any]]:
-        """List all available engines with metadata"""
-        engines_info = {}
-        
-        for name, engine_class in self._engines.items():
-            # Get engine instance for metadata
-            engine = engine_class()
-            
-            engines_info[name] = {
-                "name": name,
-                "engine_name": getattr(engine, "engine_name", name),
-                "engine_version": getattr(engine, "engine_version", "unknown"),
-                "evidence_base": getattr(engine, "evidence_base", "unknown"),
-                "description": self._get_engine_description(name)
-            }
-        
-        return engines_info
-    
-    def _get_engine_description(self, name: str) -> str:
-        """Get engine description"""
-        descriptions = {
-            "adci": "Adaptive Decision Confidence Index for treatment recommendations with uncertainty quantification",
-            "gastrectomy": "Surgical approach and technique recommendations for gastric cancer resection",
-            "flot": "Fluorouracil, Leucovorin, Oxaliplatin, and Docetaxel perioperative chemotherapy protocol"
-        }
-        return descriptions.get(name, "Clinical decision support engine")
-    
-    def update_protocol(self, name: str, protocol_data: Dict[str, Any]):
-        """Update the protocol for a specific engine dynamically."""
-        if name not in self._engines:
-            raise ValueError(f"Engine {name} not found in registry")
+        self.engines = {}
+        self._register_engines()
 
-        engine_instance = self.get_engine(name)
-        if hasattr(engine_instance, 'update_protocol'):
-            engine_instance.update_protocol(protocol_data)
-        else:
-            raise NotImplementedError(f"Engine {name} does not support dynamic protocol updates")
+    def _register_engines(self):
+        """Register all available decision engines"""
+        for engine_cls in [ADCIEngine, GastrectomyEngine, FLOTEngine]:
+            engine_instance = engine_cls()
+            self.engines[engine_instance.engine_name] = engine_instance
 
+    def get_engine(self, engine_name: str) -> PluginInterface:
+        """Retrieve a decision engine by name"""
+        if engine_name not in self.engines:
+            raise ValueError(f"Engine '{engine_name}' not found")
+        return self.engines[engine_name]
 
-# Global registry instance
-engine_registry = DecisionEngineRegistry()
-
-
-# Convenience functions
-def get_engine(name: str) -> DecisionEngine:
-    """Get an engine instance"""
-    return engine_registry.get_engine(name)
-
-
-def list_engines() -> Dict[str, Dict[str, Any]]:
-    """List all available engines"""
-    return engine_registry.list_engines()
-
-
-def register_engine(name: str, engine_class: Type[DecisionEngine]):
-    """Register a new engine"""
-    engine_registry.register(name, engine_class)
+    async def process_decision(
+        self,
+        engine_name: str,
+        patient_id: str,
+        parameters: Dict[str, Any],
+        context: Optional[Dict[str, Any]] = None,
+        include_alternatives: bool = True,
+        confidence_threshold: float = 0.75
+    ) -> Dict[str, Any]:
+        """Delegate decision processing to the appropriate engine"""
+        engine = self.get_engine(engine_name)
+        return await engine.process_decision(
+            patient_id, parameters, context, include_alternatives, confidence_threshold
+        )

@@ -285,3 +285,11 @@ For technical support: [tech-support@gastric-adci.health](mailto:tech-support@ga
    - TLS 1.3, AES-256-GCM encryption, and OPA for access control.
    - Audit trails persisted in IPFS with Merkle tree validation.
    - Full HIPAA and GDPR compliance.
+
+## 🔄 Recent Updates
+
+- Refactored decision engines to support plugin architecture.
+- Integrated ADCI framework into the core framework module.
+- Removed legacy `adci_framework` directory for better modularity.
+- Enhanced compliance with HL7 FHIR and JSON Schema standards.
+- Improved modularity and scalability for cross-domain use.
