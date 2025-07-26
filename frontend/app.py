@@ -11,6 +11,7 @@ from .islands.decision import DecisionIsland
 from .components.layout import BaseLayout
 from .components.pwa import create_pwa_manifest, create_service_worker
 from .static.js.pwa import dicom_viewer, webrtc_collab, ar_visualization, post_op_monitoring, ai_analytics, instrument_tracking
+from fastapi.responses import JSONResponse
 
 # Initialize FastHTML app
 app = FastHTML(
@@ -61,6 +62,33 @@ def instrument_tracking_page():
     """Instrument Tracking & Intraoperative Logging"""
     return instrument_tracking.render()
 
+# Add routes for new features
+@app.get("/whatsapp-integration")
+def whatsapp_integration_page():
+    """WhatsApp Communication Layer"""
+    return "<h1>WhatsApp Integration Coming Soon</h1>"
+
+@app.get("/news-carousel")
+def news_carousel_page():
+    """Landing Page News Carousel"""
+    return "<h1>News Carousel Coming Soon</h1>"
+
+@app.get("/clipboard")
+def clipboard_page():
+    """Clipboard/Web Share API Support"""
+    return "<h1>Clipboard Integration Coming Soon</h1>"
+
+@app.get("/deep-link/{case_id}")
+def deep_link(case_id: str):
+    """Deep Linking for Patient Cases"""
+    return f"<h1>Deep Link to Case {case_id} Coming Soon</h1>"
+
+# Placeholder for push notifications
+@app.get("/push-notifications")
+def push_notifications_page():
+    """Push Notifications"""
+    return "<h1>Push Notifications Coming Soon</h1>"
+
 # Updated PWA manifest and service worker routes
 @app.get("/manifest.json")
 def pwa_manifest():
@@ -72,6 +100,21 @@ def service_worker():
 
 # API Base URL configuration
 API_BASE_URL = os.getenv("API_BASE_URL", "http://localhost:8000/api/v1")
+
+@app.get("/remote-report/{report_id}")
+def remote_report_access(report_id: str):
+    """Access clinical reports remotely"""
+    # Mock report data for demonstration
+    report_data = {
+        "report_id": report_id,
+        "title": "Clinical Report",
+        "content": "This is a detailed clinical report for case ID " + report_id,
+        "timestamp": "2025-07-25T12:00:00Z",
+        "author": "Dr. Smith",
+    }
+
+    # Return the report data as JSON
+    return JSONResponse(content=report_data)
 
 if __name__ == "__main__":
     import uvicorn

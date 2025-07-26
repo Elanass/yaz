@@ -3,6 +3,8 @@
  * HIPAA/GDPR Compliant patient monitoring with offline-first capabilities
  */
 
+import { openDatabase } from '../utils/db-utils.js';
+
 class PostOpMonitoring {
     constructor() {
         this.patientData = null;
@@ -59,44 +61,38 @@ class PostOpMonitoring {
     }
     
     async setupDatabase() {
-        return new Promise((resolve, reject) => {
-            const request = window.indexedDB.open('postOpMonitoringDB', 1);
-            
-            request.onerror = (event) => {
-                console.error('IndexedDB error:', event.target.error);
-                reject(event.target.error);
-            };
-            
-            request.onupgradeneeded = (event) => {
-                const db = event.target.result;
-                
-                // Create object stores for different metrics
-                const patientStore = db.createObjectStore('patients', { keyPath: 'id' });
-                patientStore.createIndex('by_mrn', 'mrn', { unique: true });
-                
-                const metricsStore = db.createObjectStore('metrics', { keyPath: 'id', autoIncrement: true });
-                metricsStore.createIndex('by_patient_id', 'patientId', { unique: false });
-                metricsStore.createIndex('by_timestamp', 'timestamp', { unique: false });
-                metricsStore.createIndex('by_metric_type', 'metricType', { unique: false });
-                
-                const alertsStore = db.createObjectStore('alerts', { keyPath: 'id', autoIncrement: true });
-                alertsStore.createIndex('by_patient_id', 'patientId', { unique: false });
-                alertsStore.createIndex('by_timestamp', 'timestamp', { unique: false });
-                alertsStore.createIndex('by_status', 'status', { unique: false });
-                
-                // Create audit log store (HIPAA requirement)
-                const auditStore = db.createObjectStore('audit', { keyPath: 'id', autoIncrement: true });
-                auditStore.createIndex('by_user', 'userId', { unique: false });
-                auditStore.createIndex('by_action', 'action', { unique: false });
-                auditStore.createIndex('by_timestamp', 'timestamp', { unique: false });
-            };
-            
-            request.onsuccess = (event) => {
-                this.dbInstance = event.target.result;
-                console.log('IndexedDB setup successful');
-                resolve();
-            };
-        });
+        try {
+            this.dbInstance = await openDatabase('postOpMonitoringDB', 1, (db) => {
+                if (!db.objectStoreNames.contains('patients')) {
+                    const patientStore = db.createObjectStore('patients', { keyPath: 'id' });
+                    patientStore.createIndex('by_mrn', 'mrn', { unique: true });
+                }
+
+                if (!db.objectStoreNames.contains('metrics')) {
+                    const metricsStore = db.createObjectStore('metrics', { keyPath: 'id', autoIncrement: true });
+                    metricsStore.createIndex('by_patient_id', 'patientId', { unique: false });
+                    metricsStore.createIndex('by_timestamp', 'timestamp', { unique: false });
+                    metricsStore.createIndex('by_metric_type', 'metricType', { unique: false });
+                }
+
+                if (!db.objectStoreNames.contains('alerts')) {
+                    const alertsStore = db.createObjectStore('alerts', { keyPath: 'id', autoIncrement: true });
+                    alertsStore.createIndex('by_patient_id', 'patientId', { unique: false });
+                    alertsStore.createIndex('by_timestamp', 'timestamp', { unique: false });
+                    alertsStore.createIndex('by_status', 'status', { unique: false });
+                }
+
+                if (!db.objectStoreNames.contains('audit')) {
+                    const auditStore = db.createObjectStore('audit', { keyPath: 'id', autoIncrement: true });
+                    auditStore.createIndex('by_user', 'userId', { unique: false });
+                    auditStore.createIndex('by_action', 'action', { unique: false });
+                    auditStore.createIndex('by_timestamp', 'timestamp', { unique: false });
+                }
+            });
+            console.log('Database setup complete');
+        } catch (error) {
+            console.error('Error setting up database:', error);
+        }
     }
     
     requestNotificationPermission() {

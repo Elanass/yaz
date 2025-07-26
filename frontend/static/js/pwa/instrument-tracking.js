@@ -3,6 +3,8 @@
  * HIPAA/GDPR Compliant real-time instrument tracking and analytics
  */
 
+import { openDatabase } from '../utils/db-utils.js';
+
 class InstrumentTracking {
     constructor() {
         this.instruments = new Map();
@@ -63,49 +65,37 @@ class InstrumentTracking {
     }
     
     async setupDatabase() {
-        return new Promise((resolve, reject) => {
-            const request = window.indexedDB.open('instrumentTrackingDB', 1);
-            
-            request.onerror = (event) => {
-                console.error('IndexedDB error:', event.target.error);
-                reject(event.target.error);
-            };
-            
-            request.onupgradeneeded = (event) => {
-                const db = event.target.result;
-                
-                // Create object stores
-                const instrumentStore = db.createObjectStore('instruments', { keyPath: 'id' });
-                instrumentStore.createIndex('by_type', 'type', { unique: false });
-                instrumentStore.createIndex('by_status', 'status', { unique: false });
-                instrumentStore.createIndex('by_set', 'setId', { unique: false });
-                
-                const scanStore = db.createObjectStore('scans', { keyPath: 'id', autoIncrement: true });
-                scanStore.createIndex('by_instrument', 'instrumentId', { unique: false });
-                scanStore.createIndex('by_timestamp', 'timestamp', { unique: false });
-                scanStore.createIndex('by_case', 'caseId', { unique: false });
-                scanStore.createIndex('by_sync_status', 'syncStatus', { unique: false });
-                
-                const caseStore = db.createObjectStore('cases', { keyPath: 'id' });
-                caseStore.createIndex('by_date', 'date', { unique: false });
-                caseStore.createIndex('by_patient', 'patientId', { unique: false });
-                caseStore.createIndex('by_status', 'status', { unique: false });
-                
-                const setStore = db.createObjectStore('instrumentSets', { keyPath: 'id' });
-                setStore.createIndex('by_type', 'type', { unique: false });
-                
-                const auditStore = db.createObjectStore('audit', { keyPath: 'id', autoIncrement: true });
-                auditStore.createIndex('by_timestamp', 'timestamp', { unique: false });
-                auditStore.createIndex('by_action', 'action', { unique: false });
-                auditStore.createIndex('by_sync_status', 'syncStatus', { unique: false });
-            };
-            
-            request.onsuccess = (event) => {
-                this.dbInstance = event.target.result;
-                console.log('Instrument tracking database initialized');
-                resolve();
-            };
-        });
+        try {
+            this.dbInstance = await openDatabase('instrumentTrackingDB', 1, (db) => {
+                if (!db.objectStoreNames.contains('instruments')) {
+                    const instrumentStore = db.createObjectStore('instruments', { keyPath: 'id' });
+                    instrumentStore.createIndex('by_type', 'type', { unique: false });
+                    instrumentStore.createIndex('by_status', 'status', { unique: false });
+                }
+
+                if (!db.objectStoreNames.contains('cases')) {
+                    const caseStore = db.createObjectStore('cases', { keyPath: 'id' });
+                    caseStore.createIndex('by_date', 'date', { unique: false });
+                    caseStore.createIndex('by_patient', 'patientId', { unique: false });
+                    caseStore.createIndex('by_status', 'status', { unique: false });
+                }
+
+                if (!db.objectStoreNames.contains('instrumentSets')) {
+                    const setStore = db.createObjectStore('instrumentSets', { keyPath: 'id' });
+                    setStore.createIndex('by_type', 'type', { unique: false });
+                }
+
+                if (!db.objectStoreNames.contains('audit')) {
+                    const auditStore = db.createObjectStore('audit', { keyPath: 'id', autoIncrement: true });
+                    auditStore.createIndex('by_user', 'userId', { unique: false });
+                    auditStore.createIndex('by_action', 'action', { unique: false });
+                    auditStore.createIndex('by_timestamp', 'timestamp', { unique: false });
+                }
+            });
+            console.log('Database setup complete');
+        } catch (error) {
+            console.error('Error setting up database:', error);
+        }
     }
     
     async loadPreferences() {

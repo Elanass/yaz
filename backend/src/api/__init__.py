@@ -4,7 +4,7 @@ API Router configuration for Gastric ADCI Platform
 
 from fastapi import APIRouter
 from .v1 import auth, users, patients, protocols, decision_engine, evidence, admin, cohorts
-from . import assistance_bot, workflow
+from . import assistance_bot, workflow, remote_reports
 
 # Create main API router
 api_router = APIRouter()
@@ -20,6 +20,7 @@ api_router.include_router(cohorts.router, prefix="/cohorts", tags=["cohorts"])
 api_router.include_router(admin.router, prefix="/admin", tags=["admin"])
 api_router.include_router(assistance_bot.router, prefix="/assistance-bot", tags=["assistance-bot"])
 api_router.include_router(workflow.router, prefix="/workflow", tags=["workflow"])
+api_router.include_router(remote_reports.router, prefix="/remote-reports", tags=["remote-reports"])
 
 # API version info
 @api_router.get("/", tags=["info"])
