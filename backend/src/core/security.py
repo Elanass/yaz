@@ -13,6 +13,10 @@ from starlette.responses import Response as StarletteResponse
 from passlib.context import CryptContext
 from jose import JWTError, jwt
 import bcrypt
+from fastapi.middleware.trustedhost import TrustedHostMiddleware
+from slowapi import Limiter, _rate_limit_exceeded_handler
+from slowapi.middleware import SlowAPIMiddleware
+from slowapi.util import get_remote_address
 
 from .config import get_settings
 
@@ -267,3 +271,42 @@ async def get_current_user(credentials: HTTPAuthorizationCredentials = security)
             status_code=status.HTTP_401_UNAUTHORIZED,
             detail="Could not validate credentials"
         )
+
+
+# Initialize rate limiter
+limiter = Limiter(key_func=get_remote_address)
+
+# Add rate limiting middleware
+class BotDetectionMiddleware(BaseHTTPMiddleware):
+    """Middleware for detecting and blocking bots."""
+    async def dispatch(self, request: Request, call_next):
+        user_agent = request.headers.get("User-Agent", "")
+        if "bot" in user_agent.lower():
+            return Response(content="Bots are not allowed", status_code=status.HTTP_403_FORBIDDEN)
+        return await call_next(request)
+
+class RateLimitingMiddleware(BaseHTTPMiddleware):
+    """Middleware for rate limiting."""
+    async def dispatch(self, request: Request, call_next):
+        try:
+            limiter.limit("10/minute")(request)
+        except Exception:
+            return Response(content="Rate limit exceeded", status_code=status.HTTP_429_TOO_MANY_REQUESTS)
+        return await call_next(request)
+
+class RASPMiddleware(BaseHTTPMiddleware):
+    """Placeholder for Runtime Application Self-Protection (RASP)."""
+    async def dispatch(self, request: Request, call_next):
+        # Placeholder for RASP logic
+        response = await call_next(request)
+        return response
+
+# Update middleware stack
+middlewares = [
+    TrustedHostMiddleware(allowed_hosts=["example.com", "*.example.com"]),
+    SlowAPIMiddleware(limiter=limiter),
+    BotDetectionMiddleware,
+    RateLimitingMiddleware,
+    RASPMiddleware,
+    SecurityMiddleware,
+]

@@ -5,6 +5,7 @@ Integrates HTMX for reactive UI and Gun.js for distributed state
 
 import os
 import json
+import warnings
 from fasthtml.common import *
 from .islands.protocols import ProtocolsIsland
 from .islands.decision import DecisionIsland
@@ -12,6 +13,11 @@ from .components.layout import BaseLayout
 from .components.pwa import create_pwa_manifest, create_service_worker
 from .static.js.pwa import dicom_viewer, webrtc_collab, ar_visualization, post_op_monitoring, ai_analytics, instrument_tracking
 from fastapi.responses import JSONResponse
+from fasthtml import html, include, Template
+
+# Suppress unnecessary warnings
+warnings.filterwarnings("ignore", category=DeprecationWarning)
+warnings.filterwarnings("ignore", category=UserWarning)
 
 # Initialize FastHTML app
 app = FastHTML(
@@ -116,6 +122,38 @@ def remote_report_access(report_id: str):
     # Return the report data as JSON
     return JSONResponse(content=report_data)
 
+def render_app():
+    return html(
+        """
+        <!DOCTYPE html>
+        <html lang="en">
+        <head>
+            <meta charset="UTF-8" />
+            <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+            <title>Gastric ADCI Clinical Hub</title>
+            <link rel="stylesheet" href="/static/css/app.css" />
+            <script src="/static/js/htmx.min.js"></script>
+        </head>
+        <body>
+            <div class="sidebar">
+                <ul class="nav">
+                    <li><a href="#" hx-get="/cases" hx-target="#content" hx-swap="innerHTML">Cases</a></li>
+                    <li><a href="#" hx-get="/images" hx-target="#content" hx-swap="innerHTML">Images</a></li>
+                    <li><a href="#" hx-get="/videos" hx-target="#content" hx-swap="innerHTML">Videos</a></li>
+                    <li><a href="#" hx-get="/tools" hx-target="#content" hx-swap="innerHTML">Tools</a></li>
+                </ul>
+            </div>
+            <div id="content" class="main-content">
+                <!-- initial load: Cases stream -->
+                <div hx-get="/cases" hx-trigger="load" hx-swap="innerHTML">
+                    Loading cases...
+                </div>
+            </div>
+        </body>
+        </html>
+        """
+    )
+
 if __name__ == "__main__":
     import uvicorn
-    uvicorn.run(app, host="0.0.0.0", port=8001)
+    uvicorn.run(app, host="0.0.0.0", port=8001, log_level="warning")

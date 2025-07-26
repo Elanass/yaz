@@ -3,23 +3,72 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Gastric ADCI Platform</title>
-    <link rel="stylesheet" href="/static/css/layout.css">
+    <title>Surgify - Surgical Case Viewer</title>
+    <link rel="stylesheet" href="/static/css/tailwind.css">
+    <link rel="stylesheet" href="/static/css/dark-mode.css">
 </head>
-<body>
-    <div id="vertical-scroll">
-        <h1>Clinical Categories</h1>
-        <p>Select a category to view details.</p>
-    </div>
-    <div id="horizontal-scroll">
-        <div class="card">Patient Case 1</div>
-        <div class="card">Patient Case 2</div>
-        <div class="card">Protocol 1</div>
-        <div class="card">Protocol 2</div>
-    </div>
-    <input type="text" id="search-input" placeholder="Search..." style="margin: 1rem; padding: 0.5rem; width: calc(100% - 2rem);">
-    <div id="results-container" style="margin: 1rem; padding: 1rem; border: 1px solid #dee2e6; border-radius: 8px; background-color: #f8f9fa;"></div>
-    <script src="/static/js/search.js" defer></script>
-    <script src="/static/js/visual_output.js" defer></script>
+<body class="bg-gray-100 dark:bg-gray-900 text-gray-800 dark:text-gray-200">
+    <!-- Top Bar -->
+    <header class="flex items-center justify-between p-4 bg-white dark:bg-gray-800 shadow-md">
+        <h1 class="text-xl font-bold">Surgify</h1>
+        <div class="flex items-center">
+            <input type="text" placeholder="Search..." class="border rounded-lg px-4 py-2 text-sm">
+            <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 ml-2 text-gray-500" viewBox="0 0 20 20" fill="currentColor">
+                <path fill-rule="evenodd" d="M9 3a6 6 0 100 12 6 6 0 000-12zm0 2a4 4 0 110 8 4 4 0 010-8zm8 10a1 1 0 00-1.707-.707l-3.586 3.586a1 1 0 001.414 1.414l3.586-3.586A1 1 0 0017 15z" clip-rule="evenodd" />
+            </svg>
+        </div>
+    </header>
+
+    <!-- Filter Buttons -->
+    <nav class="flex justify-center space-x-4 p-4 bg-gray-50 dark:bg-gray-700">
+        <button class="px-4 py-2 bg-blue-500 text-white rounded-lg">Series</button>
+        <button class="px-4 py-2 bg-blue-500 text-white rounded-lg">Journal</button>
+        <button class="px-4 py-2 bg-blue-500 text-white rounded-lg">Event</button>
+        <button class="px-4 py-2 bg-blue-500 text-white rounded-lg">New</button>
+    </nav>
+
+    <!-- Scrollable Case Cards -->
+    <main class="p-4">
+        <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
+            <div class="bg-white dark:bg-gray-800 rounded-lg shadow-md overflow-hidden">
+                <img src="/static/images/case1.jpg" alt="Case Image" class="w-full h-32 object-cover">
+                <div class="p-4">
+                    <h2 class="text-lg font-bold">Case Title 1</h2>
+                    <p class="text-sm text-gray-500">Dr. John Doe</p>
+                </div>
+            </div>
+            <!-- Placeholder for additional cards -->
+        </div>
+    </main>
+
+    <!-- Fixed Tab Bar -->
+    <footer class="fixed bottom-0 w-full bg-white dark:bg-gray-800 shadow-md">
+        <div class="flex justify-around p-4">
+            <button class="flex flex-col items-center">
+                <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6 text-gray-500" viewBox="0 0 20 20" fill="currentColor">
+                    <path d="M10 3a1 1 0 011 1v12a1 1 0 01-2 0V4a1 1 0 011-1z" />
+                    <path d="M4 9a1 1 0 011 1v4a1 1 0 01-2 0v-4a1 1 0 011-1z" />
+                    <path d="M16 9a1 1 0 011 1v4a1 1 0 01-2 0v-4a1 1 0 011-1z" />
+                </svg>
+                <span class="text-sm">Workstation</span>
+            </button>
+            <button class="flex flex-col items-center">
+                <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6 text-gray-500" viewBox="0 0 20 20" fill="currentColor">
+                    <path d="M10 3a1 1 0 011 1v12a1 1 0 01-2 0V4a1 1 0 011-1z" />
+                    <path d="M4 9a1 1 0 011 1v4a1 1 0 01-2 0v-4a1 1 0 011-1z" />
+                    <path d="M16 9a1 1 0 011 1v4a1 1 0 01-2 0v-4a1 1 0 011-1z" />
+                </svg>
+                <span class="text-sm">Add Case</span>
+            </button>
+            <button class="flex flex-col items-center">
+                <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6 text-gray-500" viewBox="0 0 20 20" fill="currentColor">
+                    <path d="M10 3a1 1 0 011 1v12a1 1 0 01-2 0V4a1 1 0 011-1z" />
+                    <path d="M4 9a1 1 0 011 1v4a1 1 0 01-2 0v-4a1 1 0 011-1z" />
+                    <path d="M16 9a1 1 0 011 1v4a1 1 0 01-2 0v-4a1 1 0 011-1z" />
+                </svg>
+                <span class="text-sm">Marketplace</span>
+            </button>
+        </div>
+    </footer>
 </body>
 </html>

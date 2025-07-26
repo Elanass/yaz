@@ -1,0 +1,73 @@
+{
+  "plugin_id": "adci_gastric_diagnostic",
+  "name": "ADCI Gastric Adenocarcinoma Diagnostic Module",
+  "version": "3.0.0",
+  "domain": "gastric_oncology",
+  "module_type": "diagnostic",
+  "author": "Gastric ADCI Platform Team",
+  "description": "Advanced diagnostic classification module for gastric adenocarcinoma subtypes using WHO, Lauren, and TCGA molecular classifications with high-confidence decision support.",
+  "dependencies": [],
+  "config_schema": {
+    "type": "object",
+    "properties": {
+      "confidence_threshold": {
+        "type": "number",
+        "default": 0.75,
+        "minimum": 0.0,
+        "maximum": 1.0,
+        "description": "Minimum confidence threshold for diagnostic recommendations"
+      },
+      "enable_molecular_subtyping": {
+        "type": "boolean",
+        "default": true,
+        "description": "Enable TCGA molecular subtype classification"
+      },
+      "ihc_required": {
+        "type": "boolean",
+        "default": false,
+        "description": "Require immunohistochemistry data for classification"
+      },
+      "cache_ttl_hours": {
+        "type": "integer",
+        "default": 12,
+        "minimum": 1,
+        "maximum": 168,
+        "description": "Cache time-to-live in hours"
+      }
+    }
+  },
+  "entry_point": "modules.adci_diagnostic",
+  "min_framework_version": "3.0.0",
+  "tags": [
+    "oncology",
+    "gastric",
+    "pathology",
+    "molecular_diagnostics",
+    "WHO_classification",
+    "Lauren_classification",
+    "TCGA_subtypes",
+    "biomarkers",
+    "precision_medicine"
+  ],
+  "capabilities": {
+    "input_formats": ["histology", "immunohistochemistry", "molecular_testing"],
+    "output_types": ["subtype_classification", "confidence_intervals", "treatment_implications"],
+    "classification_systems": ["WHO_2019", "Lauren", "TCGA_molecular"],
+    "biomarker_support": ["HER2", "MSI", "EBV", "PD-L1"],
+    "languages": ["en"],
+    "compliance": ["HIPAA", "GDPR"]
+  },
+  "performance_targets": {
+    "response_time_ms": 150,
+    "cache_hit_rate": 0.92,
+    "accuracy": 0.95,
+    "availability": 0.999
+  },
+  "integration": {
+    "compatible_domains": ["gastric_surgery", "medical_oncology", "pathology"],
+    "data_sharing": {
+      "exports": ["diagnostic_result", "confidence_metrics", "biomarker_status"],
+      "imports": ["clinical_data", "imaging_results"]
+    }
+  }
+}

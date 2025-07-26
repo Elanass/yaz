@@ -1,0 +1,92 @@
+{
+  "plugin_id": "gastrectomy_surgical",
+  "name": "Gastrectomy Surgical Decision Module",
+  "version": "3.0.0",
+  "domain": "gastric_surgery",
+  "module_type": "procedural",
+  "author": "Gastric ADCI Platform Team",
+  "description": "Evidence-based surgical decision support for gastrectomy procedures including approach selection, resection planning, and outcome prediction based on JGCA/IGCA guidelines.",
+  "dependencies": [],
+  "config_schema": {
+    "type": "object",
+    "properties": {
+      "institutional_capability": {
+        "type": "string",
+        "enum": ["basic", "standard", "advanced", "expert"],
+        "default": "standard",
+        "description": "Institutional surgical capability level"
+      },
+      "preferred_approach": {
+        "type": "string",
+        "enum": ["open", "laparoscopic", "robotic", "adaptive"],
+        "default": "adaptive",
+        "description": "Preferred surgical approach when multiple options available"
+      },
+      "risk_tolerance": {
+        "type": "string",
+        "enum": ["conservative", "moderate", "aggressive"],
+        "default": "moderate",
+        "description": "Risk tolerance for surgical recommendations"
+      },
+      "enable_alternative_recommendations": {
+        "type": "boolean",
+        "default": true,
+        "description": "Generate alternative surgical approaches"
+      },
+      "cache_ttl_hours": {
+        "type": "integer",
+        "default": 6,
+        "minimum": 1,
+        "maximum": 48,
+        "description": "Cache time-to-live in hours"
+      }
+    }
+  },
+  "entry_point": "modules.gastrectomy_surgical",
+  "min_framework_version": "3.0.0",
+  "tags": [
+    "surgery",
+    "gastric",
+    "oncologic_surgery",
+    "laparoscopy",
+    "robotic_surgery",
+    "perioperative_care",
+    "ERAS_protocol",
+    "surgical_planning",
+    "quality_metrics"
+  ],
+  "capabilities": {
+    "input_formats": ["tumor_characteristics", "patient_factors", "institutional_factors"],
+    "output_types": ["surgical_plan", "risk_assessment", "outcome_prediction"],
+    "surgical_approaches": ["open", "laparoscopic", "robotic"],
+    "resection_types": ["subtotal", "total"],
+    "lymph_dissections": ["D1", "D1+", "D2"],
+    "reconstructions": ["billroth_i", "billroth_ii", "roux_en_y", "jejunal_pouch"],
+    "guidelines": ["JGCA_2024", "IGCA", "EORTC"],
+    "languages": ["en"],
+    "compliance": ["HIPAA", "GDPR"]
+  },
+  "performance_targets": {
+    "response_time_ms": 200,
+    "cache_hit_rate": 0.90,
+    "guideline_compliance": 0.98,
+    "availability": 0.999
+  },
+  "integration": {
+    "compatible_domains": ["gastric_oncology", "anesthesiology", "pathology", "medical_oncology"],
+    "data_sharing": {
+      "exports": ["surgical_plan", "risk_assessment", "quality_metrics"],
+      "imports": ["diagnostic_result", "staging_information", "patient_fitness"]
+    },
+    "workflow_integration": {
+      "follows": ["diagnostic_modules"],
+      "precedes": ["perioperative_modules"],
+      "parallel": ["anesthesia_planning"]
+    }
+  },
+  "quality_metrics": {
+    "clinical_indicators": ["R0_resection_rate", "morbidity_rate", "mortality_rate"],
+    "process_indicators": ["operative_time", "blood_loss", "length_of_stay"],
+    "outcome_indicators": ["5_year_survival", "quality_of_life", "functional_outcomes"]
+  }
+}
