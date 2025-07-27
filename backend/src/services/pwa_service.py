@@ -344,21 +344,15 @@ class PWAService:
         await asyncio.sleep(1)  # Simulate processing
         return True
 
-    async def _sync_audit_logs(
-        self, db: AsyncSession, user_id: UUID, job_data: Dict[str, Any]
+    async def _sync_job(
+        self, db: AsyncSession, user_id: UUID, job_data: Dict[str, Any], job_type: str
     ) -> bool:
-        """Sync audit logs in background."""
-        logger.info(f"Syncing audit logs for user {user_id}")
+        """Generic background sync job."""
+        logger.info(f"Syncing {job_type} for user {user_id}")
         await asyncio.sleep(1)  # Simulate processing
         return True
 
-    async def _update_clinical_protocols(
-        self, db: AsyncSession, user_id: UUID, job_data: Dict[str, Any]
-    ) -> bool:
-        """Update clinical protocols in background."""
-        logger.info(f"Updating clinical protocols for user {user_id}")
-        await asyncio.sleep(1)  # Simulate processing
-        return True
+    # ...existing code...
 
     def _hash_endpoint(self, endpoint: str) -> str:
         """Create a hash of the endpoint for duplicate detection."""

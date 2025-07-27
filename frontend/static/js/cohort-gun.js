@@ -300,6 +300,27 @@ window.CohortGun = {
     },
     
     /**
+     * Generic sync pending data utility
+     */
+    async genericSync(storeName, apiEndpoint) {
+      const items = await this.getStoreItems(storeName);
+      for (const item of items) {
+        try {
+          const res = await fetch(apiEndpoint, {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify(item)
+          });
+          if (res.ok) {
+            this.clearStoreItem(storeName, item.id);
+          }
+        } catch (err) {
+          console.error(`Failed to sync ${storeName}:`, err);
+        }
+      }
+    },
+    
+    /**
      * Update cohort statistics
      */
     async updateCohortStats(cohortId) {

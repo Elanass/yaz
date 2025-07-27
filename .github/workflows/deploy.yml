@@ -1,0 +1,56 @@
+name: CI/CD Pipeline
+
+on:
+  push:
+    branches:
+      - main
+
+jobs:
+  build-and-push:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v3
+
+      - name: Set up Docker Buildx
+        uses: docker/setup-buildx-action@v2
+
+      - name: Log in to DockerHub
+        uses: docker/login-action@v2
+        with:
+          username: ${{ secrets.DOCKERHUB_USERNAME }}
+          password: ${{ secrets.DOCKERHUB_TOKEN }}
+
+      - name: Build & push Backend image
+        uses: docker/build-push-action@v4
+        with:
+          context: ./backend
+          file: ./backend/Dockerfile
+          push: true
+          tags: |
+            ${{ secrets.DOCKERHUB_USERNAME }}/gastric-adci-backend:latest
+            ${{ secrets.DOCKERHUB_USERNAME }}/gastric-adci-backend:${{ github.sha }}
+
+      - name: Build & push Frontend image
+        uses: docker/build-push-action@v4
+        with:
+          context: ./frontend
+          file: ./frontend/Dockerfile
+          push: true
+          tags: |
+            ${{ secrets.DOCKERHUB_USERNAME }}/gastric-adci-frontend:latest
+            ${{ secrets.DOCKERHUB_USERNAME }}/gastric-adci-frontend:${{ github.sha }}
+
+  deploy:
+    needs: build-and-push
+    runs-on: ubuntu-latest
+    steps:
+      - name: Deploy to Dokku
+        uses: dokku/github-action@v0.5.5
+        with:
+          remote-url: ${{ secrets.DOKKU_REMOTE_URL }}
+          app-name: gastric-adci-platform
+
+      - name: Confirm deployment
+        run: |
+          echo "Deployment triggered on Dokku at ${{ secrets.DOKKU_REMOTE_URL }} for app 'gastric-adci-platform'."

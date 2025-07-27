@@ -1,38 +1,22 @@
 # Dockerfile for Gastric ADCI Platform
-FROM python:3.11-slim
+FROM python:3.11-slim AS base
 
-# Set environment variables
-ENV PYTHONUNBUFFERED=1
-ENV PYTHONDONTWRITEBYTECODE=1
-ENV PYTHONPATH=/app
-ENV PYTHONWARNINGS="ignore"
-
-# Set work directory
+# Set working directory
 WORKDIR /app
 
-# Install system dependencies
-RUN apt-get update && apt-get install -y \
-    gcc \
-    g++ \
-    libpq-dev \
-    && rm -rf /var/lib/apt/lists/*
-
-# Copy requirements and install Python dependencies
+# Install dependencies
 COPY requirements.txt .
 RUN pip install --no-cache-dir -r requirements.txt
 
 # Copy application code
 COPY . .
 
-# Create necessary directories
-RUN mkdir -p uploads/patients logs frontend/static/icons
+# Set environment variables for scalability
+ENV PYTHONUNBUFFERED=1
+ENV WORKERS=4
 
-# Expose ports
-EXPOSE 8000 8001
+# Expose application port
+EXPOSE 8000
 
-# Health check
-HEALTHCHECK --interval=30s --timeout=30s --start-period=5s --retries=3 \
-  CMD curl -f http://localhost:8000/health || exit 1
-
-# Default command
-CMD ["./start_platform.sh"]
+# Start application
+CMD ["gunicorn", "main:app", "--workers", "${WORKERS}", "--bind", "0.0.0.0:8000"]

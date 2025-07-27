@@ -90,5 +90,48 @@ The Gastric ADCI Platform is a healthcare-grade Progressive Web App (PWA) design
 ## Contributing
 We welcome contributions! Please read our [Contributing Guide](CONTRIBUTING.md) for details on our code of conduct and the process for submitting pull requests.
 
+## Multi-Cloud & Self-Host Deployment
+
+Use the following options to deploy the Gastric ADCI PWA on any VM or PaaS (Oracle Free Tier, Hostinger VPS, self-hosted servers, or multi-cloud setups) with Docker, Dokku, or Coolify.
+
+### 1. Docker Compose on Your VM
+1. SSH into your VM (Oracle Cloud VM, Hostinger VPS, etc.).
+2. Clone the repo and switch to the main branch:
+   ```bash
+   git clone https://github.com/Elanass/yaz.git
+   cd yaz
+   git checkout main
+   ```
+3. Copy the production environment file:
+   ```bash
+   cp infra/config/production.env .env
+   ```
+4. Build and start services in detached mode:
+   ```bash
+   docker-compose up --build -d
+   ```
+5. Verify:
+   - Frontend: http://<VM_PUBLIC_IP>
+   - Backend API: http://<VM_PUBLIC_IP>:8000
+
+### 2. Dokku Deployment
+1. Add your Dokku remote and set as a Git remote:
+   ```bash
+   git remote add dokku dokku@<YOUR_DOKKU_HOST>:gastric-adci-platform
+   ```
+2. Push to Dokku:
+   ```bash
+   git push dokku main
+   ```
+3. GitHub Actions pipeline in `.github/workflows/deploy.yml` will also auto-deploy on each push to `main`.
+
+### 3. Coolify Deployment
+1. Create a new app in Coolify and link this GitHub repo.
+2. Add environment variables from `infra/config/production.env`.
+3. Configure build steps:
+   - **Backend**: `docker build -t backend ./backend && docker run --env-file production.env backend`
+   - **Frontend**: `docker build -t frontend ./frontend && docker run -p 80:80 frontend`
+4. Deploy and monitor via Coolify dashboard.
+
 ## License
 This project is licensed under the MIT License. See the [LICENSE](LICENSE) file for details.

@@ -229,8 +229,13 @@ function hideLoadingState(element) {
  * Offline Detection and Handling
  */
 function initializeOfflineDetection() {
-    window.addEventListener('online', handleOnline);
-    window.addEventListener('offline', handleOffline);
+    window.addEventListener('online', () => {
+        window.GastricADCI.Utilities.showNotification('You are back online.', 'success');
+    });
+
+    window.addEventListener('offline', () => {
+        window.GastricADCI.Utilities.showNotification('You are offline. Some features may be limited.', 'warning');
+    });
     
     // Check initial connection state
     updateConnectionState();
@@ -307,42 +312,60 @@ function storeOfflineRequest(requestData) {
     };
 }
 
-function syncOfflineData() {
-    if (!('indexedDB' in window)) return;
-    
-    const request = indexedDB.open('GastricADCI_OfflineDB', 1);
-    
-    request.onsuccess = function(event) {
-        const db = event.target.result;
-        const transaction = db.transaction(['offlineRequests'], 'readonly');
-        const store = transaction.objectStore('offlineRequests');
-        
-        const getAllRequest = store.getAll();
-        
-        getAllRequest.onsuccess = function() {
-            const requests = getAllRequest.result;
-            
-            requests.forEach(async (requestData) => {
-                try {
-                    const response = await fetch(requestData.url, {
-                        method: requestData.method,
-                        headers: requestData.headers,
-                        body: requestData.body
-                    });
-                    
-                    if (response.ok) {
-                        // Remove successful request from offline storage
-                        const deleteTransaction = db.transaction(['offlineRequests'], 'readwrite');
-                        const deleteStore = deleteTransaction.objectStore('offlineRequests');
-                        deleteStore.delete(requestData.id);
+window.GastricADCI.Utilities = {
+    /**
+     * Generic offline sync handler
+     */
+    async syncOfflineData(dbName, storeName, apiEndpoint) {
+        const request = indexedDB.open(dbName, 1);
+
+        request.onsuccess = function(event) {
+            const db = event.target.result;
+            const transaction = db.transaction([storeName], 'readonly');
+            const store = transaction.objectStore(storeName);
+
+            const getAllRequest = store.getAll();
+
+            getAllRequest.onsuccess = async function() {
+                const items = getAllRequest.result;
+
+                for (const item of items) {
+                    try {
+                        const response = await fetch(apiEndpoint, {
+                            method: 'POST',
+                            headers: {
+                                'Content-Type': 'application/json',
+                            },
+                            body: JSON.stringify(item),
+                        });
+
+                        if (response.ok) {
+                            const deleteTransaction = db.transaction([storeName], 'readwrite');
+                            const deleteStore = deleteTransaction.objectStore(storeName);
+                            deleteStore.delete(item.id);
+                        }
+                    } catch (error) {
+                        console.error('Failed to sync offline data:', error);
                     }
-                } catch (error) {
-                    console.error('Failed to sync offline request:', error);
                 }
-            });
+            };
         };
-    };
-}
+    },
+
+    /**
+     * Notification utility
+     */
+    showNotification(message, type = 'info') {
+        const notificationElement = document.createElement('div');
+        notificationElement.className = `notification ${type}`;
+        notificationElement.innerText = message;
+        document.body.appendChild(notificationElement);
+
+        setTimeout(() => {
+            notificationElement.remove();
+        }, 5000);
+    },
+};
 
 /**
  * Notification System

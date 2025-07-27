@@ -55,13 +55,9 @@ class ClinicalQualityService:
             if not decision:
                 raise HTTPException(status_code=404, detail="Decision not found")
 
-            # Generate feature importance analysis
+            # Generate explanation components
             feature_importance = await self._analyze_feature_importance(db, decision)
-            
-            # Generate clinical reasoning
             clinical_reasoning = await self._generate_clinical_reasoning(db, decision)
-            
-            # Generate natural language explanation
             natural_explanation = await self._generate_natural_explanation(
                 decision, feature_importance, explanation_level
             )
@@ -520,3 +516,26 @@ the strength of evidence and consistency with established clinical guidelines.
                 "contraindications": ["M1", "poor_performance_status", "severe_comorbidities"],
             }
         }
+
+    async def _sync_data(self, db: AsyncSession, user_id: UUID, job_data: Dict[str, Any], sync_type: str) -> bool:
+        """Generic sync handler for patient data, audit logs, etc."""
+        logger.info(f"Syncing {sync_type} for user {user_id}")
+        await asyncio.sleep(1)  # Simulate processing
+        return True
+
+    async def _generate_explanation(self, db: AsyncSession, decision: DecisionResult, explanation_level: str) -> DecisionExplanation:
+        """Consolidated explanation generation logic."""
+        feature_importance = await self._analyze_feature_importance(db, decision)
+        clinical_reasoning = await self._generate_clinical_reasoning(db, decision)
+        natural_explanation = await self._generate_natural_explanation(decision, feature_importance, explanation_level)
+        return DecisionExplanation(
+            decision_id=decision.id,
+            natural_explanation=natural_explanation,
+            feature_importance=feature_importance,
+            clinical_reasoning=clinical_reasoning,
+            confidence_metrics=await self._calculate_confidence_metrics(db, decision),
+            similar_cases=await self._find_similar_cases(db, decision),
+            evidence_quality=await self._assess_evidence_quality(db, decision),
+            guideline_alignment=await self._check_guideline_alignment(db, decision),
+            uncertainty_sources=await self._identify_uncertainty_sources(db, decision),
+        )
