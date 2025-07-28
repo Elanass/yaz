@@ -1,131 +1,169 @@
 # Gastric ADCI Platform
 
-A healthcare-grade Progressive Web App (PWA) for gastric oncology-surgery decision support using the Adaptive Decision Confidence Index (ADCI) framework.
-
 ## Overview
+The Gastric ADCI (Adaptive Decision Confidence Index) Platform provides clinicians with evidence-based decision support for gastric cancer treatment planning. The platform uses advanced statistical analysis, precision medicine algorithms, and evidence synthesis to provide personalized treatment recommendations with confidence intervals. Previously based on Markov chain simulations, the platform now employs more robust statistical methods including Cox regression, logistic regression, and Random Forest models for improved prediction accuracy and clinical interpretability.
 
-The Gastric ADCI Platform provides clinicians with evidence-based decision support for gastric cancer treatment planning. The platform uses advanced Markov modeling, precision medicine algorithms, and evidence synthesis to provide personalized treatment recommendations with confidence intervals.
+## Features
 
-## Key Features
+### Core Features
+- **Adaptive Decision Confidence Index (ADCI)**: Structured decision framework with confidence scoring
+- **Statistical Analysis**: Both retrospective (Cox & Logistic Regression) and prospective (Random Forest, RL) models
+- **Evidence Synthesis**: Automated literature review and protocol integration
+- **HIPAA/GDPR Compliant**: End-to-end encryption and comprehensive audit logging
 
-- **Data Ingestion**: Support for retrospective and prospective clinical data
-- **Precision Decision Engine**: Personalized treatment recommendations with confidence metrics
-- **Markov Chain Simulation**: Advanced disease progression modeling
-- **Evidence Synthesis**: Integration with clinical guidelines and research
-- **Clinical Workflow Integration**: Seamless integration with clinical workflows
-- **HIPAA & GDPR Compliance**: Built-in security and audit features
-- **Responsive UI**: Offline-capable Progressive Web App
-
-## Technology Stack
-
-- **Backend**: FastAPI, PostgreSQL, ElectricsQL, IPFS
-- **Frontend**: FastHTML, HTMX, Gun.js for reactive state
-- **Deployment**: Google Cloud Run/GKE, Docker
-- **Compliance**: HIPAA, GDPR with audit trails
-
-## Architecture
-
-The platform follows a modular architecture with the following components:
-
-- **Core**: Base configuration, shared models, and utilities
-- **Features**: Modular services for specific domain functionality
-  - Data Ingestion Pipeline
-  - Markov Simulation Engine
-  - Precision Decision Engine
-  - Evidence Synthesis Engine
-  - Report Generation Service
-- **API**: RESTful endpoints with proper validation and documentation
-- **Web**: HTMX-powered user interface components
-  - Clinical Platform Components
-  - Decision Support Interface
-  - Evidence Visualization Tools
+### Key Components
+- **Decision Support Engine**: Evidence-based gastric cancer treatment recommendations
+- **Precision Medicine Framework**: Patient-specific risk stratification
+- **Statistical Analysis Module**: Advanced analytics for outcome prediction
+- **Progressive Web App**: Healthcare-grade, offline-capable interface
 
 ## Getting Started
 
 ### Prerequisites
-
 - Python 3.10+
-- Docker and Docker Compose
-- Node.js 18+ (for frontend build tools)
+- Docker (for containerized deployment)
+- PostgreSQL 14+ (production) or SQLite (development)
 
 ### Installation
 
-1. Clone the repository:
-   ```bash
-   git clone https://github.com/yourusername/gastric-adci-platform.git
-   cd gastric-adci-platform
-   ```
-
-2. Set up environment variables:
-   ```bash
-   cp .env.example .env
-   # Edit .env with your configuration
-   ```
-
-3. Build and start the services:
-   ```bash
-   docker-compose up -d
-   ```
-
-4. Access the application:
-   ```
-   http://localhost:8000
-   ```
-
-## Development
-
-### Running Tests
-
+#### Local Development
 ```bash
-# Run unit tests
-pytest tests/unit
+# Clone the repository
+git clone https://github.com/yourusername/gastric-adci-platform.git
+cd gastric-adci-platform
 
-# Run integration tests
-pytest tests/integration
+# Create and activate virtual environment
+python -m venv venv
+source venv/bin/activate  # On Windows: venv\Scripts\activate
 
-# Run with coverage
-pytest --cov=. tests/
+# Install dependencies
+pip install -r requirements.txt
+
+# Run the application
+python main.py
 ```
 
-### Code Structure
-
-```
-├── api/                 # API endpoints
-│   └── v1/              # API version 1
-├── core/                # Core functionality
-│   ├── config/          # Configuration
-│   ├── models/          # Shared data models
-│   └── utils/           # Utility functions
-├── features/            # Domain-specific features
-│   ├── auth/            # Authentication & authorization
-│   ├── data_ingestion/  # Data ingestion pipeline
-│   ├── decisions/       # Decision support engine
-│   ├── evidence/        # Evidence synthesis
-│   ├── export/          # Report generation
-│   └── markov/          # Markov simulation
-├── tests/               # Test suite
-│   ├── unit/            # Unit tests
-│   └── integration/     # Integration tests
-└── web/                 # Web interface
-    ├── components/      # Reusable UI components
-    ├── pages/           # Page definitions
-    └── static/          # Static assets
+#### Docker Deployment
+```bash
+# Build and run with Docker
+docker-compose up -d
 ```
 
-## Security & Compliance
+## Architecture
 
-The platform implements several security measures:
+### Backend
+- **FastAPI**: High-performance API framework
+- **PostgreSQL**: Primary database
+- **ElectricsQL**: Offline-first data synchronization
+- **IPFS**: Immutable evidence storage
 
-- **Authentication**: JWT-based authentication with role-based access control
-- **Data Encryption**: Encryption for sensitive clinical data
-- **Audit Logging**: Comprehensive audit trails for all data access
-- **HIPAA/GDPR Compliance**: Built-in compliance features
-- **Input Validation**: Strict validation for all user inputs
+### Frontend
+- **FastHTML**: Clean, lightweight templating
+- **HTMX**: Modern, reactive UI with minimal JavaScript
+- **Gun.js**: Reactive state management
+
+### Deployment
+- **Google Cloud Run/GKE**: Scalable, managed deployment
+- **Docker**: Containerized for consistent environments
+
+### Project Structure
+```
+gastric-adci-platform/
+├── api/                  # API endpoints
+│   └── v1/
+│       ├── analysis_retrospective.py  # Retrospective analysis endpoints
+│       ├── analysis_prospective.py    # Prospective analysis endpoints
+│       └── decisions.py               # Decision support endpoints
+├── core/                 # Core framework
+│   ├── config/           # Configuration
+│   ├── models/           # Shared data models
+│   └── utils/            # Utilities
+├── features/             # Business logic modules
+│   ├── analysis/         # Statistical analysis
+│   │   ├── retrospective.py  # Cox & Logistic Regression
+│   │   ├── prospective.py    # Random Forest
+│   │   └── rl_engine.py      # Reinforcement Learning stub
+│   ├── auth/             # Authentication
+│   ├── cohorts/          # Cohort management
+│   └── decisions/        # Decision support
+├── tests/                # Test suite
+│   ├── integration/      # Integration tests
+│   └── unit/             # Unit tests
+└── web/                  # Web interface
+    ├── components/       # Reusable UI components
+    ├── pages/            # Page templates
+    └── static/           # Static assets
+```
+
+## Statistical Analysis Module
+
+### Retrospective Analysis
+The retrospective analysis module provides tools for analyzing historical data:
+
+- **Cox Proportional Hazards Regression**: For time-to-event outcomes (survival analysis)
+  - Identifies prognostic factors and their effect sizes
+  - Calculates hazard ratios with confidence intervals
+  - Provides concordance and likelihood ratio tests
+
+- **Logistic Regression**: For binary outcomes
+  - Estimates probability of outcomes based on predictors
+  - Calculates odds ratios with confidence intervals
+  - Provides model performance metrics (AUC, accuracy)
+
+### Prospective Analysis
+The prospective analysis module provides predictive modeling for future outcomes:
+
+- **Random Forest**: Ensemble machine learning for outcome prediction
+  - Handles complex non-linear relationships
+  - Provides feature importance rankings
+  - Robust to noise and outliers
+
+- **Reinforcement Learning**: Adaptive decision-making framework (experimental)
+  - Learns optimal strategies from outcomes
+  - Adapts to changing patient characteristics
+  - Balances exploration and exploitation
+
+## Recent Changes
+
+### Version 2.0.0 (July 2025)
+- **Removed Markov Chain Simulation**: Replaced with more robust statistical analysis modules
+- **Added Retrospective Analysis**: Cox & Logistic Regression models with clinical interpretation
+- **Added Prospective Analysis**: Random Forest models and RL framework stub
+- **Enhanced User Interface**: Added new analysis pages with interactive forms
+- **Improved API**: New endpoints for statistical analysis with comprehensive documentation
+- **Extended Testing**: Added unit and integration tests for analysis modules
+
+## API Documentation
+
+### Authentication
+```
+POST /api/v1/auth/login
+POST /api/v1/auth/refresh
+POST /api/v1/auth/logout
+```
+
+### Decision Support
+```
+POST /api/v1/decisions/analyze
+GET /api/v1/decisions/{decision_id}
+GET /api/v1/decisions/history
+```
+
+### Analysis
+```
+# Retrospective Analysis
+POST /api/v1/analysis/retrospective/cox        # Cox Proportional Hazards Regression
+POST /api/v1/analysis/retrospective/logistic   # Logistic Regression
+
+# Prospective Analysis
+POST /api/v1/analysis/prospective/random-forest # Train Random Forest model
+POST /api/v1/analysis/prospective/predict      # Predict outcomes for a patient
+```
 
 ## License
+This project is licensed under the AGPL-3.0 License - see the LICENSE file for details.
 
-This project is licensed under the MIT License - see the LICENSE file for details.
-
-## Contact
-
-For questions or support, please contact [your-email@example.com](mailto:your-email@example.com).
+## Acknowledgements
+- Gastric Oncology Research Consortium
+- World Health Organization Guidelines
+- Healthcare Interoperability Standards Organization
