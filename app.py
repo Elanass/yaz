@@ -198,6 +198,7 @@ def setup_web_routes(app: FastAPI):
     navigation = [
         {"url": "/", "text": "Dashboard"},
         {"url": "/decision", "text": "New Decision"},
+        {"url": "/analysis", "text": "Analysis"},
         {"url": "/api/docs", "text": "API Docs"}
     ]
     
@@ -212,6 +213,27 @@ def setup_web_routes(app: FastAPI):
         """Decision analysis form"""
         content = create_decision_form()
         return create_page_layout("Clinical Decision Analysis", content, navigation)
+        
+    @app.get("/analysis", response_class=HTMLResponse)
+    async def analysis_home():
+        """Analysis home page"""
+        with open("web/pages/analysis.html", "r") as file:
+            content = file.read()
+        return HTMLResponse(content=content)
+        
+    @app.get("/analysis/retrospective", response_class=HTMLResponse)
+    async def retrospective_analysis():
+        """Retrospective analysis page"""
+        with open("web/pages/analysis_retrospective.html", "r") as file:
+            content = file.read()
+        return HTMLResponse(content=content)
+        
+    @app.get("/analysis/prospective", response_class=HTMLResponse)
+    async def prospective_analysis():
+        """Prospective analysis page"""
+        with open("web/pages/analysis_prospective.html", "r") as file:
+            content = file.read()
+        return HTMLResponse(content=content)
 
 
 def setup_exception_handlers(app: FastAPI):

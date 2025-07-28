@@ -1,0 +1,120 @@
+{% extends "base.html" %}
+
+{% block title %}Statistical Analysis{% endblock %}
+
+{% block content %}
+<div class="container mt-4">
+    <div class="row">
+        <div class="col-12">
+            <h1 class="display-4 mb-4">Statistical Analysis</h1>
+            <p class="lead">
+                Advanced statistical analysis tools for gastric oncology research and clinical decision support.
+            </p>
+        </div>
+    </div>
+    
+    <div class="row">
+        <div class="col-md-6">
+            <div class="card mb-4">
+                <div class="card-header bg-primary text-white">
+                    <h3 class="card-title">Retrospective Analysis</h3>
+                </div>
+                <div class="card-body">
+                    <p>
+                        Analyze historical patient data to identify prognostic factors, evaluate outcomes, and generate hypotheses.
+                    </p>
+                    <h5>Available Methods:</h5>
+                    <ul>
+                        <li><strong>Cox Proportional Hazards Regression</strong> - Survival analysis for time-to-event data</li>
+                        <li><strong>Logistic Regression</strong> - Predictive modeling for binary outcomes</li>
+                    </ul>
+                    <p>
+                        Perfect for analyzing historical cohorts, identifying risk factors, and validating clinical hypotheses.
+                    </p>
+                    <a href="/analysis/retrospective" class="btn btn-primary mt-3">Go to Retrospective Analysis</a>
+                </div>
+            </div>
+        </div>
+        
+        <div class="col-md-6">
+            <div class="card mb-4">
+                <div class="card-header bg-success text-white">
+                    <h3 class="card-title">Prospective Analysis</h3>
+                </div>
+                <div class="card-body">
+                    <p>
+                        Build predictive models to forecast patient outcomes and optimize treatment decisions.
+                    </p>
+                    <h5>Available Methods:</h5>
+                    <ul>
+                        <li><strong>Random Forest</strong> - Ensemble machine learning for outcome prediction</li>
+                        <li><strong>Reinforcement Learning</strong> - Adaptive decision-making framework (experimental)</li>
+                    </ul>
+                    <p>
+                        Ideal for personalized treatment planning, risk stratification, and clinical decision support.
+                    </p>
+                    <a href="/analysis/prospective" class="btn btn-success mt-3">Go to Prospective Analysis</a>
+                </div>
+            </div>
+        </div>
+    </div>
+    
+    <div class="row mt-4">
+        <div class="col-12">
+            <div class="card">
+                <div class="card-header bg-info text-white">
+                    <h3 class="card-title">Comparing Analysis Approaches</h3>
+                </div>
+                <div class="card-body">
+                    <table class="table table-bordered">
+                        <thead>
+                            <tr>
+                                <th>Feature</th>
+                                <th>Retrospective Analysis</th>
+                                <th>Prospective Analysis</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <tr>
+                                <td>Data Requirements</td>
+                                <td>Historical outcome data with follow-up</td>
+                                <td>Training data for model development</td>
+                            </tr>
+                            <tr>
+                                <td>Primary Purpose</td>
+                                <td>Identify associations and risk factors</td>
+                                <td>Predict future outcomes</td>
+                            </tr>
+                            <tr>
+                                <td>Key Methods</td>
+                                <td>Cox Regression, Logistic Regression</td>
+                                <td>Random Forest, Reinforcement Learning</td>
+                            </tr>
+                            <tr>
+                                <td>Clinical Application</td>
+                                <td>Evidence synthesis, protocol development</td>
+                                <td>Treatment selection, risk stratification</td>
+                            </tr>
+                            <tr>
+                                <td>Output</td>
+                                <td>Hazard ratios, odds ratios, p-values</td>
+                                <td>Predictions, probabilities, recommendations</td>
+                            </tr>
+                        </tbody>
+                    </table>
+                    
+                    <div class="alert alert-warning mt-4">
+                        <h5>Important Considerations</h5>
+                        <ul>
+                            <li>All statistical models have limitations and should be interpreted in the clinical context</li>
+                            <li>Model predictions are supplements to, not replacements for, clinical judgment</li>
+                            <li>Regular model validation and updating is essential as new evidence emerges</li>
+                            <li>Consider biases in your data that may affect model performance and generalizability</li>
+                        </ul>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

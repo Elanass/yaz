@@ -1,0 +1,637 @@
+{
+  "template_id": "gastric-surgical-assessment",
+  "template_name": "Gastric Surgical Assessment",
+  "template_version": "1.0",
+  "clinical_domain": "gastric_oncology",
+  "description": "Structured template for comprehensive gastric surgical assessment",
+  "sections": [
+    {
+      "section_id": "patient_demographics",
+      "section_name": "Patient Demographics",
+      "required": true,
+      "fields": [
+        {
+          "field_id": "age",
+          "field_name": "Age",
+          "field_type": "number",
+          "required": true,
+          "unit": "years",
+          "validation": {
+            "min": 18,
+            "max": 120
+          }
+        },
+        {
+          "field_id": "sex",
+          "field_name": "Biological Sex",
+          "field_type": "select",
+          "required": true,
+          "options": ["Male", "Female", "Other"],
+          "codingSystem": "SNOMED-CT"
+        },
+        {
+          "field_id": "bmi",
+          "field_name": "BMI",
+          "field_type": "number",
+          "required": true,
+          "unit": "kg/m²",
+          "validation": {
+            "min": 10,
+            "max": 80
+          },
+          "calculated": true,
+          "calculation": "weight_kg / (height_m * height_m)"
+        },
+        {
+          "field_id": "performance_status",
+          "field_name": "ECOG Performance Status",
+          "field_type": "select",
+          "required": true,
+          "options": ["0", "1", "2", "3", "4"],
+          "optionDescriptions": [
+            "Fully active",
+            "Restricted but ambulatory",
+            "Ambulatory but unable to work",
+            "Limited self-care",
+            "Completely disabled"
+          ],
+          "codingSystem": "ECOG"
+        }
+      ]
+    },
+    {
+      "section_id": "tumor_characteristics",
+      "section_name": "Tumor Characteristics",
+      "required": true,
+      "fields": [
+        {
+          "field_id": "tumor_location",
+          "field_name": "Tumor Location",
+          "field_type": "multi-select",
+          "required": true,
+          "options": ["Cardia", "Fundus", "Body", "Antrum", "Pylorus", "Lesser Curvature", "Greater Curvature", "Diffuse"],
+          "codingSystem": "SNOMED-CT"
+        },
+        {
+          "field_id": "tumor_size",
+          "field_name": "Tumor Size",
+          "field_type": "number",
+          "required": true,
+          "unit": "cm",
+          "validation": {
+            "min": 0,
+            "max": 30
+          }
+        },
+        {
+          "field_id": "histological_type",
+          "field_name": "Histological Type",
+          "field_type": "select",
+          "required": true,
+          "options": [
+            "Intestinal adenocarcinoma", 
+            "Diffuse adenocarcinoma", 
+            "Mixed adenocarcinoma", 
+            "Mucinous adenocarcinoma",
+            "Poorly cohesive carcinoma",
+            "Signet ring cell carcinoma",
+            "Other"
+          ],
+          "codingSystem": "WHO"
+        },
+        {
+          "field_id": "differentiation",
+          "field_name": "Differentiation",
+          "field_type": "select",
+          "required": true,
+          "options": ["Well differentiated", "Moderately differentiated", "Poorly differentiated", "Undifferentiated"]
+        },
+        {
+          "field_id": "lauren_classification",
+          "field_name": "Lauren Classification",
+          "field_type": "select",
+          "required": true,
+          "options": ["Intestinal", "Diffuse", "Mixed", "Indeterminate"]
+        }
+      ]
+    },
+    {
+      "section_id": "staging",
+      "section_name": "Clinical Staging",
+      "required": true,
+      "fields": [
+        {
+          "field_id": "clinical_t",
+          "field_name": "Clinical T Stage",
+          "field_type": "select",
+          "required": true,
+          "options": ["Tx", "T0", "Tis", "T1a", "T1b", "T2", "T3", "T4a", "T4b"],
+          "codingSystem": "AJCC 8th"
+        },
+        {
+          "field_id": "clinical_n",
+          "field_name": "Clinical N Stage",
+          "field_type": "select",
+          "required": true,
+          "options": ["Nx", "N0", "N1", "N2", "N3a", "N3b"],
+          "codingSystem": "AJCC 8th"
+        },
+        {
+          "field_id": "clinical_m",
+          "field_name": "Clinical M Stage",
+          "field_type": "select",
+          "required": true,
+          "options": ["M0", "M1"],
+          "codingSystem": "AJCC 8th"
+        },
+        {
+          "field_id": "staging_method",
+          "field_name": "Staging Methods Used",
+          "field_type": "multi-select",
+          "required": true,
+          "options": [
+            "CT scan", 
+            "MRI", 
+            "Endoscopic ultrasound", 
+            "PET scan", 
+            "Diagnostic laparoscopy",
+            "Biopsy"
+          ]
+        }
+      ]
+    },
+    {
+      "section_id": "comorbidities",
+      "section_name": "Comorbidities",
+      "required": true,
+      "fields": [
+        {
+          "field_id": "asa_class",
+          "field_name": "ASA Physical Status Classification",
+          "field_type": "select",
+          "required": true,
+          "options": ["I", "II", "III", "IV", "V", "VI"],
+          "optionDescriptions": [
+            "Normal healthy patient",
+            "Patient with mild systemic disease",
+            "Patient with severe systemic disease",
+            "Patient with severe systemic disease that is a constant threat to life",
+            "Moribund patient who is not expected to survive without the operation",
+            "Declared brain-dead patient whose organs are being removed for donor purposes"
+          ],
+          "codingSystem": "ASA"
+        },
+        {
+          "field_id": "cardiovascular",
+          "field_name": "Cardiovascular Comorbidities",
+          "field_type": "multi-select",
+          "required": false,
+          "options": [
+            "Hypertension", 
+            "Coronary artery disease", 
+            "Heart failure", 
+            "Arrhythmia", 
+            "Previous myocardial infarction",
+            "Valvular disease",
+            "None"
+          ]
+        },
+        {
+          "field_id": "respiratory",
+          "field_name": "Respiratory Comorbidities",
+          "field_type": "multi-select",
+          "required": false,
+          "options": [
+            "COPD", 
+            "Asthma", 
+            "Interstitial lung disease", 
+            "Sleep apnea", 
+            "Pulmonary hypertension",
+            "None"
+          ]
+        },
+        {
+          "field_id": "diabetes",
+          "field_name": "Diabetes",
+          "field_type": "select",
+          "required": true,
+          "options": ["None", "Type 1", "Type 2 - diet controlled", "Type 2 - oral medications", "Type 2 - insulin dependent"]
+        },
+        {
+          "field_id": "charlson_score",
+          "field_name": "Charlson Comorbidity Index",
+          "field_type": "number",
+          "required": true,
+          "validation": {
+            "min": 0,
+            "max": 37
+          }
+        }
+      ]
+    },
+    {
+      "section_id": "nutritional_status",
+      "section_name": "Nutritional Status",
+      "required": true,
+      "fields": [
+        {
+          "field_id": "weight_loss",
+          "field_name": "Weight Loss in Past 6 Months",
+          "field_type": "number",
+          "required": true,
+          "unit": "%",
+          "validation": {
+            "min": 0,
+            "max": 100
+          }
+        },
+        {
+          "field_id": "albumin",
+          "field_name": "Serum Albumin",
+          "field_type": "number",
+          "required": true,
+          "unit": "g/dL",
+          "validation": {
+            "min": 0.5,
+            "max": 6.0
+          }
+        },
+        {
+          "field_id": "nutritional_risk_index",
+          "field_name": "Nutritional Risk Index",
+          "field_type": "number",
+          "required": false,
+          "validation": {
+            "min": 0,
+            "max": 150
+          }
+        },
+        {
+          "field_id": "pgsga_score",
+          "field_name": "PG-SGA Score",
+          "field_type": "number",
+          "required": false,
+          "validation": {
+            "min": 0,
+            "max": 49
+          }
+        }
+      ]
+    },
+    {
+      "section_id": "previous_treatments",
+      "section_name": "Previous Treatments",
+      "required": true,
+      "fields": [
+        {
+          "field_id": "neoadjuvant_therapy",
+          "field_name": "Neoadjuvant Therapy",
+          "field_type": "select",
+          "required": true,
+          "options": ["None", "Chemotherapy", "Radiotherapy", "Chemoradiotherapy"]
+        },
+        {
+          "field_id": "chemotherapy_regimen",
+          "field_name": "Chemotherapy Regimen",
+          "field_type": "multi-select",
+          "required": false,
+          "options": [
+            "FLOT", 
+            "ECF/ECX", 
+            "EOX", 
+            "FOLFOX", 
+            "FOLFIRI",
+            "Paclitaxel/Carboplatin",
+            "Other",
+            "Not applicable"
+          ],
+          "dependsOn": {
+            "field": "neoadjuvant_therapy",
+            "values": ["Chemotherapy", "Chemoradiotherapy"]
+          }
+        },
+        {
+          "field_id": "chemo_cycles",
+          "field_name": "Number of Chemotherapy Cycles",
+          "field_type": "number",
+          "required": false,
+          "validation": {
+            "min": 0,
+            "max": 12
+          },
+          "dependsOn": {
+            "field": "neoadjuvant_therapy",
+            "values": ["Chemotherapy", "Chemoradiotherapy"]
+          }
+        },
+        {
+          "field_id": "treatment_response",
+          "field_name": "Response to Neoadjuvant Treatment",
+          "field_type": "select",
+          "required": false,
+          "options": [
+            "Complete response", 
+            "Partial response", 
+            "Stable disease", 
+            "Progressive disease",
+            "Not evaluated"
+          ],
+          "dependsOn": {
+            "field": "neoadjuvant_therapy",
+            "values": ["Chemotherapy", "Radiotherapy", "Chemoradiotherapy"]
+          }
+        }
+      ]
+    },
+    {
+      "section_id": "surgical_planning",
+      "section_name": "Surgical Planning",
+      "required": true,
+      "fields": [
+        {
+          "field_id": "proposed_procedure",
+          "field_name": "Proposed Procedure",
+          "field_type": "select",
+          "required": true,
+          "options": [
+            "Total gastrectomy", 
+            "Subtotal gastrectomy", 
+            "Proximal gastrectomy", 
+            "Distal gastrectomy", 
+            "Extended gastrectomy",
+            "Palliative procedure"
+          ]
+        },
+        {
+          "field_id": "lymphadenectomy",
+          "field_name": "Proposed Lymphadenectomy",
+          "field_type": "select",
+          "required": true,
+          "options": ["D0", "D1", "D1+", "D2", "D2+", "D3"]
+        },
+        {
+          "field_id": "surgical_approach",
+          "field_name": "Proposed Surgical Approach",
+          "field_type": "select",
+          "required": true,
+          "options": ["Open", "Laparoscopic", "Robotic", "Laparoscopic-assisted", "Robotic-assisted"]
+        },
+        {
+          "field_id": "multi_visceral_resection",
+          "field_name": "Anticipated Multi-visceral Resection",
+          "field_type": "boolean",
+          "required": true
+        },
+        {
+          "field_id": "organs_involved",
+          "field_name": "Additional Organs for Resection",
+          "field_type": "multi-select",
+          "required": false,
+          "options": [
+            "Spleen", 
+            "Pancreas (partial)", 
+            "Liver (partial)", 
+            "Colon", 
+            "Small bowel",
+            "Diaphragm",
+            "Other",
+            "None"
+          ],
+          "dependsOn": {
+            "field": "multi_visceral_resection",
+            "values": [true]
+          }
+        }
+      ]
+    },
+    {
+      "section_id": "adci_assessment",
+      "section_name": "ADCI Assessment",
+      "required": true,
+      "fields": [
+        {
+          "field_id": "adci_score",
+          "field_name": "ADCI Score",
+          "field_type": "number",
+          "required": true,
+          "validation": {
+            "min": 0,
+            "max": 100
+          },
+          "calculated": true
+        },
+        {
+          "field_id": "confidence_interval",
+          "field_name": "Confidence Interval",
+          "field_type": "range",
+          "required": true,
+          "calculated": true
+        },
+        {
+          "field_id": "recommendation",
+          "field_name": "ADCI Recommendation",
+          "field_type": "select",
+          "required": true,
+          "options": [
+            "Proceed with planned surgery", 
+            "Consider alternative approach", 
+            "Consider additional neoadjuvant therapy", 
+            "Consider non-surgical management", 
+            "Refer to high-volume center",
+            "Further evaluation needed"
+          ],
+          "calculated": true
+        },
+        {
+          "field_id": "key_factors",
+          "field_name": "Key Decision Factors",
+          "field_type": "multi-select",
+          "required": true,
+          "options": [
+            "Tumor location",
+            "Tumor stage",
+            "Histological type",
+            "Comorbidities",
+            "Nutritional status",
+            "Age",
+            "Performance status",
+            "Previous treatment response",
+            "Patient preference"
+          ],
+          "minSelections": 1
+        }
+      ]
+    },
+    {
+      "section_id": "surgeon_assessment",
+      "section_name": "Surgeon's Assessment",
+      "required": true,
+      "fields": [
+        {
+          "field_id": "surgeon_recommendation",
+          "field_name": "Surgeon's Recommendation",
+          "field_type": "select",
+          "required": true,
+          "options": [
+            "Proceed with planned surgery", 
+            "Modify surgical approach", 
+            "Additional neoadjuvant therapy", 
+            "Non-surgical management", 
+            "Refer to high-volume center",
+            "Further evaluation needed"
+          ]
+        },
+        {
+          "field_id": "surgical_complexity",
+          "field_name": "Anticipated Surgical Complexity",
+          "field_type": "select",
+          "required": true,
+          "options": ["Low", "Moderate", "High", "Very high"]
+        },
+        {
+          "field_id": "estimated_blood_loss",
+          "field_name": "Estimated Blood Loss",
+          "field_type": "select",
+          "required": true,
+          "options": ["<100mL", "100-300mL", "300-500mL", "500-1000mL", ">1000mL"]
+        },
+        {
+          "field_id": "estimated_los",
+          "field_name": "Estimated Length of Stay",
+          "field_type": "number",
+          "required": true,
+          "unit": "days",
+          "validation": {
+            "min": 1,
+            "max": 60
+          }
+        },
+        {
+          "field_id": "surgeon_notes",
+          "field_name": "Additional Notes",
+          "field_type": "text",
+          "required": false,
+          "maxLength": 1000
+        }
+      ]
+    },
+    {
+      "section_id": "mdt_discussion",
+      "section_name": "MDT Discussion",
+      "required": false,
+      "fields": [
+        {
+          "field_id": "mdt_date",
+          "field_name": "MDT Discussion Date",
+          "field_type": "date",
+          "required": true
+        },
+        {
+          "field_id": "mdt_members",
+          "field_name": "MDT Members Present",
+          "field_type": "multi-select",
+          "required": true,
+          "options": [
+            "Surgeon", 
+            "Medical Oncologist", 
+            "Radiation Oncologist", 
+            "Gastroenterologist", 
+            "Radiologist",
+            "Pathologist",
+            "Dietitian",
+            "Nurse specialist",
+            "Other"
+          ],
+          "minSelections": 3
+        },
+        {
+          "field_id": "mdt_recommendation",
+          "field_name": "MDT Recommendation",
+          "field_type": "select",
+          "required": true,
+          "options": [
+            "Proceed with planned surgery", 
+            "Modify surgical approach", 
+            "Additional neoadjuvant therapy", 
+            "Non-surgical management", 
+            "Refer to high-volume center",
+            "Clinical trial",
+            "Further evaluation needed"
+          ]
+        },
+        {
+          "field_id": "mdt_notes",
+          "field_name": "MDT Discussion Notes",
+          "field_type": "text",
+          "required": false,
+          "maxLength": 2000
+        }
+      ]
+    },
+    {
+      "section_id": "final_decision",
+      "section_name": "Final Decision",
+      "required": true,
+      "fields": [
+        {
+          "field_id": "final_plan",
+          "field_name": "Final Treatment Plan",
+          "field_type": "select",
+          "required": true,
+          "options": [
+            "Proceed with planned surgery", 
+            "Modified surgical approach", 
+            "Additional neoadjuvant therapy", 
+            "Non-surgical management", 
+            "Referral to high-volume center",
+            "Clinical trial",
+            "Further evaluation"
+          ]
+        },
+        {
+          "field_id": "decision_rationale",
+          "field_name": "Decision Rationale",
+          "field_type": "text",
+          "required": true,
+          "maxLength": 1000
+        },
+        {
+          "field_id": "patient_informed",
+          "field_name": "Patient Informed of Decision",
+          "field_type": "boolean",
+          "required": true
+        },
+        {
+          "field_id": "decision_date",
+          "field_name": "Decision Date",
+          "field_type": "date",
+          "required": true
+        },
+        {
+          "field_id": "decision_maker",
+          "field_name": "Primary Decision Maker",
+          "field_type": "select",
+          "required": true,
+          "options": [
+            "Lead Surgeon", 
+            "MDT Consensus", 
+            "Patient Preference", 
+            "Referring Physician", 
+            "Other"
+          ]
+        }
+      ]
+    }
+  ],
+  "metadata": {
+    "created_date": "2023-06-15",
+    "last_updated": "2023-11-10",
+    "target_user_roles": ["Surgeon", "Oncologist", "Gastroenterologist", "MDT Coordinator"],
+    "evidence_references": [
+      "ESMO Clinical Practice Guidelines for Gastric Cancer (2022)",
+      "NCCN Guidelines for Gastric Cancer, Version 2.2023",
+      "Japanese Gastric Cancer Treatment Guidelines 2021 (5th edition)"
+    ],
+    "calculated_fields": ["bmi", "adci_score", "confidence_interval", "recommendation"]
+  }
+}

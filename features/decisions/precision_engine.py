@@ -1,0 +1,189 @@
+"""
+Precision Decision Engine
+Combines impact analysis with statistical prediction models
+"""
+
+import logging
+from typing import Dict, List, Any, Optional
+from datetime import datetime
+import uuid
+
+from core.models.shared_models import Patient
+from features.analysis.prospective import ProspectiveAnalyzer
+from core.utils.helpers import log_action, handle_error
+
+logger = logging.getLogger(__name__)
+
+class ImpactAnalyzer:
+    """
+    Analyzes impact of different treatment options (FLOT vs. surgery)
+    """
+    
+    def __init__(self):
+        """Initialize the impact analyzer"""
+        logger.info("Initializing Impact Analyzer")
+        # Default risk factors and weights
+        self.risk_factors = {
+            "age": {"weight": 0.2, "threshold": 70},
+            "comorbidities": {"weight": 0.3, "per_item": 0.05},
+            "tumor_stage": {
+                "weight": 0.5,
+                "values": {
+                    "T1N0M0": 0.1,
+                    "T2N0M0": 0.3,
+                    "T3N0M0": 0.5,
+                    "T1N1M0": 0.4,
+                    "T2N1M0": 0.6,
+                    "T3N1M0": 0.7,
+                    "T4N0M0": 0.8,
+                    "T4N1M0": 0.9,
+                    "T*N*M1": 1.0
+                }
+            }
+        }
+    
+    def calculate_base_risk(self, patient: Dict[str, Any]) -> float:
+        """Calculate base risk score for a patient"""
+        risk_score = 0.0
+        
+        # Age risk
+        age = int(patient.get("age", 0))
+        if age > self.risk_factors["age"]["threshold"]:
+            age_factor = (age - self.risk_factors["age"]["threshold"]) / 30  # Normalize
+            risk_score += age_factor * self.risk_factors["age"]["weight"]
+        
+        # Comorbidities risk
+        comorbidities = patient.get("comorbidities", [])
+        if isinstance(comorbidities, str):
+            comorbidities = comorbidities.split(",")
+        comorbidity_count = len(comorbidities)
+        risk_score += min(comorbidity_count * self.risk_factors["comorbidities"]["per_item"], 
+                          self.risk_factors["comorbidities"]["weight"])
+        
+        # Tumor stage risk
+        tumor_stage = patient.get("tumor_stage", "T1N0M0")
+        stage_risk = self.risk_factors["tumor_stage"]["values"].get(
+            tumor_stage, 
+            self.risk_factors["tumor_stage"]["values"].get("T*N*M1", 0.5)
+        )
+        risk_score += stage_risk * self.risk_factors["tumor_stage"]["weight"]
+        
+        return min(risk_score, 1.0)  # Cap at 1.0
+    
+    def analyze_surgery_impact(self, patient: Dict[str, Any]) -> Dict[str, Any]:
+        """Analyze surgery impact"""
+        base_risk = self.calculate_base_risk(patient)
+        
+        # Surgery-specific factors
+        tumor_location = patient.get("tumor_location", "").lower()
+        is_proximal = "proximal" in tumor_location or "cardia" in tumor_location
+        
+        # Adjust risk based on tumor location
+        location_factor = 0.15 if is_proximal else 0.05
+        surgery_risk = base_risk + location_factor
+        surgery_risk = min(surgery_risk, 1.0)  # Cap at 1.0
+        
+        return {
+            "treatment": "surgery",
+            "base_risk": round(base_risk, 3),
+            "adjusted_risk": round(surgery_risk, 3),
+            "risk_level": "high" if surgery_risk > 0.7 else "medium" if surgery_risk > 0.4 else "low",
+            "recommended": surgery_risk < 0.6,
+            "confidence": 0.8 - (0.3 * surgery_risk)  # Lower confidence with higher risk
+        }
+    
+    def analyze_flot_impact(self, patient: Dict[str, Any]) -> Dict[str, Any]:
+        """Analyze FLOT chemotherapy impact"""
+        base_risk = self.calculate_base_risk(patient)
+        
+        # FLOT-specific factors
+        age = int(patient.get("age", 0))
+        performance_status = int(patient.get("performance_status", 1))
+        
+        # Adjust risk based on age and performance status
+        age_factor = 0.01 * max(0, age - 65)
+        performance_factor = 0.1 * performance_status
+        
+        flot_risk = base_risk + age_factor + performance_factor
+        flot_risk = min(flot_risk, 1.0)  # Cap at 1.0
+        
+        # FLOT is generally preferred for advanced stages
+        tumor_stage = patient.get("tumor_stage", "T1N0M0")
+        is_advanced = any(x in tumor_stage for x in ["T3", "T4", "N1", "M1"])
+        
+        return {
+            "treatment": "FLOT",
+            "base_risk": round(base_risk, 3),
+            "adjusted_risk": round(flot_risk, 3),
+            "risk_level": "high" if flot_risk > 0.7 else "medium" if flot_risk > 0.4 else "low",
+            "recommended": is_advanced and flot_risk < 0.7,
+            "confidence": 0.75 - (0.2 * flot_risk)  # Lower confidence with higher risk
+        }
+
+class PrecisionEngine:
+    """
+    Precision Decision Engine combining impact analysis with statistical prediction models
+    """
+    
+    def __init__(self, model_path: Optional[str] = None):
+        """Initialize the precision engine"""
+        logger.info("Initializing Precision Engine")
+        self.impact_analyzer = ImpactAnalyzer()
+        
+        # Initialize prediction model
+        self.prospective_analyzer = ProspectiveAnalyzer()
+        if model_path:
+            logger.info(f"Loading prediction model from {model_path}")
+            # In a real implementation, this would load a pre-trained model
+            pass
+    
+    def predict_outcomes(self, patient_data: Dict[str, Any], model_type: str = "random_forest") -> Dict[str, Any]:
+        """
+        Predict outcomes for a patient using impact analysis and statistical prediction
+        
+        Args:
+            patient_data: Patient clinical data
+            model_type: Type of prediction model to use ('random_forest' or 'reinforcement_learning')
+            
+        Returns:
+            Dictionary containing impact analysis and prediction results
+        """
+        try:
+            # Generate decision ID
+            decision_id = str(uuid.uuid4())
+            
+            # Perform impact analysis
+            surgery_impact = self.impact_analyzer.analyze_surgery_impact(patient_data)
+            flot_impact = self.impact_analyzer.analyze_flot_impact(patient_data)
+            
+            # Determine recommended treatment based on impact analysis
+            surgery_score = surgery_impact["recommended"] * surgery_impact["confidence"]
+            flot_score = flot_impact["recommended"] * flot_impact["confidence"]
+            
+            recommended_treatment = "surgery" if surgery_score > flot_score else "FLOT"
+            
+            # Statistical prediction using prospective analyzer
+            prediction_results = self.prospective_analyzer.predict(patient_data, model_type)
+            
+            # Compile results
+            results = {
+                "decision_id": decision_id,
+                "timestamp": str(datetime.now()),
+                "patient_data": patient_data,
+                "impact_analysis": {
+                    "surgery": surgery_impact,
+                    "flot": flot_impact
+                },
+                "recommendation": {
+                    "treatment": recommended_treatment,
+                    "confidence": max(surgery_score, flot_score),
+                    "explanation": f"{recommended_treatment.upper()} is recommended based on patient risk profile and clinical factors."
+                },
+                "prediction": prediction_results
+            }
+            
+            return results
+            
+        except Exception as e:
+            logger.error(f"Error predicting outcomes: {e}")
+            return handle_error(e)

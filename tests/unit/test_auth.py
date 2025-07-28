@@ -6,7 +6,7 @@ Comprehensive tests for auth functionality
 import pytest
 from fastapi.testclient import TestClient
 
-from app import create_app
+from yaz.main import create_app
 from features.auth.service import UserCreate, UserLogin, UserRole
 
 

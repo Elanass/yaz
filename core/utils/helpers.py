@@ -8,6 +8,7 @@ import json
 import logging
 import re
 import uuid
+import csv
 from datetime import datetime, timedelta
 from typing import Any, Dict, List, Optional, Union
 
@@ -290,3 +291,25 @@ class LoggingUtils:
         logger.addHandler(handler)
         logger.setLevel(logging.INFO)
         return logger
+
+
+def load_csv(file_path: str) -> List[Dict[str, str]]:
+    """Load CSV file into a list of dictionaries"""
+    try:
+        with open(file_path, mode="r", encoding="utf-8") as file:
+            reader = csv.DictReader(file)
+            return list(reader)
+    except Exception as e:
+        logger.error(f"Failed to load CSV file: {file_path}. Error: {e}")
+        raise
+
+
+def log_action(user_id: str, action: str, details: Dict[str, str]):
+    """Log user actions for audit trails"""
+    logger.info(f"User {user_id} performed action: {action} with details: {details}")
+
+
+def handle_error(error: Exception):
+    """Handle errors gracefully"""
+    logger.error(f"Error occurred: {error}")
+    return {"success": False, "error": str(error)}

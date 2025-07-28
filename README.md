@@ -1,192 +1,131 @@
 # Gastric ADCI Platform
 
-A state-of-the-art Progressive Web App (PWA) for precision oncology decision support in gastric surgery, centered on the ADCI (Adaptive Decision Confidence Index) framework.
+A healthcare-grade Progressive Web App (PWA) for gastric oncology-surgery decision support using the Adaptive Decision Confidence Index (ADCI) framework.
 
-## 🎯 Overview
+## Overview
 
-This platform serves clinical experts and patients in collaborative, evidence-based healthcare environments for gastric cancer treatment decisions.
+The Gastric ADCI Platform provides clinicians with evidence-based decision support for gastric cancer treatment planning. The platform uses advanced Markov modeling, precision medicine algorithms, and evidence synthesis to provide personalized treatment recommendations with confidence intervals.
 
-## 🏗️ Architecture
+## Key Features
 
-### New Modular Structure
-```
-yaz/
-├── core/                    # 🤖 Core platform functionality
-│   ├── config/             # Central configuration system
-│   ├── models/             # Shared data models
-│   ├── services/           # Base services & utilities
-│   └── utils/              # Helper functions
-├── features/               # 🔧 Feature modules (add new features here)
-│   ├── auth/              # Authentication & RBAC
-│   ├── decisions/         # Decision engines (ADCI, Gastrectomy)
-│   ├── insights/          # Insight generation (future)
-│   └── cohorts/           # Cohort management (future)
-├── api/                   # 🌐 Clean API layer
-│   └── v1/               # API v1 endpoints
-├── web/                  # 💻 Simple web interface
-│   ├── components/       # Reusable UI components
-│   └── pages/           # Page templates
-├── data/                # 📊 Data layer (future)
-│   ├── models/          # Database models
-│   └── repositories/    # Data access layer
-└── tests/               # ✅ Comprehensive tests
-    ├── unit/           # Unit tests
-    └── integration/    # End-to-end tests
-```
+- **Data Ingestion**: Support for retrospective and prospective clinical data
+- **Precision Decision Engine**: Personalized treatment recommendations with confidence metrics
+- **Markov Chain Simulation**: Advanced disease progression modeling
+- **Evidence Synthesis**: Integration with clinical guidelines and research
+- **Clinical Workflow Integration**: Seamless integration with clinical workflows
+- **HIPAA & GDPR Compliance**: Built-in security and audit features
+- **Responsive UI**: Offline-capable Progressive Web App
 
-### Frontend (PWA)
-- **FastHTML** + **HTMX** for reactive UI
-- **Gun.js** for real-time distributed state
-- **ElectricsQL** for offline-first PostgreSQL sync
-- **Service Worker** for offline capabilities
-- **Web App Manifest** for PWA installation
+## Technology Stack
 
-### Backend (FastAPI)
-- **FastAPI** with async support
-- **PostgreSQL** with ElectricsQL compatibility
-- **IPFS** for immutable evidence storage
-- **RBAC** (Role-Based Access Control)
-- **Decision Engine** with ADCI, Gastrectomy, FLOT protocols
+- **Backend**: FastAPI, PostgreSQL, ElectricsQL, IPFS
+- **Frontend**: FastHTML, HTMX, Gun.js for reactive state
+- **Deployment**: Google Cloud Run/GKE, Docker
+- **Compliance**: HIPAA, GDPR with audit trails
 
-### Key Features
-- 🔒 **HIPAA/GDPR Compliant** with audit trails
-- 📱 **Mobile-first** responsive design
-- 🔄 **Offline-first** with background sync
-- 🧠 **AI-powered** decision support
-- 👥 **Multi-role** support (Patients, Practitioners, Researchers)
-- 📊 **Evidence visualization** and analysis
-- 🔍 **Advanced filtering** and search
-- 📤 **Data export** (CSV/JSON)
+## Architecture
 
-## 🚀 Quick Start
+The platform follows a modular architecture with the following components:
+
+- **Core**: Base configuration, shared models, and utilities
+- **Features**: Modular services for specific domain functionality
+  - Data Ingestion Pipeline
+  - Markov Simulation Engine
+  - Precision Decision Engine
+  - Evidence Synthesis Engine
+  - Report Generation Service
+- **API**: RESTful endpoints with proper validation and documentation
+- **Web**: HTMX-powered user interface components
+  - Clinical Platform Components
+  - Decision Support Interface
+  - Evidence Visualization Tools
+
+## Getting Started
 
 ### Prerequisites
-- Python 3.11+
-- PostgreSQL 15+ (optional - SQLite used for development)
-- Redis 7+ (optional - for production caching)
 
-### Development Setup
+- Python 3.10+
+- Docker and Docker Compose
+- Node.js 18+ (for frontend build tools)
 
-1. **Clone and setup the project:**
+### Installation
+
+1. Clone the repository:
+   ```bash
+   git clone https://github.com/yourusername/gastric-adci-platform.git
+   cd gastric-adci-platform
+   ```
+
+2. Set up environment variables:
+   ```bash
+   cp .env.example .env
+   # Edit .env with your configuration
+   ```
+
+3. Build and start the services:
+   ```bash
+   docker-compose up -d
+   ```
+
+4. Access the application:
+   ```
+   http://localhost:8000
+   ```
+
+## Development
+
+### Running Tests
+
 ```bash
-git clone <your-repo-url>
-cd yaz
+# Run unit tests
+pytest tests/unit
+
+# Run integration tests
+pytest tests/integration
+
+# Run with coverage
+pytest --cov=. tests/
 ```
 
-2. **Install Dependencies:**
-```bash
-pip install -r requirements.txt
-```
-
-3. **Configure Environment:**
-```bash
-cp .env.example .env
-# Edit .env with your settings
-```
-
-4. **Start the platform:**
-```bash
-python app.py
-```
-
-## 🏗️ Migration Notes
-
-This restructure focuses on:
-- **DRY** (Don't Repeat Yourself) - Eliminated code duplication
-- **MVP** (Minimum Viable Product) - Core functionality first
-- **Reproducible** - Standardized patterns for feature development
-
-Refer to the new modular structure above for details.
-
-## 📂 Project Structure
+### Code Structure
 
 ```
-gastric-adci-platform/
-├── backend/
-│   ├── src/
-│   │   ├── api/           # FastAPI routes
-│   │   ├── core/          # Configuration, security
-│   │   ├── db/            # Database models, migrations
-│   │   ├── services/      # Business logic
-│   │   └── engines/       # Decision engines
-│   ├── tests/
-│   └── alembic/
-├── frontend/
-│   ├── static/            # CSS, JS, images
-│   ├── templates/         # FastHTML templates
-│   ├── components/        # Reusable components
-│   └── islands/           # Page islands
-├── scripts/               # Deployment, setup scripts
-├── docs/                  # Documentation
-└── docker/                # Docker configurations
+├── api/                 # API endpoints
+│   └── v1/              # API version 1
+├── core/                # Core functionality
+│   ├── config/          # Configuration
+│   ├── models/          # Shared data models
+│   └── utils/           # Utility functions
+├── features/            # Domain-specific features
+│   ├── auth/            # Authentication & authorization
+│   ├── data_ingestion/  # Data ingestion pipeline
+│   ├── decisions/       # Decision support engine
+│   ├── evidence/        # Evidence synthesis
+│   ├── export/          # Report generation
+│   └── markov/          # Markov simulation
+├── tests/               # Test suite
+│   ├── unit/            # Unit tests
+│   └── integration/     # Integration tests
+└── web/                 # Web interface
+    ├── components/      # Reusable UI components
+    ├── pages/           # Page definitions
+    └── static/          # Static assets
 ```
 
-## 🔬 Clinical Decision Engines
+## Security & Compliance
 
-### ADCI (Adaptive Decision Confidence Index)
-- Real-time confidence scoring
-- Evidence-based recommendations
-- Uncertainty quantification
+The platform implements several security measures:
 
-### Gastrectomy Protocol Engine
-- Surgical approach recommendations
-- Risk stratification
-- Recovery predictions
+- **Authentication**: JWT-based authentication with role-based access control
+- **Data Encryption**: Encryption for sensitive clinical data
+- **Audit Logging**: Comprehensive audit trails for all data access
+- **HIPAA/GDPR Compliance**: Built-in compliance features
+- **Input Validation**: Strict validation for all user inputs
 
-### FLOT (Fluorouracil, Leucovorin, Oxaliplatin, Docetaxel)
-- Chemotherapy protocol optimization
-- Side effect prediction
-- Dosage recommendations
+## License
 
-## 👥 User Roles
+This project is licensed under the MIT License - see the LICENSE file for details.
 
-- **Patients**: View treatment options, track progress
-- **Practitioners**: Access decision tools, update protocols
-- **Researchers**: Contribute evidence, analyze outcomes
+## Contact
 
-## 🛡️ Security & Compliance
-
-- End-to-end encryption for clinical data
-- Audit logging for all access and modifications
-- RBAC with fine-grained permissions
-- HIPAA-compliant data handling
-- GDPR-compliant data processing
-
-## 🌐 Deployment
-
-### Google Cloud Platform
-- **Cloud Run** for scalable container deployment
-- **Cloud SQL** for managed PostgreSQL
-- **Cloud Storage** for static assets
-- **Cloud CDN** for global distribution
-
-### Monitoring
-- **Prometheus** metrics collection
-- **Grafana** dashboards
-- **Cloud Logging** for centralized logs
-- **Error Reporting** for issue tracking
-
-## 📊 Performance Targets
-
-- API response time: < 200ms (95th percentile)
-- PWA load time: < 3s on 3G
-- Offline functionality: Full feature parity
-- Uptime: 99.9% SLA
-
-## 🤝 Contributing
-
-Please read our [Contributing Guidelines](CONTRIBUTING.md) and [Code of Conduct](CODE_OF_CONDUCT.md).
-
-## 📄 License
-
-- **Clinical Decision Logic**: Proprietary/Licensed
-- **EMR Integration Modules**: Open Source (MIT)
-
-## 📞 Support
-
-For clinical support: [clinical-support@gastric-adci.health](mailto:clinical-support@gastric-adci.health)
-For technical support: [tech-support@gastric-adci.health](mailto:tech-support@gastric-adci.health)
-
----
-
-**⚠️ Important**: This is a medical decision support tool. Always consult with qualified healthcare professionals before making clinical decisions.
+For questions or support, please contact [your-email@example.com](mailto:your-email@example.com).

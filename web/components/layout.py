@@ -161,6 +161,7 @@ def create_nav_links(user: dict = None, mobile: bool = False):
         A("Protocols", href="/protocols", class_=link_class) if user else None,
         A("Decision Support", href="/decision-support", class_=link_class) if user and user.get("role") in ["practitioner", "researcher"] else None,
         A("Cohort Management", href="/cohorts", class_=link_class) if user and user.get("role") in ["researcher", "practitioner"] else None,
+        A("Analysis", href="/analysis", class_=link_class) if user and user.get("role") in ["researcher", "practitioner"] else None,
         A("About", href="/about", class_=link_class),
     ]
     
