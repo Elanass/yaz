@@ -11,7 +11,6 @@ from sqlalchemy.orm import selectinload
 from core.dependencies import DatabaseSession, CurrentUser, EncryptionService
 from core.models.base import ApiResponse
 from data.models import Case, CaseCreate, CaseUpdate, CaseResponse
-from data.repositories import CaseRepository
 
 
 router = APIRouter(prefix="/cases", tags=["Cases"])
@@ -31,7 +30,7 @@ async def get_cases(
     """
     try:
         # Build query
-        query = select(Case).options(selectinload(Case.patient))
+        query = select(Case)
         
         # Apply filters
         if center_id:
@@ -74,6 +73,7 @@ async def get_cases(
             detail=f"Failed to retrieve cases: {str(e)}"
         )
 
+
 @router.get("/{case_id}", response_model=ApiResponse[CaseResponse])
 async def get_case(
     case_id: str,
@@ -84,9 +84,7 @@ async def get_case(
     
     try:
         result = await session.execute(
-            select(Case)
-            .options(selectinload(Case.patient))
-            .where(Case.id == case_id)
+            select(Case).where(Case.id == case_id)
         )
         case = result.scalar_one_or_none()
         
@@ -277,97 +275,3 @@ async def delete_case(
             status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
             detail=f"Failed to delete case: {str(e)}"
         )
-                    <button class="btn btn-sm" hx-get="/api/v1/cases?offset={max(0, offset-limit)}&limit={limit}" hx-target="#cases-table">Previous</button>
-                    <span>Page {offset//limit + 1}</span>
-                    <button class="btn btn-sm" hx-get="/api/v1/cases?offset={offset+limit}&limit={limit}" hx-target="#cases-table">Next</button>
-                </div>
-            </div>
-            """
-            return HTMLResponse(content=html_content)
-        
-        # Default: return JSON
-        return results
-    
-    except Exception as e:
-        raise HTTPException(status_code=500, detail=f"Failed to get cases: {str(e)}")
-
-@router.post("")
-async def upload_cases(
-    request: Request,
-    file: UploadFile = File(...),
-    current_user = Depends(require_permission(Domain.HEALTHCARE, Scope.WRITE))
-):
-    """
-    Upload cases from a CSV file
-    
-    Returns JSON or HTML partial based on Accept header
-    """
-    try:
-        # Create data directory if it doesn't exist
-        os.makedirs(os.path.dirname(CASES_DATA_PATH), exist_ok=True)
-        
-        # Read CSV content
-        content = await file.read()
-        
-        # Validate CSV format
-        try:
-            csv_content = content.decode("utf-8")
-            reader = csv.DictReader(io.StringIO(csv_content))
-            
-            # Check for required headers
-            required_fields = ["id", "age", "gender", "tumor_stage", "tumor_location"]
-            headers = reader.fieldnames or []
-            
-            missing_fields = [field for field in required_fields if field not in headers]
-            if missing_fields:
-                raise ValueError(f"Missing required fields: {', '.join(missing_fields)}")
-            
-            # Count rows
-            rows = list(reader)
-            row_count = len(rows)
-            
-            # Write to file
-            with open(CASES_DATA_PATH, "w", newline="", encoding="utf-8") as f:
-                writer = csv.DictWriter(f, fieldnames=headers)
-                writer.writeheader()
-                writer.writerows(rows)
-            
-            # Log action
-            log_action(str(current_user.id), "upload_cases", {
-                "file_name": file.filename,
-                "row_count": row_count
-            })
-            
-            # Prepare response
-            response_data = {
-                "success": True,
-                "message": f"Successfully uploaded {row_count} cases",
-                "file_name": file.filename,
-                "row_count": row_count
-            }
-            
-            # Check if client wants HTML (HTMX request)
-            accept = request.headers.get("Accept", "")
-            if "text/html" in accept:
-                # Return HTMX-compatible partial
-                html_content = f"""
-                <div id="upload-result" hx-swap-oob="true">
-                    <div class="alert alert-success">
-                        <h4>Upload Successful</h4>
-                        <p>Successfully uploaded {row_count} cases from {file.filename}</p>
-                    </div>
-                    <button class="btn btn-primary" hx-get="/api/v1/cases" hx-target="#cases-table">Refresh Cases</button>
-                </div>
-                """
-                return HTMLResponse(content=html_content)
-            
-            # Default: return JSON
-            return response_data
-            
-        except ValueError as e:
-            raise HTTPException(status_code=400, detail=f"Invalid CSV format: {str(e)}")
-        
-    except HTTPException:
-        raise
-    except Exception as e:
-        raise HTTPException(status_code=500, detail=f"Failed to upload cases: {str(e)}")

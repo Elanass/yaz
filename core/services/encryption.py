@@ -7,49 +7,68 @@ ensuring HIPAA/GDPR compliance with proper key management.
 
 import os
 import base64
+import bcrypt
 from typing import Any, Dict, Union
+import logging
 
 from cryptography.fernet import Fernet
 from cryptography.hazmat.primitives import hashes
 from cryptography.hazmat.primitives.kdf.pbkdf2 import PBKDF2HMAC
 
-from core.config.settings import get_security_config
-from core.services.base import BaseService
+from core.config.platform_config import config
 
 
-class EncryptionService(BaseService):
+class EncryptionService:
     """Service for encrypting and decrypting sensitive data"""
     
     def __init__(self):
-        super().__init__()
-        self.config = get_security_config()
+        self.logger = logging.getLogger(__name__)
         self._fernet = self._initialize_fernet()
     
     def _initialize_fernet(self) -> Fernet:
         """Initialize the Fernet encryption with the configured key"""
-        key = self.config.get("encryption_key")
+        key = config.encryption_key
         
         # If no key is set, generate one (dev environments only)
-        if not key and os.getenv("ENVIRONMENT") != "production":
-            salt = os.urandom(16)
-            kdf = PBKDF2HMAC(
-                algorithm=hashes.SHA256(),
-                length=32,
-                salt=salt,
-                iterations=100000
-            )
-            key = base64.urlsafe_b64encode(kdf.derive(self.config.get("secret_key").encode()))
-            
-            # Log warning in non-production environments
-            if os.getenv("ENVIRONMENT") != "production":
+        if not key or key == "dev-encryption-key-32-chars-long":
+            if config.environment != "production":
+                salt = os.urandom(16)
+                kdf = PBKDF2HMAC(
+                    algorithm=hashes.SHA256(),
+                    length=32,
+                    salt=salt,
+                    iterations=100000
+                )
+                key = base64.urlsafe_b64encode(kdf.derive(config.secret_key.encode()))
+                
+                # Log warning in non-production environments
                 self.logger.warning(
                     "Generated temporary encryption key. "
-                    "In production, set SECURITY_ENCRYPTION_KEY environment variable."
+                    "In production, set ENCRYPTION_KEY environment variable."
                 )
+            else:
+                raise ValueError(
+                    "Encryption key not set for production. Set ENCRYPTION_KEY environment variable."
+                )
+        
+        # Ensure key is properly formatted for Fernet
+        if isinstance(key, str):
+            if len(key) != 44:  # Fernet key length in base64
+                # Derive proper key from provided key
+                salt = b'gastric_adci_salt'  # Static salt for consistent key derivation
+                kdf = PBKDF2HMAC(
+                    algorithm=hashes.SHA256(),
+                    length=32,
+                    salt=salt,
+                    iterations=100000
+                )
+                key = base64.urlsafe_b64encode(kdf.derive(key.encode()))
+            else:
+                key = key.encode()
         
         if not key:
             raise ValueError(
-                "Encryption key not set. Set SECURITY_ENCRYPTION_KEY environment variable."
+                "Encryption key not set. Set ENCRYPTION_KEY environment variable."
             )
             
         return Fernet(key)
@@ -96,8 +115,6 @@ class EncryptionService(BaseService):
         Returns:
             Securely hashed password
         """
-        import bcrypt
-        
         # Generate a salt and hash the password
         salt = bcrypt.gensalt(rounds=12)
         hashed = bcrypt.hashpw(password.encode('utf-8'), salt)
@@ -114,9 +131,19 @@ class EncryptionService(BaseService):
         Returns:
             True if the password matches, False otherwise
         """
-        import bcrypt
-        
         return bcrypt.checkpw(
             plain_password.encode('utf-8'),
             hashed_password.encode('utf-8')
         )
+    
+    def encrypt_sensitive_data(self, data: str) -> str:
+        """Encrypt sensitive data (placeholder implementation)."""
+        return f"encrypted({data})"
+
+    def decrypt_sensitive_data(self, data: str) -> str:
+        """Decrypt sensitive data (placeholder implementation)."""
+        return data.replace("encrypted(", "").rstrip(")")
+
+
+# Singleton instance
+encryption_service = EncryptionService()

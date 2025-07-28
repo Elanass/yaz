@@ -330,3 +330,8 @@ class Logger:
             },
             **kwargs
         )
+
+def get_logger(name: str):
+    """Retrieve a structured logger instance."""
+    import structlog
+    return structlog.get_logger(name)

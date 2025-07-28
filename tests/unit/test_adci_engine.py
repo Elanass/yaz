@@ -1,5 +1,5 @@
 import pytest
-from features.decisions.adci_engine import ADCIEngine
+from core.medical.consolidated import ADCIEngine
 
 @pytest.fixture
 def adci_engine():

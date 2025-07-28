@@ -2,114 +2,111 @@
 
 {% block title %}Surgify - Clinical Research Interface{% endblock %}
 
+{% block extra_head %}
+<link rel="preconnect" href="https://fonts.gstatic.com/" crossorigin />
+<link rel="stylesheet" as="style" onload="this.rel='stylesheet'" href="https://fonts.googleapis.com/css2?display=swap&family=Noto+Sans:wght@400;500;700;900&family=Plus+Jakarta+Sans:wght@400;500;700;800" />
+<script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+{% endblock %}
+
 {% block content %}
-<div class="max-w-7xl mx-auto py-6 sm:px-6 lg:px-8" x-data="surgifyApp()">
-    <!-- Header -->
-    <div class="bg-white shadow rounded-lg mb-6">
-        <div class="px-6 py-4 border-b border-gray-200">
-            <h1 class="text-2xl font-bold text-gray-900">Surgify Clinical Research Interface</h1>
-            <p class="mt-1 text-sm text-gray-600">Advanced gastric oncology decision support with ADCI framework</p>
-        </div>
-        
-        <!-- Search and Filters -->
-        <div class="px-6 py-4">
-            <div class="flex flex-col sm:flex-row sm:items-center sm:justify-between space-y-4 sm:space-y-0">
-                <div class="flex-1 max-w-lg">
-                    <div class="relative">
-                        <input 
-                            type="text" 
-                            placeholder="Search cases by title or author..."
-                            class="w-full pl-10 pr-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
-                            hx-get="/api/search"
-                            hx-trigger="keyup changed delay:300ms"
-                            hx-target="#cases-container"
-                            hx-include="[name='filter']"
-                            name="query"
-                        >
-                        <div class="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
-                            <svg class="h-5 w-5 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"></path>
-                            </svg>
-                        </div>
-                    </div>
-                </div>
-                
-                <div class="flex items-center space-x-4">
-                    <select 
-                        name="filter" 
-                        class="border border-gray-300 rounded-lg px-3 py-2 focus:ring-2 focus:ring-blue-500 focus:border-transparent"
-                        hx-get="/api/search"
-                        hx-trigger="change"
-                        hx-target="#cases-container"
-                        hx-include="[name='query']"
-                    >
-                        <option value="all">All Cases</option>
-                        <option value="high_value">High Value (>80)</option>
-                        <option value="medium_value">Medium Value (50-80)</option>
-                        <option value="low_value">Low Value (<50)</option>
-                    </select>
-                    
-                    <button 
-                        class="bg-green-600 text-white px-4 py-2 rounded-lg hover:bg-green-700 flex items-center space-x-2"
-                        @click="showInsightsModal = true"
-                        hx-get="/api/insights"
-                        hx-target="#insights-content"
-                        hx-trigger="click"
-                    >
-                        <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9.663 17h4.673M12 3v1m6.364 1.636l-.707.707M21 12h-1M4 12H3m3.343-5.657l-.707-.707m2.828 9.9a5 5 0 117.072 0l-.548.547A3.374 3.374 0 0014 18.469V19a2 2 0 11-4 0v-.531c0-.895-.356-1.754-.988-2.386l-.548-.547z"></path>
-                        </svg>
-                        <span>Generate Insights</span>
-                    </button>
-                </div>
-            </div>
-        </div>
+<div class="relative flex w-full min-h-screen flex-col bg-neutral-50 justify-between overflow-x-hidden" style="font-family: 'Plus Jakarta Sans', 'Noto Sans', sans-serif;">
+  <div>
+    <div class="flex items-center bg-neutral-50 p-4 pb-2 justify-between">
+      <!-- Menu Icon -->
+      <div class="text-[#141414] flex items-center" data-icon="List">
+        <!-- SVG icon -->
+      </div>
+      <h2 class="text-[#141414] text-lg font-bold text-center flex-1">Surgify</h2>
+      <!-- User Icon -->
+      <div class="flex items-center justify-end w-12">
+        <button class="rounded-full h-12 w-12 flex items-center justify-center bg-transparent">
+          <!-- SVG user icon -->
+        </button>
+      </div>
     </div>
 
-    <!-- Cases Grid -->
-    <div id="cases-container" 
-         hx-get="/api/search" 
-         hx-trigger="load" 
-         hx-target="this"
-         class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-        <!-- Cases will be loaded here -->
+    <!-- Search Bar -->
+    <div class="px-4 py-3">
+      <div class="flex items-center bg-[#ededed] rounded-xl h-12 overflow-hidden">
+        <div class="pl-4 flex items-center text-neutral-500">
+          <!-- SVG search icon -->
+        </div>
+        <input type="text" placeholder="Search" class="flex-1 bg-[#ededed] border-none px-4 placeholder:text-neutral-500 focus:outline-none text-base text-[#141414]" />
+      </div>
     </div>
 
-    <!-- Insights Modal -->
-    <div x-show="showInsightsModal" 
-         x-transition:enter="ease-out duration-300"
-         x-transition:enter-start="opacity-0"
-         x-transition:enter-end="opacity-100"
-         x-transition:leave="ease-in duration-200"
-         x-transition:leave-start="opacity-100"
-         x-transition:leave-end="opacity-0"
-         class="fixed inset-0 z-50 overflow-y-auto"
-         style="display: none;">
-        <div class="flex items-end justify-center min-h-screen pt-4 px-4 pb-20 text-center sm:block sm:p-0">
-            <div class="fixed inset-0 bg-gray-500 bg-opacity-75 transition-opacity"></div>
-            
-            <div class="inline-block align-bottom bg-white rounded-lg text-left overflow-hidden shadow-xl transform transition-all sm:my-8 sm:align-middle sm:max-w-4xl sm:w-full">
-                <div class="bg-white px-4 pt-5 pb-4 sm:p-6 sm:pb-4">
-                    <div class="flex items-center justify-between mb-4">
-                        <h3 class="text-lg font-medium text-gray-900">Generated Insights</h3>
-                        <button @click="showInsightsModal = false" class="text-gray-400 hover:text-gray-600">
-                            <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"></path>
-                            </svg>
-                        </button>
-                    </div>
-                    <div id="insights-content" class="max-h-96 overflow-y-auto">
-                        <!-- Insights will be loaded here -->
-                    </div>
-                </div>
-                <div class="bg-gray-50 px-4 py-3 sm:px-6 sm:flex sm:flex-row-reverse">
-                    <button @click="showInsightsModal = false" class="w-full sm:w-auto sm:ml-3 inline-flex justify-center rounded-md border border-transparent shadow-sm px-4 py-2 bg-blue-600 text-base font-medium text-white hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500 sm:text-sm">
-                        Close
-                    </button>
-                </div>
-            </div>
-        </div>
+    <!-- Tabs -->
+    <div class="flex gap-3 p-3 overflow-x-auto">
+      <button class="flex items-center h-8 bg-[#ededed] rounded-full px-4">
+        <span class="text-[#141414] text-sm font-medium">Journal</span>
+        <!-- Caret icon -->
+      </button>
+      <button class="flex items-center h-8 bg-[#ededed] rounded-full px-4">
+        <span class="text-[#141414] text-sm font-medium">Events</span>
+      </button>
+      <button class="flex items-center h-8 bg-[#ededed] rounded-full px-4">
+        <span class="text-[#141414] text-sm font-medium">Series</span>
+      </button>
     </div>
+
+    <!-- Featured Series -->
+    <h2 class="px-4 pt-5 pb-3 text-[22px] font-bold text-[#141414]">Featured Series</h2>
+    <div class="flex overflow-x-auto scrollbar-hidden p-4 gap-3">
+      <div class="min-w-[60px] flex flex-col gap-4 rounded-lg">
+        <div class="aspect-video bg-cover rounded-xl" style="background-image: url('https://lh3.googleusercontent.com/aida-public/...');"></div>
+        <p class="text-base font-medium text-[#141414]">Advanced Spinal Fusion Techniques</p>
+        <p class="text-sm text-neutral-500">Dr. Evelyn Reed</p>
+      </div>
+    </div>
+
+    <!-- Upcoming Events -->
+    <h2 class="px-4 pt-5 pb-3 text-[22px] font-bold text-[#141414]">Upcoming Events</h2>
+    <div class="flex overflow-x-auto scrollbar-hidden p-4 gap-3">
+      <div class="min-w-[60px] flex flex-col gap-4 rounded-lg">
+        <div class="aspect-video bg-cover rounded-xl" style="background-image: url('https://lh3.googleusercontent.com/aida-public/...');"></div>
+        <p class="text-base font-medium text-[#141414]">Minimally Invasive Surgery Conference</p>
+        <p class="text-sm text-neutral-500">October 20-22, 2024</p>
+      </div>
+    </div>
+
+    <!-- Latest Journal Articles -->
+    <h2 class="px-4 pt-5 pb-3 text-[22px] font-bold text-[#141414]">Latest Journal Articles</h2>
+    <div class="p-4 space-y-4">
+      <div class="flex items-center gap-4 rounded-xl">
+        <div class="flex-2 flex flex-col gap-1">
+          <p class="text-base font-bold text-[#141414]">Robotic-Assisted Surgery Outcomes</p>
+          <p class="text-sm text-neutral-500">Dr. Marcus Chen</p>
+        </div>
+        <div class="flex-1 aspect-video bg-cover rounded-xl" style="background-image: url('https://lh3.googleusercontent.com/aida-public/...');"></div>
+      </div>
+      <div class="flex items-center gap-4 rounded-xl">
+        <div class="flex-2 flex flex-col gap-1">
+          <p class="text-base font-bold text-[#141414]">Pediatric Cardiac Surgery Innovations</p>
+          <p class="text-sm text-neutral-500">Dr. Anya Sharma</p>
+        </div>
+        <div class="flex-1 aspect-video bg-cover rounded-xl" style="background-image: url('https://lh3.googleusercontent.com/aida-public/...');"></div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Bottom Nav -->
+  <div>
+    <div class="flex justify-between items-center border-t bg-neutral-50 p-4 gap-2">
+      <a href="#" class="flex flex-col items-center text-[#141414] gap-1">
+        <!-- Briefcase icon -->
+        <p class="text-xs font-medium">Workstation</p>
+      </a>
+      <a href="#" class="flex flex-col items-center text-neutral-500 gap-1">
+        <!-- Plus icon -->
+        <p class="text-xs font-medium">Add Case</p>
+      </a>
+      <a href="#" class="flex flex-col items-center text-neutral-500 gap-1">
+        <!-- Storefront icon -->
+        <p class="text-xs font-medium">Marketplace</p>
+      </a>
+    </div>
+    <div class="h-5 bg-neutral-50"></div>
+  </div>
 </div>
 {% endblock %}
 

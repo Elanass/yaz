@@ -3,16 +3,7 @@ Precision Decision Engine
 Combines impact analysis with statistical prediction models
 """
 
-import logging
-from typing import Dict, List, Any, Optional
-from datetime import datetime
-import uuid
-
-from core.models.shared_models import Patient
-from features.analysis.prospective import ProspectiveAnalyzer
-from core.utils.helpers import log_action, handle_error
-
-logger = logging.getLogger(__name__)
+from typing import Dict, List, Any
 
 class ImpactAnalyzer:
     """
@@ -21,7 +12,6 @@ class ImpactAnalyzer:
     
     def __init__(self):
         """Initialize the impact analyzer"""
-        logger.info("Initializing Impact Analyzer")
         # Default risk factors and weights
         self.risk_factors = {
             "age": {"weight": 0.2, "threshold": 70},
@@ -125,65 +115,15 @@ class PrecisionEngine:
     Precision Decision Engine combining impact analysis with statistical prediction models
     """
     
-    def __init__(self, model_path: Optional[str] = None):
+    def __init__(self):
         """Initialize the precision engine"""
-        logger.info("Initializing Precision Engine")
         self.impact_analyzer = ImpactAnalyzer()
-        
-        # Initialize prediction model
-        self.prospective_analyzer = ProspectiveAnalyzer()
-        if model_path:
-            logger.info(f"Loading prediction model from {model_path}")
-            # In a real implementation, this would load a pre-trained model
-            pass
     
-    def predict_outcomes(self, patient_data: Dict[str, Any], model_type: str = "random_forest") -> Dict[str, Any]:
-        """
-        Predict outcomes for a patient using impact analysis and statistical prediction
-        
-        Args:
-            patient_data: Patient clinical data
-            model_type: Type of prediction model to use ('random_forest' or 'reinforcement_learning')
-            
-        Returns:
-            Dictionary containing impact analysis and prediction results
-        """
-        try:
-            # Generate decision ID
-            decision_id = str(uuid.uuid4())
-            
-            # Perform impact analysis
-            surgery_impact = self.impact_analyzer.analyze_surgery_impact(patient_data)
-            flot_impact = self.impact_analyzer.analyze_flot_impact(patient_data)
-            
-            # Determine recommended treatment based on impact analysis
-            surgery_score = surgery_impact["recommended"] * surgery_impact["confidence"]
-            flot_score = flot_impact["recommended"] * flot_impact["confidence"]
-            
-            recommended_treatment = "surgery" if surgery_score > flot_score else "FLOT"
-            
-            # Statistical prediction using prospective analyzer
-            prediction_results = self.prospective_analyzer.predict(patient_data, model_type)
-            
-            # Compile results
-            results = {
-                "decision_id": decision_id,
-                "timestamp": str(datetime.now()),
-                "patient_data": patient_data,
-                "impact_analysis": {
-                    "surgery": surgery_impact,
-                    "flot": flot_impact
-                },
-                "recommendation": {
-                    "treatment": recommended_treatment,
-                    "confidence": max(surgery_score, flot_score),
-                    "explanation": f"{recommended_treatment.upper()} is recommended based on patient risk profile and clinical factors."
-                },
-                "prediction": prediction_results
-            }
-            
-            return results
-            
-        except Exception as e:
-            logger.error(f"Error predicting outcomes: {e}")
-            return handle_error(e)
+    def analyze(self, patients: List[Dict[str, Any]]) -> List[Dict[str, Any]]:
+        """Analyze a list of patients and return impact insights"""
+        insights = []
+        for patient in patients:
+            surgery = self.impact_analyzer.analyze_surgery_impact(patient)
+            flot = self.impact_analyzer.analyze_flot_impact(patient)
+            insights.append({"surgery": surgery, "flot": flot})
+        return insights

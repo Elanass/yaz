@@ -6,7 +6,7 @@ End-to-end workflow testing
 import pytest
 from fastapi.testclient import TestClient
 
-from yaz.main import create_app
+from main import create_app
 
 
 @pytest.fixture

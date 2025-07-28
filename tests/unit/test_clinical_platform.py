@@ -3,7 +3,7 @@ Tests for the Clinical Decision Platform components
 """
 
 import pytest
-from fasthtml.common import *
+# from fasthtml.common import *  # removed dependency on fasthtml
 from web.components.clinical_platform import (
     create_adaptive_decision_component,
     create_simulation_component,

@@ -8,7 +8,7 @@ import io
 import pandas as pd
 import numpy as np
 
-from app import create_app
+from main import create_app
 
 
 @pytest.fixture

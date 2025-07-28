@@ -6,7 +6,7 @@ Comprehensive tests for decision functionality
 import pytest
 from fastapi.testclient import TestClient
 
-from yaz.main import create_app
+from main import create_app
 from features.decisions.service import DecisionRequest
 
 

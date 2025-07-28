@@ -1,77 +1,45 @@
 #!/usr/bin/env python3
 """
-Gastric ADCI Platform - Main Entry Point
-Clean, DRY, MVP-focused implementation
+MVP Precision Decision Platform - Main Entry Point
 """
 
-import os
 import uvicorn
-from app import create_app
-from core.config.settings import ApplicationConfig, DatabaseConfig, SecurityConfig
-from features.decisions.service import DecisionService
-from api.v1 import api_router
-from web.components.layout import create_base_layout
-from web.components.pwa import create_pwa_manifest
-from web.components.clinical_platform import (
-    create_adaptive_decision_component,
-    create_simulation_component,
-    create_evidence_synthesis_component,
-    create_clinical_dashboard
-)
-from services.event_correlation.service import start_background_processing
+from fastapi import FastAPI, UploadFile, File, HTTPException
+import pandas as pd
+from core.config.platform_config import config
+from features.decisions.precision_engine import PrecisionEngine
+from features.decisions.adci_engine import ADCIEngine
 
+app = FastAPI(title=config.api_title, version=config.api_version)
 
-def main():
-    """Main application entry point"""
-    # Load configurations
-    app_config = ApplicationConfig()
-    db_config = DatabaseConfig()
-    security_config = SecurityConfig()
+@app.get("/health")
+async def health_check():
+    return {"status": "healthy", "version": config.api_version}
 
-    # Create the FastAPI application
-    app = create_app()
+@app.post("/process-csv")
+async def process_csv(file: UploadFile = File(...)):
+    """Process uploaded CSV file and return precision engine insights"""
+    df = pd.read_csv(file.file)
+    engine = PrecisionEngine()
+    records = df.to_dict(orient="records")
+    insights = engine.analyze(records)
+    return {"insights": insights}
 
-    # Register consolidated API router
-    app.include_router(api_router, prefix="/api/v1")
+@app.post("/predict/adci")
+async def predict_adci(patient: dict):
+    """Predict using the ADCI surgery decision engine for a single patient."""
+    engine = ADCIEngine()
+    if not engine.validate_input(patient):
+        raise HTTPException(status_code=400, detail="Invalid patient data for ADCI engine")
+    result = engine.predict(patient)
+    return result
 
-    # Register web components
-    app.mount("/web/layout", create_base_layout("Gastric ADCI Platform", content=None))
-    app.mount("/web/pwa", create_pwa_manifest())
-
-    # Start background services
-    @app.on_event("startup")
-    async def startup_event():
-        """Start background services when app starts"""
-        # Start event correlation background processing
-        # This would be run as a separate task
-        # For now, we'll just log that it would be started
-        print("Starting event correlation background processing...")
-        # In production, use:
-        # import asyncio
-        # asyncio.create_task(start_background_processing())
-
-    # Get configuration from environment
-    host = os.getenv("HOST", app_config.host)
-    port = int(os.getenv("PORT", app_config.port))
-    debug = app_config.debug
-
-    # Configure uvicorn
-    config = uvicorn.Config(
-        app=app,
-        host=host,
-        port=port,
-        reload=debug,
-        reload_dirs=["core", "features", "api", "web", "services", "adapters"] if debug else None,
-        log_level="info",
-        access_log=True,
-        server_header=False,  # Security: hide server info
-        date_header=False,    # Security: hide date info
-    )
-
-    # Start the server
-    server = uvicorn.Server(config)
-    server.run()
-
+@app.post("/predict/precision")
+async def predict_precision(patient: dict):
+    """Predict impact analysis for a single patient."""
+    engine = PrecisionEngine()
+    insights = engine.analyze([patient])
+    return insights[0]
 
 if __name__ == "__main__":
-    main()
+    uvicorn.run(app, host=config.host, port=config.port, reload=config.debug)

@@ -6,11 +6,11 @@ class BaseDecisionEngine(ABC):
         """
         Predict outcomes based on patient data.
         """
-        pass
+        raise NotImplementedError("predict() must be implemented by subclasses")
 
     @abstractmethod
     def validate_input(self, patient_data: dict) -> bool:
         """
         Validate input data for the decision engine.
         """
-        pass
+        raise NotImplementedError("validate_input() must be implemented by subclasses")
