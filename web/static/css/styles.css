@@ -1,0 +1,112 @@
+/* Custom CSS for Gastric ADCI Platform */
+
+.htmx-indicator {
+    opacity: 0;
+    transition: opacity 0.3s ease-in-out;
+}
+
+.htmx-request .htmx-indicator {
+    opacity: 1;
+}
+
+.htmx-request.htmx-indicator {
+    opacity: 1;
+}
+
+/* Loading animations */
+@keyframes pulse {
+    0%, 100% {
+        opacity: 1;
+    }
+    50% {
+        opacity: .5;
+    }
+}
+
+.animate-pulse {
+    animation: pulse 2s cubic-bezier(0.4, 0, 0.6, 1) infinite;
+}
+
+/* Card hover effects */
+.card-hover {
+    transition: all 0.3s ease;
+}
+
+.card-hover:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 20px 25px -5px rgba(0, 0, 0, 0.1), 0 10px 10px -5px rgba(0, 0, 0, 0.04);
+}
+
+/* ADCI Score indicators */
+.adci-high {
+    background: linear-gradient(135deg, #10b981, #059669);
+    color: white;
+}
+
+.adci-medium {
+    background: linear-gradient(135deg, #f59e0b, #d97706);
+    color: white;
+}
+
+.adci-low {
+    background: linear-gradient(135deg, #ef4444, #dc2626);
+    color: white;
+}
+
+/* Clinical priority badges */
+.priority-high {
+    background: linear-gradient(135deg, #fecaca, #fca5a5);
+    color: #991b1b;
+}
+
+.priority-medium {
+    background: linear-gradient(135deg, #fef3c7, #fde68a);
+    color: #92400e;
+}
+
+.priority-low {
+    background: linear-gradient(135deg, #d1fae5, #a7f3d0);
+    color: #065f46;
+}
+
+/* Table enhancements */
+.table-hover tbody tr:hover {
+    background-color: #f8fafc;
+}
+
+/* Search bar enhancements */
+.search-focus:focus {
+    box-shadow: 0 0 0 3px rgba(59, 130, 246, 0.1);
+    border-color: #3b82f6;
+}
+
+/* Mobile responsive adjustments */
+@media (max-width: 768px) {
+    .mobile-stack {
+        flex-direction: column;
+    }
+    
+    .mobile-full {
+        width: 100%;
+    }
+}
+
+/* Dark mode support */
+@media (prefers-color-scheme: dark) {
+    .dark-mode {
+        background-color: #1f2937;
+        color: #f9fafb;
+    }
+    
+    .dark-mode .bg-white {
+        background-color: #374151;
+    }
+    
+    .dark-mode .text-gray-900 {
+        color: #f9fafb;
+    }
+    
+    .dark-mode .border-gray-200 {
+        border-color: #4b5563;
+    }
+}

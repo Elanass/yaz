@@ -1,137 +1,192 @@
 # Gastric ADCI Platform
 
-## Overview
-The Gastric ADCI Platform is a healthcare-grade Progressive Web App (PWA) designed to support gastric oncology-surgery decision-making using the Adaptive Decision Confidence Index (ADCI) framework. It integrates advanced clinical decision engines, real-time collaboration tools, and compliance with healthcare standards like HIPAA and GDPR.
+A state-of-the-art Progressive Web App (PWA) for precision oncology decision support in gastric surgery, centered on the ADCI (Adaptive Decision Confidence Index) framework.
 
-## Current State of the Codebase
+## 🎯 Overview
 
-### Backend
-- **Framework**: FastAPI for building RESTful APIs.
-- **Database**: PostgreSQL with ElectricsQL for real-time synchronization.
-- **Decision Engines**:
-  - **ADCI Engine**: Provides confidence-scored treatment recommendations.
-  - **Gastrectomy Engine**: Suggests surgical approaches based on clinical data.
-  - **FLOT Engine**: Optimizes perioperative chemotherapy protocols.
-- **Security**:
-  - Role-Based Access Control (RBAC).
-  - Audit logging for all data access and modifications.
-  - Encryption for sensitive clinical data.
-- **Compliance**:
-  - Fully adheres to HIPAA and GDPR standards.
-  - Implements audit trails for all clinical workflows.
+This platform serves clinical experts and patients in collaborative, evidence-based healthcare environments for gastric cancer treatment decisions.
 
-### Frontend
-- **Framework**: FastHTML and HTMX for lightweight, reactive UI components.
-- **State Management**: Gun.js for real-time collaboration and offline-first functionality.
-- **Features**:
-  - Responsive, mobile-first design.
-  - Advanced analytics dashboards with export options (PDF, CSV, JSON).
-  - Real-time notifications and updates.
-  - Accessibility compliant with WCAG 2.1 AA standards.
+## 🏗️ Architecture
 
-### Deployment
-- **Containerization**: Dockerized services for consistent deployment.
-- **Cloud**: Google Cloud Run/GKE for scalable hosting.
-- **CI/CD**: Automated pipelines for testing and deployment.
+### New Modular Structure
+```
+yaz/
+├── core/                    # 🤖 Core platform functionality
+│   ├── config/             # Central configuration system
+│   ├── models/             # Shared data models
+│   ├── services/           # Base services & utilities
+│   └── utils/              # Helper functions
+├── features/               # 🔧 Feature modules (add new features here)
+│   ├── auth/              # Authentication & RBAC
+│   ├── decisions/         # Decision engines (ADCI, Gastrectomy)
+│   ├── insights/          # Insight generation (future)
+│   └── cohorts/           # Cohort management (future)
+├── api/                   # 🌐 Clean API layer
+│   └── v1/               # API v1 endpoints
+├── web/                  # 💻 Simple web interface
+│   ├── components/       # Reusable UI components
+│   └── pages/           # Page templates
+├── data/                # 📊 Data layer (future)
+│   ├── models/          # Database models
+│   └── repositories/    # Data access layer
+└── tests/               # ✅ Comprehensive tests
+    ├── unit/           # Unit tests
+    └── integration/    # End-to-end tests
+```
 
-### Testing
-- Comprehensive unit tests for decision engines.
-- Integration tests for clinical workflows.
-- Performance tests ensuring sub-200ms API response times.
-- Offline functionality and sync scenarios validated.
+### Frontend (PWA)
+- **FastHTML** + **HTMX** for reactive UI
+- **Gun.js** for real-time distributed state
+- **ElectricsQL** for offline-first PostgreSQL sync
+- **Service Worker** for offline capabilities
+- **Web App Manifest** for PWA installation
 
-## State-of-the-Art Features
-1. **Adaptive Decision Confidence Index (ADCI)**:
-   - Provides confidence intervals and uncertainty measures for clinical decisions.
-   - Integrates evidence-based scoring and recommendations.
+### Backend (FastAPI)
+- **FastAPI** with async support
+- **PostgreSQL** with ElectricsQL compatibility
+- **IPFS** for immutable evidence storage
+- **RBAC** (Role-Based Access Control)
+- **Decision Engine** with ADCI, Gastrectomy, FLOT protocols
 
-2. **Real-Time Collaboration**:
-   - Supports collaborative protocol editing and case discussions.
-   - Real-time synchronization of decisions and evidence.
+### Key Features
+- 🔒 **HIPAA/GDPR Compliant** with audit trails
+- 📱 **Mobile-first** responsive design
+- 🔄 **Offline-first** with background sync
+- 🧠 **AI-powered** decision support
+- 👥 **Multi-role** support (Patients, Practitioners, Researchers)
+- 📊 **Evidence visualization** and analysis
+- 🔍 **Advanced filtering** and search
+- 📤 **Data export** (CSV/JSON)
 
-3. **Offline-First Functionality**:
-   - Ensures seamless operation during network outages.
-   - Automatic synchronization when connectivity is restored.
-
-4. **Advanced Analytics**:
-   - Interactive dashboards for cohort analysis and protocol optimization.
-   - Exportable reports with clinical explanations and evidence citations.
-
-5. **Compliance and Security**:
-   - End-to-end encryption for sensitive data.
-   - Comprehensive audit trails for all actions.
-
-## Getting Started
+## 🚀 Quick Start
 
 ### Prerequisites
-- Python 3.11 or higher.
-- Docker and Docker Compose.
-- Node.js (for frontend builds).
+- Python 3.11+
+- PostgreSQL 15+ (optional - SQLite used for development)
+- Redis 7+ (optional - for production caching)
 
-### Installation
-1. Clone the repository:
-   ```bash
-   git clone https://github.com/your-repo/gastric-adci-platform.git
-   cd gastric-adci-platform
-   ```
-2. Set up the Python environment:
-   ```bash
-   poetry install
-   ```
-3. Start the platform:
-   ```bash
-   ./scripts/start_platform.sh
-   ```
+### Development Setup
 
-### Troubleshooting
-- Ensure Python 3.11+ is installed and set as the default interpreter.
-- Check Docker and Node.js installations for compatibility.
+1. **Clone and setup the project:**
+```bash
+git clone <your-repo-url>
+cd yaz
+```
 
-## Contributing
-We welcome contributions! Please read our [Contributing Guide](CONTRIBUTING.md) for details on our code of conduct and the process for submitting pull requests.
+2. **Install Dependencies:**
+```bash
+pip install -r requirements.txt
+```
 
-## Multi-Cloud & Self-Host Deployment
+3. **Configure Environment:**
+```bash
+cp .env.example .env
+# Edit .env with your settings
+```
 
-Use the following options to deploy the Gastric ADCI PWA on any VM or PaaS (Oracle Free Tier, Hostinger VPS, self-hosted servers, or multi-cloud setups) with Docker, Dokku, or Coolify.
+4. **Start the platform:**
+```bash
+python app.py
+```
 
-### 1. Docker Compose on Your VM
-1. SSH into your VM (Oracle Cloud VM, Hostinger VPS, etc.).
-2. Clone the repo and switch to the main branch:
-   ```bash
-   git clone https://github.com/Elanass/yaz.git
-   cd yaz
-   git checkout main
-   ```
-3. Copy the production environment file:
-   ```bash
-   cp infra/config/production.env .env
-   ```
-4. Build and start services in detached mode:
-   ```bash
-   docker-compose up --build -d
-   ```
-5. Verify:
-   - Frontend: http://<VM_PUBLIC_IP>
-   - Backend API: http://<VM_PUBLIC_IP>:8000
+## 🏗️ Migration Notes
 
-### 2. Dokku Deployment
-1. Add your Dokku remote and set as a Git remote:
-   ```bash
-   git remote add dokku dokku@<YOUR_DOKKU_HOST>:gastric-adci-platform
-   ```
-2. Push to Dokku:
-   ```bash
-   git push dokku main
-   ```
-3. GitHub Actions pipeline in `.github/workflows/deploy.yml` will also auto-deploy on each push to `main`.
+This restructure focuses on:
+- **DRY** (Don't Repeat Yourself) - Eliminated code duplication
+- **MVP** (Minimum Viable Product) - Core functionality first
+- **Reproducible** - Standardized patterns for feature development
 
-### 3. Coolify Deployment
-1. Create a new app in Coolify and link this GitHub repo.
-2. Add environment variables from `infra/config/production.env`.
-3. Configure build steps:
-   - **Backend**: `docker build -t backend ./backend && docker run --env-file production.env backend`
-   - **Frontend**: `docker build -t frontend ./frontend && docker run -p 80:80 frontend`
-4. Deploy and monitor via Coolify dashboard.
+Refer to the new modular structure above for details.
 
-## License
-This project is licensed under the MIT License. See the [LICENSE](LICENSE) file for details.
+## 📂 Project Structure
+
+```
+gastric-adci-platform/
+├── backend/
+│   ├── src/
+│   │   ├── api/           # FastAPI routes
+│   │   ├── core/          # Configuration, security
+│   │   ├── db/            # Database models, migrations
+│   │   ├── services/      # Business logic
+│   │   └── engines/       # Decision engines
+│   ├── tests/
+│   └── alembic/
+├── frontend/
+│   ├── static/            # CSS, JS, images
+│   ├── templates/         # FastHTML templates
+│   ├── components/        # Reusable components
+│   └── islands/           # Page islands
+├── scripts/               # Deployment, setup scripts
+├── docs/                  # Documentation
+└── docker/                # Docker configurations
+```
+
+## 🔬 Clinical Decision Engines
+
+### ADCI (Adaptive Decision Confidence Index)
+- Real-time confidence scoring
+- Evidence-based recommendations
+- Uncertainty quantification
+
+### Gastrectomy Protocol Engine
+- Surgical approach recommendations
+- Risk stratification
+- Recovery predictions
+
+### FLOT (Fluorouracil, Leucovorin, Oxaliplatin, Docetaxel)
+- Chemotherapy protocol optimization
+- Side effect prediction
+- Dosage recommendations
+
+## 👥 User Roles
+
+- **Patients**: View treatment options, track progress
+- **Practitioners**: Access decision tools, update protocols
+- **Researchers**: Contribute evidence, analyze outcomes
+
+## 🛡️ Security & Compliance
+
+- End-to-end encryption for clinical data
+- Audit logging for all access and modifications
+- RBAC with fine-grained permissions
+- HIPAA-compliant data handling
+- GDPR-compliant data processing
+
+## 🌐 Deployment
+
+### Google Cloud Platform
+- **Cloud Run** for scalable container deployment
+- **Cloud SQL** for managed PostgreSQL
+- **Cloud Storage** for static assets
+- **Cloud CDN** for global distribution
+
+### Monitoring
+- **Prometheus** metrics collection
+- **Grafana** dashboards
+- **Cloud Logging** for centralized logs
+- **Error Reporting** for issue tracking
+
+## 📊 Performance Targets
+
+- API response time: < 200ms (95th percentile)
+- PWA load time: < 3s on 3G
+- Offline functionality: Full feature parity
+- Uptime: 99.9% SLA
+
+## 🤝 Contributing
+
+Please read our [Contributing Guidelines](CONTRIBUTING.md) and [Code of Conduct](CODE_OF_CONDUCT.md).
+
+## 📄 License
+
+- **Clinical Decision Logic**: Proprietary/Licensed
+- **EMR Integration Modules**: Open Source (MIT)
+
+## 📞 Support
+
+For clinical support: [clinical-support@gastric-adci.health](mailto:clinical-support@gastric-adci.health)
+For technical support: [tech-support@gastric-adci.health](mailto:tech-support@gastric-adci.health)
+
+---
+
+**⚠️ Important**: This is a medical decision support tool. Always consult with qualified healthcare professionals before making clinical decisions.

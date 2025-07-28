@@ -1,0 +1,79 @@
+<!-- Cases Cards for Surgify -->
+{% if cases %}
+    {% for case in cases %}
+    <div class="bg-white rounded-lg shadow-md hover:shadow-lg transition-shadow duration-200">
+        <div class="p-6">
+            <!-- Header -->
+            <div class="flex items-start justify-between mb-4">
+                <div class="flex-1">
+                    <h3 class="text-lg font-semibold text-gray-900 mb-2">{{ case.title }}</h3>
+                    <p class="text-sm text-gray-600">by {{ case.author }}</p>
+                </div>
+                <div class="ml-4 text-right">
+                    <span class="text-2xl font-bold text-blue-600">{{ "%.1f"|format(case.value) }}</span>
+                    <p class="text-xs text-gray-500">Clinical Value</p>
+                </div>
+            </div>
+            
+            <!-- ADCI Insights -->
+            {% if case.adci_score %}
+            <div class="border-t border-gray-200 pt-4">
+                <div class="grid grid-cols-2 gap-4 mb-4">
+                    <div>
+                        <p class="text-sm font-medium text-gray-700">ADCI Score</p>
+                        <p class="text-xl font-semibold text-green-600">{{ "%.1f"|format(case.adci_score) }}</p>
+                    </div>
+                    <div>
+                        <p class="text-sm font-medium text-gray-700">Risk Category</p>
+                        <span class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium
+                            {% if case.risk_category == 'Low Risk' %}bg-green-100 text-green-800
+                            {% elif case.risk_category == 'Medium Risk' %}bg-yellow-100 text-yellow-800
+                            {% else %}bg-red-100 text-red-800{% endif %}">
+                            {{ case.risk_category }}
+                        </span>
+                    </div>
+                </div>
+                
+                <!-- Recommendation -->
+                <div class="bg-blue-50 rounded-lg p-3">
+                    <p class="text-sm font-medium text-blue-900 mb-1">Clinical Recommendation</p>
+                    <p class="text-sm text-blue-800">{{ case.recommendation }}</p>
+                </div>
+                
+                <!-- FLOT Eligibility -->
+                {% if case.flot_eligible %}
+                <div class="mt-3 flex items-center text-sm text-green-600">
+                    <svg class="w-4 h-4 mr-1" fill="currentColor" viewBox="0 0 20 20">
+                        <path fill-rule="evenodd" d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z" clip-rule="evenodd"></path>
+                    </svg>
+                    FLOT Protocol Eligible
+                </div>
+                {% endif %}
+            </div>
+            {% endif %}
+            
+            <!-- Actions -->
+            <div class="mt-4 flex space-x-2">
+                <button class="flex-1 bg-blue-600 text-white px-3 py-2 rounded-md text-sm font-medium hover:bg-blue-700">
+                    View Details
+                </button>
+                <button class="bg-gray-100 text-gray-700 px-3 py-2 rounded-md text-sm font-medium hover:bg-gray-200">
+                    Export
+                </button>
+            </div>
+        </div>
+    </div>
+    {% endfor %}
+{% else %}
+    <div class="col-span-full">
+        <div class="text-center py-12">
+            <svg class="mx-auto h-12 w-12 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"></path>
+            </svg>
+            <h3 class="mt-2 text-sm font-medium text-gray-900">No cases found</h3>
+            <p class="mt-1 text-sm text-gray-500">
+                {% if error %}{{ error }}{% else %}Try adjusting your search criteria or upload new data.{% endif %}
+            </p>
+        </div>
+    </div>
+{% endif %}

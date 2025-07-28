@@ -1,5 +1,5 @@
 {
-  "name": "Precision Decision Support",
+  "name": "Precision Decision Engine",
   "image": "python:3.10-slim-bullseye",
   "features": {
     "docker-in-docker": "latest"

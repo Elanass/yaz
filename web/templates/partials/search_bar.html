@@ -1,0 +1,61 @@
+<div class="flex flex-col md:flex-row gap-4 mb-6">
+    <!-- Search Input -->
+    <div class="flex-1">
+        <div class="relative">
+            <div class="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
+                <svg class="h-5 w-5 text-gray-400" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20" fill="currentColor">
+                    <path fill-rule="evenodd" d="M8 4a4 4 0 100 8 4 4 0 000-8zM2 8a6 6 0 1110.89 3.476l4.817 4.817a1 1 0 01-1.414 1.414l-4.816-4.816A6 6 0 012 8z" clip-rule="evenodd" />
+                </svg>
+            </div>
+            <input id="search-input" 
+                   type="text" 
+                   placeholder="Search clinical guidelines, protocols, evidence..."
+                   class="block w-full pl-10 pr-4 py-3 border border-gray-300 rounded-xl focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+                   hx-get="/api/search"
+                   hx-trigger="keyup changed delay:300ms, search"
+                   hx-target="#results-container"
+                   hx-swap="innerHTML"
+                   hx-indicator="#loading"
+                   hx-include="#filter-select">
+        </div>
+    </div>
+    
+    <!-- Filter Dropdown -->
+    <div class="md:w-64">
+        <select id="filter-select" 
+                name="filter"
+                class="block w-full px-4 py-3 border border-gray-300 rounded-xl focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+                hx-get="/api/search"
+                hx-trigger="change"
+                hx-target="#results-container"
+                hx-swap="innerHTML"
+                hx-indicator="#loading"
+                hx-include="#search-input">
+            <option value="all">All Categories</option>
+            <option value="journal">Journal Articles</option>
+            <option value="guidelines">Clinical Guidelines</option>
+            <option value="protocols">Treatment Protocols</option>
+            <option value="high_value">High Priority</option>
+            <option value="medium_value">Medium Priority</option>
+        </select>
+    </div>
+    
+    <!-- Advanced Search Toggle -->
+    <button class="px-6 py-3 bg-blue-600 text-white rounded-xl hover:bg-blue-700 transition-colors font-medium">
+        <svg class="h-5 w-5 inline mr-2" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 6V4m0 2a2 2 0 100 4m0-4a2 2 0 110 4m-6 8a2 2 0 100-4m0 4a2 2 0 100 4m0-4v2m0-6V4m6 6v10m6-2a2 2 0 100-4m0 4a2 2 0 100 4m0-4v2m0-6V4" />
+        </svg>
+        Filters
+    </button>
+</div>
+
+<!-- Search Stats -->
+<div class="flex items-center justify-between text-sm text-gray-600 mb-4">
+    <div id="search-stats">
+        <span class="font-medium">Real-time clinical insights powered by ADCI framework</span>
+    </div>
+    <div class="flex items-center space-x-2">
+        <span class="w-2 h-2 bg-green-500 rounded-full animate-pulse"></span>
+        <span>Live updates</span>
+    </div>
+</div>
