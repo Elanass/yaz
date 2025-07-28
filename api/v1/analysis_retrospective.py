@@ -10,6 +10,7 @@ import io
 import logging
 
 from features.analysis.retrospective import RetrospectiveAnalyzer
+from features.analysis.retrospective_analysis import RetrospectiveAnalysis
 from features.auth.service import get_current_user, require_role, Domain, Scope
 from core.utils.helpers import log_action
 
@@ -19,6 +20,7 @@ router = APIRouter(prefix="/analysis/retrospective", tags=["Analysis"])
 
 # Initialize retrospective analyzer
 retrospective_analyzer = RetrospectiveAnalyzer()
+retrospective_analysis = RetrospectiveAnalysis()
 
 @router.post("/cox")
 async def run_cox_regression(
@@ -228,3 +230,14 @@ async def run_logistic_regression(
     except Exception as e:
         logger.exception("Error in Logistic regression")
         raise HTTPException(status_code=500, detail=f"Analysis failed: {str(e)}")
+
+@router.post("/analysis/retrospective")
+def analyze_retrospective(data: dict):
+    """
+    API endpoint to perform retrospective analysis.
+    """
+    if not retrospective_analysis.validate_data(data):
+        raise HTTPException(status_code=400, detail="Invalid input data")
+
+    results = retrospective_analysis.analyze(data)
+    return results

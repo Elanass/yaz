@@ -95,6 +95,21 @@ gastric-adci-platform/
     └── static/           # Static assets
 ```
 
+## Optimized Root Directory
+
+### Changes Made:
+1. Removed unnecessary files and directories:
+   - `.pytest_cache/`: Temporary cache files from pytest.
+   - `.venv/`: Local virtual environment (not required for containerized environments).
+   - `__init__.py`: Redundant at the root level.
+   - `app.py`: Unused file.
+
+2. Modularized the codebase:
+   - Created feature-specific directories and base classes.
+   - Added API endpoints and tests for each feature.
+
+3. Enhanced project structure for maintainability and scalability.
+
 ## Statistical Analysis Module
 
 ### Retrospective Analysis

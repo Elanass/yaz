@@ -10,6 +10,7 @@ import io
 import logging
 
 from features.analysis.prospective import ProspectiveAnalyzer
+from features.analysis.prospective_analysis import ProspectiveAnalysis
 from features.auth.service import get_current_user, require_role, Domain, Scope
 from core.utils.helpers import log_action
 
@@ -19,6 +20,7 @@ router = APIRouter(prefix="/analysis/prospective", tags=["Analysis"])
 
 # Initialize prospective analyzer
 prospective_analyzer = ProspectiveAnalyzer()
+prospective_analysis = ProspectiveAnalysis()
 
 @router.post("/random-forest")
 async def run_random_forest(
@@ -211,3 +213,14 @@ async def predict_patient_outcome(
     except Exception as e:
         logger.exception("Error in patient prediction")
         raise HTTPException(status_code=500, detail=f"Prediction failed: {str(e)}")
+
+@router.post("/analysis/prospective")
+def analyze_prospective(data: dict):
+    """
+    API endpoint to perform prospective analysis.
+    """
+    if not prospective_analysis.validate_data(data):
+        raise HTTPException(status_code=400, detail="Invalid input data")
+
+    results = prospective_analysis.analyze(data)
+    return results

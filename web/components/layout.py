@@ -409,3 +409,17 @@ def create_pwa_install_prompt():
             "x-data": "{ showInstallPrompt: false, isPWAInstalled: false }"
         }
     )
+
+
+def create_enhanced_header(user_role: str, permissions: dict):
+    """Create an enhanced header with Surgify-inspired design, RBAC, branding, and emergency access integration"""
+    
+    return Header(
+        # Surgify-inspired hamburger menu with existing RBAC
+        create_role_based_hamburger(user_role, permissions),
+        # Enhanced branding maintaining platform identity
+        create_gastric_adci_brand(),
+        # User panel with existing auth integration
+        create_user_panel_with_emergency_access(),
+        cls="surgify-inspired-header"
+    )
