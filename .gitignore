@@ -38,6 +38,7 @@ deployment/*/.env
 
 # IDE
 .vscode/
+.history/
 .idea/
 *.swp
 *.swo
