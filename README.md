@@ -1,19 +1,21 @@
-# Gastric ADCI Platform
+# Decision Precision in Surgery: Gastric ADCI Surgery FLOT Impact
 
 ## Overview
-The Gastric ADCI (Adaptive Decision Confidence Index) Platform provides clinicians with evidence-based decision support for gastric cancer treatment planning. The platform includes a dedicated Precision Decision Engine for diffuse-type gastric cancer surgery that integrates FLOT protocol impact analysis, a multi-criteria decision analysis (MCDA) framework, and real-time confidence scoring. It also features an Impact Analyzer tool that computes Kaplan–Meier survival curves, treatment effectiveness, quality-of-life assessments, and cost–effectiveness metrics. Previously based on Markov chain simulations, the platform now employs more robust statistical methods—including Cox regression, logistic regression, and Random Forest models—for improved prediction accuracy and clinical interpretability.
+The Decision Precision in Surgery platform provides clinicians with evidence-based decision support for gastric cancer treatment planning, with a specific focus on the impact of FLOT protocol on surgical outcomes. The platform includes a dedicated Precision Decision Engine for diffuse-type gastric cancer surgery that integrates FLOT protocol impact analysis, a multi-criteria decision analysis (MCDA) framework, and real-time confidence scoring using the ADCI (Adaptive Decision Confidence Index) methodology. It also features an Impact Analyzer tool that computes Kaplan–Meier survival curves, treatment effectiveness, quality-of-life assessments, and cost–effectiveness metrics. Previously based on Markov chain simulations, the platform now employs more robust statistical methods—including Cox regression, logistic regression, and Random Forest models—for improved prediction accuracy and clinical interpretability.
 
 ## Features
 
 ### Core Features
 - **Adaptive Decision Confidence Index (ADCI)**: Structured decision framework with confidence scoring
+- **FLOT Protocol Impact Assessment**: Comprehensive analysis of FLOT protocol impact on surgical outcomes
 - **Statistical Analysis**: Both retrospective (Cox & Logistic Regression) and prospective (Random Forest, RL) models
 - **Evidence Synthesis**: Automated literature review and protocol integration
 - **HIPAA/GDPR Compliant**: End-to-end encryption and comprehensive audit logging
 
 ### Key Components
 - **Decision Support Engine**: Evidence-based gastric cancer treatment recommendations
-- **Precision Medicine Framework**: Patient-specific risk stratification
+- **Precision Surgery Framework**: Patient-specific risk stratification for surgical outcomes
+- **FLOT Impact Analysis**: Assessment of perioperative chemotherapy effects on surgical results
 - **Statistical Analysis Module**: Advanced analytics for outcome prediction
 - **Progressive Web App**: Healthcare-grade, offline-capable interface
 

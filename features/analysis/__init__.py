@@ -2,10 +2,10 @@
 Analysis package for statistical modeling and decision support
 """
 
-from .retrospective import RetrospectiveAnalyzer
-from .prospective import ProspectiveAnalyzer
+from .analysis import AnalysisEngine
+from .surgery_analyzer import IntegratedSurgeryAnalyzer
 
 __all__ = [
-    'RetrospectiveAnalyzer',
-    'ProspectiveAnalyzer'
+    'AnalysisEngine',
+    'IntegratedSurgeryAnalyzer'
 ]

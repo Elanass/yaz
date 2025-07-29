@@ -391,3 +391,34 @@ class OpenMRSAdapter(BaseService):
     async def close(self):
         """Close the HTTP client"""
         await self.http_client.aclose()
+
+
+class OpenMRSClient(BaseService):
+    """
+    OpenMRS REST API client for Decision Precision in Surgery platform
+    """
+    
+    def __init__(self):
+        """Initialize the OpenMRS client"""
+        self.config = get_adapter_config("openmrs")
+        self.base_url = self.config.get("base_url", "https://demo.openmrs.org/openmrs/ws/rest/v1")
+        self.username = self.config.get("username", "admin")
+        self.password = self.config.get("password", "Admin123")
+        self.logger = Logger()
+        self.logger.info("OpenMRS client initialized")
+        
+    async def get_patient(self, patient_id: str) -> Optional[OpenMRSPatient]:
+        """Get patient by ID"""
+        self.logger.info(f"Fetching patient {patient_id} from OpenMRS")
+        # Implementation details here
+        return None
+        
+    async def search_patients(self, query: str) -> List[OpenMRSPatient]:
+        """Search for patients"""
+        self.logger.info(f"Searching patients with query: {query}")
+        # Implementation details here
+        return []
+
+
+# Create a singleton instance for importing
+openmrs_client = OpenMRSClient()

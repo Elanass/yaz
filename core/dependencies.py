@@ -5,29 +5,141 @@ This module provides dependency injection for database sessions, authentication,
 and other services throughout the application.
 """
 
-from typing import Optional, Annotated, AsyncGenerator
-from fastapi import Depends, HTTPException, status
-from fastapi.security import HTTPBearer, HTTPAuthorizationCredentials
+from typing import Optional, Annotated, AsyncGenerator, Union
+from fastapi import Depends, HTTPException, status, Request
+from fastapi.security import HTTPBearer, HTTPAuthorizationCredentials, OAuth2PasswordBearer
 from sqlalchemy.ext.asyncio import AsyncSession
 import jwt
+from jwt.exceptions import PyJWTError
 
 from core.config.platform_config import config
-from data.database.electric import ElectricSQLManager as ElectricManager
+from data.database import get_db_session
 from core.services.encryption import encryption_service
 from core.services.logger import get_logger
 from services.event_logger.service import event_logger, EventCategory, EventSeverity
+from core.models.shared_models import User, UserRole
 
 # Initialize logger
 logger = get_logger(__name__)
 
 # HTTP Bearer for JWT token authentication
-security = HTTPBearer()
+security = HTTPBearer(auto_error=False)
+oauth2_scheme = OAuth2PasswordBearer(tokenUrl="/api/v1/auth/token", auto_error=False)
 
-# ElectricSQL Manager (singleton)
-electric_manager = ElectricManager()
+# Mock user for development (to be removed in production)
+MOCK_USERS = {
+    "dev-user": User(
+        id="00000000-0000-0000-0000-000000000000",
+        username="dev-user",
+        email="dev@gastricadci.org",
+        full_name="Development User",
+        role=UserRole.ADMIN,
+        is_active=True,
+    )
+}
 
+# Database session dependency
+async def get_db() -> AsyncGenerator[AsyncSession, None]:
+    """Dependency for getting database session"""
+    async with get_db_session() as session:
+        yield session
 
-async def get_database_session() -> AsyncGenerator[AsyncSession, None]:
+# Token dependency
+async def get_token(
+    bearer: Optional[HTTPAuthorizationCredentials] = Depends(security),
+    token: Optional[str] = Depends(oauth2_scheme),
+) -> Optional[str]:
+    """Get token from authorization header or OAuth2 scheme"""
+    if bearer is not None:
+        return bearer.credentials
+    if token is not None:
+        return token
+    return None
+
+# User dependency
+async def get_current_user(
+    request: Request,
+    token: Optional[str] = Depends(get_token),
+    db: AsyncSession = Depends(get_db),
+) -> Optional[User]:
+    """
+    Dependency for getting the current authenticated user
+    
+    In production, this would verify the JWT token and fetch the user from the database.
+    In development, it can optionally use a mock user for testing.
+    """
+    if token is None:
+        # In development, we allow anonymous access
+        if config.is_development:
+            logger.warning("No token provided, using development user")
+            return MOCK_USERS["dev-user"]
+        return None
+    
+    try:
+        # Decode JWT token
+        payload = jwt.decode(
+            token, config.secret_key, algorithms=["HS256"]
+        )
+        user_id: str = payload.get("sub")
+        if user_id is None:
+            return None
+        
+        # In a real application, you would query the database for the user
+        # For now, we'll use a mock user
+        if config.is_development:
+            logger.info(f"Using mock user for user_id: {user_id}")
+            return MOCK_USERS["dev-user"]
+        
+        # Query user from database
+        # user = await db.query(UserModel).filter(UserModel.id == user_id).first()
+        # return user
+        
+        # For now, return None in production since we don't have a real user database yet
+        return None
+        
+    except PyJWTError as e:
+        logger.error(f"JWT token error: {e}")
+        return None
+
+# Admin user dependency
+async def get_admin_user(
+    current_user: Optional[User] = Depends(get_current_user),
+) -> User:
+    """Dependency for getting an admin user"""
+    if current_user is None or current_user.role != UserRole.ADMIN:
+        raise HTTPException(
+            status_code=status.HTTP_403_FORBIDDEN,
+            detail="Admin privileges required",
+        )
+    return current_user
+
+# Authenticated user dependency
+async def get_authenticated_user(
+    current_user: Optional[User] = Depends(get_current_user),
+) -> User:
+    """Dependency for getting an authenticated user"""
+    if current_user is None:
+        raise HTTPException(
+            status_code=status.HTTP_401_UNAUTHORIZED,
+            detail="Authentication required",
+            headers={"WWW-Authenticate": "Bearer"},
+        )
+    if not current_user.is_active:
+        raise HTTPException(
+            status_code=status.HTTP_403_FORBIDDEN,
+            detail="Inactive user",
+        )
+    return current_user
+
+# Encryption service dependency
+def get_encryption_service():
+    """Dependency for getting the encryption service"""
+    return encryption_service
+
+# Event logger dependency
+def get_event_logger():
+    """Dependency for getting the event logger service"""
+    return event_logger
     """
     Dependency to get an async database session
     

@@ -1,0 +1,308 @@
+{% extends "layout.html" %}
+
+{% block title %}Settings - Gastric ADCI Platform{% endblock %}
+
+{% block header_title %}Settings{% endblock %}
+
+{% block head %}
+<link rel="stylesheet" href="/static/css/settings.css">
+<script src="/static/js/settings.js" defer></script>
+{% endblock %}
+
+{% block content %}
+<div class="settings-container">
+  <h2 class="section-title">Account</h2>
+  
+  <div class="settings-list">
+    <!-- Account Details -->
+    <div class="settings-item">
+      <div class="flex items-center gap-4">
+        <div class="settings-icon">
+          <svg xmlns="http://www.w3.org/2000/svg" width="24px" height="24px" fill="currentColor" viewBox="0 0 256 256">
+            <path d="M230.92,212c-15.23-26.33-38.7-45.21-66.09-54.16a72,72,0,1,0-73.66,0C63.78,166.78,40.31,185.66,25.08,212a8,8,0,1,0,13.85,8c18.84-32.56,52.14-52,89.07-52s70.23,19.44,89.07,52a8,8,0,1,0,13.85-8ZM72,96a56,56,0,1,1,56,56A56.06,56.06,0,0,1,72,96Z"></path>
+          </svg>
+        </div>
+        <div class="flex flex-col justify-center">
+          <p class="settings-title">Account Details</p>
+          <p class="settings-subtitle">Manage your personal information</p>
+        </div>
+      </div>
+      <div class="shrink-0">
+        <a href="/settings/account" class="settings-arrow">
+          <svg xmlns="http://www.w3.org/2000/svg" width="24px" height="24px" fill="currentColor" viewBox="0 0 256 256">
+            <path d="M181.66,133.66l-80,80a8,8,0,0,1-11.32-11.32L164.69,128,90.34,53.66a8,8,0,0,1,11.32-11.32l80,80A8,8,0,0,1,181.66,133.66Z"></path>
+          </svg>
+        </a>
+      </div>
+    </div>
+    
+    <!-- Password -->
+    <div class="settings-item">
+      <div class="flex items-center gap-4">
+        <div class="settings-icon">
+          <svg xmlns="http://www.w3.org/2000/svg" width="24px" height="24px" fill="currentColor" viewBox="0 0 256 256">
+            <path d="M208,80H176V56a48,48,0,0,0-96,0V80H48A16,16,0,0,0,32,96V208a16,16,0,0,0,16,16H208a16,16,0,0,0,16-16V96A16,16,0,0,0,208,80ZM96,56a32,32,0,0,1,64,0V80H96ZM208,208H48V96H208V208Zm-68-56a12,12,0,1,1-12-12A12,12,0,0,1,140,152Z"></path>
+          </svg>
+        </div>
+        <div class="flex flex-col justify-center">
+          <p class="settings-title">Password</p>
+          <p class="settings-subtitle">Change your password</p>
+        </div>
+      </div>
+      <div class="shrink-0">
+        <a href="/settings/password" class="settings-arrow">
+          <svg xmlns="http://www.w3.org/2000/svg" width="24px" height="24px" fill="currentColor" viewBox="0 0 256 256">
+            <path d="M181.66,133.66l-80,80a8,8,0,0,1-11.32-11.32L164.69,128,90.34,53.66a8,8,0,0,1,11.32-11.32l80,80A8,8,0,0,1,181.66,133.66Z"></path>
+          </svg>
+        </a>
+      </div>
+    </div>
+  </div>
+  
+  <h2 class="section-title">Appearance</h2>
+  
+  <div class="settings-list">
+    <!-- Theme -->
+    <div class="settings-item">
+      <div class="flex items-center gap-4">
+        <div class="settings-icon">
+          <svg xmlns="http://www.w3.org/2000/svg" width="24px" height="24px" fill="currentColor" viewBox="0 0 256 256">
+            <path d="M120,40V32a8,8,0,0,1,16,0v8a8,8,0,0,1-16,0Zm72,88a64,64,0,1,1-64-64A64.07,64.07,0,0,1,192,128Zm-16,0a48,48,0,1,0-48,48A48.05,48.05,0,0,0,176,128ZM58.34,69.66A8,8,0,0,0,69.66,58.34l-8-8A8,8,0,0,0,50.34,61.66Zm0,116.68-8,8a8,8,0,0,0,11.32,11.32l8-8a8,8,0,0,0-11.32-11.32ZM192,72a8,8,0,0,0,5.66-2.34l8-8a8,8,0,0,0-11.32-11.32l-8,8A8,8,0,0,0,192,72Zm5.66,114.34a8,8,0,0,0-11.32,11.32l8,8a8,8,0,0,0,11.32-11.32ZM40,128a8,8,0,0,0-8-8H24a8,8,0,0,0,0,16h8A8,8,0,0,0,40,128Zm192-8h-8a8,8,0,0,0,0,16h8a8,8,0,0,0,0-16Z"></path>
+          </svg>
+        </div>
+        <div class="flex flex-col justify-center">
+          <p class="settings-title">Theme</p>
+          <p class="settings-subtitle">Choose between light and dark mode</p>
+        </div>
+      </div>
+      <div class="shrink-0">
+        <label class="relative inline-flex items-center cursor-pointer">
+          <input type="checkbox" class="sr-only peer theme-toggle">
+          <div class="w-11 h-6 bg-gray-200 peer-focus:outline-none rounded-full peer dark:bg-gray-700 peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:border-gray-300 after:border after:rounded-full after:h-5 after:w-5 after:transition-all dark:border-gray-600 peer-checked:bg-[var(--bg-accent)]"></div>
+        </label>
+      </div>
+    </div>
+    
+    <!-- Font Size -->
+    <div class="settings-item">
+      <div class="flex items-center gap-4">
+        <div class="settings-icon">
+          <svg xmlns="http://www.w3.org/2000/svg" width="24px" height="24px" fill="currentColor" viewBox="0 0 256 256">
+            <path d="M213.66,82.34l-56-56A8,8,0,0,0,152,24H56A16,16,0,0,0,40,40V216a16,16,0,0,0,16,16H200a16,16,0,0,0,16-16V88A8,8,0,0,0,213.66,82.34ZM160,51.31,188.69,80H160ZM200,216H56V40h88V88a8,8,0,0,0,8,8h48V216Zm-42.34-77.66a8,8,0,0,1-11.32,11.32L136,139.31l-10.34,10.35a8,8,0,0,1-11.32,0L104,139.31l-10.34,10.35a8,8,0,0,1-11.32-11.32l16-16a8,8,0,0,1,11.32,0L120,132.69l10.34-10.35a8,8,0,0,1,11.32,0ZM120,104a8,8,0,0,1,16,0v8a8,8,0,0,1-16,0Z"></path>
+          </svg>
+        </div>
+        <div class="flex flex-col justify-center">
+          <p class="settings-title">Font Size</p>
+          <p class="settings-subtitle">Adjust text size for better readability</p>
+        </div>
+      </div>
+      <div class="shrink-0">
+        <a href="/settings/font-size" class="settings-arrow">
+          <svg xmlns="http://www.w3.org/2000/svg" width="24px" height="24px" fill="currentColor" viewBox="0 0 256 256">
+            <path d="M181.66,133.66l-80,80a8,8,0,0,1-11.32-11.32L164.69,128,90.34,53.66a8,8,0,0,1,11.32-11.32l80,80A8,8,0,0,1,181.66,133.66Z"></path>
+          </svg>
+        </a>
+      </div>
+    </div>
+  </div>
+  
+  <h2 class="section-title">App</h2>
+  
+  <div class="settings-list">
+    <!-- Notifications -->
+    <div class="settings-item">
+      <div class="flex items-center gap-4">
+        <div class="settings-icon">
+          <svg xmlns="http://www.w3.org/2000/svg" width="24px" height="24px" fill="currentColor" viewBox="0 0 256 256">
+            <path d="M221.8,175.94C216.25,166.38,208,139.31,208,104a80,80,0,1,0-160,0c0,35.31-8.26,62.38-13.81,71.94A16,16,0,0,0,48,200H88.81a40,40,0,0,0,78.38,0H208a16,16,0,0,0,13.8-24.06ZM128,216a24,24,0,0,1-22.62-16h45.24A24,24,0,0,1,128,216ZM48,184c7.7-13.24,16-43.92,16-80a64,64,0,1,1,128,0c0,36.08,8.3,66.76,16,80Z"></path>
+          </svg>
+        </div>
+        <div class="flex flex-col justify-center">
+          <p class="settings-title">Notifications</p>
+          <p class="settings-subtitle">Manage alert preferences</p>
+        </div>
+      </div>
+      <div class="shrink-0">
+        <a href="/settings/notifications" class="settings-arrow">
+          <svg xmlns="http://www.w3.org/2000/svg" width="24px" height="24px" fill="currentColor" viewBox="0 0 256 256">
+            <path d="M181.66,133.66l-80,80a8,8,0,0,1-11.32-11.32L164.69,128,90.34,53.66a8,8,0,0,1,11.32-11.32l80,80A8,8,0,0,1,181.66,133.66Z"></path>
+          </svg>
+        </a>
+      </div>
+    </div>
+    
+    <!-- Privacy -->
+    <div class="settings-item">
+      <div class="flex items-center gap-4">
+        <div class="settings-icon">
+          <svg xmlns="http://www.w3.org/2000/svg" width="24px" height="24px" fill="currentColor" viewBox="0 0 256 256">
+            <path d="M128,128a12,12,0,1,1,12-12A12,12,0,0,1,128,128Zm-4,28v-4a8,8,0,0,1,8,0v4a8,8,0,0,1-8,0Zm108-60V208a16,16,0,0,1-16,16H40a16,16,0,0,1-16-16V96a16,16,0,0,1,16-16H232A16,16,0,0,1,232,96ZM40,208H216V96H40Zm56-67.06a8,8,0,0,0-8-8h0a8,8,0,0,0-8,8v2.34A12,12,0,0,0,90.68,156c5.88,1.8,11.65,3.33,15.67,4.33A8,8,0,0,0,116,156a12,12,0,0,0-8-11.13V140.94Zm80,0a8,8,0,0,0-8-8h0a8,8,0,0,0-8,8v4.84a12,12,0,0,0-8,11.3,8,8,0,0,0,9.62,4.31c4-.89,9.81-2.35,15.7-4.09A12,12,0,0,0,168,152.75v-11.8Z"></path>
+          </svg>
+        </div>
+        <div class="flex flex-col justify-center">
+          <p class="settings-title">Privacy</p>
+          <p class="settings-subtitle">Manage data privacy settings</p>
+        </div>
+      </div>
+      <div class="shrink-0">
+        <a href="/settings/privacy" class="settings-arrow">
+          <svg xmlns="http://www.w3.org/2000/svg" width="24px" height="24px" fill="currentColor" viewBox="0 0 256 256">
+            <path d="M181.66,133.66l-80,80a8,8,0,0,1-11.32-11.32L164.69,128,90.34,53.66a8,8,0,0,1,11.32-11.32l80,80A8,8,0,0,1,181.66,133.66Z"></path>
+          </svg>
+        </a>
+      </div>
+    </div>
+    
+    <!-- About -->
+    <div class="settings-item">
+      <div class="flex items-center gap-4">
+        <div class="settings-icon">
+          <svg xmlns="http://www.w3.org/2000/svg" width="24px" height="24px" fill="currentColor" viewBox="0 0 256 256">
+            <path d="M128,24A104,104,0,1,0,232,128,104.11,104.11,0,0,0,128,24Zm0,192a88,88,0,1,1,88-88A88.1,88.1,0,0,1,128,216Zm16-40a8,8,0,0,1-8,8,16,16,0,0,1-16-16V128a8,8,0,0,1,0-16,16,16,0,0,1,16,16v40A8,8,0,0,1,144,176ZM112,84a12,12,0,1,1,12,12A12,12,0,0,1,112,84Z"></path>
+          </svg>
+        </div>
+        <div class="flex flex-col justify-center">
+          <p class="settings-title">About</p>
+          <p class="settings-subtitle">App version and information</p>
+        </div>
+      </div>
+      <div class="shrink-0">
+        <a href="/settings/about" class="settings-arrow">
+          <svg xmlns="http://www.w3.org/2000/svg" width="24px" height="24px" fill="currentColor" viewBox="0 0 256 256">
+            <path d="M181.66,133.66l-80,80a8,8,0,0,1-11.32-11.32L164.69,128,90.34,53.66a8,8,0,0,1,11.32-11.32l80,80A8,8,0,0,1,181.66,133.66Z"></path>
+          </svg>
+        </a>
+      </div>
+    </div>
+  </div>
+</div>
+{% endblock %}
+    <h2 class="text-white text-[22px] font-bold leading-tight tracking-[-0.015em] px-4 pb-3 pt-5">Account</h2>
+    <div class="flex items-center gap-4 bg-[#231810] px-4 min-h-[72px] py-2">
+      <div class="text-white flex items-center justify-center rounded-lg bg-[#493322] shrink-0 size-12" data-icon="User" data-size="24px" data-weight="regular">
+        <svg xmlns="http://www.w3.org/2000/svg" width="24px" height="24px" fill="currentColor" viewBox="0 0 256 256">
+          <path
+            d="M230.92,212c-15.23-26.33-38.7-45.21-66.09-54.16a72,72,0,1,0-73.66,0C63.78,166.78,40.31,185.66,25.08,212a8,8,0,1,0,13.85,8c18.84-32.56,52.14-52,89.07-52s70.23,19.44,89.07,52a8,8,0,1,0,13.85-8ZM72,96a56,56,0,1,1,56,56A56.06,56.06,0,0,1,72,96Z"
+          ></path>
+        </svg>
+      </div>
+      <div class="flex flex-col justify-center">
+        <p class="text-white text-base font-medium leading-normal line-clamp-1">Account Details</p>
+        <p class="text-[#cba990] text-sm font-normal leading-normal line-clamp-2">Manage your personal information</p>
+      </div>
+    </div>
+    <div class="flex items-center gap-4 bg-[#231810] px-4 min-h-[72px] py-2">
+      <div class="text-white flex items-center justify-center rounded-lg bg-[#493322] shrink-0 size-12" data-icon="Lock" data-size="24px" data-weight="regular">
+        <svg xmlns="http://www.w3.org/2000/svg" width="24px" height="24px" fill="currentColor" viewBox="0 0 256 256">
+          <path
+            d="M208,80H176V56a48,48,0,0,0-96,0V80H48A16,16,0,0,0,32,96V208a16,16,0,0,0,16,16H208a16,16,0,0,0,16-16V96A16,16,0,0,0,208,80ZM96,56a32,32,0,0,1,64,0V80H96ZM208,208H48V96H208V208Zm-68-56a12,12,0,1,1-12-12A12,12,0,0,1,140,152Z"
+          ></path>
+        </svg>
+      </div>
+      <div class="flex flex-col justify-center">
+        <p class="text-white text-base font-medium leading-normal line-clamp-1">Password</p>
+        <p class="text-[#cba990] text-sm font-normal leading-normal line-clamp-2">Change your password</p>
+      </div>
+    </div>
+    <h2 class="text-white text-[22px] font-bold leading-tight tracking-[-0.015em] px-4 pb-3 pt-5">Preferences</h2>
+    <div class="flex items-center gap-4 bg-[#231810] px-4 min-h-[72px] py-2">
+      <div class="text-white flex items-center justify-center rounded-lg bg-[#493322] shrink-0 size-12" data-icon="Bell" data-size="24px" data-weight="regular">
+        <svg xmlns="http://www.w3.org/2000/svg" width="24px" height="24px" fill="currentColor" viewBox="0 0 256 256">
+          <path
+            d="M221.8,175.94C216.25,166.38,208,139.33,208,104a80,80,0,1,0-160,0c0,35.34-8.26,62.38-13.81,71.94A16,16,0,0,0,48,200H88.81a40,40,0,0,0,78.38,0H208a16,16,0,0,0,13.8-24.06ZM128,216a24,24,0,0,1-22.62-16h45.24A24,24,0,0,1,128,216ZM48,184c7.7-13.24,16-43.92,16-80a64,64,0,1,1,128,0c0,36.05,8.28,66.73,16,80Z"
+          ></path>
+        </svg>
+      </div>
+      <div class="flex flex-col justify-center">
+        <p class="text-white text-base font-medium leading-normal line-clamp-1">Notifications</p>
+        <p class="text-[#cba990] text-sm font-normal leading-normal line-clamp-2">Customize your notification settings</p>
+      </div>
+    </div>
+    <div class="flex items-center gap-4 bg-[#231810] px-4 min-h-[72px] py-2 justify-between">
+      <div class="flex items-center gap-4">
+        <div class="text-white flex items-center justify-center rounded-lg bg-[#493322] shrink-0 size-12" data-icon="Sun" data-size="24px" data-weight="regular">
+          <svg xmlns="http://www.w3.org/2000/svg" width="24px" height="24px" fill="currentColor" viewBox="0 0 256 256">
+            <path
+              d="M120,40V16a8,8,0,0,1,16,0V40a8,8,0,0,1-16,0Zm72,88a64,64,0,1,1-64-64A64.07,64.07,0,0,1,192,128Zm-16,0a48,48,0,1,0-48,48A48.05,48.05,0,0,0,176,128ZM58.34,69.66A8,8,0,0,0,69.66,58.34l-16-16A8,8,0,0,0,42.34,53.66Zm0,116.68-16,16a8,8,0,0,0,11.32,11.32l16-16a8,8,0,0,0-11.32-11.32ZM192,72a8,8,0,0,0,5.66-2.34l16-16a8,8,0,0,0-11.32-11.32l-16,16A8,8,0,0,0,192,72Zm5.66,114.34a8,8,0,0,0-11.32,11.32l16,16a8,8,0,0,0,11.32-11.32ZM48,128a8,8,0,0,0-8-8H16a8,8,0,0,0,0,16H40A8,8,0,0,0,48,128Zm80,80a8,8,0,0,0-8,8v24a8,8,0,0,0,16,0V216A8,8,0,0,0,128,208Zm112-88H216a8,8,0,0,0,0,16h24a8,8,0,0,0,0-16Z"
+            ></path>
+          </svg>
+        </div>
+        <div class="flex flex-col justify-center">
+          <p class="text-white text-base font-medium leading-normal line-clamp-1">Appearance</p>
+          <p class="text-[#cba990] text-sm font-normal leading-normal line-clamp-2">Switch between light and dark themes</p>
+        </div>
+      </div>
+      <div class="shrink-0">
+        <label
+          class="relative flex h-[31px] w-[51px] cursor-pointer items-center rounded-full border-none bg-[#493322] p-0.5 has-[:checked]:justify-end has-[:checked]:bg-[#f37b20] theme-toggle-wrapper"
+        >
+          <div class="h-full w-[27px] rounded-full bg-white" style="box-shadow: rgba(0, 0, 0, 0.15) 0px 3px 8px, rgba(0, 0, 0, 0.06) 0px 3px 1px;"></div>
+          <input type="checkbox" class="invisible absolute theme-toggle" />
+        </label>
+      </div>
+    </div>
+    <h2 class="text-white text-[22px] font-bold leading-tight tracking-[-0.015em] px-4 pb-3 pt-5">Support</h2>
+    <div class="flex items-center gap-4 bg-[#231810] px-4 min-h-[72px] py-2">
+      <div class="text-white flex items-center justify-center rounded-lg bg-[#493322] shrink-0 size-12" data-icon="Question" data-size="24px" data-weight="regular">
+        <svg xmlns="http://www.w3.org/2000/svg" width="24px" height="24px" fill="currentColor" viewBox="0 0 256 256">
+          <path
+            d="M140,180a12,12,0,1,1-12-12A12,12,0,0,1,140,180ZM128,72c-22.06,0-40,16.15-40,36v4a8,8,0,0,0,16,0v-4c0-11,10.77-20,24-20s24,9,24,20-10.77,20-24,20a8,8,0,0,0-8,8v8a8,8,0,0,0,16,0v-.72c18.24-3.35,32-17.9,32-35.28C168,88.15,150.06,72,128,72Zm104,56A104,104,0,1,1,128,24,104.11,104.11,0,0,1,232,128Zm-16,0a88,88,0,1,0-88,88A88.1,88.1,0,0,0,216,128Z"
+          ></path>
+        </svg>
+      </div>
+      <div class="flex flex-col justify-center">
+        <p class="text-white text-base font-medium leading-normal line-clamp-1">Help &amp; Support</p>
+        <p class="text-[#cba990] text-sm font-normal leading-normal line-clamp-2">Get help with using the app</p>
+      </div>
+    </div>
+    <div class="flex items-center gap-4 bg-[#231810] px-4 min-h-[72px] py-2">
+      <div class="text-white flex items-center justify-center rounded-lg bg-[#493322] shrink-0 size-12" data-icon="FileText" data-size="24px" data-weight="regular">
+        <svg xmlns="http://www.w3.org/2000/svg" width="24px" height="24px" fill="currentColor" viewBox="0 0 256 256">
+          <path
+            d="M213.66,82.34l-56-56A8,8,0,0,0,152,24H56A16,16,0,0,0,40,40V216a16,16,0,0,0,16,16H200a16,16,0,0,0,16-16V88A8,8,0,0,0,213.66,82.34ZM160,51.31,188.69,80H160ZM200,216H56V40h88V88a8,8,0,0,0,8,8h48V216Zm-32-80a8,8,0,0,1-8,8H96a8,8,0,0,1,0-16h64A8,8,0,0,1,168,136Zm0,32a8,8,0,0,1-8,8H96a8,8,0,0,1,0-16h64A8,8,0,0,1,168,168Z"
+          ></path>
+        </svg>
+      </div>
+      <div class="flex flex-col justify-center">
+        <p class="text-white text-base font-medium leading-normal line-clamp-1">Terms of Service</p>
+        <p class="text-[#cba990] text-sm font-normal leading-normal line-clamp-2">Learn more about our terms and conditions</p>
+      </div>
+    </div>
+  </div>
+  <div>
+    <div class="flex gap-2 border-t border-[#493322] bg-[#342418] px-4 pb-3 pt-2">
+      <a class="just flex flex-1 flex-col items-center justify-end gap-1 text-[#cba990]" href="{{ url_for('index') }}">
+        <div class="text-[#cba990] flex h-8 items-center justify-center" data-icon="House" data-size="24px" data-weight="regular">
+          <svg xmlns="http://www.w3.org/2000/svg" width="24px" height="24px" fill="currentColor" viewBox="0 0 256 256">
+            <path
+              d="M218.83,103.77l-80-75.48a1.14,1.14,0,0,1-.11-.11,16,16,0,0,0-21.53,0l-.11.11L37.17,103.77A16,16,0,0,0,32,115.55V208a16,16,0,0,0,16,16H96a16,16,0,0,0,16-16V160h32v48a16,16,0,0,0,16,16h48a16,16,0,0,0,16-16V115.55A16,16,0,0,0,218.83,103.77ZM208,208H160V160a16,16,0,0,0-16-16H112a16,16,0,0,0-16,16v48H48V115.55l.11-.1L128,40l79.9,75.43.11.1Z"
+            ></path>
+          </svg>
+        </div>
+        <p class="text-[#cba990] text-xs font-medium leading-normal tracking-[0.015em]">Home</p>
+      </a>
+      <a class="just flex flex-1 flex-col items-center justify-end gap-1 rounded-full text-white" href="{{ url_for('settings') }}">
+        <div class="text-white flex h-8 items-center justify-center" data-icon="Gear" data-size="24px" data-weight="fill">
+          <svg xmlns="http://www.w3.org/2000/svg" width="24px" height="24px" fill="currentColor" viewBox="0 0 256 256">
+            <path
+              d="M216,130.16q.06-2.16,0-4.32l14.92-18.64a8,8,0,0,0,1.48-7.06,107.6,107.6,0,0,0-10.88-26.25,8,8,0,0,0-6-3.93l-23.72-2.64q-1.48-1.56-3-3L186,40.54a8,8,0,0,0-3.94-6,107.29,107.29,0,0,0-26.25-10.86,8,8,0,0,0-7.06,1.48L130.16,40Q128,40,125.84,40L107.2,25.11a8,8,0,0,0-7.06-1.48A107.6,107.6,0,0,0,73.89,34.51a8,8,0,0,0-3.93,6L67.32,64.27q-1.56,1.49-3,3L40.54,70a8,8,0,0,0-6,3.94,107.71,107.71,0,0,0-10.87,26.25,8,8,0,0,0,1.49,7.06L40,125.84Q40,128,40,130.16L25.11,148.8a8,8,0,0,0-1.48,7.06,107.6,107.6,0,0,0,10.88,26.25,8,8,0,0,0,6,3.93l23.72,2.64q1.49,1.56,3,3L70,215.46a8,8,0,0,0,3.94,6,107.71,107.71,0,0,0,26.25,10.87,8,8,0,0,0,7.06-1.49L125.84,216q2.16.06,4.32,0l18.64,14.92a8,8,0,0,0,7.06,1.48,107.21,107.21,0,0,0,26.25-10.88,8,8,0,0,0,3.93-6l2.64-23.72q1.56-1.48,3-3L215.46,186a8,8,0,0,0,6-3.94,107.71,107.71,0,0,0,10.87-26.25,8,8,0,0,0-1.49-7.06ZM128,168a40,40,0,1,1,40-40A40,40,0,0,1,128,168Z"
+            ></path>
+          </svg>
+        </div>
+        <p class="text-white text-xs font-medium leading-normal tracking-[0.015em]">Settings</p>
+      </a>
+      <a class="just flex flex-1 flex-col items-center justify-end gap-1 text-[#cba990]" href="#">
+        <div class="text-[#cba990] flex h-8 items-center justify-center" data-icon="User" data-size="24px" data-weight="regular">
+          <svg xmlns="http://www.w3.org/2000/svg" width="24px" height="24px" fill="currentColor" viewBox="0 0 256 256">
+            <path
+              d="M230.92,212c-15.23-26.33-38.7-45.21-66.09-54.16a72,72,0,1,0-73.66,0C63.78,166.78,40.31,185.66,25.08,212a8,8,0,1,0,13.85,8c18.84-32.56,52.14-52,89.07-52s70.23,19.44,89.07,52a8,8,0,1,0,13.85-8ZM72,96a56,56,0,1,1,56,56A56.06,56.06,0,0,1,72,96Z"
+            ></path>
+          </svg>
+        </div>
+        <p class="text-[#cba990] text-xs font-medium leading-normal tracking-[0.015em]">Profile</p>
+      </a>
+    </div>
+    <div class="h-5 bg-[#342418]"></div>
+  </div>
+</div>
+{% endblock %}

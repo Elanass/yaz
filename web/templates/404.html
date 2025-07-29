@@ -1,0 +1,72 @@
+{% extends "layout.html" %}
+
+{% block title %}Page Not Found - {{ app_name }}{% endblock %}
+
+{% block header_title %}Page Not Found{% endblock %}
+
+{% block head %}
+<style>
+.error-container {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  padding: 2rem;
+  text-align: center;
+  min-height: 60vh;
+}
+
+.error-code {
+  font-size: 4rem;
+  font-weight: 700;
+  color: var(--text-accent);
+  margin-bottom: 1rem;
+}
+
+.error-message {
+  font-size: 1.5rem;
+  margin-bottom: 1.5rem;
+  color: var(--text-primary);
+}
+
+.error-description {
+  color: var(--text-secondary);
+  margin-bottom: 2rem;
+  max-width: 500px;
+}
+
+.error-button {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  padding: 0.75rem 1.5rem;
+  background-color: var(--bg-accent);
+  color: var(--text-on-accent);
+  border-radius: 9999px;
+  font-weight: 600;
+  text-decoration: none;
+  transition: all 0.2s ease;
+}
+
+.error-button:hover {
+  opacity: 0.9;
+  transform: translateY(-2px);
+}
+</style>
+{% endblock %}
+
+{% block content %}
+<div class="error-container">
+  <div class="error-code">404</div>
+  <h1 class="error-message">Page Not Found</h1>
+  <p class="error-description">
+    We couldn't find the page you're looking for. The page may have been moved, deleted, or never existed.
+  </p>
+  <a href="/" class="error-button">
+    <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" fill="currentColor" viewBox="0 0 256 256" class="mr-2">
+      <path d="M218.83,103.77l-80-75.48a1.14,1.14,0,0,1-.11-.11,16,16,0,0,0-21.53,0l-.11.11L37.17,103.77A16,16,0,0,0,32,115.55V208a16,16,0,0,0,16,16H96a16,16,0,0,0,16-16V160h32v48a16,16,0,0,0,16,16h48a16,16,0,0,0,16-16V115.55A16,16,0,0,0,218.83,103.77ZM208,208H160V160a16,16,0,0,0-16-16H112a16,16,0,0,0-16,16v48H48V115.55l.11-.1L128,40l79.9,75.43.11.1Z"></path>
+    </svg>
+    Return to Home
+  </a>
+</div>
+{% endblock %}

@@ -1,26 +1,31 @@
 """
-Integrated Surgery Analyzer Module
+Integrated Surgery Analyzer Module for Decision Precision in Surgery Platform
 
 This module provides a comprehensive surgical case analysis system that integrates:
-- FLOT Protocol analysis for gastric surgery
+- ADCI framework for decision confidence
+- FLOT Protocol impact assessment for gastric surgery
 - Surgical risk assessment
 - Outcome prediction
 - Quality metrics calculation
-- Protocol management
+- Precision decision support
 
 The module follows HIPAA/GDPR compliance patterns with proper audit logging
 and error handling with clinical context.
 """
 
 import logging
+import asyncio
 from datetime import datetime
 from typing import Dict, List, Any, Optional
 
 from features.protocols.flot_analyzer import FLOTAnalyzer
+from features.decisions.adci_engine import ADCIEngine
 from features.analysis.impact_metrics import ImpactMetricsCalculator
-from core.services.logger import audit_log
+from core.services.logger import get_logger, audit_log
+from core.models.surgery_models import SurgicalCaseModel, SurgicalAnalysisResult
+from core.utils.validation import validate_surgical_case
 
-logger = logging.getLogger(__name__)
+logger = get_logger(__name__)
 
 class SurgicalRiskCalculator:
     """Calculates multi-dimensional surgical risk assessment."""
@@ -1003,3 +1008,330 @@ class IntegratedSurgeryAnalyzer:
                 "Patient satisfaction"
             ]
         }
+
+
+class IntegratedSurgeryAnalyzer:
+    """
+    Integrated Surgery Analyzer for Decision Precision in Surgery Platform
+    
+    This class provides a comprehensive analysis framework that integrates:
+    - ADCI decision engine
+    - FLOT protocol impact assessment
+    - Surgical risk assessment
+    - Outcome prediction
+    - Precision decision support
+    """
+    
+    def __init__(self):
+        """Initialize the integrated surgery analyzer with its components"""
+        self.risk_calculator = SurgicalRiskCalculator()
+        self.adci_engine = ADCIEngine()
+        self.flot_analyzer = FLOTAnalyzer()
+        self.impact_calculator = ImpactMetricsCalculator()
+        self.version = "3.0-Precision"
+        
+        logger.info(f"Integrated Surgery Analyzer initialized with version {self.version}")
+    
+    async def analyze_case(self, case_data: Dict[str, Any], 
+                     collaboration_context: Optional[Dict[str, Any]] = None) -> Dict[str, Any]:
+        """
+        Perform a comprehensive analysis of a surgical case with collaboration support
+        
+        Args:
+            case_data: Complete surgical case data
+            collaboration_context: Optional context for collaborative analysis
+            
+        Returns:
+            Complete analysis results with integrated ADCI, FLOT, and surgical assessment
+        """
+        # Validate case data using centralized validation
+        is_valid, missing_fields = validate_surgical_case(case_data)
+        if not is_valid:
+            error_msg = f"Invalid case data for integrated analysis: missing {', '.join(missing_fields)}"
+            logger.error(error_msg)
+            return {"error": error_msg}
+        
+        # Log analysis start with audit trail
+        case_id = case_data.get("case_id", "unknown")
+        patient_id = case_data.get("patient_id", "unknown")
+        
+        audit_log(
+            action="integrated_analysis_start",
+            resource_type="surgical_case",
+            resource_id=case_id,
+            details=f"Starting integrated surgical analysis for patient {patient_id}"
+        )
+        
+        try:
+            # Run parallel analyses
+            adci_task = self._run_adci_analysis(case_data, collaboration_context)
+            flot_task = self._run_flot_analysis(case_data, collaboration_context)
+            risk_assessment = self.risk_calculator.calculate_comprehensive_risk(case_data)
+            
+            # Wait for async tasks to complete
+            adci_result = await adci_task
+            flot_result = await flot_task
+            
+            # Calculate impact metrics
+            impact_metrics = self.impact_calculator.calculate_metrics(
+                case_data, 
+                adci_result,
+                flot_result
+            )
+            
+            # Generate integrated recommendations
+            recommendations = self._generate_integrated_recommendations(
+                adci_result,
+                flot_result,
+                risk_assessment,
+                impact_metrics
+            )
+            
+            # Generate collaborative insights if context provided
+            if collaboration_context:
+                collaborative_insights = self._generate_collaborative_insights(
+                    case_data,
+                    adci_result,
+                    flot_result,
+                    collaboration_context
+                )
+            else:
+                collaborative_insights = None
+            
+            # Compile complete result
+            result = {
+                "case_id": case_id,
+                "patient_id": patient_id,
+                "adci_analysis": adci_result,
+                "flot_analysis": flot_result,
+                "risk_assessment": risk_assessment,
+                "impact_metrics": impact_metrics,
+                "integrated_recommendations": recommendations,
+                "collaborative_insights": collaborative_insights,
+                "analysis_version": self.version,
+                "analysis_timestamp": datetime.utcnow().isoformat()
+            }
+            
+            # Log analysis completion
+            audit_log(
+                action="integrated_analysis_complete",
+                resource_type="surgical_case",
+                resource_id=case_id,
+                details=f"Integrated surgical analysis completed for patient {patient_id}"
+            )
+            
+            return result
+            
+        except Exception as e:
+            # Log error with audit trail
+            audit_log(
+                action="integrated_analysis_error",
+                resource_type="surgical_case",
+                resource_id=case_id,
+                details=f"Error in integrated analysis: {str(e)}"
+            )
+            
+            logger.error(f"Error in integrated surgical analysis: {str(e)}")
+            return {"error": str(e)}
+    
+    async def _run_adci_analysis(self, case_data: Dict[str, Any],
+                           collaboration_context: Optional[Dict[str, Any]] = None) -> Dict[str, Any]:
+        """
+        Run ADCI analysis asynchronously
+        
+        Args:
+            case_data: Surgical case data
+            collaboration_context: Optional collaboration context
+            
+        Returns:
+            ADCI analysis results
+        """
+        return await self.adci_engine.predict(case_data, collaboration_context)
+    
+    async def _run_flot_analysis(self, case_data: Dict[str, Any],
+                           collaboration_context: Optional[Dict[str, Any]] = None) -> Dict[str, Any]:
+        """
+        Run FLOT protocol analysis asynchronously
+        
+        Args:
+            case_data: Surgical case data
+            collaboration_context: Optional collaboration context
+            
+        Returns:
+            FLOT analysis results
+        """
+        # Extract research context from collaboration context if available
+        research_context = collaboration_context.get("research_context") if collaboration_context else None
+        
+        return await self.flot_analyzer.analyze_gastric_surgery_case(case_data, research_context)
+    
+    def _generate_integrated_recommendations(self, adci_result: Dict[str, Any],
+                                          flot_result: Dict[str, Any],
+                                          risk_assessment: Dict[str, Any],
+                                          impact_metrics: Dict[str, Any]) -> Dict[str, Any]:
+        """
+        Generate integrated recommendations based on all analysis components
+        
+        Args:
+            adci_result: ADCI analysis results
+            flot_result: FLOT protocol analysis results
+            risk_assessment: Surgical risk assessment
+            impact_metrics: Impact metrics calculation
+            
+        Returns:
+            Integrated recommendations
+        """
+        # Extract key decision factors
+        adci_confidence = adci_result.get("adci", {}).get("score", 0)
+        flot_recommendation = flot_result.get("treatment_plan", {}).get("recommendation", "")
+        overall_risk = risk_assessment.get("overall_risk_score", 1.0)
+        
+        # Determine primary recommendation
+        if adci_confidence > 0.8 and overall_risk < 0.5 and "Recommended" in flot_recommendation:
+            primary_recommendation = "Proceed with FLOT protocol followed by surgical resection"
+            confidence = "high"
+        elif adci_confidence > 0.6 and overall_risk < 0.7:
+            primary_recommendation = "Consider modified FLOT protocol with close monitoring"
+            confidence = "moderate"
+        else:
+            primary_recommendation = "Consider alternative approach or additional workup"
+            confidence = "low"
+        
+        # Generate specific recommendations
+        specific_recommendations = []
+        
+        if overall_risk > 0.6:
+            specific_recommendations.append("Implement comprehensive risk mitigation strategies")
+            
+        if "dose_reduction_required" in flot_result.get("treatment_plan", {}):
+            specific_recommendations.append("Implement dose reductions as per FLOT protocol analysis")
+            
+        if adci_confidence < 0.7:
+            specific_recommendations.append("Consider additional diagnostics to improve decision confidence")
+        
+        return {
+            "primary_recommendation": primary_recommendation,
+            "confidence_level": confidence,
+            "specific_recommendations": specific_recommendations,
+            "key_decision_factors": self._extract_key_decision_factors(
+                adci_result, flot_result, risk_assessment
+            ),
+            "expected_outcomes": self._project_outcomes(
+                adci_result, flot_result, risk_assessment, impact_metrics
+            )
+        }
+    
+    def _extract_key_decision_factors(self, adci_result: Dict[str, Any],
+                                    flot_result: Dict[str, Any],
+                                    risk_assessment: Dict[str, Any]) -> List[str]:
+        """Extract key decision factors from all analyses"""
+        factors = []
+        
+        # Add ADCI critical factors
+        if "critical_factors" in adci_result.get("adci", {}):
+            factors.extend(adci_result["adci"]["critical_factors"])
+            
+        # Add high risk components
+        for component, value in risk_assessment.get("risk_components", {}).items():
+            if value > 0.7:
+                factors.append(f"High {component}")
+                
+        # Add FLOT-specific factors
+        if flot_result.get("risk_assessment", {}).get("overall_risk") == "high":
+            factors.append("High FLOT protocol risk")
+            
+        return factors
+    
+    def _project_outcomes(self, adci_result: Dict[str, Any],
+                        flot_result: Dict[str, Any],
+                        risk_assessment: Dict[str, Any],
+                        impact_metrics: Dict[str, Any]) -> Dict[str, Any]:
+        """Project expected outcomes based on all analyses"""
+        # Implementation would project outcomes based on all analyses
+        # Simplified implementation for MVP
+        
+        # Extract r0 resection probability from FLOT analysis
+        r0_probability = flot_result.get("surgical_impact", {}).get("r0_resection_probability", 0.6)
+        
+        # Modify based on risk assessment
+        if risk_assessment.get("overall_risk_score", 0) > 0.7:
+            r0_probability *= 0.8  # Reduce by 20% for high-risk cases
+            
+        # Calculate other outcome probabilities
+        complication_rate = 0.2 + (risk_assessment.get("overall_risk_score", 0) * 0.3)
+        mortality_risk = 0.02 + (risk_assessment.get("overall_risk_score", 0) * 0.08)
+        
+        return {
+            "r0_resection_probability": r0_probability,
+            "expected_complication_rate": complication_rate,
+            "mortality_risk": mortality_risk,
+            "expected_los_days": 7 + int(risk_assessment.get("overall_risk_score", 0) * 5),
+            "expected_readmission_risk": 0.1 + (risk_assessment.get("overall_risk_score", 0) * 0.2)
+        }
+    
+    def _generate_collaborative_insights(self, case_data: Dict[str, Any],
+                                       adci_result: Dict[str, Any],
+                                       flot_result: Dict[str, Any],
+                                       collaboration_context: Dict[str, Any]) -> Dict[str, Any]:
+        """
+        Generate collaborative research insights
+        
+        Args:
+            case_data: Surgical case data
+            adci_result: ADCI analysis results
+            flot_result: FLOT protocol analysis results
+            collaboration_context: Collaboration context
+            
+        Returns:
+            Collaborative insights
+        """
+        # Implementation would generate collaborative insights
+        # Simplified implementation for MVP
+        
+        # Extract contributors
+        contributors = collaboration_context.get("contributors", [])
+        
+        # Extract key insights from collaboration
+        divergent_opinions = collaboration_context.get("divergent_opinions", [])
+        consensus_level = collaboration_context.get("consensus_level", "pending")
+        
+        # Generate research implications
+        research_implications = []
+        
+        if flot_result.get("research_insights") is not None:
+            research_implications.extend(flot_result["research_insights"].get("research_relevance", []))
+            
+        if "elderly_patient" in collaboration_context.get("tags", []) and case_data.get("age", 0) > 70:
+            research_implications.append("Elderly patient outcomes with FLOT protocol")
+            
+        return {
+            "contributors": contributors,
+            "contributor_count": len(contributors),
+            "consensus_level": consensus_level,
+            "divergent_opinions": divergent_opinions,
+            "research_implications": research_implications,
+            "collaboration_stage": collaboration_context.get("stage", "initial"),
+            "next_collaboration_steps": self._suggest_collaboration_steps(
+                case_data, adci_result, flot_result, collaboration_context
+            )
+        }
+    
+    def _suggest_collaboration_steps(self, case_data: Dict[str, Any],
+                                   adci_result: Dict[str, Any],
+                                   flot_result: Dict[str, Any],
+                                   collaboration_context: Dict[str, Any]) -> List[str]:
+        """Suggest next steps for collaboration"""
+        # Implementation would suggest collaboration steps
+        # Simplified implementation for MVP
+        steps = ["Document case discussion outcomes"]
+        
+        if collaboration_context.get("consensus_level") == "pending":
+            steps.append("Schedule follow-up discussion to reach consensus")
+            
+        if len(collaboration_context.get("divergent_opinions", [])) > 0:
+            steps.append("Address divergent opinions with additional evidence")
+            
+        if adci_result.get("confidence_metrics", {}).get("overall_confidence", 1.0) < 0.7:
+            steps.append("Gather additional diagnostic information to improve decision confidence")
+            
+        return steps

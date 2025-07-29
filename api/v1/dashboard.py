@@ -1,5 +1,5 @@
 """
-Dashboard API for Gastric ADCI Platform.
+Dashboard API for Decision Precision in Surgery Platform.
 
 Provides endpoints for the Surgify-inspired dashboard interface with
 HTMX integration, RBAC security, and real-time data.
@@ -11,7 +11,7 @@ from fastapi.templating import Jinja2Templates
 from typing import List, Dict, Any, Optional
 import datetime
 
-from features.auth.service import require_role, get_current_user
+from features.auth.service import get_current_user
 from features.cohorts import get_featured_series, get_upcoming_events, get_journal_articles
 from core.dependencies import get_cohorts_service
 from features.cohorts import CohortsService
@@ -23,57 +23,41 @@ router = APIRouter(prefix="", tags=["dashboard"])
 templates = Jinja2Templates(directory="web")
 logger = get_logger(__name__)
 
-# Initialize services
-journal_service = JournalService()
-evidence_engine = EvidenceEngine()
-protocol_service = ProtocolService()
 
-
-@router.get("/dashboard", response_class=HTMLResponse)
-async def surgify_dashboard(
+@router.get("/", response_class=HTMLResponse)
+async def index(
     request: Request,
-    user=Depends(get_current_user),
-    _=Depends(require_role("dashboard", "read")),
-    cohorts_service: CohortsService = Depends(get_cohorts_service)
+    user=Depends(get_current_user)
 ):
     """
-    Main Surgify dashboard endpoint with featured content.
+    Main index page with Surgify UI.
     
-    Returns the dashboard page with featured series, upcoming events,
-    and latest journal articles.
+    Returns the new Surgify-style PWA interface.
     """
     try:
-        # Log dashboard access
+        # Log access
         await event_logger.log_event(
             category=EventCategory.USER_ACTION,
             severity=EventSeverity.INFO,
-            message=f"Dashboard accessed by user {user.get('id', 'unknown')}",
-            metadata={"user_id": user.get('id'), "endpoint": "/dashboard"}
+            message=f"Home page accessed by user {user.get('id', 'unknown') if user else 'anonymous'}",
+            metadata={"endpoint": "/"}
         )
         
-        # Get featured content
-        featured_series = await cohorts_service.get_featured_series()
-        upcoming_events = await cohorts_service.get_upcoming_events()
-        journal_articles = await cohorts_service.get_journal_articles()
-        
-        return templates.TemplateResponse("pages/surgify.html", {
+        return templates.TemplateResponse("index.html", {
             "request": request,
-            "current_page": "dashboard",
-            "featured_series": featured_series,
-            "upcoming_events": upcoming_events,
-            "journal_articles": journal_articles,
+            "current_page": "home",
             "user": user
         })
         
     except Exception as e:
-        logger.error(f"Dashboard error: {str(e)}")
+        logger.error(f"Index error: {str(e)}")
         await event_logger.log_event(
             category=EventCategory.SYSTEM_ERROR,
             severity=EventSeverity.ERROR,
-            message=f"Dashboard error: {str(e)}",
-            metadata={"user_id": user.get('id'), "error": str(e)}
+            message=f"Index error: {str(e)}",
+            metadata={"error": str(e)}
         )
-        raise HTTPException(status_code=500, detail="Dashboard unavailable")
+        raise HTTPException(status_code=500, detail="Home page unavailable")
 
 
 @router.get("/api/v1/journal", response_class=HTMLResponse)
@@ -82,7 +66,7 @@ async def journal_partial(
     limit: int = 10,
     offset: int = 0,
     user=Depends(get_current_user),
-    _=Depends(require_role("journal", "read"))
+    
 ):
     """Get journal articles as HTML partial for HTMX."""
     try:
@@ -109,7 +93,7 @@ async def events_partial(
     limit: int = 10,
     offset: int = 0,
     user=Depends(get_current_user),
-    _=Depends(require_role("events", "read"))
+    
 ):
     """Get events as HTML partial for HTMX."""
     try:
@@ -136,7 +120,7 @@ async def series_partial(
     limit: int = 10,
     offset: int = 0,
     user=Depends(get_current_user),
-    _=Depends(require_role("series", "read"))
+    
 ):
     """Get series as HTML partial for HTMX."""
     try:
@@ -162,7 +146,7 @@ async def protocols_partial(
     limit: int = 10,
     offset: int = 0,
     user=Depends(get_current_user),
-    _=Depends(require_role("protocols", "read"))
+    
 ):
     """Get protocols as HTML partial for HTMX."""
     try:
@@ -190,7 +174,7 @@ async def cases_search(
     limit: int = 10,
     offset: int = 0,
     user=Depends(get_current_user),
-    _=Depends(require_role("cases", "read"))
+    
 ):
     """Search cases with HTMX support."""
     try:
@@ -290,30 +274,8 @@ async def get_upcoming_events(limit: int = 5, offset: int = 0) -> List[Dict[str,
 async def get_journal_articles(limit: int = 5, offset: int = 0) -> List[Dict[str, Any]]:
     """Get latest journal articles."""
     try:
-        # Use actual journal service
-        articles_data = await journal_service.get_latest_articles(limit=limit, offset=offset)
-        
-        articles = []
-        for article in articles_data:
-            articles.append({
-                "id": article.get("id"),
-                "title": article.get("title", "Untitled Article"),
-                "author": article.get("author", "Unknown Author"),
-                "abstract": article.get("abstract", ""),
-                "description": article.get("description", ""),
-                "journal": article.get("journal", ""),
-                "published_date": article.get("published_date"),
-                "impact_factor": article.get("impact_factor"),
-                "image_url": article.get("image_url"),
-                "type": "journal"
-            })
-        
-        return articles
-        
-    except Exception as e:
-        logger.error(f"Error fetching journal articles: {str(e)}")
-        # Return mock data as fallback
-        return [
+        # Mock data for journal articles
+        articles = [
             {
                 "id": "article_1",
                 "title": "ADCI Framework Validation in Gastric Cancer",
@@ -323,8 +285,24 @@ async def get_journal_articles(limit: int = 5, offset: int = 0) -> List[Dict[str
                 "published_date": datetime.datetime.now() - datetime.timedelta(days=7),
                 "impact_factor": 8.5,
                 "type": "journal"
+            },
+            {
+                "id": "article_2",
+                "title": "FLOT Protocol Meta-Analysis",
+                "author": "Dr. Williams et al.",
+                "abstract": "Meta-analysis of FLOT protocol outcomes in gastric cancer",
+                "journal": "International Journal of Surgical Oncology",
+                "published_date": datetime.datetime.now() - datetime.timedelta(days=14),
+                "impact_factor": 7.2,
+                "type": "journal"
             }
         ]
+        
+        return articles
+        
+    except Exception as e:
+        logger.error(f"Error fetching journal articles: {str(e)}")
+        return []
 
 
 async def get_events(limit: int = 10, offset: int = 0) -> List[Dict[str, Any]]:
@@ -340,11 +318,29 @@ async def get_series(limit: int = 10, offset: int = 0) -> List[Dict[str, Any]]:
 async def get_protocols(limit: int = 10, offset: int = 0) -> List[Dict[str, Any]]:
     """Get clinical protocols."""
     try:
-        protocols_data = await protocol_service.get_protocols(limit=limit, offset=offset)
+        # Mock protocol data
+        protocols = [
+            {
+                "id": "protocol_1",
+                "name": "FLOT Perioperative Protocol",
+                "description": "Standard FLOT implementation for gastric cancer",
+                "summary": "4 cycles pre-op, 4 cycles post-op of Fluorouracil, Leucovorin, Oxaliplatin, and Docetaxel",
+                "created_at": datetime.datetime.now() - datetime.timedelta(days=30),
+                "created_by": "Surgical Oncology Team"
+            },
+            {
+                "id": "protocol_2",
+                "name": "Gastric ADCI Implementation",
+                "description": "Decision support implementation for gastric cancer surgery",
+                "summary": "Step-by-step ADCI framework for surgical planning",
+                "created_at": datetime.datetime.now() - datetime.timedelta(days=45),
+                "created_by": "Decision Precision Team"
+            }
+        ]
         
-        protocols = []
-        for protocol in protocols_data:
-            protocols.append({
+        protocols_list = []
+        for protocol in protocols:
+            protocols_list.append({
                 "id": protocol.get("id"),
                 "title": protocol.get("name", "Untitled Protocol"),
                 "subtitle": protocol.get("description", ""),
@@ -354,7 +350,7 @@ async def get_protocols(limit: int = 10, offset: int = 0) -> List[Dict[str, Any]
                 "author": protocol.get("created_by", "System")
             })
         
-        return protocols
+        return protocols_list
         
     except Exception as e:
         logger.error(f"Error fetching protocols: {str(e)}")

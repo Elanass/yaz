@@ -1,5 +1,5 @@
 """
-API endpoints for the journal service.
+Clinical Journal API for Decision Precision in Surgery Platform
 
 These endpoints provide access to clinical note templates, creation and
 management of structured clinical notes, and auto-generation of content.

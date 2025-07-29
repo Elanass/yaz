@@ -1,0 +1,221 @@
+/**
+ * Gastric ADCI Platform - Theme Styles
+ * 
+ * This file contains CSS variables for light and dark themes
+ * and styling for theme-specific elements.
+ */
+
+:root {
+  /* Light theme variables */
+  --bg-primary: #fcfaf8;
+  --bg-secondary: #f4ece7;
+  --bg-tertiary: #fcfaf8;
+  --bg-accent: #f37b20;
+  --bg-icon: #493322;
+  --bg-icon-selected: #f37b20;
+  
+  --text-primary: #1c130d;
+  --text-secondary: #9c6d49;
+  --text-tertiary: #9c6d49;
+  --text-accent: #f37b20;
+  --text-on-accent: #ffffff;
+  
+  --border-color: #f4ece7;
+  
+  --sidebar-bg: #fcfaf8;
+  --sidebar-selected: #f4ece7;
+}
+
+:root.dark-mode {
+  /* Dark theme variables */
+  --bg-primary: #231810;
+  --bg-secondary: #342418;
+  --bg-tertiary: #231810;
+  --bg-accent: #f37b20;
+  --bg-icon: #493322;
+  --bg-icon-selected: #f37b20;
+  
+  --text-primary: #ffffff;
+  --text-secondary: #cba990;
+  --text-tertiary: #cba990;
+  --text-accent: #f37b20;
+  --text-on-accent: #ffffff;
+  
+  --border-color: #493322;
+  
+  --sidebar-bg: #231810;
+  --sidebar-selected: #41342a;
+}
+
+/* Apply theme to elements */
+body {
+  background-color: var(--bg-primary);
+  color: var(--text-primary);
+  transition: background-color 0.3s ease, color 0.3s ease;
+}
+
+/* Header styling */
+header {
+  background-color: var(--bg-primary);
+  border-color: var(--border-color);
+}
+
+/* Bottom navigation */
+.bottom-nav {
+  background-color: var(--bg-secondary);
+  border-top: 1px solid var(--border-color);
+}
+
+/* Sidebar styles */
+.sidebar {
+  background-color: var(--sidebar-bg);
+  border-right: 1px solid var(--border-color);
+}
+
+.category-item {
+  transition: background-color 0.2s ease;
+}
+
+.category-item:hover {
+  background-color: var(--sidebar-selected);
+}
+
+.category-item.active {
+  background-color: var(--sidebar-selected);
+}
+
+.category-icon {
+  background-color: var(--bg-icon);
+}
+
+.category-item.active .category-icon {
+  background-color: var(--bg-icon-selected);
+}
+
+/* Input fields */
+input[type="text"], 
+input[type="search"],
+input[type="email"],
+input[type="password"],
+select,
+textarea {
+  background-color: var(--bg-secondary);
+  color: var(--text-primary);
+  border: 1px solid var(--border-color);
+}
+
+/* Cards */
+.card {
+  background-color: var(--bg-secondary);
+  color: var(--text-primary);
+  transition: background-color 0.3s ease, color 0.3s ease, transform 0.2s ease, box-shadow 0.2s ease;
+}
+
+/* Links */
+a {
+  color: var(--text-accent);
+}
+
+a:hover {
+  opacity: 0.8;
+}
+
+/* Buttons */
+button, .btn {
+  transition: background-color 0.3s ease, color 0.3s ease;
+}
+
+button.primary, .btn.primary {
+  background-color: var(--bg-accent);
+  color: var(--text-on-accent);
+}
+
+/* Theme toggle switch animations */
+.theme-toggle:checked + div {
+  background-color: var(--bg-accent);
+}
+
+/* Scrollbars */
+::-webkit-scrollbar {
+  width: 8px;
+  height: 8px;
+}
+
+::-webkit-scrollbar-track {
+  background: var(--bg-secondary);
+}
+
+::-webkit-scrollbar-thumb {
+  background: var(--text-tertiary);
+  border-radius: 4px;
+}
+
+::-webkit-scrollbar-thumb:hover {
+  background: var(--text-accent);
+}
+.group\/design-root {
+  background-color: var(--bg-primary);
+  color: var(--text-primary);
+}
+
+.group\/design-root.dark {
+  background-color: var(--bg-primary);
+  color: var(--text-primary);
+}
+
+/* Navigation bar styling */
+.bottom-nav {
+  border-top: 1px solid var(--border-color);
+  background-color: var(--bg-primary);
+}
+
+.bottom-nav-item {
+  color: var(--text-tertiary);
+}
+
+.bottom-nav-item.active {
+  color: var(--text-primary);
+}
+
+/* Sidebar styling */
+.sidebar {
+  background-color: var(--sidebar-bg);
+}
+
+.sidebar-item {
+  color: var(--text-primary);
+}
+
+.sidebar-item.active, .sidebar-item:hover {
+  background-color: var(--sidebar-selected);
+}
+
+.sidebar-icon {
+  background-color: var(--bg-icon);
+}
+
+.sidebar-icon.active {
+  background-color: var(--bg-icon-selected);
+}
+
+/* Toggle switch styling */
+.theme-toggle-wrapper {
+  background-color: var(--bg-icon);
+}
+
+.theme-toggle-wrapper.checked {
+  background-color: var(--bg-accent);
+}
+
+/* Categories list styling */
+.category-item {
+  color: var(--text-primary);
+}
+
+.category-item.active {
+  background-color: var(--sidebar-selected);
+}
+
+.category-icon {
+  color: var(--text-primary);
+}

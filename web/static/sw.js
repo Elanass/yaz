@@ -1,9 +1,10 @@
-// Service Worker for Gastric ADCI PWA
+// Service Worker for Decision Precision in Surgery PWA
 // Provides offline functionality, caching, and background sync
 
-const CACHE_NAME = 'gastric-adci-v1.0';
-const STATIC_CACHE = 'gastric-adci-static-v1.0';
-const DYNAMIC_CACHE = 'gastric-adci-dynamic-v1.0';
+const CACHE_NAME = 'surgify-v1.0';
+const STATIC_CACHE = 'surgify-static-v1.0';
+const DYNAMIC_CACHE = 'surgify-dynamic-v1.0';
+const OFFLINE_FALLBACK = '/offline.html';
 
 // Assets to cache immediately
 const STATIC_ASSETS = [
@@ -12,14 +13,15 @@ const STATIC_ASSETS = [
   '/static/manifest.json',
   '/static/css/app.css',
   '/static/js/app.js',
+  OFFLINE_FALLBACK,
   // Add more static assets as needed
 ];
 
 // API endpoints to cache
 const API_CACHE_PATTERNS = [
   /^\/api\/v1\/journal/,
-  /^\/api\/v1\/events/,
-  /^\/api\/v1\/series/,
+  /^\/api\/v1\/decisions/,
+  /^\/api\/v1\/surgery/,
   /^\/api\/v1\/protocols/,
 ];
 

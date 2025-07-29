@@ -14,3 +14,12 @@ def get_logging_config():
         "level": "INFO",
         "handlers": ["console"]
     }
+
+def get_adapter_config(adapter_name):
+    """Retrieve configuration for a specific adapter."""
+    return {
+        "url": "http://localhost:8080",
+        "username": "admin",
+        "password": "password",
+        "timeout": 30
+    }

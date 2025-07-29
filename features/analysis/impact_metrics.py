@@ -1,9 +1,59 @@
 """
-Extended Impact Analyzer for detailed outcome and economic analysis
+Impact Metrics Analyzer for Decision Precision in Surgery
+
+This module provides advanced outcome metrics calculation and analysis
+for gastric surgery with FLOT protocol impact assessment, supporting
+the Precision Decision Engine with evidence-based outcome predictions.
 """
 
 from typing import Any, Dict, List
 from lifelines import KaplanMeierFitter
+
+class ImpactMetricsCalculator:
+    """Calculates impact metrics for surgical and medical interventions"""
+    
+    def calculate_impact_metrics(self, patient_data: Dict[str, Any], procedure_type: str) -> Dict[str, Any]:
+        """Calculate comprehensive impact metrics for the given procedure"""
+        analyzer = ImpactMetricsAnalyzer()
+        
+        # Generate core surgical outcomes
+        surgical_outcomes = analyzer.analyze_surgical_outcomes(patient_data, procedure_type)
+        
+        # Calculate quality of life impact if data available
+        qol_impact = {}
+        if 'surveys' in patient_data:
+            qol_impact = analyzer.analyze_quality_of_life_impact(patient_data.get('surveys', []))
+        
+        # Calculate economic impact if data available
+        economic_impact = {}
+        if 'cost_data' in patient_data:
+            economic_impact = self._calculate_economic_impact(patient_data.get('cost_data', {}))
+            
+        return {
+            'surgical_outcomes': surgical_outcomes,
+            'quality_of_life': qol_impact,
+            'economic_impact': economic_impact,
+            'confidence_interval': self._calculate_confidence_interval(surgical_outcomes),
+            'procedure_type': procedure_type
+        }
+    
+    def _calculate_economic_impact(self, cost_data: Dict[str, Any]) -> Dict[str, Any]:
+        """Calculate economic impact metrics"""
+        # Basic implementation for MVP
+        return {
+            'estimated_cost': cost_data.get('estimated_cost', 0),
+            'cost_effectiveness': cost_data.get('cost_effectiveness', 'unknown'),
+            'resource_utilization': cost_data.get('resource_utilization', {})
+        }
+    
+    def _calculate_confidence_interval(self, outcomes: Dict[str, Any]) -> Dict[str, Any]:
+        """Calculate confidence intervals for outcomes"""
+        # Basic implementation for MVP
+        return {
+            'lower_bound': 0.8,
+            'upper_bound': 0.95,
+            'confidence_level': 0.9
+        }
 
 class ImpactMetricsAnalyzer:
     """Analyzes surgical and treatment impact metrics"""
@@ -57,13 +107,93 @@ class ImpactMetricsAnalyzer:
             'count': count
         }
 
-    def generate_cost_effectiveness_analysis(self, resource_data: Dict[str, Any]) -> Dict[str, Any]:
-        """Economic impact analysis of treatments"""
-        cost = resource_data.get('cost', 0.0)
-        benefit = resource_data.get('benefit', 0.0)
-        ratio = (cost / benefit) if benefit > 0 else None
-        return {
-            'cost': cost,
-            'benefit': benefit,
-            'cost_effectiveness_ratio': round(ratio, 3) if ratio is not None else None
-        }
+
+class PrecisionEngine:
+    """
+    Decision Precision in Surgery Engine for gastric cancer treatment planning
+    with FLOT protocol impact assessment for surgical outcomes.
+    
+    This engine provides evidence-based analysis and recommendations for
+    gastric surgery cases, integrating both retrospective analysis and 
+    predictive modeling.
+    """
+    
+    def __init__(self):
+        """Initialize the Precision Engine"""
+        self.version = "3.0-Precision"
+    
+    def analyze(self, patient_records: List[Dict[str, Any]]) -> List[Dict[str, Any]]:
+        """
+        Analyze patient records and generate insights
+        
+        Args:
+            patient_records: List of patient data dictionaries
+            
+        Returns:
+            List of insight dictionaries
+        """
+        insights = []
+        
+        for record in patient_records:
+            # Generate basic insights for MVP
+            patient_insight = {
+                'patient_id': record.get('patient_id', 'unknown'),
+                'risk_factors': self._extract_risk_factors(record),
+                'treatment_recommendations': self._generate_recommendations(record),
+                'confidence_score': self._calculate_confidence(record),
+                'evidence_sources': self._get_evidence_sources(record)
+            }
+            
+            insights.append(patient_insight)
+            
+        return insights
+    
+    def _extract_risk_factors(self, patient_data: Dict[str, Any]) -> Dict[str, Any]:
+        """Extract risk factors from patient data"""
+        risk_factors = {}
+        
+        # Basic risk factor extraction for MVP
+        if patient_data.get('age', 0) > 65:
+            risk_factors['age'] = 'elevated'
+        
+        comorbidities = patient_data.get('comorbidities', [])
+        if comorbidities:
+            risk_factors['comorbidities'] = comorbidities
+            
+        if patient_data.get('bmi', 0) > 30:
+            risk_factors['bmi'] = 'elevated'
+            
+        return risk_factors
+    
+    def _generate_recommendations(self, patient_data: Dict[str, Any]) -> List[str]:
+        """Generate treatment recommendations based on patient data"""
+        recommendations = []
+        
+        # Very basic recommendations for MVP
+        if 'gastric_cancer' in patient_data.get('diagnosis', []):
+            recommendations.append("Consider FLOT protocol assessment")
+        
+        risk_factors = self._extract_risk_factors(patient_data)
+        if risk_factors.get('age') == 'elevated':
+            recommendations.append("Consider geriatric assessment")
+        
+        return recommendations
+    
+    def _calculate_confidence(self, patient_data: Dict[str, Any]) -> float:
+        """Calculate confidence score for the analysis"""
+        # Simplified confidence calculation for MVP
+        # Data completeness affects confidence
+        completeness = sum(1 for k in ['age', 'gender', 'comorbidities', 'diagnosis'] if k in patient_data) / 4
+        return round(completeness * 0.9, 2)  # Max 0.9 for MVP
+    
+    def _get_evidence_sources(self, patient_data: Dict[str, Any]) -> List[Dict[str, str]]:
+        """Get evidence sources for the analysis"""
+        # Placeholder evidence sources for MVP
+        return [
+            {
+                'title': 'FLOT vs. ECF/ECX for perioperative treatment of gastric cancer',
+                'journal': 'The Lancet Oncology',
+                'year': '2019',
+                'url': 'https://example.com/evidence1'
+            }
+        ]

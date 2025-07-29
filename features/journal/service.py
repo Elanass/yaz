@@ -1,5 +1,5 @@
 """
-Journal Service for Gastric ADCI Platform.
+Journal Service for Decision Precision in Surgery Platform.
 
 This service provides structured clinical documentation capabilities with
 support for standardized templates, auto-generated entries, and
@@ -24,6 +24,7 @@ from core.services.logger import get_logger
 from core.services.ipfs_client import IPFSClient
 from core.services.encryption import encrypt_data
 from services.event_logger.service import event_logger, EventCategory, EventSeverity
+from features.journal.models import AutoGenerateRequest
 
 # Configure logger
 logger = get_logger(__name__)

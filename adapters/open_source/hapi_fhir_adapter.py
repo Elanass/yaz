@@ -448,3 +448,32 @@ class HAPIFHIRAdapter(BaseService):
     async def close(self):
         """Close the HTTP client"""
         await self.http_client.aclose()
+
+
+class HAPIFHIRClient(BaseService):
+    """
+    HAPI FHIR REST API client for Decision Precision in Surgery platform
+    """
+    
+    def __init__(self):
+        """Initialize the HAPI FHIR client"""
+        self.config = get_adapter_config("hapi_fhir")
+        self.base_url = self.config.get("base_url", "https://hapi.fhir.org/baseR4")
+        self.logger = Logger()
+        self.logger.info("HAPI FHIR client initialized")
+        
+    async def get_patient(self, patient_id: str) -> Optional[Dict[str, Any]]:
+        """Get patient by ID"""
+        self.logger.info(f"Fetching patient {patient_id} from FHIR server")
+        # Implementation details here
+        return None
+        
+    async def search_patients(self, query: str) -> List[Dict[str, Any]]:
+        """Search for patients"""
+        self.logger.info(f"Searching patients with query: {query}")
+        # Implementation details here
+        return []
+
+
+# Create a singleton instance for importing
+fhir_client = HAPIFHIRClient()

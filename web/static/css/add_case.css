@@ -1,0 +1,171 @@
+/**
+ * Gastric ADCI Platform - Add Case Styles
+ * 
+ * Specific styling for the add case page.
+ */
+
+.add-case-container {
+  padding: 0 0 80px 0;
+  height: 100%;
+  display: flex;
+  flex-direction: column;
+}
+
+.form-sections {
+  display: flex;
+  flex-direction: column;
+  max-width: 480px;
+  margin: 0 auto;
+  width: 100%;
+}
+
+.form-field {
+  padding: 0.75rem 1rem;
+  width: 100%;
+}
+
+.field-label {
+  color: var(--text-primary);
+  font-size: 1rem;
+  font-weight: 500;
+  line-height: normal;
+  padding-bottom: 0.5rem;
+}
+
+.form-input, .form-select {
+  display: flex;
+  width: 100%;
+  min-width: 0;
+  flex: 1;
+  resize: none;
+  overflow: hidden;
+  border-radius: 0.75rem;
+  color: var(--text-primary);
+  border: none;
+  background-color: var(--bg-secondary);
+  height: 3.5rem;
+  padding: 1rem;
+  font-size: 1rem;
+  font-weight: normal;
+  line-height: normal;
+}
+
+.form-input::placeholder, .form-select::placeholder {
+  color: var(--text-secondary);
+}
+
+.form-input:focus, .form-select:focus {
+  outline: none;
+  border: none;
+  box-shadow: 0 0 0 2px var(--bg-accent);
+}
+
+.form-select {
+  appearance: none;
+  background-image: url("data:image/svg+xml,%3csvg xmlns='http://www.w3.org/2000/svg' width='24px' height='24px' fill='rgb(191,171,155)' viewBox='0 0 256 256'%3e%3cpath d='M213.66,101.66l-80,80a8,8,0,0,1-11.32,0l-80-80A8,8,0,0,1,53.66,90.34L128,164.69l74.34-74.35a8,8,0,0,1,11.32,11.32Z'%3e%3c/path%3e%3c/svg%3e");
+  background-repeat: no-repeat;
+  background-position: right 1rem center;
+  background-size: 1.5em 1.5em;
+  padding-right: 2.5rem;
+}
+
+.section-title {
+  color: var(--text-primary);
+  font-size: 1.375rem;
+  font-weight: 700;
+  line-height: tight;
+  letter-spacing: -0.015em;
+  padding: 1.25rem 1rem 0.75rem 1rem;
+}
+
+.multimedia-upload {
+  padding: 1rem;
+}
+
+.upload-container {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 1.5rem;
+  border: 2px dashed var(--border-color);
+  border-radius: 0.75rem;
+  padding: 3.5rem 1.5rem;
+}
+
+.upload-content {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 0.5rem;
+  max-width: 480px;
+}
+
+.upload-title {
+  color: var(--text-primary);
+  font-size: 1.125rem;
+  font-weight: 700;
+  line-height: tight;
+  letter-spacing: -0.015em;
+  text-align: center;
+}
+
+.upload-subtitle {
+  color: var(--text-primary);
+  font-size: 0.875rem;
+  font-weight: normal;
+  line-height: normal;
+  text-align: center;
+}
+
+.upload-button {
+  display: flex;
+  min-width: 84px;
+  max-width: 480px;
+  cursor: pointer;
+  align-items: center;
+  justify-content: center;
+  overflow: hidden;
+  border-radius: 9999px;
+  height: 2.5rem;
+  padding: 0 1rem;
+  background-color: var(--bg-secondary);
+  color: var(--text-primary);
+  font-size: 0.875rem;
+  font-weight: 700;
+  line-height: normal;
+  letter-spacing: 0.015em;
+  border: none;
+}
+
+.action-buttons {
+  display: flex;
+  padding: 0.75rem 1rem;
+  position: sticky;
+  bottom: 0;
+  background-color: var(--bg-primary);
+}
+
+.save-button {
+  display: flex;
+  min-width: 84px;
+  max-width: 480px;
+  width: 100%;
+  cursor: pointer;
+  align-items: center;
+  justify-content: center;
+  overflow: hidden;
+  border-radius: 9999px;
+  height: 3rem;
+  padding: 0 1.25rem;
+  background-color: var(--bg-accent);
+  color: var(--text-on-accent);
+  font-size: 1rem;
+  font-weight: 700;
+  line-height: normal;
+  letter-spacing: 0.015em;
+  border: none;
+}
+
+.save-button:hover {
+  opacity: 0.9;
+}

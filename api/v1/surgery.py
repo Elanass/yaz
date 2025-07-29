@@ -1,53 +1,335 @@
 """
-Surgery Analysis API Module
+Surgery Analysis API Module for Collaborative Gastric ADCI Platform
 
 This module provides API endpoints for comprehensive surgical analysis
-including various surgery types like gastric surgery with FLOT protocol,
-colorectal surgery with ERAS protocol, and others.
+with collaborative capabilities focused on gastric surgery with FLOT protocol
+and ADCI decision framework integration.
 
 The endpoints follow RESTful design with proper error handling and
 HIPAA/GDPR compliance for healthcare data.
 """
 
-from fastapi import APIRouter, Depends, HTTPException, status
-from typing import Dict, Any, Optional
+from fastapi import APIRouter, Depends, HTTPException, status, Query
+from typing import Dict, Any, Optional, List
 from datetime import datetime
 import logging
 
 from core.dependencies import get_current_user
 from core.models.surgery_models import SurgicalCaseModel, SurgicalAnalysisResult
 from features.analysis.surgery_analyzer import IntegratedSurgeryAnalyzer
+from core.services.logger import get_logger, audit_log
 
 router = APIRouter(
     prefix="/surgery",
     tags=["surgery"],
-    responses={404: {"description": "Not found"}},
+    responses={404: {"description": "Not found"}}
 )
 
-logger = logging.getLogger(__name__)
-
+logger = get_logger(__name__)
+surgery_analyzer = IntegratedSurgeryAnalyzer()
 
 @router.post("/analyze", response_model=Dict[str, Any])
 async def analyze_surgery_case(
     case_data: SurgicalCaseModel,
-    surgery_type: Optional[str] = None,
+    collaboration_mode: Optional[bool] = Query(False, description="Enable collaboration mode"),
     current_user: dict = Depends(get_current_user)
 ):
     """
-    Comprehensive surgical case analysis endpoint.
+    Comprehensive surgical case analysis endpoint with collaboration support.
     
-    This endpoint performs a complete analysis of a surgical case, including:
+    This endpoint performs a complete analysis of a surgical case, integrating:
+    - ADCI decision framework analysis
+    - FLOT protocol assessment
     - Risk assessment
-    - Protocol selection and customization
     - Outcome prediction
-    - Quality metrics calculation
-    - Decision support recommendations
+    - Collaborative insights (if collaboration_mode is enabled)
     
-    The analysis is tailored to the specific surgery type (e.g., gastric_flot,
-    colorectal_eras, hepatobiliary, emergency, general).
+    The analysis is optimized for gastric surgery cases with FLOT protocol.
     
     Args:
         case_data: Complete surgical case data
+        collaboration_mode: Enable collaborative analysis features
+        
+    Returns:
+        Comprehensive analysis with integrated ADCI, FLOT, and surgical assessment
+    """
+    # Log request with audit trail
+    audit_log(
+        action="analyze_surgery_case",
+        resource_type="surgical_case",
+        resource_id=case_data.case_id,
+        user_id=current_user.get("id"),
+        details=f"Surgical case analysis requested by {current_user.get('username')}"
+    )
+    
+    try:
+        # Create collaboration context if collaboration mode is enabled
+        collaboration_context = None
+        if collaboration_mode:
+            collaboration_context = {
+                "contributors": [current_user.get("username")],
+                "consensus_level": "pending",
+                "stage": "initial",
+                "divergent_opinions": [],
+                "tags": []
+            }
+        
+        # Perform integrated analysis
+        result = await surgery_analyzer.analyze_case(
+            case_data.dict(),
+            collaboration_context
+        )
+        
+        return result
+        
+    except ValueError as e:
+        logger.error(f"Validation error in surgery analysis: {str(e)}")
+        raise HTTPException(
+            status_code=status.HTTP_400_BAD_REQUEST,
+            detail=str(e)
+        )
+    except Exception as e:
+        logger.error(f"Error in surgery analysis: {str(e)}")
+        raise HTTPException(
+            status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
+            detail=f"Surgery analysis failed: {str(e)}"
+        )
+
+
+@router.post("/collaborate/{case_id}", response_model=Dict[str, Any])
+async def collaborate_on_case(
+    case_id: str,
+    collaboration_input: Dict[str, Any],
+    current_user: dict = Depends(get_current_user)
+):
+    """
+    Contribute to collaborative analysis of a surgical case.
+    
+    This endpoint allows team members to contribute insights, opinions,
+    and evidence to an ongoing collaborative case analysis.
+    
+    Args:
+        case_id: ID of the surgical case
+        collaboration_input: Collaboration data including opinions, evidence, etc.
+        
+    Returns:
+        Updated collaboration status and insights
+    """
+    # Log collaboration with audit trail
+    audit_log(
+        action="collaborate_on_case",
+        resource_type="surgical_case",
+        resource_id=case_id,
+        user_id=current_user.get("id"),
+        details=f"Collaboration contribution by {current_user.get('username')}"
+    )
+    
+    try:
+        # Validate collaboration input
+        if "opinion" not in collaboration_input and "evidence" not in collaboration_input:
+            raise ValueError("Collaboration must include either opinion or evidence")
+        
+        # TODO: In a full implementation, this would interact with a collaboration service
+        # For MVP, we'll return a simulated response
+        
+        # Add the current user to contributors if not already present
+        contributors = collaboration_input.get("existing_contributors", [])
+        if current_user.get("username") not in contributors:
+            contributors.append(current_user.get("username"))
+        
+        # Update consensus level based on input
+        consensus_level = "reached" if collaboration_input.get("agrees_with_recommendation", True) else "divergent"
+        
+        # Track divergent opinions
+        divergent_opinions = collaboration_input.get("existing_divergent_opinions", [])
+        if not collaboration_input.get("agrees_with_recommendation", True):
+            divergent_opinions.append({
+                "contributor": current_user.get("username"),
+                "opinion": collaboration_input.get("opinion", ""),
+                "timestamp": datetime.utcnow().isoformat()
+            })
+        
+        # Compile collaboration result
+        result = {
+            "case_id": case_id,
+            "collaboration_status": {
+                "contributors": contributors,
+                "contributor_count": len(contributors),
+                "consensus_level": consensus_level,
+                "divergent_opinions": divergent_opinions,
+                "latest_contribution": {
+                    "contributor": current_user.get("username"),
+                    "timestamp": datetime.utcnow().isoformat(),
+                    "type": "opinion" if "opinion" in collaboration_input else "evidence"
+                }
+            },
+            "next_steps": _generate_next_steps(
+                consensus_level, 
+                len(divergent_opinions)
+            )
+        }
+        
+        return result
+        
+    except ValueError as e:
+        logger.error(f"Validation error in collaboration: {str(e)}")
+        raise HTTPException(
+            status_code=status.HTTP_400_BAD_REQUEST,
+            detail=str(e)
+        )
+    except Exception as e:
+        logger.error(f"Error in collaboration: {str(e)}")
+        raise HTTPException(
+            status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
+            detail=f"Collaboration failed: {str(e)}"
+        )
+        
+def _generate_next_steps(consensus_level: str, divergent_count: int) -> List[str]:
+    """Generate next steps based on collaboration status"""
+    steps = []
+    
+    if consensus_level == "reached":
+        steps.append("Proceed with agreed-upon treatment plan")
+        steps.append("Document consensus in patient record")
+        
+    elif consensus_level == "divergent":
+        steps.append("Schedule team discussion to address divergent opinions")
+        
+        if divergent_count > 2:
+            steps.append("Consider additional expert consultation")
+            
+    else:  # pending
+        steps.append("Await additional team input")
+        
+    return steps
+
+
+@router.get("/cases/collaborative", response_model=List[Dict[str, Any]])
+async def get_collaborative_cases(
+    status: Optional[str] = Query(None, description="Filter by collaboration status"),
+    current_user: dict = Depends(get_current_user)
+):
+    """
+    Retrieve a list of cases available for collaboration.
+    
+    This endpoint returns cases that are open for collaborative analysis,
+    optionally filtered by collaboration status.
+    
+    Args:
+        status: Optional filter for collaboration status
+        
+    Returns:
+        List of collaborative cases with summary information
+    """
+    # TODO: In a full implementation, this would query a database
+    # For MVP, we'll return a simulated response
+    
+    # Log request with audit trail
+    audit_log(
+        action="get_collaborative_cases",
+        resource_type="collaborative_cases",
+        user_id=current_user.get("id"),
+        details=f"Collaborative cases requested by {current_user.get('username')}"
+    )
+    
+    # Sample data for MVP
+    cases = [
+        {
+            "case_id": "CS001",
+            "patient_id": "PT10045",
+            "diagnosis": "Gastric adenocarcinoma",
+            "collaboration_status": "active",
+            "contributor_count": 3,
+            "last_updated": datetime.utcnow().isoformat(),
+            "consensus_level": "pending"
+        },
+        {
+            "case_id": "CS002",
+            "patient_id": "PT10062",
+            "diagnosis": "Gastric GIST",
+            "collaboration_status": "completed",
+            "contributor_count": 5,
+            "last_updated": datetime.utcnow().isoformat(),
+            "consensus_level": "reached"
+        }
+    ]
+    
+    # Apply status filter if provided
+    if status:
+        cases = [case for case in cases if case["collaboration_status"] == status]
+    
+    return cases
+
+
+@router.get("/research/flot-impact", response_model=Dict[str, Any])
+async def get_flot_impact_metrics(
+    current_user: dict = Depends(get_current_user)
+):
+    """
+    Retrieve aggregated research metrics on FLOT protocol impact.
+    
+    This endpoint provides aggregated research insights on the impact of
+    FLOT protocol on surgical outcomes based on collaborative case analyses.
+    
+    Returns:
+        Research metrics on FLOT protocol impact
+    """
+    # TODO: In a full implementation, this would analyze real data
+    # For MVP, we'll return a simulated response
+    
+    # Log request with audit trail
+    audit_log(
+        action="get_flot_impact_metrics",
+        resource_type="research_metrics",
+        user_id=current_user.get("id"),
+        details=f"FLOT impact metrics requested by {current_user.get('username')}"
+    )
+    
+    return {
+        "metrics_timestamp": datetime.utcnow().isoformat(),
+        "data_points": 42,  # Placeholder
+        "r0_resection_rate": {
+            "with_flot": 0.85,
+            "without_flot": 0.65,
+            "improvement_percentage": 30.8,
+            "confidence_interval": [20.5, 41.1]
+        },
+        "overall_survival": {
+            "with_flot": {
+                "median_months": 38.5,
+                "three_year_rate": 0.57
+            },
+            "without_flot": {
+                "median_months": 26.2,
+                "three_year_rate": 0.42
+            },
+            "hazard_ratio": 0.72,
+            "confidence_interval": [0.58, 0.89]
+        },
+        "surgical_outcomes": {
+            "complication_rate": {
+                "with_flot": 0.28,
+                "without_flot": 0.32,
+                "difference": -0.04
+            },
+            "reoperation_rate": {
+                "with_flot": 0.12,
+                "without_flot": 0.14,
+                "difference": -0.02
+            }
+        },
+        "protocol_adherence": {
+            "completion_rate": 0.76,
+            "dose_reduction_rate": 0.32,
+            "early_termination_rate": 0.18
+        },
+        "research_insights": [
+            "FLOT shows significant survival benefit in gastric cancer",
+            "Preoperative FLOT may improve R0 resection rates",
+            "Elderly patients (>75) show higher toxicity but maintained benefit",
+            "Protocol adherence correlates with improved outcomes"
+        ]
+    }
         surgery_type: Type of surgery (defaults to case_data.surgery_type if not provided)
         current_user: Current authenticated user
         

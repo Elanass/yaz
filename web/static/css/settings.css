@@ -1,0 +1,47 @@
+/**
+ * Gastric ADCI Platform - Settings Page Styles
+ */
+
+/* Settings page specific styles */
+.group\/design-root.dark {
+    background-color: #231810;
+    color: #ffffff;
+}
+
+.group\/design-root:not(.dark) {
+    background-color: #fcfaf8;
+    color: #1c130d;
+}
+
+/* Settings item hover effect */
+.flex.items-center.gap-4.bg-\[\#231810\]:not(:has(label)) {
+    cursor: pointer;
+    transition: background-color 0.2s ease;
+}
+
+.flex.items-center.gap-4.bg-\[\#231810\]:not(:has(label)):hover {
+    background-color: #342418;
+}
+
+/* Toggle switch animations */
+.has-\[\:checked\]\:justify-end {
+    transition: background-color 0.3s ease;
+}
+
+.has-\[\:checked\]\:justify-end > div {
+    transition: transform 0.3s ease;
+}
+
+.has-\[\:checked\]\:justify-end:has(:checked) > div {
+    transform: translateX(20px);
+}
+
+/* Back button hover effect */
+[data-icon="ArrowLeft"] {
+    cursor: pointer;
+    transition: opacity 0.2s ease;
+}
+
+[data-icon="ArrowLeft"]:hover {
+    opacity: 0.8;
+}

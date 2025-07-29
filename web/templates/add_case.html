@@ -1,0 +1,118 @@
+{% extends "layout.html" %}
+
+{% block title %}Add Case - Gastric ADCI Platform{% endblock %}
+
+{% block header_title %}Add Case{% endblock %}
+
+{% block head %}
+<link rel="stylesheet" href="/static/css/add_case.css">
+<script src="/static/js/add_case.js" defer></script>
+{% endblock %}
+
+{% block content %}
+<div class="add-case-container">
+  <div class="form-sections">
+    <div class="form-field">
+      <label for="case-title">
+        <p class="field-label">Case Title</p>
+        <input 
+          id="case-title"
+          placeholder="Enter case title"
+          class="form-input"
+          value=""
+        />
+      </label>
+    </div>
+    
+    <div class="form-field">
+      <label for="surgical-specialty">
+        <p class="field-label">Surgical Specialty</p>
+        <select 
+          id="surgical-specialty"
+          class="form-select"
+        >
+          <option value="">Select specialty</option>
+          <option value="gastric">Gastric</option>
+          <option value="colorectal">Colorectal</option>
+          <option value="hepatobiliary">Hepatobiliary</option>
+          <option value="pancreatic">Pancreatic</option>
+          <option value="esophageal">Esophageal</option>
+        </select>
+      </label>
+    </div>
+    
+    <div class="form-field">
+      <label for="patient-id">
+        <p class="field-label">Patient ID (Optional)</p>
+        <input 
+          id="patient-id"
+          placeholder="Enter patient ID"
+          class="form-input"
+          value=""
+        />
+      </label>
+    </div>
+    
+    <div class="form-field">
+      <label for="procedure-details">
+        <p class="field-label">Procedure Details</p>
+        <input 
+          id="procedure-details"
+          placeholder="Enter procedure details"
+          class="form-input"
+          value=""
+        />
+      </label>
+    </div>
+    
+    <div class="form-field">
+      <label for="procedure-date">
+        <p class="field-label">Date</p>
+        <input 
+          id="procedure-date"
+          type="date"
+          placeholder="Select date"
+          class="form-input"
+          value=""
+        />
+      </label>
+    </div>
+    
+    <div class="form-field">
+      <label for="location">
+        <p class="field-label">Location</p>
+        <input 
+          id="location"
+          placeholder="Enter location"
+          class="form-input"
+          value=""
+        />
+      </label>
+    </div>
+  </div>
+  
+  <h2 class="section-title">Multimedia</h2>
+  
+  <div class="multimedia-upload">
+    <div class="upload-container">
+      <div class="upload-content">
+        <p class="upload-title">Upload Files</p>
+        <p class="upload-subtitle">Add images or videos related to the case</p>
+      </div>
+      <button class="upload-button">
+        <span>Browse Files</span>
+      </button>
+    </div>
+  </div>
+  
+  <div class="action-buttons">
+    <button class="save-button">
+      <span>Save Case</span>
+    </button>
+  </div>
+</div>
+{% endblock %}
+
+{% block scripts %}
+<script src="/static/js/add_case.js" defer></script>
+{% endblock %}

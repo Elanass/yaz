@@ -30,24 +30,62 @@ metadata = MetaData(naming_convention={
 # Base class for all ORM models
 Base = declarative_base(metadata=metadata)
 
-# Database manager instance
-db_manager = None
+# Global session factory
+async_session_factory = None
+engine = None
 
+@asynccontextmanager
+async def get_db_session() -> AsyncGenerator[AsyncSession, None]:
+    """Get a database session with proper error handling and connection management"""
+    if async_session_factory is None:
+        raise RuntimeError("Database has not been initialized. Call init_database() first.")
+    
+    session = async_session_factory()
+    try:
+        yield session
+        await session.commit()
+    except Exception as e:
+        await session.rollback()
+        logger.error(f"Database session error: {e}")
+        raise
+    finally:
+        await session.close()
 
 async def init_database():
-    """Initialize the database for MVP"""
-    logger.info("Initializing database for MVP")
-    # For MVP, we're using SQLite which doesn't need complex initialization
+    """Initialize the database with connection pooling and retry logic"""
+    global engine, async_session_factory
     
-    engine = create_async_engine(config.database_url)
+    logger.info("Initializing database connection")
+    
+    # Create async engine with appropriate connection pool settings
+    engine = create_async_engine(
+        config.database_url,
+        echo=config.debug,
+        pool_size=10,
+        max_overflow=20,
+        pool_timeout=30,
+        pool_recycle=1800,  # Recycle connections every 30 minutes
+        pool_pre_ping=True,  # Check connection liveness before using from pool
+    )
+    
+    # Create async session factory
+    async_session_factory = async_sessionmaker(
+        engine,
+        expire_on_commit=False,
+        autoflush=False,
+    )
     
     # Create tables if they don't exist
-    from data.models.orm import Base
-    async with engine.begin() as conn:
-        # await conn.run_sync(Base.metadata.drop_all)  # Uncomment to reset database
-        await conn.run_sync(Base.metadata.create_all)
-    
-    logger.info("Database initialized successfully")
+    try:
+        from data.models.orm import Base
+        async with engine.begin() as conn:
+            # await conn.run_sync(Base.metadata.drop_all)  # Uncomment to reset database
+            await conn.run_sync(Base.metadata.create_all)
+        
+        logger.info("Database initialized successfully")
+    except Exception as e:
+        logger.error(f"Database initialization error: {e}")
+        raise
     return True
 
 
@@ -210,3 +248,33 @@ async def init_database():
 async def close_database():
     """Close database connections for application shutdown."""
     await db_manager.close()
+
+
+async def check_database_connection() -> bool:
+    """Check if the database connection is alive and functioning"""
+    if engine is None:
+        logger.warning("Database not initialized, connection check failed")
+        return False
+    
+    try:
+        # Attempt a simple query to check connection
+        async with engine.connect() as conn:
+            await conn.execute("SELECT 1")
+        return True
+    except Exception as e:
+        logger.error(f"Database connection check failed: {e}")
+        return False
+
+
+async def close_db_connections() -> None:
+    """Close all database connections"""
+    if engine is None:
+        logger.warning("No database engine to close")
+        return
+    
+    try:
+        await engine.dispose()
+        logger.info("Database connections closed successfully")
+    except Exception as e:
+        logger.error(f"Error closing database connections: {e}")
+        raise

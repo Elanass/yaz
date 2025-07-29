@@ -1,0 +1,89 @@
+/**
+ * Gastric ADCI Platform - Index Page Styles
+ * 
+ * Specific styling for the main landing page.
+ */
+
+/* Main content area */
+.main-content {
+  padding: 1rem;
+  margin-bottom: 60px; /* Space for bottom nav */
+}
+
+/* Card styles */
+.card {
+  background-color: var(--bg-secondary);
+  border-radius: 1rem;
+  padding: 1.5rem;
+  margin-bottom: 1rem;
+  box-shadow: 0 2px 10px rgba(0, 0, 0, 0.05);
+  transition: transform 0.2s ease, box-shadow 0.2s ease;
+}
+
+.card:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+}
+
+.card h3 {
+  color: var(--text-primary);
+  font-weight: 700;
+  margin-bottom: 0.5rem;
+}
+
+.card p {
+  color: var(--text-secondary);
+}
+
+/* Bottom navigation */
+.bottom-nav {
+  position: fixed;
+  bottom: 0;
+  left: 0;
+  right: 0;
+  background-color: var(--bg-secondary);
+  display: flex;
+  justify-content: space-around;
+  padding: 0.75rem 0;
+  box-shadow: 0 -2px 10px rgba(0, 0, 0, 0.05);
+  z-index: 10;
+}
+
+.nav-item {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  color: var(--text-secondary);
+}
+
+.nav-item.active {
+  color: var(--text-accent);
+}
+
+.nav-item svg {
+  margin-bottom: 0.25rem;
+}
+
+/* Horizontal scrolling section */
+#horizontal-scroll {
+  display: flex;
+  overflow-x: auto;
+  padding: 1rem;
+  gap: 1rem;
+  -webkit-overflow-scrolling: touch;
+  scrollbar-width: none; /* Firefox */
+}
+
+#horizontal-scroll::-webkit-scrollbar {
+  display: none; /* Chrome, Safari, Edge */
+}
+
+#horizontal-scroll .card {
+  min-width: 200px;
+  margin-bottom: 0;
+}
+
+/* Vertical section */
+#vertical-scroll {
+  padding: 1rem;
+}

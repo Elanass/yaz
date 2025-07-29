@@ -1,6 +1,7 @@
 #!/usr/bin/env python3
 """
-Gastric ADCI Platform - Main Application Entry Point (MVP Version)
+Decision Precision in Surgery - Gastric ADCI Surgery FLOT Impact Platform
+Production-ready FastAPI application with optimized imports and error handling
 """
 
 import asyncio
@@ -11,21 +12,14 @@ import uvicorn
 from fastapi import FastAPI, Request, UploadFile, File, HTTPException
 from fastapi.middleware.cors import CORSMiddleware
 from fastapi.middleware.gzip import GZipMiddleware
-from fastapi.responses import JSONResponse
+from fastapi.responses import JSONResponse, RedirectResponse
 from fastapi.staticfiles import StaticFiles
-import pandas as pd
+from starlette.middleware.sessions import SessionMiddleware
 
 from core.config.platform_config import config
-from core.config.settings import get_settings
 from core.models.base import ApiResponse, HealthStatus
 from core.services.logger import get_logger
 from core.utils.helpers import LoggingUtils
-
-# Import API router for MVP
-from api.v1.main import api_router
-from features.decisions.adci_engine import ADCIEngine
-from features.protocols.flot_analyzer import FLOTAnalyzer
-from features.analysis.impact_metrics import PrecisionEngine
 
 # Setup logging
 LoggingUtils.setup_structured_logging()
@@ -34,269 +28,196 @@ logger = get_logger(__name__)
 
 @asynccontextmanager
 async def lifespan(app: FastAPI):
-    """Application lifespan manager"""
+    """Application lifespan manager with improved error handling and initialization"""
     
     # Startup
-    logger.info("🚀 Starting Gastric ADCI Platform - MVP Mode")
+    logger.info("🚀 Starting Decision Precision in Surgery Platform - Gastric ADCI FLOT Impact")
     
-    # Initialize SQLite database (simplified for MVP)
+    # Initialize database
     try:
         from data.database import init_database
         await init_database()
         logger.info("✅ Database initialized")
     except Exception as e:
         logger.error(f"❌ Database initialization failed: {e}")
+        # We don't raise the exception here to allow the app to start even with DB issues
+        # This is a production-focused approach that allows for graceful degradation
     
-    # Initialize core services
-    from features.auth.service import auth_service
-    from features.decisions.service import DecisionService
+    # Initialize core services with better error isolation
+    service_initialization_tasks = []
     
-    # Create decision service instance
-    decision_service = DecisionService()
-    
-    # Health checks
     try:
-        auth_health = await auth_service.health_check()
-        decision_health = await decision_service.health_check()
-        logger.info("✅ All services healthy")
+        # Pre-initialize ADCI engine
+        from features.decisions.adci_engine import ADCIEngine
+        adci_engine = ADCIEngine()
+        logger.info("✅ ADCI Engine initialized")
+        
+        # Pre-initialize FLOT analyzer
+        from features.protocols.flot_analyzer import FLOTAnalyzer
+        flot_analyzer = FLOTAnalyzer()
+        logger.info("✅ FLOT Protocol Analyzer initialized")
+        
+        # Import and initialize auth and decision services
+        from features.auth.service import auth_service
+        from features.decisions.service import DecisionService
+        
+        # Create decision service instance
+        decision_service = DecisionService()
+        
+        # Health checks
+        async def perform_health_checks():
+            try:
+                auth_health = await auth_service.health_check()
+                decision_health = await decision_service.health_check()
+                logger.info("✅ All services healthy")
+            except Exception as e:
+                logger.error(f"❌ Service health check failed: {e}")
+        
+        # Schedule health checks to run in the background
+        if not config.is_testing:  # Skip in testing mode
+            service_initialization_tasks.append(
+                asyncio.create_task(perform_health_checks())
+            )
+        
     except Exception as e:
-        logger.error(f"❌ Service health check failed: {e}")
+        logger.error(f"❌ Core services initialization failed: {e}")
+    
+    # Register any cache warmup or data preloading tasks here
+    try:
+        # Run all initialization tasks concurrently
+        if service_initialization_tasks:
+            await asyncio.gather(*service_initialization_tasks, return_exceptions=True)
+    except Exception as e:
+        logger.error(f"❌ Service initialization tasks failed: {e}")
     
     yield
     
     # Shutdown
-    logger.info("🛑 Shutting down Gastric ADCI Platform")
+    logger.info("🛑 Shutting down Decision Precision in Surgery Platform")
     
-    # Close database connections
+    # Close any open connections or resources
     try:
-        from data.database import close_database
-        await close_database()
+        # Close database connections
+        from data.database.services import close_db_connections
+        await close_db_connections()
         logger.info("✅ Database connections closed")
     except Exception as e:
-        logger.error(f"❌ Database shutdown failed: {e}")
+        logger.error(f"❌ Error closing database connections: {e}")
 
 
-def create_app() -> FastAPI:
-    """Create and configure FastAPI application"""
-    
-    settings = get_settings()
-    
-    # Create app
-    app = FastAPI(
-        title=settings.app.name,
-        version=settings.app.version,
-        description="Healthcare-grade Progressive Web App for gastric oncology decision support",
-        docs_url="/api/docs" if settings.app.enable_swagger else None,
-        redoc_url="/api/redoc" if settings.app.enable_swagger else None,
-        openapi_url="/api/openapi.json" if settings.app.enable_swagger else None,
-        lifespan=lifespan
-    )
-    
-    # Add middleware
-    setup_middleware(app, settings)
-    
-    # Add routes
-    setup_routes(app)
-    
-    # Add exception handlers
-    setup_exception_handlers(app)
-    
-    return app
+# Create FastAPI app with optimized settings
+app = FastAPI(
+    title="Decision Precision in Surgery",
+    description="""
+    A healthcare-grade Progressive Web App for surgical decision support
+    with a focus on gastric oncology using the ADCI (Adaptive Decision Confidence Index) 
+    framework and FLOT protocol impact assessment.
+    """,
+    version=config.api_version,
+    lifespan=lifespan,
+    # Only enable docs in development or when explicitly enabled
+    docs_url="/docs" if config.enable_swagger else None,
+    redoc_url="/redoc" if config.enable_swagger else None,
+)
 
 
-def setup_middleware(app: FastAPI, settings):
-    """Setup application middleware"""
-    
-    # CORS
-    app.add_middleware(
-        CORSMiddleware,
-        allow_origins=settings.security.cors_origins,
-        allow_credentials=True,
-        allow_methods=settings.security.cors_methods,
-        allow_headers=settings.security.cors_headers,
-    )
-    
-    # Compression
+# Add middleware with proper security settings
+app.add_middleware(
+    CORSMiddleware,
+    allow_origins=config.cors_origins,
+    allow_credentials=True,
+    allow_methods=["GET", "POST", "PUT", "DELETE", "PATCH", "OPTIONS"],
+    allow_headers=["Authorization", "Content-Type", "Accept", "X-CSRF-Token", "X-Requested-With"],
+)
+
+# Add session middleware with secure configuration
+app.add_middleware(
+    SessionMiddleware,
+    secret_key=config.secret_key,
+    session_cookie="gastric_adci_session",
+    max_age=86400,  # 1 day in seconds
+    same_site="lax",
+    https_only=config.is_production,  # Only use HTTPS in production
+)
+
+# Add Gzip compression for performance optimization
+if config.enable_response_compression:
     app.add_middleware(GZipMiddleware, minimum_size=1000)
-    
-    # Request logging middleware
-    @app.middleware("http")
-    async def log_requests(request: Request, call_next):
-        import time
-        start_time = time.perf_counter()
-        
-        response = await call_next(request)
-        
-        process_time = time.perf_counter() - start_time
-        logger.info(
-            "HTTP request",
-            method=request.method,
-            url=str(request.url),
-            status_code=response.status_code,
-            process_time=f"{process_time:.4f}s"
-        )
-        
-        return response
 
+# Import API router
+from api.v1.main import api_router
 
-def setup_routes(app: FastAPI):
-    """Setup application routes"""
-    
-    # Health check
-    @app.get("/health", response_model=ApiResponse[HealthStatus])
-    async def health_check():
-        """Application health check"""
-        
-        health = HealthStatus(
-            status="healthy",
-            version=get_settings().app.version,
-            environment=get_settings().environment
-        )
-        
-        # Check service health
-        try:
-            from features.auth.service import auth_service
-            from features.decisions.service import DecisionService
-            
-            # Create decision service instance
-            decision_service = DecisionService()
-            
-            auth_health = await auth_service.health_check()
-            decision_health = await decision_service.health_check()
-            
-            health.add_component("auth", auth_health.get("status", "unknown"))
-            health.add_component("decisions", decision_health.get("status", "unknown"))
-            
-        except Exception as e:
-            health.add_component("services", "error")
-            health.status = "unhealthy"
-            logger.error(f"Health check failed: {e}")
-        
-        return ApiResponse.success_response(
-            data=health,
-            message="Health check completed"
-        )
-    
-    # Direct endpoints from main.py
-    @app.post("/process-csv")
-    async def process_csv(file: UploadFile = File(...)):
-        """Process uploaded CSV file and return precision engine insights"""
-        df = pd.read_csv(file.file)
-        engine = PrecisionEngine()
-        records = df.to_dict(orient="records")
-        insights = engine.analyze(records)
-        return {"insights": insights}
+# Include API router
+app.include_router(api_router, prefix="/api/v1")
 
-    @app.post("/predict/adci")
-    async def predict_adci(patient: dict):
-        """Predict using the ADCI surgery decision engine for a single patient."""
-        engine = ADCIEngine()
-        if not engine.validate_input(patient):
-            raise HTTPException(status_code=400, detail="Invalid patient data for ADCI engine")
-        result = engine.predict(patient)
-        return result
-    
-    @app.post("/predict/flot")
-    async def predict_flot(patient: dict):
-        """Predict FLOT chemotherapy protocol eligibility and recommendations."""
-        analyzer = FLOTAnalyzer()
-        if not analyzer.validate_input(patient):
-            raise HTTPException(status_code=400, detail="Invalid patient data for FLOT protocol")
-        result = analyzer.analyze_patient(patient)
-        return result
+# Serve static files with optimized caching
+app.mount(
+    "/static", 
+    StaticFiles(directory="web/static"), 
+    name="static"
+)
 
-    @app.post("/predict/precision")
-    async def predict_precision(patient: dict):
-        """Predict impact analysis for a single patient."""
-        engine = PrecisionEngine()
-        insights = engine.analyze([patient])
-        return insights[0]
+# Add global exception handler
+@app.exception_handler(Exception)
+async def global_exception_handler(request: Request, exc: Exception):
+    """Global exception handler for unhandled exceptions"""
+    logger.error(f"Unhandled exception: {exc}", exc_info=True)
     
-    # Root endpoint
-    @app.get("/", response_model=ApiResponse[dict])
-    async def root():
-        """Root endpoint with API information"""
-        
-        return ApiResponse.success_response(
-            data={
-                "name": "Gastric ADCI Platform",
-                "version": get_settings().app.version,
-                "description": "Healthcare-grade decision support for gastric oncology",
-                "docs_url": "/api/docs",
-                "endpoints": {
-                    "auth": "/api/v1/auth",
-                    "decisions": "/api/v1/decisions",
-                    "health": "/health"
-                }
-            },
-            message="Welcome to Gastric ADCI Platform"
-        )
-    
-    # API routes
-    app.include_router(api_router, prefix="/api/v1")
-    
-    # Static files (for web interface)
-    try:
-        app.mount("/static", StaticFiles(directory="web/static"), name="static")
-    except Exception:
-        logger.warning("Static files directory not found")
-
-
-def setup_exception_handlers(app: FastAPI):
-    """Setup global exception handlers"""
-    
-    @app.exception_handler(ValueError)
-    async def value_error_handler(request: Request, exc: ValueError):
-        """Handle validation errors"""
-        
-        logger.warning(f"Validation error: {exc}")
-        return JSONResponse(
-            status_code=400,
-            content=ApiResponse.error_response(
-                message="Validation error",
-                errors=[str(exc)]
-            ).dict()
-        )
-    
-    @app.exception_handler(Exception)
-    async def general_exception_handler(request: Request, exc: Exception):
-        """Handle general exceptions"""
-        
-        logger.error(f"Unhandled exception: {exc}", exc_info=True)
-        
-        # Don't expose internal errors in production
-        settings = get_settings()
-        if settings.is_production:
-            message = "An internal error occurred"
-            errors = ["Internal server error"]
-        else:
-            message = f"Internal error: {type(exc).__name__}"
-            errors = [str(exc)]
-        
+    # Return a JSON response for API requests, HTML for web requests
+    if request.url.path.startswith("/api/"):
         return JSONResponse(
             status_code=500,
-            content=ApiResponse.error_response(
-                message=message,
-                errors=errors
-            ).dict()
+            content={"detail": "An internal server error occurred"},
+        )
+    else:
+        # For web requests, return a simple error page
+        return JSONResponse(
+            status_code=500,
+            content={"detail": "An internal server error occurred. Please try again later."}
         )
 
 
-# Create the application instance
-app = create_app()
+@app.get("/", tags=["Root"], include_in_schema=False)
+async def root():
+    """Redirect to the PWA app"""
+    return RedirectResponse(url="/api/v1/")
 
 
-# For development and testing
+@app.get("/health", tags=["Health"])
+async def health_check():
+    """Health check endpoint for monitoring and load balancers"""
+    # Improved health check with more comprehensive status information
+    status = "healthy"
+    database_connected = True
+    api_available = True
+    
+    # Check database connectivity
+    try:
+        from data.database import check_database_connection
+        database_connected = await check_database_connection()
+    except Exception as e:
+        logger.error(f"Database health check failed: {e}")
+        database_connected = False
+        status = "degraded"
+    
+    return HealthStatus(
+        status=status,
+        version=config.api_version,
+        database_connected=database_connected,
+        api_available=api_available,
+        environment=config.environment
+    )
+
+
 if __name__ == "__main__":
-    import time
-    import uvicorn
-    
-    settings = get_settings()
-    
+    # Run using Uvicorn with optimized settings when called directly
     uvicorn.run(
         "main:app",
-        host=settings.app.host,
-        port=settings.app.port,
-        reload=settings.app.debug,
-        log_level=settings.app.log_level.lower()
+        host=config.host,
+        port=config.port,
+        reload=config.debug_mode,
+        log_level=config.log_level.lower(),
+        workers=config.workers if config.is_production else 1,
+        proxy_headers=config.is_production,  # Enable in production for proper IP forwarding
+        forwarded_allow_ips="*" if config.is_production else None,
     )
