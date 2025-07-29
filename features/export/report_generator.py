@@ -8,6 +8,8 @@ import json
 import logging
 import os
 import uuid
+from reportlab.pdfgen import canvas
+from reportlab.lib.pagesizes import letter
 from typing import Dict, List, Any, Optional
 from datetime import datetime
 
@@ -97,18 +99,27 @@ class IntelligentReportGenerator:
             raise
     
     def _export_pdf(self, data: Any, file_path: str) -> str:
-        """Export data to PDF file"""
+        """Export data to PDF file using ReportLab"""
         try:
-            # Note: In a real implementation, use a PDF library like ReportLab or WeasyPrint
-            logger.warning("PDF export is not fully implemented. Creating a placeholder file.")
-            
-            # Create a placeholder file with JSON content
-            with open(file_path, "w", encoding="utf-8") as pdffile:
-                pdffile.write("PDF PLACEHOLDER\n\n")
-                pdffile.write(json.dumps(data, indent=2))
-            
+            c = canvas.Canvas(file_path, pagesize=letter)
+            width, height = letter
+            y = height - 40
+            # Title
+            c.setFont('Helvetica-Bold', 14)
+            c.drawString(40, y, f"Report Generated: {datetime.now().strftime('%Y-%m-%d %H:%M:%S')}")
+            y -= 30
+            # Content: JSON dump
+            text = json.dumps(data, indent=2)
+            c.setFont('Helvetica', 10)
+            for line in text.splitlines():
+                if y < 40:
+                    c.showPage()
+                    y = height - 40
+                    c.setFont('Helvetica', 10)
+                c.drawString(40, y, line[:100])
+                y -= 14
+            c.save()
             return file_path
-            
         except Exception as e:
             logger.error(f"Error exporting to PDF: {e}")
             raise

@@ -14,8 +14,9 @@ from sqlalchemy.orm import declarative_base, sessionmaker
 from sqlalchemy.pool import StaticPool
 
 from core.config.platform_config import config
+from core.services.logger import get_logger
 
-logger = logging.getLogger(__name__)
+logger = get_logger(__name__)
 
 # Database metadata with naming convention for consistent migrations
 metadata = MetaData(naming_convention={
@@ -28,6 +29,33 @@ metadata = MetaData(naming_convention={
 
 # Base class for all ORM models
 Base = declarative_base(metadata=metadata)
+
+# Database manager instance
+db_manager = None
+
+
+async def init_database():
+    """Initialize the database for MVP"""
+    logger.info("Initializing database for MVP")
+    # For MVP, we're using SQLite which doesn't need complex initialization
+    
+    engine = create_async_engine(config.database_url)
+    
+    # Create tables if they don't exist
+    from data.models.orm import Base
+    async with engine.begin() as conn:
+        # await conn.run_sync(Base.metadata.drop_all)  # Uncomment to reset database
+        await conn.run_sync(Base.metadata.create_all)
+    
+    logger.info("Database initialized successfully")
+    return True
+
+
+async def close_database():
+    """Close database connections"""
+    logger.info("Closing database connections")
+    # For MVP with SQLite, this is a no-op
+    return True
 
 
 class DatabaseManager:

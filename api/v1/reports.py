@@ -11,18 +11,19 @@ import json
 
 from core.utils.helpers import load_csv
 from features.export.report_generator import IntelligentReportGenerator
+from core.dependencies import get_report_generator
 from features.auth.service import get_current_user, require_role, Domain, Scope
 
 router = APIRouter(prefix="/reports", tags=["Reports"])
 
-# Initialize report generator
-report_generator = IntelligentReportGenerator()
+# Report generator is injected via DI
 
 @router.post("/generate")
 async def generate_report(
     request: Request,
     params: Dict[str, Any] = Body(...),
-    current_user = Depends(require_role(Domain.HEALTHCARE, Scope.READ))
+    current_user = Depends(require_role(Domain.HEALTHCARE, Scope.READ)),
+    report_generator: IntelligentReportGenerator = Depends(get_report_generator)
 ):
     """
     Generate a report based on parameters
@@ -152,7 +153,8 @@ async def generate_report(
 @router.get("/download/{report_id}")
 async def download_report(
     report_id: str,
-    current_user = Depends(require_role(Domain.HEALTHCARE, Scope.READ))
+    current_user = Depends(require_role(Domain.HEALTHCARE, Scope.READ)),
+    report_generator: IntelligentReportGenerator = Depends(get_report_generator)
 ):
     """
     Download a generated report

@@ -10,14 +10,15 @@ import datetime
 from fastapi import APIRouter, Depends, HTTPException, Query, Path, Body
 from pydantic import BaseModel
 
-from core.models.base import UserIdentity
+from core.models.user import UserIdentity
 from core.services.logger import get_logger
 from features.journal.service import (
     journal_service,
     ClinicalTemplate,
     ClinicalNote,
     TemplateSection,
-    FieldValue
+    FieldValue,
+    AutoGenerateRequest
 )
 from features.journal.auto_entries import (
     auto_generate_note_content,
@@ -294,7 +295,7 @@ async def amend_note(
 @router.post("/notes/{note_id}/auto-generate", response_model=ClinicalNote)
 async def auto_generate_content(
     note_id: str = Path(..., description="The ID of the note to update"),
-    request: AutoGenerateRequest,
+    request: AutoGenerateRequest = Body(...),
     current_user: UserIdentity = Depends(get_current_active_user)
 ):
     """

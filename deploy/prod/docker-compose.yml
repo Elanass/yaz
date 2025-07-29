@@ -28,44 +28,36 @@ services:
       retries: 5
 
   app:
-    build: .
+    build: 
+      context: ../../
+      dockerfile: deploy/prod/Dockerfile
     environment:
       - DATABASE_URL=postgresql://adci_user:adci_pass@db:5432/adci_db
       - REDIS_URL=redis://redis:6379/0
       - SECRET_KEY=your-secret-key-change-in-production
       - ENVIRONMENT=production
       - API_BASE_URL=http://localhost:8000/api/v1
+      - LOG_LEVEL=INFO
+      - ENABLE_SWAGGER=false
+      - PATIENT_DATA_ENCRYPTION=true
+      - ENABLE_AUDIT_LOGGING=true
     ports:
       - "8000:8000"
-      - "8001:8001"
     depends_on:
       db:
         condition: service_healthy
       redis:
         condition: service_healthy
     volumes:
-      - ./uploads:/app/uploads
+      - ../../data/uploads:/app/data/uploads
+      - ../../logs:/app/logs
+      - ../../web/static:/app/web/static
     healthcheck:
       test: ["CMD", "curl", "-f", "http://localhost:8000/health"]
       interval: 30s
       timeout: 10s
       retries: 3
-
-  backend:
-    build:
-      context: ./backend
-    env_file:
-      - ./config/development.env
-    ports:
-      - "8000:8000"
-    depends_on:
-      - db
-
-  frontend:
-    build:
-      context: ./frontend
-    ports:
-      - "80:80"
+    command: ["uvicorn", "main:app", "--host", "0.0.0.0", "--port", "8000"]
 
 volumes:
   postgres_data:

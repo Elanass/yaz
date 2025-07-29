@@ -42,7 +42,7 @@ frontend/web/
 3. **RBAC Security**: Role-based access control throughout
 4. **Modular Services**: Clean separation of concerns
 5. **MVP Focus**: Essential features with robust foundation
-6. **Docker Ready**: Updated Dockerfiles and docker-compose
+6. **Docker Ready**: Updated Dockerfiles and Docker Compose configurations moved to `/deploy/` directory
 7. **PythonAnywhere Compatible**: WSGI wrapper maintained
 
 ### Configuration:
@@ -62,7 +62,9 @@ frontend/web/
 ### Files Updated:
 - `/backend/src/main.py` - New integrated FastAPI app
 - `/backend/src/wsgi.py` - Updated for new structure
-- `/docker-compose.yml` - Simplified services
+- `/deploy/prod/docker-compose.yml` - Production services
+- `/deploy/dev/docker-compose.yml` - Development services
+- `/deploy/test/docker-compose.yml` - Testing services
 - `/Dockerfile` - Updated for new paths
 - `/.env.development` - Development configuration
 - `/frontend/web/templates/*` - Enhanced UI templates

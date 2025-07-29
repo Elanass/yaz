@@ -40,7 +40,7 @@ class ElectricSQLConfig:
     def __init__(self):
         self.database_url = config.database_url
         self.electric_url = config.electricsql_url
-        self.electric_token = config.electric_token
+        self.electric_token = config.electricsql_token
         self.database_id = config.electric_database_id
         
         # Healthcare compliance settings

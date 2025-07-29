@@ -9,83 +9,97 @@
 {% endblock %}
 
 {% block content %}
-<div class="relative flex w-full min-h-screen flex-col bg-neutral-50 justify-between overflow-x-hidden" style="font-family: 'Plus Jakarta Sans', 'Noto Sans', sans-serif;">
+<div class="relative flex w-full min-h-screen flex-col bg-neutral-50 justify-between group/design-root overflow-x-hidden" style='font-family: "Plus Jakarta Sans", "Noto Sans", sans-serif;'>
   <div>
     <div class="flex items-center bg-neutral-50 p-4 pb-2 justify-between">
-      <!-- Menu Icon -->
-      <div class="text-[#141414] flex items-center" data-icon="List">
-        <!-- SVG icon -->
+      <div class="text-[#141414] flex size-12 shrink-0 items-center" data-icon="List" data-size="24px" data-weight="regular">
+        <svg xmlns="http://www.w3.org/2000/svg" width="24px" height="24px" fill="currentColor" viewBox="0 0 256 256">
+          <path d="M224,128a8,8,0,0,1-8,8H40a8,8,0,0,1,0-16H216A8,8,0,0,1,224,128ZM40,72H216a8,8,0,0,0,0-16H40a8,8,0,0,0,0,16ZM216,184H40a8,8,0,0,0,0,16H216a8,8,0,0,0,0-16Z"></path>
+        </svg>
       </div>
-      <h2 class="text-[#141414] text-lg font-bold text-center flex-1">Surgify</h2>
-      <!-- User Icon -->
-      <div class="flex items-center justify-end w-12">
-        <button class="rounded-full h-12 w-12 flex items-center justify-center bg-transparent">
-          <!-- SVG user icon -->
+      <h2 class="text-[#141414] text-lg font-bold leading-tight tracking-[-0.015em] flex-1 text-center">Surgify</h2>
+      <div class="flex w-12 items-center justify-end">
+        <button class="flex max-w-[480px] cursor-pointer items-center justify-center overflow-hidden rounded-full h-12 bg-transparent text-[#141414] gap-2 text-base font-bold leading-normal tracking-[0.015em] min-w-0 p-0">
+          <div class="text-[#141414]" data-icon="User" data-size="24px" data-weight="regular">
+            <svg xmlns="http://www.w3.org/2000/svg" width="24px" height="24px" fill="currentColor" viewBox="0 0 256 256">
+              <path d="M230.92,212c-15.23-26.33-38.7-45.21-66.09-54.16a72,72,0,1,0-73.66,0C63.78,166.78,40.31,185.66,25.08,212a8,8,0,1,0,13.85,8c18.84-32.56,52.14-52,89.07-52s70.23,19.44,89.07,52a8,8,0,1,0,13.85-8ZM72,96a56,56,0,1,1,56,56A56.06,56.06,0,0,1,72,96Z"></path>
+            </svg>
+          </div>
         </button>
       </div>
     </div>
-
-    <!-- Search Bar -->
     <div class="px-4 py-3">
-      <div class="flex items-center bg-[#ededed] rounded-xl h-12 overflow-hidden">
-        <div class="pl-4 flex items-center text-neutral-500">
-          <!-- SVG search icon -->
+      <label class="flex flex-col min-w-40 h-12 w-full">
+        <div class="flex w-full flex-1 items-stretch rounded-xl h-full">
+          <div class="text-neutral-500 flex border-none bg-[#ededed] items-center justify-center pl-4 rounded-l-xl border-r-0" data-icon="MagnifyingGlass" data-size="24px" data-weight="regular">
+            <svg xmlns="http://www.w3.org/2000/svg" width="24px" height="24px" fill="currentColor" viewBox="0 0 256 256"><path d="M229.66,218.34l-50.07-50.06a88.11,88.11,0,1,0-11.31,11.31l50.06,50.07a8,8,0,0,0,11.32-11.32ZM40,112a72,72,0,1,1,72,72A72.08,72.08,0,0,1,40,112Z"></path></svg>
+          </div>
+          <input placeholder="Search" class="form-input flex w-full min-w-0 flex-1 resize-none overflow-hidden rounded-xl text-[#141414] focus:outline-0 focus:ring-0 border-none bg-[#ededed] focus:border-none h-full placeholder:text-neutral-500 px-4 rounded-l-none border-l-0 pl-2 text-base font-normal leading-normal" />
         </div>
-        <input type="text" placeholder="Search" class="flex-1 bg-[#ededed] border-none px-4 placeholder:text-neutral-500 focus:outline-none text-base text-[#141414]" />
-      </div>
+      </label>
     </div>
 
     <!-- Tabs -->
-    <div class="flex gap-3 p-3 overflow-x-auto">
-      <button class="flex items-center h-8 bg-[#ededed] rounded-full px-4">
-        <span class="text-[#141414] text-sm font-medium">Journal</span>
-        <!-- Caret icon -->
+    <div class="flex gap-3 p-3 overflow-x-hidden">
+      <button class="flex h-8 shrink-0 items-center justify-center gap-x-2 rounded-full bg-[#ededed] pl-4 pr-2">
+        <p class="text-[#141414] text-sm font-medium leading-normal">Journal</p>
+        <div class="text-[#141414]" data-icon="CaretDown" data-size="20px" data-weight="regular"><svg><!-- SVG --></svg></div>
       </button>
-      <button class="flex items-center h-8 bg-[#ededed] rounded-full px-4">
-        <span class="text-[#141414] text-sm font-medium">Events</span>
-      </button>
-      <button class="flex items-center h-8 bg-[#ededed] rounded-full px-4">
-        <span class="text-[#141414] text-sm font-medium">Series</span>
-      </button>
+      <button class="flex h-8 shrink-0 items-center justify-center gap-x-2 rounded-full bg-[#ededed] pl-4 pr-2"><p class="text-[#141414] text-sm font-medium leading-normal">Events</p><div class="text-[#141414]" data-icon="CaretDown" data-size="20px" data-weight="regular"><svg><!-- SVG --></svg></div></button>
+      <button class="flex h-8 shrink-0 items-center justify-center gap-x-2 rounded-full bg-[#ededed] pl-4 pr-2"><p class="text-[#141414] text-sm font-medium leading-normal">Series</p><div class="text-[#141414]" data-icon="CaretDown" data-size="20px" data-weight="regular"><svg><!-- SVG --></svg></div></button>
     </div>
 
     <!-- Featured Series -->
     <h2 class="px-4 pt-5 pb-3 text-[22px] font-bold text-[#141414]">Featured Series</h2>
     <div class="flex overflow-x-auto scrollbar-hidden p-4 gap-3">
-      <div class="min-w-[60px] flex flex-col gap-4 rounded-lg">
-        <div class="aspect-video bg-cover rounded-xl" style="background-image: url('https://lh3.googleusercontent.com/aida-public/...');"></div>
-        <p class="text-base font-medium text-[#141414]">Advanced Spinal Fusion Techniques</p>
-        <p class="text-sm text-neutral-500">Dr. Evelyn Reed</p>
+      {% for series in featured_series %}
+      <div class="min-w-[60px] flex flex-col gap-4 rounded-lg" 
+           hx-get="/series/{{ series.id }}/peek" 
+           hx-trigger="mouseenter" 
+           hx-target="#peek-{{ series.id }}" 
+           hx-swap="afterend">
+        <div class="aspect-video bg-cover rounded-xl" style="background-image: url('{{ series.image_url }}');"></div>
+        <p class="text-base font-medium text-[#141414]">{{ series.title }}</p>
+        <p class="text-sm text-neutral-500">{{ series.author }}</p>
       </div>
+      <div id="peek-{{ series.id }}" class="absolute z-10 bg-white shadow-lg hidden"></div>
+      {% endfor %}
     </div>
 
     <!-- Upcoming Events -->
     <h2 class="px-4 pt-5 pb-3 text-[22px] font-bold text-[#141414]">Upcoming Events</h2>
     <div class="flex overflow-x-auto scrollbar-hidden p-4 gap-3">
-      <div class="min-w-[60px] flex flex-col gap-4 rounded-lg">
-        <div class="aspect-video bg-cover rounded-xl" style="background-image: url('https://lh3.googleusercontent.com/aida-public/...');"></div>
-        <p class="text-base font-medium text-[#141414]">Minimally Invasive Surgery Conference</p>
-        <p class="text-sm text-neutral-500">October 20-22, 2024</p>
+      {% for event in upcoming_events %}
+      <div class="min-w-[60px] flex flex-col gap-4 rounded-lg" 
+           hx-get="/events/{{ event.id }}/peek" 
+           hx-trigger="mouseenter" 
+           hx-target="#peek-event-{{ event.id }}" 
+           hx-swap="afterend">
+        <div class="aspect-video bg-cover rounded-xl" style="background-image: url('{{ event.image_url }}');"></div>
+        <p class="text-base font-medium text-[#141414]">{{ event.title }}</p>
+        <p class="text-sm text-neutral-500">{{ event.date }}</p>
       </div>
+      <div id="peek-event-{{ event.id }}" class="absolute z-10 bg-white shadow-lg hidden"></div>
+      {% endfor %}
     </div>
 
     <!-- Latest Journal Articles -->
     <h2 class="px-4 pt-5 pb-3 text-[22px] font-bold text-[#141414]">Latest Journal Articles</h2>
     <div class="p-4 space-y-4">
-      <div class="flex items-center gap-4 rounded-xl">
+      {% for article in journal_articles %}
+      <div class="flex items-center gap-4 rounded-xl" 
+           hx-get="/articles/{{ article.id }}/peek" 
+           hx-trigger="mouseenter" 
+           hx-target="#peek-article-{{ article.id }}" 
+           hx-swap="afterend">
         <div class="flex-2 flex flex-col gap-1">
-          <p class="text-base font-bold text-[#141414]">Robotic-Assisted Surgery Outcomes</p>
-          <p class="text-sm text-neutral-500">Dr. Marcus Chen</p>
+          <p class="text-base font-bold text-[#141414]">{{ article.title }}</p>
+          <p class="text-sm text-neutral-500">{{ article.author }}</p>
         </div>
-        <div class="flex-1 aspect-video bg-cover rounded-xl" style="background-image: url('https://lh3.googleusercontent.com/aida-public/...');"></div>
+        <div class="flex-1 aspect-video bg-cover rounded-xl" style="background-image: url('{{ article.image_url }}');"></div>
       </div>
-      <div class="flex items-center gap-4 rounded-xl">
-        <div class="flex-2 flex flex-col gap-1">
-          <p class="text-base font-bold text-[#141414]">Pediatric Cardiac Surgery Innovations</p>
-          <p class="text-sm text-neutral-500">Dr. Anya Sharma</p>
-        </div>
-        <div class="flex-1 aspect-video bg-cover rounded-xl" style="background-image: url('https://lh3.googleusercontent.com/aida-public/...');"></div>
-      </div>
+      <div id="peek-article-{{ article.id }}" class="absolute z-10 bg-white shadow-lg hidden"></div>
+      {% endfor %}
     </div>
   </div>
 

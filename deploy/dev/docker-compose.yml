@@ -1,0 +1,93 @@
+version: '3.8'
+
+services:
+  db:
+    image: postgres:15
+    environment:
+      POSTGRES_DB: adci_db
+      POSTGRES_USER: adci_user
+      POSTGRES_PASSWORD: adci_pass
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
+    ports:
+      - "5432:5432"
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U adci_user -d adci_db"]
+      interval: 30s
+      timeout: 10s
+      retries: 5
+
+  redis:
+    image: redis:7-alpine
+    ports:
+      - "6379:6379"
+    healthcheck:
+      test: ["CMD", "redis-cli", "ping"]
+      interval: 30s
+      timeout: 10s
+      retries: 5
+
+  app:
+    build: 
+      context: ../../
+      dockerfile: deploy/prod/Dockerfile
+    environment:
+      - DATABASE_URL=postgresql://adci_user:adci_pass@db:5432/adci_db
+      - REDIS_URL=redis://redis:6379/0
+      - SECRET_KEY=your-secret-key-change-in-production
+      - ENVIRONMENT=development
+      - API_BASE_URL=http://localhost:8000/api/v1
+      - LOG_LEVEL=INFO
+      - ENABLE_SWAGGER=true
+      - PATIENT_DATA_ENCRYPTION=true
+      - ENABLE_AUDIT_LOGGING=true
+      - ENCRYPTION_KEY=dGVzdGtleWZvcmZlcm5ldHRlc3RpbmdhbmRub3RoaW5nZWxzZQ==
+    ports:
+      - "8000:8000"
+    depends_on:
+      db:
+        condition: service_healthy
+      redis:
+        condition: service_healthy
+    volumes:
+      - ../../data/uploads:/app/data/uploads
+      - ../../logs:/app/logs
+      - ../../web/static:/app/web/static
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://localhost:8000/health"]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+    command: ["uvicorn", "main:app", "--host", "0.0.0.0", "--port", "8000", "--reload"]
+
+  # Dedicated service for development and testing
+  dev:
+    build: 
+      context: ../../
+      dockerfile: deploy/dev/Dockerfile
+    environment:
+      - DATABASE_URL=postgresql://adci_user:adci_pass@db:5432/adci_db
+      - REDIS_URL=redis://redis:6379/0
+      - SECRET_KEY=dev-secret-key
+      - ENVIRONMENT=development
+      - API_BASE_URL=http://localhost:8001/api/v1
+      - LOG_LEVEL=DEBUG
+      - ENABLE_SWAGGER=true
+      - PATIENT_DATA_ENCRYPTION=true
+      - ENABLE_AUDIT_LOGGING=true
+      - ENCRYPTION_KEY=dGVzdGtleWZvcmZlcm5ldHRlc3RpbmdhbmRub3RoaW5nZWxzZQ==
+    ports:
+      - "8001:8001"
+    depends_on:
+      db:
+        condition: service_healthy
+    volumes:
+      - ../../:/app
+      - ../../data/uploads:/app/data/uploads
+      - ../../logs:/app/logs
+    command: ["/bin/bash"]
+    stdin_open: true
+    tty: true
+
+volumes:
+  postgres_data:

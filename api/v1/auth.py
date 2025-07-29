@@ -9,7 +9,7 @@ from sqlalchemy import select
 
 from core.models.base import ApiResponse
 from core.dependencies import DatabaseSession, CurrentUser, EncryptionService, require_role
-from data.models import User, UserCreate, UserLogin, UserResponse, TokenResponse
+from data.models.users import User, UserCreate, UserLogin, UserResponse, TokenResponse
 from features.auth.service import auth_service
 
 

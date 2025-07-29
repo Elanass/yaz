@@ -118,6 +118,8 @@ class PrecisionEngine:
     def __init__(self):
         """Initialize the precision engine"""
         self.impact_analyzer = ImpactAnalyzer()
+        # Multi-Criteria Decision Analysis weights: lower risk and higher confidence
+        self.criteria_weights = {"risk_score": 0.5, "confidence": 0.5}
     
     def analyze(self, patients: List[Dict[str, Any]]) -> List[Dict[str, Any]]:
         """Analyze a list of patients and return impact insights"""
@@ -125,5 +127,20 @@ class PrecisionEngine:
         for patient in patients:
             surgery = self.impact_analyzer.analyze_surgery_impact(patient)
             flot = self.impact_analyzer.analyze_flot_impact(patient)
+            # Compute MCDA score and confidence intervals for each option
+            for option in (surgery, flot):
+                option['mcda_score'] = round(self._compute_mcda_score(option), 3)
+                lower = max(option['confidence'] - 0.1, 0)
+                upper = min(option['confidence'] + 0.1, 1)
+                option['confidence_interval'] = [round(lower, 3), round(upper, 3)]
             insights.append({"surgery": surgery, "flot": flot})
         return insights
+    
+    def _compute_mcda_score(self, option: Dict[str, Any]) -> float:
+        """Compute MCDA score combining adjusted risk and confidence"""
+        # Lower adjusted_risk is better; invert for scoring
+        risk_score = 1 - option.get('adjusted_risk', 1)
+        confidence = option.get('confidence', 0)
+        w = self.criteria_weights
+        score = risk_score * w['risk_score'] + confidence * w['confidence']
+        return max(0.0, min(score, 1.0))

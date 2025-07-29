@@ -4,7 +4,13 @@ Endpoints for managing retrospective and prospective case data with ElectricSQL
 """
 
 from typing import List, Optional
-from fastapi import APIRouter, HTTPException, Query, status
+import os
+import io
+import csv
+import uuid
+from datetime import datetime
+from fastapi import APIRouter, HTTPException, Query, Request, status, File, UploadFile, Depends
+from fastapi.responses import HTMLResponse
 from sqlalchemy import select
 from sqlalchemy.orm import selectinload
 
@@ -12,7 +18,10 @@ from core.dependencies import DatabaseSession, CurrentUser, EncryptionService
 from core.models.base import ApiResponse
 from data.models import Case, CaseCreate, CaseUpdate, CaseResponse
 from data.repositories import CaseRepository
+from core.utils.helpers import log_action
 
+# Path for cases data
+CASES_DATA_PATH = "data/upload/cases.csv"
 
 router = APIRouter(prefix="/cases", tags=["Cases"])
 

@@ -15,7 +15,8 @@ from typing import Any, Dict, List, Optional, Union
 from core.config.settings import get_feature_config
 from core.services.base import BaseService
 from core.utils.helpers import HashUtils
-from core.services.encryption import EncryptionService
+
+# Import EncryptionService at function level to avoid circular imports
 
 
 class IPFSClient(BaseService):
@@ -24,10 +25,19 @@ class IPFSClient(BaseService):
     def __init__(self):
         super().__init__()
         self.config = get_feature_config("ipfs")
-        self.encryption = EncryptionService()
         self.base_url = self.config.get("ipfs_api_url", "http://localhost:5001/api/v0")
         self.gateway_url = self.config.get("ipfs_gateway_url", "http://localhost:8080/ipfs")
         self.http_client = httpx.AsyncClient(timeout=30.0)
+        # Initialize encryption service lazily when needed
+        self._encryption_service = None
+    
+    @property
+    def encryption(self):
+        """Lazy initialization of encryption service to prevent circular imports"""
+        if self._encryption_service is None:
+            from core.services.encryption import encryption_service
+            self._encryption_service = encryption_service
+        return self._encryption_service
     
     async def add_json(self, data: Dict[str, Any], encrypt: bool = True) -> str:
         """

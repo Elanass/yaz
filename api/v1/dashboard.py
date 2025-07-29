@@ -13,6 +13,8 @@ import datetime
 
 from features.auth.service import require_role, get_current_user
 from features.cohorts import get_featured_series, get_upcoming_events, get_journal_articles
+from core.dependencies import get_cohorts_service
+from features.cohorts import CohortsService
 from core.services.logger import get_logger
 from services.event_logger.service import event_logger, EventCategory, EventSeverity
 
@@ -31,7 +33,8 @@ protocol_service = ProtocolService()
 async def surgify_dashboard(
     request: Request,
     user=Depends(get_current_user),
-    _=Depends(require_role("dashboard", "read"))
+    _=Depends(require_role("dashboard", "read")),
+    cohorts_service: CohortsService = Depends(get_cohorts_service)
 ):
     """
     Main Surgify dashboard endpoint with featured content.
@@ -49,9 +52,9 @@ async def surgify_dashboard(
         )
         
         # Get featured content
-        featured_series = await get_featured_series()
-        upcoming_events = await get_upcoming_events()
-        journal_articles = await get_journal_articles()
+        featured_series = await cohorts_service.get_featured_series()
+        upcoming_events = await cohorts_service.get_upcoming_events()
+        journal_articles = await cohorts_service.get_journal_articles()
         
         return templates.TemplateResponse("pages/surgify.html", {
             "request": request,

@@ -1,7 +1,7 @@
 # Gastric ADCI Platform
 
 ## Overview
-The Gastric ADCI (Adaptive Decision Confidence Index) Platform provides clinicians with evidence-based decision support for gastric cancer treatment planning. The platform uses advanced statistical analysis, precision medicine algorithms, and evidence synthesis to provide personalized treatment recommendations with confidence intervals. Previously based on Markov chain simulations, the platform now employs more robust statistical methods including Cox regression, logistic regression, and Random Forest models for improved prediction accuracy and clinical interpretability.
+The Gastric ADCI (Adaptive Decision Confidence Index) Platform provides clinicians with evidence-based decision support for gastric cancer treatment planning. The platform includes a dedicated Precision Decision Engine for diffuse-type gastric cancer surgery that integrates FLOT protocol impact analysis, a multi-criteria decision analysis (MCDA) framework, and real-time confidence scoring. It also features an Impact Analyzer tool that computes Kaplan–Meier survival curves, treatment effectiveness, quality-of-life assessments, and cost–effectiveness metrics. Previously based on Markov chain simulations, the platform now employs more robust statistical methods—including Cox regression, logistic regression, and Random Forest models—for improved prediction accuracy and clinical interpretability.
 
 ## Features
 
@@ -17,37 +17,62 @@ The Gastric ADCI (Adaptive Decision Confidence Index) Platform provides clinicia
 - **Statistical Analysis Module**: Advanced analytics for outcome prediction
 - **Progressive Web App**: Healthcare-grade, offline-capable interface
 
-## Getting Started
+## Quick Start
 
 ### Prerequisites
-- Python 3.10+
-- Docker (for containerized deployment)
-- PostgreSQL 14+ (production) or SQLite (development)
+- Docker and Docker Compose
+- Git
+- 4GB+ RAM for development environment
 
-### Installation
+### Development Setup
 
-#### Local Development
-```bash
-# Clone the repository
-git clone https://github.com/yourusername/gastric-adci-platform.git
-cd gastric-adci-platform
+1. Clone the repository:
+   ```bash
+   git clone https://github.com/yourusername/gastric-adci-platform.git
+   cd gastric-adci-platform
+   ```
 
-# Create and activate virtual environment
-python -m venv venv
-source venv/bin/activate  # On Windows: venv\Scripts\activate
+2. Start the development environment:
+   ```bash
+   docker-compose -f deploy/dev/docker-compose.yml up -d
+   ```
 
-# Install dependencies
-pip install -r requirements.txt
+3. Enter the development container:
+   ```bash
+   docker-compose -f deploy/dev/docker-compose.yml exec dev bash
+   ```
 
-# Run the application
-python main.py
-```
+4. Run tests within the container:
+   ```bash
+   python -m pytest tests/
+   ```
 
-#### Docker Deployment
-```bash
-# Build and run with Docker
-docker-compose up -d
-```
+5. Start the development server:
+   ```bash
+   uvicorn main:app --host 0.0.0.0 --port 8001 --reload
+   ```
+
+6. Access the application:
+   - Web interface: http://localhost:8001
+   - API documentation: http://localhost:8001/api/docs
+   - Health check: http://localhost:8001/health
+
+### Production Deployment
+
+1. Configure environment variables for production:
+   ```bash
+   cp .env.example .env.prod
+   # Edit .env.prod with your production settings
+   ```
+
+2. Start the production stack:
+   ```bash
+   docker-compose -f deploy/prod/docker-compose.yml up -d
+   ```
+
+3. Access the production application:
+   - Web interface: http://localhost:8000
+   - API documentation: http://localhost:8000/api/docs (if enabled)
 
 ## Architecture
 
@@ -66,7 +91,38 @@ docker-compose up -d
 - **Google Cloud Run/GKE**: Scalable, managed deployment
 - **Docker**: Containerized for consistent environments
 
-### Project Structure
+## Detailed Project Description
+The Gastric ADCI Platform is a comprehensive decision-support system for gastric oncology surgery, designed to be modular, extensible, and compliant with healthcare regulations (HIPAA, GDPR). It brings together clinical data, advanced analytics, and a responsive PWA to deliver evidence-based recommendations with confidence intervals.
+
+### Precision Decision Engine for Diffuse Gastric Cancer Surgery
+- Built on `features/decisions/precision_engine.py`, this engine analyzes patient-specific risk factors for diffuse-type gastric cancer surgeries.
+- Integrates the FLOT protocol impact analysis (5-FU, Leucovorin, Oxaliplatin, Docetaxel) from `features/protocols/flot_analyzer.py` to adjust surgical risk and perioperative planning.
+- Applies Multi-Criteria Decision Analysis (MCDA) combining adjusted risk scores and confidence intervals to generate `mcda_score` and `confidence_interval` per treatment option.
+- Provides real-time confidence scoring algorithms and statistical prediction models (e.g., Random Forest outputs, logistic regression baselines).
+
+### Impact Analyzer Tool
+- Implemented in `features/analysis/impact_metrics.py`, the ImpactMetricsAnalyzer computes:
+  - Kaplan–Meier survival curves using the `lifelines` library for cohort outcome tracking.
+  - Treatment effectiveness metrics (response rates, pre/post comparisons).
+  - Quality of Life (QoL) impact assessments from patient survey data.
+  - Cost–effectiveness analysis for clinical and economic decision support.
+
+## Security & Compliance
+
+### HIPAA/GDPR Features
+- **Encryption**: End-to-end encryption for PHI using industry-standard cryptography
+- **Audit Logging**: Comprehensive audit trails for all data access and modifications
+- **Access Control**: Role-based access control (RBAC) with fine-grained permissions
+- **Data Retention**: Configurable data retention policies
+- **Secure Communication**: TLS/SSL for all data transmission
+
+### Security Testing
+Run the security test suite:
+```bash
+python -m pytest tests/security/
+```
+
+## Project Structure
 ```
 gastric-adci-platform/
 ├── api/                  # API endpoints
@@ -95,59 +151,6 @@ gastric-adci-platform/
     └── static/           # Static assets
 ```
 
-## Optimized Root Directory
-
-### Changes Made:
-1. Removed unnecessary files and directories:
-   - `.pytest_cache/`: Temporary cache files from pytest.
-   - `.venv/`: Local virtual environment (not required for containerized environments).
-   - `__init__.py`: Redundant at the root level.
-   - `app.py`: Unused file.
-
-2. Modularized the codebase:
-   - Created feature-specific directories and base classes.
-   - Added API endpoints and tests for each feature.
-
-3. Enhanced project structure for maintainability and scalability.
-
-## Statistical Analysis Module
-
-### Retrospective Analysis
-The retrospective analysis module provides tools for analyzing historical data:
-
-- **Cox Proportional Hazards Regression**: For time-to-event outcomes (survival analysis)
-  - Identifies prognostic factors and their effect sizes
-  - Calculates hazard ratios with confidence intervals
-  - Provides concordance and likelihood ratio tests
-
-- **Logistic Regression**: For binary outcomes
-  - Estimates probability of outcomes based on predictors
-  - Calculates odds ratios with confidence intervals
-  - Provides model performance metrics (AUC, accuracy)
-
-### Prospective Analysis
-The prospective analysis module provides predictive modeling for future outcomes:
-
-- **Random Forest**: Ensemble machine learning for outcome prediction
-  - Handles complex non-linear relationships
-  - Provides feature importance rankings
-  - Robust to noise and outliers
-
-- **Reinforcement Learning**: Adaptive decision-making framework (experimental)
-  - Learns optimal strategies from outcomes
-  - Adapts to changing patient characteristics
-  - Balances exploration and exploitation
-
-## Recent Changes
-
-### Version 2.0.0 (July 2025)
-- **Removed Markov Chain Simulation**: Replaced with more robust statistical analysis modules
-- **Added Retrospective Analysis**: Cox & Logistic Regression models with clinical interpretation
-- **Added Prospective Analysis**: Random Forest models and RL framework stub
-- **Enhanced User Interface**: Added new analysis pages with interactive forms
-- **Improved API**: New endpoints for statistical analysis with comprehensive documentation
-- **Extended Testing**: Added unit and integration tests for analysis modules
-
 ## API Documentation
 
 ### Authentication
@@ -174,6 +177,21 @@ POST /api/v1/analysis/retrospective/logistic   # Logistic Regression
 POST /api/v1/analysis/prospective/random-forest # Train Random Forest model
 POST /api/v1/analysis/prospective/predict      # Predict outcomes for a patient
 ```
+
+## Contributing
+
+### Development Workflow
+1. Create a feature branch: `git checkout -b feature/your-feature-name`
+2. Make your changes
+3. Run tests: `python -m pytest tests/`
+4. Format code: `black .` and `isort .`
+5. Submit a pull request
+
+### Coding Standards
+- Follow PEP 8 style guide
+- Write comprehensive docstrings
+- Include unit tests for new features
+- Maintain minimum 95% test coverage
 
 ## License
 This project is licensed under the AGPL-3.0 License - see the LICENSE file for details.
