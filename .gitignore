@@ -119,3 +119,5 @@ uploads/
 static/uploads/
 data/exports/
 temp/
+.vscode/
+.history/
