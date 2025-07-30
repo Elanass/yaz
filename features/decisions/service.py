@@ -810,6 +810,149 @@ class DecisionService(BaseService):
         
         return [self._create_response(d) for d in decisions]
     
+    async def register_decision_job(
+        self,
+        job_id: str,
+        request: DecisionRequest,
+        user_id: str
+    ) -> DecisionResponse:
+        """
+        Register a decision job and return a pending decision
+        
+        Args:
+            job_id: Job ID of the submitted analysis
+            request: Decision request data
+            user_id: ID of the user making the request
+            
+        Returns:
+            Decision response with job details
+        """
+        # Generate decision ID
+        decision_id = HashUtils.generate_uuid()
+        
+        # Create decision record with pending status
+        decision = {
+            "decision_id": decision_id,
+            "engine_type": request.engine_type,
+            "status": DecisionStatus.PENDING,
+            "user_id": user_id,
+            "patient_hash": HashUtils.hash_dict(request.patient_data),
+            "request_data": request.dict(),
+            "job_id": job_id,
+            "created_at": datetime.now().isoformat(),
+            "confidence_level": None,
+            "recommendation": None,
+            "factors": [],
+            "alternatives": []
+        }
+        
+        # Store in database
+        await self.db.save_decision(decision)
+        
+        # Return decision response
+        return DecisionResponse(**decision)
+    
+    async def update_decision_from_job(
+        self,
+        decision_id: str,
+        job_id: str
+    ) -> None:
+        """
+        Update a decision record when a job completes
+        
+        Args:
+            decision_id: ID of the decision to update
+            job_id: Job ID to retrieve results for
+        """
+        # Import job manager functions
+        from features.analysis.job_manager import get_job_status, wait_for_job_result
+        
+        # Wait for job to complete (max 30 minutes)
+        result = await wait_for_job_result(job_id, timeout=1800)
+        
+        if not result:
+            # Update decision as failed if timeout
+            await self.db.update_decision(
+                decision_id,
+                {
+                    "status": DecisionStatus.FAILED,
+                    "updated_at": datetime.now().isoformat(),
+                    "error": "Job timed out after 30 minutes"
+                }
+            )
+            return
+            
+        # Update decision with results
+        await self.create_decision_from_result(
+            result=result,
+            decision_id=decision_id
+        )
+    
+    async def create_decision_from_result(
+        self,
+        result: Dict[str, Any],
+        decision_id: Optional[str] = None,
+        request: Optional[DecisionRequest] = None,
+        user_id: Optional[str] = None
+    ) -> DecisionResponse:
+        """
+        Create or update a decision from a job result
+        
+        Args:
+            result: Job result data
+            decision_id: Optional ID of existing decision to update
+            request: Optional request data if creating new decision
+            user_id: Optional user ID if creating new decision
+            
+        Returns:
+            Updated decision response
+        """
+        if not decision_id and not (request and user_id):
+            raise ValueError("Either decision_id or both request and user_id must be provided")
+            
+        # Create new decision if needed
+        if not decision_id:
+            decision_id = HashUtils.generate_uuid()
+            decision = {
+                "decision_id": decision_id,
+                "engine_type": request.engine_type,
+                "status": DecisionStatus.COMPLETED,
+                "user_id": user_id,
+                "patient_hash": HashUtils.hash_dict(request.patient_data),
+                "request_data": request.dict(),
+                "created_at": datetime.now().isoformat(),
+                "updated_at": datetime.now().isoformat()
+            }
+        else:
+            # Get existing decision
+            decision = await self.db.get_decision(decision_id)
+            decision["status"] = DecisionStatus.COMPLETED
+            decision["updated_at"] = datetime.now().isoformat()
+        
+        # Process result data
+        if "confidence_metrics" in result:
+            decision["confidence_level"] = self._map_confidence_level(
+                result["confidence_metrics"].get("overall_confidence", 0)
+            )
+        
+        if "recommendation" in result:
+            decision["recommendation"] = result["recommendation"]
+            
+        if "factors" in result:
+            decision["factors"] = result["factors"]
+            
+        if "alternatives" in result:
+            decision["alternatives"] = result["alternatives"]
+            
+        # Add additional result data
+        decision["result_data"] = result
+        
+        # Save decision
+        await self.db.save_decision(decision)
+        
+        # Return response
+        return DecisionResponse(**decision)
+    
     def _generate_cache_key(self, request: DecisionRequest) -> str:
         """Generate cache key for request"""
         

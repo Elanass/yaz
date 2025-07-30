@@ -34,13 +34,29 @@ services:
     environment:
       - DATABASE_URL=postgresql://adci_user:adci_pass@db:5432/adci_db
       - REDIS_URL=redis://redis:6379/0
-      - SECRET_KEY=your-secret-key-change-in-production
+      - SECRET_KEY=${SECRET_KEY:-your-secret-key-change-in-production}
       - ENVIRONMENT=production
-      - API_BASE_URL=http://localhost:8000/api/v1
+      - API_BASE_URL=${API_BASE_URL:-http://localhost:8000/api/v1}
       - LOG_LEVEL=INFO
       - ENABLE_SWAGGER=false
       - PATIENT_DATA_ENCRYPTION=true
       - ENABLE_AUDIT_LOGGING=true
+      - WORKERS=${API_WORKERS:-4}
+      - MAX_REQUESTS=${MAX_REQUESTS:-1000}
+      - MAX_REQUESTS_JITTER=${MAX_REQUESTS_JITTER:-100}
+      - KEEPALIVE=${KEEPALIVE:-65}
+    deploy:
+      replicas: ${APP_REPLICAS:-2}
+      resources:
+        limits:
+          cpus: '2'
+          memory: 2G
+        reservations:
+          cpus: '1'
+          memory: 1G
+      restart_policy:
+        condition: on-failure
+        max_attempts: 3
     ports:
       - "8000:8000"
     depends_on:
@@ -59,5 +75,51 @@ services:
       retries: 3
     command: ["uvicorn", "main:app", "--host", "0.0.0.0", "--port", "8000"]
 
+  worker:
+    build: 
+      context: ../../
+      dockerfile: deploy/prod/Dockerfile
+    environment:
+      - DATABASE_URL=postgresql://adci_user:adci_pass@db:5432/adci_db
+      - REDIS_URL=redis://redis:6379/0
+      - SECRET_KEY=${SECRET_KEY:-your-secret-key-change-in-production}
+      - ENVIRONMENT=production
+      - LOG_LEVEL=INFO
+      - PATIENT_DATA_ENCRYPTION=true
+      - ENABLE_AUDIT_LOGGING=true
+    command: ["python", "-m", "features.analysis.worker"]
+    deploy:
+      replicas: ${WORKER_REPLICAS:-2}
+      resources:
+        limits:
+          cpus: '2'
+          memory: 4G
+        reservations:
+          cpus: '1'
+          memory: 2G
+    depends_on:
+      db:
+        condition: service_healthy
+      redis:
+        condition: service_healthy
+    volumes:
+      - ../../data/uploads:/app/data/uploads
+      - ../../logs:/app/logs
+      
+  ipfs:
+    image: ipfs/kubo:latest
+    volumes:
+      - ipfs_data:/data/ipfs
+    ports:
+      - "5001:5001"
+    environment:
+      - IPFS_PROFILE=server
+    healthcheck:
+      test: ["CMD", "ipfs", "dag", "stat", "/ipfs/QmUNLLsPACCz1vLxQVkXqqLX5R1X345qqfHbsf67hvA3Nn"]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+
 volumes:
   postgres_data:
+  ipfs_data:

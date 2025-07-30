@@ -15,17 +15,30 @@ RUN apt-get update && apt-get install -y \
     g++ \
     libpq-dev \
     curl \
+    git \
     && rm -rf /var/lib/apt/lists/*
 
 # Copy requirements and install Python dependencies
 COPY config/requirements.txt .
 RUN pip install --no-cache-dir -r requirements.txt
 
+# Install production-specific packages
+RUN pip install --no-cache-dir \
+    gunicorn \
+    uvloop \
+    httptools \
+    redis \
+    sentry-sdk \
+    newrelic
+
 # Copy application code
 COPY . .
 
 # Create necessary directories
 RUN mkdir -p data/uploads logs web/static/icons
+
+# Set permissions
+RUN chmod +x scripts/run_prod.sh
 
 # Expose ports
 EXPOSE 8000 8001

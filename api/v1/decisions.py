@@ -5,12 +5,17 @@ Clean, standardized decision engine endpoints
 
 from typing import List, Optional
 
-from fastapi import APIRouter, Depends, HTTPException, Query, status
+from fastapi import APIRouter, Depends, HTTPException, Query, status, BackgroundTasks
 
 from core.models.base import ApiResponse, DecisionStatus
+from core.config.platform_config import config
 from features.auth.service import User, get_current_user, require_permission, Domain, Scope
 from features.decisions.service import (
     DecisionService, DecisionRequest, DecisionResponse
+)
+from features.analysis.job_manager import (
+    submit_adci_prediction_job, submit_flot_analysis_job, 
+    get_job_status, wait_for_job_result
 )
 
 router = APIRouter(prefix="/decisions", tags=["Decisions"])
@@ -20,19 +25,56 @@ decision_service = DecisionService()
 @router.post("/analyze", response_model=ApiResponse[DecisionResponse])
 async def create_decision_analysis(
     request: DecisionRequest,
+    background_tasks: BackgroundTasks,
     current_user: User = Depends(require_permission(Domain.HEALTHCARE, Scope.WRITE))
 ):
     """Create a new decision analysis"""
     
     try:
-        decision = await decision_service.create_decision(
+        # Start job processing in the background
+        job_id = await submit_adci_prediction_job(
+            patient_data=request.patient_data,
+            collaboration_context=request.dict().get("collaboration_context")
+        )
+        
+        # In development, we might want to wait for the result
+        if config.environment == "development":
+            try:
+                # Wait up to 10 seconds for result
+                result = await wait_for_job_result(job_id, timeout=10)
+                if result:
+                    # Create decision record
+                    decision = await decision_service.create_decision_from_result(
+                        result=result,
+                        request=request,
+                        user_id=str(current_user.id)
+                    )
+                    
+                    return ApiResponse.success_response(
+                        data=decision,
+                        message="Decision analysis completed"
+                    )
+            except ValueError as e:
+                # Continue with async flow if timeout
+                pass
+        
+        # Register the job and return the job ID
+        decision = await decision_service.register_decision_job(
+            job_id=job_id,
             request=request,
             user_id=str(current_user.id)
         )
         
+        # Add background task to update the decision when job completes
+        background_tasks.add_task(
+            decision_service.update_decision_from_job,
+            decision_id=decision.id,
+            job_id=job_id
+        )
+        
         return ApiResponse.success_response(
             data=decision,
-            message="Decision analysis completed"
+            message="Decision analysis submitted and processing"
         )
         
     except ValueError as e:
