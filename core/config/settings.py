@@ -1,3 +1,5 @@
+import os
+
 # Placeholder implementation for core.config.settings
 
 def get_settings():
@@ -20,6 +22,6 @@ def get_adapter_config(adapter_name):
     return {
         "url": "http://localhost:8080",
         "username": "admin",
-        "password": "password",
+        "password": os.getenv("APP_PASSWORD", "default_password"),
         "timeout": 30
     }

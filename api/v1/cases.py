@@ -19,6 +19,7 @@ from core.models.base import ApiResponse
 from data.models import Case, CaseCreate, CaseUpdate, CaseResponse
 from data.repositories import CaseRepository
 from core.utils.helpers import log_action
+from features.auth.service import require_permission, Domain, Scope
 
 # Path for cases data
 CASES_DATA_PATH = "data/upload/cases.csv"
@@ -286,13 +287,12 @@ async def delete_case(
             status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
             detail=f"Failed to delete case: {str(e)}"
         )
-                    <button class="btn btn-sm" hx-get="/api/v1/cases?offset={max(0, offset-limit)}&limit={limit}" hx-target="#cases-table">Previous</button>
-                    <span>Page {offset//limit + 1}</span>
-                    <button class="btn btn-sm" hx-get="/api/v1/cases?offset={offset+limit}&limit={limit}" hx-target="#cases-table">Next</button>
-                </div>
-            </div>
-            """
-            return HTMLResponse(content=html_content)
+                    html_content = """
+        <button class=\"btn btn-sm\" hx-get=\"/api/v1/cases?offset={max(0, offset-limit)}&limit={limit}\" hx-target=\"#cases-table\">Previous</button>
+        <span>Page {offset//limit + 1}</span>
+        <button class=\"btn btn-sm\" hx-get=\"/api/v1/cases?offset={offset+limit}&limit={limit}\" hx-target=\"#cases-table\">Next</button>
+        """
+        return HTMLResponse(content=html_content)
         
         # Default: return JSON
         return results

@@ -29,11 +29,12 @@ class PlatformConfig:
     
     # Generate a secure secret key if not provided
     secret_key: str = os.getenv("SECRET_KEY", secrets.token_hex(32))
+    # Note: Ensure SECRET_KEY is set in the environment for production to avoid using a generated key.
     encryption_key: str = os.getenv("ENCRYPTION_KEY", secrets.token_urlsafe(32))
     token_expire_minutes: int = int(os.getenv("TOKEN_EXPIRE_MINUTES", "1440"))  # 24 hours
     
     # Database configuration
-    database_url: str = os.getenv("DATABASE_URL", "sqlite+aiosqlite:///./gastric_adci.db")
+    database_url: str = os.getenv("DATABASE_URL", "sqlite+aiosqlite:///data/database/gastric_adci.db")
     electricsql_url: str = os.getenv("ELECTRICSQL_URL", "http://localhost:5133")
     electricsql_token: str = os.getenv("ELECTRICSQL_TOKEN", "dev-token")
     electricsql_secure: bool = os.getenv("ELECTRICSQL_SECURE", "False").lower() in ("true", "1", "yes")

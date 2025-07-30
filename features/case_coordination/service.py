@@ -17,7 +17,7 @@ from core.config.settings import get_feature_config
 from core.models.base import BaseEntity
 from core.services.base import BaseService
 from core.services.logger import Logger
-from adapters.open_source.openmrs_adapter import OpenMRSAdapter
+from core.managers.adapters import OpenMRSAdapter
 
 
 class CaseStatus(str, Enum):

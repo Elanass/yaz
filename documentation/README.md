@@ -125,50 +125,32 @@ python -m pytest tests/security/
 ```
 
 ## Project Structure
-
-The codebase follows a modular architecture with clear separation of concerns:
-
 ```
 gastric-adci-platform/
-├── api/               # API endpoints and routes
-│   └── v1/            # API version 1
-├── apps/              # Application modules
-│   ├── generalservices/  # General utility services
-│   ├── parent/        # Parent supervision services
-│   ├── specificapps/  # Domain-specific applications
-│   └── visioner/      # Vision processing services
-├── core/              # Core framework components
-│   ├── adapters/      # Integration adapters
-│   ├── config/        # Configuration settings
-│   ├── managers/      # System managers
-│   ├── medical/       # Medical domain logic
-│   ├── middleware/    # Request middleware
-│   ├── models/        # Data models
-│   ├── operators/     # System operators
-│   ├── services/      # Core services
-│   └── utils/         # Utility functions
-├── data/              # Data management
-│   ├── database/      # Database scripts
-│   ├── migrations/    # Database migrations
-│   ├── models/        # Data models
-│   ├── repositories/  # Data repositories
-│   └── uploads/       # User uploads
-├── deploy/            # Deployment configurations
-├── documentation/     # Documentation files
-├── features/          # Feature modules
-│   ├── analysis/      # Data analysis
-│   ├── auth/          # Authentication
-│   ├── decisions/     # Decision support
-│   └── ...            # Other feature modules
-├── orchestrator/      # System orchestration
-├── scripts/           # Utility scripts
-├── tests/             # Test suite
-└── web/               # Web interface
-    ├── components/    # UI components
-    ├── islands/       # Island architecture components
-    ├── pages/         # Page templates
-    ├── static/        # Static assets
-    └── templates/     # HTML templates
+├── api/                  # API endpoints
+│   └── v1/
+│       ├── analysis_retrospective.py  # Retrospective analysis endpoints
+│       ├── analysis_prospective.py    # Prospective analysis endpoints
+│       └── decisions.py               # Decision support endpoints
+├── core/                 # Core framework
+│   ├── config/           # Configuration
+│   ├── models/           # Shared data models
+│   └── utils/            # Utilities
+├── features/             # Business logic modules
+│   ├── analysis/         # Statistical analysis
+│   │   ├── retrospective.py  # Cox & Logistic Regression
+│   │   ├── prospective.py    # Random Forest
+│   │   └── rl_engine.py      # Reinforcement Learning stub
+│   ├── auth/             # Authentication
+│   ├── cohorts/          # Cohort management
+│   └── decisions/        # Decision support
+├── tests/                # Test suite
+│   ├── integration/      # Integration tests
+│   └── unit/             # Unit tests
+└── web/                  # Web interface
+    ├── components/       # Reusable UI components
+    ├── pages/            # Page templates
+    └── static/           # Static assets
 ```
 
 ## API Documentation

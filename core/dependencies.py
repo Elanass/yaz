@@ -13,7 +13,8 @@ import jwt
 from jwt.exceptions import PyJWTError
 
 from core.config.platform_config import config
-from data.database import get_db_session
+from data.database import get_db_session as get_database_session
+from data.database.electric import ElectricSQLManager, electric_manager
 from core.services.encryption import encryption_service
 from core.services.logger import get_logger
 from services.event_logger.service import event_logger, EventCategory, EventSeverity
@@ -41,7 +42,7 @@ MOCK_USERS = {
 # Database session dependency
 async def get_db() -> AsyncGenerator[AsyncSession, None]:
     """Dependency for getting database session"""
-    async with get_db_session() as session:
+    async with get_database_session() as session:
         yield session
 
 # Token dependency
@@ -138,11 +139,13 @@ def get_encryption_service():
 
 # Event logger dependency
 def get_event_logger():
-    """Dependency for getting the event logger service"""
-    return event_logger
+    """Provide an event logger instance."""
+    yield event_logger  # Use yield instead of return for async generator compatibility.
+
+async def get_async_database_session():
     """
     Dependency to get an async database session
-    
+
     Returns:
         AsyncSession: SQLAlchemy async session
     """
@@ -157,10 +160,10 @@ def get_event_logger():
             await session.close()
 
 
-async def get_electric_manager() -> ElectricManager:
+async def get_electric_manager() -> "ElectricManager":
     """
     Dependency to get the ElectricSQL manager
-    
+
     Returns:
         ElectricManager: ElectricSQL manager instance
     """
@@ -173,14 +176,14 @@ async def get_current_user(
 ):
     """
     Dependency to get current authenticated user
-    
+
     Args:
         credentials: JWT token from Authorization header
         session: Database session
-        
+
     Returns:
         User: Current authenticated user
-        
+
     Raises:
         HTTPException: If token is invalid or user not found
     """
@@ -191,7 +194,7 @@ async def get_current_user(
             config.jwt_secret,
             algorithms=[config.jwt_algorithm]
         )
-        
+
         user_id: str = payload.get("sub")
         if user_id is None:
             raise HTTPException(
@@ -199,7 +202,7 @@ async def get_current_user(
                 detail="Could not validate credentials",
                 headers={"WWW-Authenticate": "Bearer"},
             )
-        
+
         # Log authentication attempt
         await event_logger.log_event(
             category=EventCategory.AUTHENTICATION,
@@ -207,7 +210,7 @@ async def get_current_user(
             message=f"User authentication: {user_id}",
             metadata={"user_id": user_id}
         )
-    
+
     except jwt.PyJWTError as e:
         # Log failed authentication
         await event_logger.log_event(
@@ -216,13 +219,13 @@ async def get_current_user(
             message=f"Authentication failed: {str(e)}",
             metadata={"error": str(e)}
         )
-        
+
         raise HTTPException(
             status_code=status.HTTP_401_UNAUTHORIZED,
             detail="Could not validate credentials",
             headers={"WWW-Authenticate": "Bearer"},
         )
-    
+
     # TODO: Get user from database using user_id
     # For now, return a mock user
     from data.models import User
@@ -232,7 +235,7 @@ async def get_current_user(
         role=payload.get("role", "clinician"),
         is_active=True
     )
-    
+
     return user
 
 
@@ -263,13 +266,13 @@ async def get_current_active_user(
 ):
     """
     Dependency to get current active user
-    
+
     Args:
         current_user: Current user from get_current_user
-        
+
     Returns:
         User: Current active user
-        
+
     Raises:
         HTTPException: If user is inactive
     """
@@ -281,7 +284,7 @@ async def get_current_active_user(
             message=f"Inactive user login attempt: {current_user.id}",
             metadata={"user_id": current_user.id}
         )
-        
+
         raise HTTPException(
             status_code=status.HTTP_400_BAD_REQUEST,
             detail="Inactive user"
@@ -292,7 +295,7 @@ async def get_current_active_user(
 async def get_encryption_service():
     """
     Dependency to get the encryption service
-    
+
     Returns:
         EncryptionService: Encryption service instance
     """
@@ -302,10 +305,10 @@ async def get_encryption_service():
 def require_role(required_role: str):
     """
     Dependency factory to require specific user role
-    
+
     Args:
         required_role: Required user role (e.g., 'admin', 'clinician', 'researcher')
-        
+
     Returns:
         Function: Dependency function that checks user role
     """
@@ -324,23 +327,23 @@ def require_role(required_role: str):
                     "required_role": required_role
                 }
             )
-            
+
             raise HTTPException(
                 status_code=status.HTTP_403_FORBIDDEN,
                 detail=f"Operation requires {required_role} role"
             )
         return current_user
-    
+
     return role_checker
 
 
 def require_permissions(required_permissions: list[str]):
     """
     Dependency factory to require specific permissions
-    
+
     Args:
         required_permissions: List of required permissions
-        
+
     Returns:
         Function: Dependency function that checks user permissions
     """
@@ -360,15 +363,18 @@ def require_permissions(required_permissions: list[str]):
                     "required_permissions": required_permissions
                 }
             )
-            
+
             raise HTTPException(
                 status_code=status.HTTP_403_FORBIDDEN,
                 detail="Insufficient permissions"
             )
         return current_user
-    
+
     return permission_checker
 
+
+# Explicitly define ElectricManager as an alias for ElectricSQLManager
+ElectricManager = ElectricSQLManager
 
 # Type aliases for common dependencies
 DatabaseSession = Annotated[AsyncSession, Depends(get_database_session)]

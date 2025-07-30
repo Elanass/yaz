@@ -278,3 +278,7 @@ async def close_db_connections() -> None:
     except Exception as e:
         logger.error(f"Error closing database connections: {e}")
         raise
+
+
+# Explicitly export get_db_session
+__all__ = ['get_db_session', 'init_database', 'close_database']

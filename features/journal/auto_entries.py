@@ -12,8 +12,7 @@ from pydantic import BaseModel, Field
 
 from core.services.logger import get_logger
 from features.journal.service import journal_service, ClinicalNote
-from adapters.open_source.openmrs_adapter import openmrs_client
-from adapters.open_source.hapi_fhir_adapter import fhir_client
+from core.managers.adapters import openmrs_client, fhir_client
 
 # Configure logger
 logger = get_logger(__name__)

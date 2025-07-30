@@ -400,3 +400,7 @@ async def init_electric_database():
 async def close_electric_database():
     """Close ElectricSQL connections"""
     await electric_manager.close()
+
+
+# Explicitly export ElectricSQLManager
+__all__ = ['ElectricSQLManager', 'electric_manager', 'get_electric_session']
