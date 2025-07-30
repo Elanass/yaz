@@ -5,6 +5,7 @@ Authentication pages for the Gastric ADCI Platform
 from fastapi import APIRouter, Request, Depends, HTTPException, Form
 from fastapi.responses import HTMLResponse, RedirectResponse
 from typing import Optional, Dict, Any
+from fasthtml.common import *
 
 from features.auth.service import get_current_user, authenticate_user, create_user, optional_user
 from web.components.layout import create_base_layout
@@ -18,8 +19,6 @@ async def login_page(request: Request, next: Optional[str] = None, current_user 
     # Redirect if already logged in
     if current_user:
         return RedirectResponse(url=next or "/", status_code=303)
-    
-    from fasthtml.common import *
     
     content = Div(
         Div(
@@ -137,8 +136,6 @@ async def register_page(request: Request, current_user = Depends(optional_user))
     # Redirect if already logged in
     if current_user:
         return RedirectResponse(url="/", status_code=303)
-    
-    from fasthtml.common import *
     
     content = Div(
         Div(
@@ -292,8 +289,6 @@ async def logout(request: Request):
 @router.get("/profile", response_class=HTMLResponse)
 async def profile(request: Request, current_user = Depends(get_current_user)):
     """User profile page"""
-    
-    from fasthtml.common import *
     
     content = Div(
         H1("Your Profile", class_="text-2xl font-bold text-gray-900 mb-6"),
