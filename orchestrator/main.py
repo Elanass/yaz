@@ -31,8 +31,29 @@ def run():
     general_app = GeneralServicesApp(licensing_manager)
     specific_app = SpecificAppsApp(licensing_manager)
     
-    # Additional initialization would go here
+    # Initialize operators
+    logger.info("Initializing operators...")
+    clinic_operator = ClinicOperator(licensing_manager)
+    imobi_operator = ImobiOperator(licensing_manager)
+    mobi_operator = MobiOperator(licensing_manager)
+    arxiv_operator = ArxivOperator(licensing_manager)
+    insure_operator = InsureOperator(licensing_manager)
+    
+    # Start operators
+    logger.info("Starting operators...")
+    clinic_operator.start()
+    imobi_operator.start()
+    mobi_operator.start()
+    arxiv_operator.start()
+    insure_operator.start()
+    
+    # Start apps
+    logger.info("Starting applications...")
+    general_app.start()
+    specific_app.start()
+    
     logger.info("API router loaded: %s", api_router)
+    logger.info("Orchestration completed successfully")
 
 if __name__ == "__main__":
     run()

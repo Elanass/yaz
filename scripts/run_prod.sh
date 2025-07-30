@@ -29,6 +29,28 @@ chmod -R 755 web/static
 
 # Run database migrations
 echo -e "${YELLOW}Running database migrations...${NC}"
+python -m alembic -c config/alembic.ini upgrade head
+
+# Check for required environment variables
+if [ -z "$SECRET_KEY" ]; then
+  echo -e "${YELLOW}WARNING: SECRET_KEY environment variable not set. Using a randomly generated key.${NC}"
+  echo -e "${YELLOW}This is not recommended for production deployments.${NC}"
+fi
+
+# Start the server with production settings
+echo -e "${GREEN}Starting Gastric ADCI Platform...${NC}"
+echo -e "${BLUE}========================================${NC}"
+
+# Use Gunicorn with Uvicorn workers for production
+exec gunicorn main:app \
+  --workers 4 \
+  --worker-class uvicorn.workers.UvicornWorker \
+  --bind 0.0.0.0:8000 \
+  --timeout 120 \
+  --log-level info \
+  --access-logfile logs/access.log \
+  --error-logfile logs/error.log
+echo -e "${YELLOW}Running database migrations...${NC}"
 alembic upgrade head
 
 # Set production environment variables

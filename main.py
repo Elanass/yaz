@@ -20,6 +20,8 @@ from core.config.platform_config import config
 from core.models.base import ApiResponse, HealthStatus
 from core.services.logger import get_logger
 from core.utils.helpers import LoggingUtils
+from core.licensing_manager import licensing_manager
+from orchestrator.main import run as run_orchestrator
 
 # Setup logging
 LoggingUtils.setup_structured_logging()
@@ -47,6 +49,10 @@ async def lifespan(app: FastAPI):
     service_initialization_tasks = []
     
     try:
+        # Start orchestrator for service coordination
+        logger.info("Starting orchestrator...")
+        run_orchestrator()
+        
         # Pre-initialize ADCI engine
         from features.decisions.adci_engine import ADCIEngine
         adci_engine = ADCIEngine()
