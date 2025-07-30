@@ -65,6 +65,10 @@ app.add_middleware(GZipMiddleware, minimum_size=1000)
 from api.v1 import router as api_router
 app.include_router(api_router, prefix="/api/v1")
 
+# Web routes
+from web.router import router as web_router
+app.include_router(web_router)
+
 # Static files
 app.mount("/static", StaticFiles(directory="web/static"), name="static")
 
@@ -79,11 +83,7 @@ async def global_exception_handler(request: Request, exc: Exception):
     )
 
 
-@app.get("/", include_in_schema=False)
-async def root():
-    """Redirect to API"""
-    return RedirectResponse(url="/api/v1/")
-
+# Root endpoint is handled by web router
 
 @app.get("/health")
 async def health_check():

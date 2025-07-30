@@ -166,7 +166,73 @@ async def home(request: Request, current_user = Depends(optional_user)):
                             class_="p-6 bg-white rounded-lg border border-gray-200 shadow-md"
                         ),
                         
-                        class_="grid grid-cols-1 gap-8 sm:grid-cols-2 lg:grid-cols-2"
+                        # Feature 5 - Education Module
+                        Div(
+                            Div(
+                                Svg(
+                                    Path(d="M12 14l9-5-9-5-9 5 9 5z"),
+                                    Path(d="M12 14l6.16-3.422a12.083 12.083 0 01.665 6.479A11.952 11.952 0 0012 20.055a11.952 11.952 0 00-6.824-2.998 12.078 12.078 0 01.665-6.479L12 14z"),
+                                    Path(stroke_linecap="round", stroke_linejoin="round", stroke_width="2", d="M12 14l9-5-9-5-9 5 9 5zm0 0l6.16-3.422a12.083 12.083 0 01.665 6.479A11.952 11.952 0 0012 20.055a11.952 11.952 0 00-6.824-2.998 12.078 12.078 0 01.665-6.479L12 14z"),
+                                    class_="h-6 w-6 text-green-600",
+                                    stroke="currentColor",
+                                    stroke_width="2",
+                                    fill="none",
+                                    viewBox="0 0 24 24"
+                                ),
+                                class_="flex items-center justify-center h-12 w-12 rounded-md bg-green-100 text-green-600"
+                            ),
+                            H3(
+                                A(
+                                    "Medical Education",
+                                    href="/education",
+                                    class_="mt-6 text-lg font-medium text-gray-900 hover:text-green-600"
+                                )
+                            ),
+                            P(
+                                "Comprehensive training programs, skill assessment, and continuing education for surgical excellence.",
+                                class_="mt-2 text-base text-gray-500"
+                            ),
+                            A(
+                                "Explore Education →",
+                                href="/education",
+                                class_="mt-3 text-sm font-medium text-green-600 hover:text-green-500"
+                            ),
+                            class_="p-6 bg-white rounded-lg border border-gray-200 shadow-md hover:shadow-lg transition-shadow"
+                        ),
+                        
+                        # Feature 6 - Hospitality Module
+                        Div(
+                            Div(
+                                Svg(
+                                    Path(d="M4.318 6.318a4.5 4.5 0 000 6.364L12 20.364l7.682-7.682a4.5 4.5 0 00-6.364-6.364L12 7.636l-1.318-1.318a4.5 4.5 0 00-6.364 0z"),
+                                    class_="h-6 w-6 text-pink-600",
+                                    stroke="currentColor",
+                                    stroke_width="2",
+                                    fill="none",
+                                    viewBox="0 0 24 24"
+                                ),
+                                class_="flex items-center justify-center h-12 w-12 rounded-md bg-pink-100 text-pink-600"
+                            ),
+                            H3(
+                                A(
+                                    "Patient Hospitality",
+                                    href="/hospitality",
+                                    class_="mt-6 text-lg font-medium text-gray-900 hover:text-pink-600"
+                                )
+                            ),
+                            P(
+                                "Comprehensive patient care coordination, family support, and hospitality management services.",
+                                class_="mt-2 text-base text-gray-500"
+                            ),
+                            A(
+                                "Explore Hospitality →",
+                                href="/hospitality",
+                                class_="mt-3 text-sm font-medium text-pink-600 hover:text-pink-500"
+                            ),
+                            class_="p-6 bg-white rounded-lg border border-gray-200 shadow-md hover:shadow-lg transition-shadow"
+                        ),
+                        
+                        class_="grid grid-cols-1 gap-8 sm:grid-cols-2 lg:grid-cols-3"
                     ),
                     class_="mt-12"
                 ),

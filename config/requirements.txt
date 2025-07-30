@@ -22,10 +22,11 @@ numpy==1.25.2
 scikit-learn==1.3.2
 lifelines==0.27.6
 
-# Infrastructure
+# Infrastructure & System Monitoring
 python-dotenv==1.0.0
 httpx==0.25.2
 structlog==23.2.0
+psutil==5.9.6
 
 # Reports
 reportlab==3.6.12

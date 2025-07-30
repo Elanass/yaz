@@ -58,6 +58,9 @@ Visit `http://localhost:8000/docs` for interactive API documentation.
 ├── core/                   # Core functionality
 │   ├── config/            # Configuration
 │   ├── models/            # Data models
+│   ├── operators/         # System operators (reorganized)
+│   │   ├── general_purpose/   # Cross-domain operators
+│   │   └── specific_purpose/  # Domain-specific operators
 │   └── services/          # Core services
 ├── features/              # Feature modules
 │   ├── analysis/          # Statistical analysis
@@ -71,6 +74,31 @@ Visit `http://localhost:8000/docs` for interactive API documentation.
 ```
 
 ## Development
+
+### Operator Architecture
+
+The YAZ platform features a reorganized operator architecture that separates cross-domain functionality from domain-specific operations:
+
+#### General Purpose Operators (`core/operators/general_purpose/`)
+- **CoreOperationsOperator**: Essential system operations (logging, configuration, validation)
+- **FinancialOperationsOperator**: Financial calculations, billing, cost analysis
+- **CommunicationOperationsOperator**: Messaging, notifications, alerts
+- **InfrastructureOperationsOperator**: System monitoring, health checks, resource management
+- **SecurityOperationsOperator**: Authentication, authorization, encryption
+- **MonitoringOperationsOperator**: Performance monitoring, analytics, reporting
+- **IntegrationOperationsOperator**: External API integrations and data exchange
+- **DataSyncOperationsOperator**: Data synchronization and consistency management
+
+#### Specific Purpose Operators (`core/operators/specific_purpose/`)
+- **HealthcareOperationsOperator**: General healthcare operations and standards
+- **SurgeryOperationsOperator**: Surgery-specific workflows and protocols
+- **PatientManagementOperationsOperator**: Patient lifecycle and care coordination
+- **EducationOperationsOperator**: Medical education and training programs
+- **HospitalityOperationsOperator**: Patient experience and accommodation services
+- **InsuranceOperationsOperator**: Insurance verification and claims processing
+- **LogisticsOperationsOperator**: Supply chain and resource logistics
+
+See `core/operators/README.md` for detailed documentation and usage examples.
 
 ### Running Tests
 ```bash
@@ -182,7 +210,24 @@ gastric-adci-platform/
 │   ├── medical/       # Medical domain logic
 │   ├── middleware/    # Request middleware
 │   ├── models/        # Data models
-│   ├── operators/     # System operators
+│   ├── operators/     # System operators (reorganized architecture)
+│   │   ├── general_purpose/   # Cross-domain operators
+│   │   │   ├── core_operations.py
+│   │   │   ├── financial_operations.py
+│   │   │   ├── communication_operations.py
+│   │   │   ├── infrastructure_operations.py
+│   │   │   ├── security_operations.py
+│   │   │   ├── monitoring_operations.py
+│   │   │   ├── integration_operations.py
+│   │   │   └── data_sync_operations.py
+│   │   └── specific_purpose/  # Domain-specific operators
+│   │       ├── healthcare_operations.py
+│   │       ├── surgery_operations.py
+│   │       ├── patient_management_operations.py
+│   │       ├── education_operations.py
+│   │       ├── hospitality_operations.py
+│   │       ├── insurance_operations.py
+│   │       └── logistics_operations.py
 │   ├── services/      # Core services
 │   └── utils/         # Utility functions
 ├── data/              # Data management
