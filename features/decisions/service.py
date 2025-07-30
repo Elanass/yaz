@@ -3,18 +3,23 @@ Decision Engines Feature Module
 Centralized decision support functionality
 """
 
-import asyncio
-import json
 from abc import ABC, abstractmethod
 from datetime import datetime
 from typing import Any, Dict, List, Optional
+import asyncio
 
 from pydantic import BaseModel, Field
 
 from core.config.settings import get_feature_config
 from core.models.base import BaseEntity, ConfidenceLevel, DecisionStatus
 from core.services.base import BaseService, CacheService
+from core.services.logger import get_logger
 from core.utils.helpers import HashUtils
+from features.decisions.adci_engine import ADCIEngine
+from features.protocols.flot_analyzer import FLOTAnalyzer
+from features.analysis.impact_metrics import ImpactMetricsCalculator
+
+logger = get_logger(__name__)
 
 
 # Schemas
@@ -153,171 +158,52 @@ class BaseDecisionEngine(ABC):
         return min(max(weighted_sum, 0.0), 1.0)
 
 
-# ADCI Decision Engine
-class ADCIEngine(BaseDecisionEngine):
-    """Adaptive Decision Confidence Index Engine"""
+# Import the dedicated ADCI Engine implementation
+from features.decisions.adci_engine import ADCIEngine
+
+
+# Create a wrapper for backward compatibility
+class ADCIEngineWrapper(BaseDecisionEngine):
+    """Wrapper for the Adaptive Decision Confidence Index Engine"""
     
     def __init__(self):
         super().__init__("adci")
-    
+        self.engine = ADCIEngine()
+        logger.info("ADCI Engine Wrapper initialized")
+        
     async def analyze(
         self,
         patient_data: Dict[str, Any],
         tumor_data: Dict[str, Any],
         context: Optional[Dict[str, Any]] = None
     ) -> Dict[str, Any]:
-        """Perform ADCI analysis"""
-        
-        # Simulate processing time
-        await asyncio.sleep(0.1)
-        
-        # Extract key parameters
-        age = patient_data.get("age", 65)
-        ps = patient_data.get("performance_status", 1)
-        stage = tumor_data.get("stage", "T2N0M0")
-        location = tumor_data.get("location", "antrum")
-        
-        # Decision logic based on clinical guidelines
-        recommendation = self._determine_treatment(age, ps, stage, location)
-        reasoning = self._generate_reasoning(age, ps, stage, location, recommendation)
-        
-        # Calculate confidence
-        confidence_factors = {
-            "data_completeness": self._assess_data_completeness(patient_data, tumor_data),
-            "evidence_strength": self._assess_evidence_strength(stage),
-            "guideline_support": self._assess_guideline_support(recommendation)
+        """Delegate to the dedicated ADCI engine"""
+        # Combine patient and tumor data to match the expected format
+        combined_data = {
+            **patient_data,
+            "tumor_data": tumor_data,
+            "patient_id": patient_data.get("id", "unknown")
         }
         
-        confidence_score = self.calculate_confidence(confidence_factors)
+        # Call the dedicated ADCI engine
+        result = await self.engine.predict(
+            patient_data=combined_data,
+            collaboration_context=context
+        )
         
+        # Format the response to match the expected interface
         return {
-            "recommendation": recommendation,
-            "confidence_score": confidence_score,
-            "confidence_level": ConfidenceLevel.from_score(confidence_score),
-            "reasoning": reasoning,
-            "evidence": [
-                {
-                    "source": "NCCN Guidelines",
-                    "strength": "strong",
-                    "description": "National Comprehensive Cancer Network Guidelines for Gastric Cancer"
-                },
-                {
-                    "source": "ESMO Guidelines", 
-                    "strength": "strong",
-                    "description": "European Society for Medical Oncology Guidelines"
-                }
-            ],
-            "confidence_factors": confidence_factors
+            "recommendation": result.get("adci", {}).get("recommendation", ""),
+            "confidence_score": result.get("confidence_metrics", {}).get("overall_confidence", 0.5),
+            "confidence_level": ConfidenceLevel.from_score(
+                result.get("confidence_metrics", {}).get("overall_confidence", 0.5)
+            ),
+            "reasoning": result.get("adci", {}).get("critical_factors", []),
+            "evidence": result.get("flot_analysis", {}).get("evidence_quality", []),
+            "warnings": [],
+            "confidence_factors": result.get("confidence_metrics", {})
         }
     
-    def _determine_treatment(self, age: int, ps: int, stage: str, location: str) -> Dict[str, Any]:
-        """Determine treatment recommendation"""
-        
-        # Early stage (T1)
-        if stage.startswith("T1"):
-            if "N0" in stage:
-                return {
-                    "primary_treatment": "endoscopic_resection",
-                    "alternative": "surgical_resection",
-                    "urgency": "elective"
-                }
-            else:
-                return {
-                    "primary_treatment": "surgical_resection",
-                    "alternative": "multimodal_therapy",
-                    "urgency": "standard"
-                }
-        
-        # Locally advanced (T2-T4, N+)
-        elif any(x in stage for x in ["T2", "T3", "T4"]) or "N" in stage:
-            if age < 75 and ps <= 2:
-                return {
-                    "primary_treatment": "multimodal_therapy",
-                    "sequence": "neoadjuvant_surgery_adjuvant",
-                    "urgency": "standard"
-                }
-            else:
-                return {
-                    "primary_treatment": "palliative_care",
-                    "alternative": "limited_surgery",
-                    "urgency": "standard"
-                }
-        
-        # Default
-        return {
-            "primary_treatment": "multidisciplinary_evaluation",
-            "urgency": "standard"
-        }
-    
-    def _generate_reasoning(self, age: int, ps: int, stage: str, location: str, recommendation: Dict[str, Any]) -> List[str]:
-        """Generate clinical reasoning"""
-        
-        reasoning = []
-        
-        reasoning.append(f"Patient age {age} years with performance status {ps}")
-        reasoning.append(f"Tumor staging {stage} indicates {self._stage_description(stage)}")
-        reasoning.append(f"Primary tumor location: {location}")
-        
-        if recommendation["primary_treatment"] == "multimodal_therapy":
-            reasoning.append("Multimodal therapy recommended for locally advanced disease")
-            reasoning.append("Neoadjuvant approach may improve resectability")
-        
-        if age >= 75:
-            reasoning.append("Advanced age considered in treatment selection")
-        
-        if ps > 2:
-            reasoning.append("Performance status limits treatment options")
-        
-        return reasoning
-    
-    def _stage_description(self, stage: str) -> str:
-        """Get stage description"""
-        if "T1" in stage and "N0" in stage:
-            return "early-stage disease"
-        elif "T2" in stage or "T3" in stage:
-            return "locally advanced disease"
-        elif "T4" in stage:
-            return "advanced local disease"
-        elif "M1" in stage:
-            return "metastatic disease"
-        else:
-            return "intermediate-stage disease"
-    
-    def _assess_data_completeness(self, patient_data: Dict[str, Any], tumor_data: Dict[str, Any]) -> float:
-        """Assess completeness of input data"""
-        
-        required_fields = ["age", "performance_status"]
-        patient_completeness = sum(1 for field in required_fields if patient_data.get(field)) / len(required_fields)
-        
-        required_tumor_fields = ["stage", "location", "histology"]
-        tumor_completeness = sum(1 for field in required_tumor_fields if tumor_data.get(field)) / len(required_tumor_fields)
-        
-        return (patient_completeness + tumor_completeness) / 2
-    
-    def _assess_evidence_strength(self, stage: str) -> float:
-        """Assess strength of evidence for this case"""
-        
-        # Strong evidence for common stages
-        if any(x in stage for x in ["T1N0", "T2N0", "T3N1"]):
-            return 0.9
-        elif any(x in stage for x in ["T4", "N2", "N3"]):
-            return 0.7
-        else:
-            return 0.6
-    
-    def _assess_guideline_support(self, recommendation: Dict[str, Any]) -> float:
-        """Assess guideline support for recommendation"""
-        
-        treatment = recommendation.get("primary_treatment")
-        
-        if treatment in ["surgical_resection", "multimodal_therapy"]:
-            return 0.9
-        elif treatment in ["endoscopic_resection", "palliative_care"]:
-            return 0.8
-        else:
-            return 0.6
-
-
 # Gastrectomy Engine
 class GastrectomyEngine(BaseDecisionEngine):
     """Gastrectomy surgical decision engine"""
@@ -451,241 +337,48 @@ class GastrectomyEngine(BaseDecisionEngine):
         return errors
 
 
-# FLOT Engine
-class FLOTEngine(BaseDecisionEngine):
-    """FLOT (Fluorouracil, Leucovorin, Oxaliplatin, Docetaxel) Protocol Engine"""
+# Create a wrapper for the FLOT analyzer
+class FLOTEngineWrapper(BaseDecisionEngine):
+    """Wrapper for the FLOT Protocol Analyzer"""
     
     def __init__(self):
         super().__init__("flot")
-        self.engine_version = "1.8.0"
-        self.evidence_base = "FLOT4-AIO Trial, ESMO Guidelines 2023"
+        self.analyzer = FLOTAnalyzer()
+        logger.info("FLOT Engine Wrapper initialized")
         
-        # Standard FLOT dosing (per cycle)
-        self.standard_dosing = {
-            "fluorouracil": "2600 mg/m2 IV continuous infusion 24h",
-            "leucovorin": "200 mg/m2 IV over 2h",
-            "oxaliplatin": "85 mg/m2 IV over 2h",
-            "docetaxel": "50 mg/m2 IV over 1h"
-        }
-    
     async def analyze(
         self,
         patient_data: Dict[str, Any],
         tumor_data: Dict[str, Any],
         context: Optional[Dict[str, Any]] = None
     ) -> Dict[str, Any]:
-        """Perform FLOT protocol analysis"""
-        
-        await asyncio.sleep(0.1)
-        
-        # Extract parameters
-        age = patient_data.get("age", 70)
-        ecog_score = patient_data.get("performance_status", 2)
-        comorbidities = patient_data.get("comorbidities", [])
-        
-        tumor_stage = tumor_data.get("stage", "T2N0M0")
-        histology = tumor_data.get("histology", "adenocarcinoma")
-        
-        # Assess FLOT eligibility
-        eligibility_score = self._assess_flot_eligibility(age, ecog_score, tumor_stage, comorbidities)
-        
-        # Generate recommendation
-        recommendation = self._generate_flot_recommendation(eligibility_score, age, ecog_score, tumor_stage)
-        reasoning = self._generate_flot_reasoning(eligibility_score, age, ecog_score, tumor_stage, recommendation)
-        
-        # Calculate confidence
-        confidence_factors = {
-            "data_completeness": self._assess_data_completeness(patient_data, tumor_data),
-            "evidence_strength": self._assess_flot_evidence_strength(tumor_stage, histology),
-            "guideline_support": self._assess_guideline_support(recommendation)
+        """Delegate to the dedicated FLOT analyzer"""
+        # Combine patient and tumor data to match the expected format
+        combined_data = {
+            **patient_data,
+            "tumor_data": tumor_data,
+            "patient_id": patient_data.get("id", "unknown")
         }
         
-        confidence_score = self.calculate_confidence(confidence_factors)
+        # Call the dedicated FLOT analyzer
+        result = await self.analyzer.analyze_gastric_surgery_case(
+            patient_data=combined_data,
+            research_context=context
+        )
         
+        # Format the response to match the expected interface
         return {
-            "recommendation": recommendation,
-            "confidence_score": confidence_score,
-            "confidence_level": ConfidenceLevel.from_score(confidence_score),
-            "reasoning": reasoning,
-            "evidence": [
-                {
-                    "source": "FLOT4-AIO Trial",
-                    "strength": "strong",
-                    "description": "Phase III trial demonstrating superiority of FLOT over ECF/ECX"
-                },
-                {
-                    "source": "ESMO Guidelines 2023",
-                    "strength": "strong",
-                    "description": "European Society for Medical Oncology Clinical Practice Guidelines"
-                }
-            ],
-            "confidence_factors": confidence_factors,
-            "eligibility_score": eligibility_score
+            "recommendation": result.get("treatment_plan", {}).get("recommendation", ""),
+            "confidence_score": result.get("treatment_plan", {}).get("confidence", 0.5),
+            "confidence_level": ConfidenceLevel.from_score(
+                result.get("treatment_plan", {}).get("confidence", 0.5)
+            ),
+            "reasoning": result.get("treatment_plan", {}).get("factors", []),
+            "evidence": result.get("evidence_quality", []),
+            "warnings": result.get("risk_assessment", {}).get("warnings", []),
+            "surgical_impact": result.get("surgical_impact", {})
         }
     
-    def _assess_flot_eligibility(self, age: int, ecog_score: int, tumor_stage: str, comorbidities: List[str]) -> float:
-        """Assess FLOT protocol eligibility"""
-        
-        eligibility = 1.0
-        
-        # Stage assessment
-        if any(x in tumor_stage for x in ["T3", "T4", "N1", "N2", "N3"]):
-            eligibility += 0.2  # Strong indication for locally advanced
-        elif "M1" in tumor_stage:
-            eligibility -= 0.6  # Metastatic disease
-        elif "T1N0" in tumor_stage:
-            eligibility -= 0.4  # Early stage
-        
-        # Age factor
-        if age >= 75:
-            eligibility -= 0.3
-        elif age >= 70:
-            eligibility -= 0.1
-        
-        # Performance status
-        if ecog_score >= 3:
-            eligibility -= 0.8  # Poor PS
-        elif ecog_score == 2:
-            eligibility -= 0.3
-        elif ecog_score == 1:
-            eligibility -= 0.05
-        
-        # Comorbidities
-        high_risk_conditions = ["severe_heart_failure", "severe_copd", "cirrhosis", "active_infection"]
-        if any(condition in comorbidities for condition in high_risk_conditions):
-            eligibility -= 0.4
-        
-        moderate_risk_conditions = ["diabetes", "hypertension", "mild_copd", "chronic_kidney_disease"]
-        moderate_count = sum(1 for condition in comorbidities if condition in moderate_risk_conditions)
-        eligibility -= moderate_count * 0.1
-        
-        return max(min(eligibility, 1.0), 0.0)
-    
-    def _generate_flot_recommendation(self, eligibility_score: float, age: int, ecog_score: int, tumor_stage: str) -> Dict[str, Any]:
-        """Generate FLOT protocol recommendation"""
-        
-        if eligibility_score >= 0.8:
-            status = "strongly_recommended"
-            rationale = "Excellent candidate for FLOT protocol"
-            cycles_preop = 4
-            cycles_postop = 4
-        elif eligibility_score >= 0.6:
-            status = "recommended"
-            rationale = "Good candidate for FLOT protocol"
-            cycles_preop = 4
-            cycles_postop = 4
-        elif eligibility_score >= 0.4:
-            status = "consider_with_caution"
-            rationale = "Borderline candidate - consider dose modifications"
-            cycles_preop = 3
-            cycles_postop = 3
-        else:
-            status = "not_recommended"
-            rationale = "Poor candidate - consider alternative approaches"
-            cycles_preop = 0
-            cycles_postop = 0
-        
-        # Determine treatment intent
-        if "M1" in tumor_stage:
-            treatment_intent = "palliative"
-            cycles_preop = 0
-            cycles_postop = 6
-        elif eligibility_score >= 0.7:
-            treatment_intent = "perioperative"
-        else:
-            treatment_intent = "adjuvant_only"
-            cycles_preop = 0
-            cycles_postop = 6
-        
-        return {
-            "status": status,
-            "rationale": rationale,
-            "treatment_intent": treatment_intent,
-            "cycles_preoperative": cycles_preop,
-            "cycles_postoperative": cycles_postop,
-            "cycle_frequency": "every_2_weeks",
-            "total_duration_weeks": (cycles_preop + cycles_postop) * 2,
-            "dosing": self.standard_dosing,
-            "monitoring_required": self._get_monitoring_requirements(eligibility_score, age),
-            "contraindications": self._assess_contraindications(age, ecog_score, tumor_stage)
-        }
-    
-    def _generate_flot_reasoning(self, eligibility_score: float, age: int, ecog_score: int, tumor_stage: str, recommendation: Dict[str, Any]) -> List[str]:
-        """Generate FLOT reasoning"""
-        
-        reasoning = []
-        
-        reasoning.append(f"Patient age {age} years with ECOG performance status {ecog_score}")
-        reasoning.append(f"Tumor staging {tumor_stage} assessed for FLOT eligibility")
-        reasoning.append(f"FLOT eligibility score: {eligibility_score:.2f}")
-        
-        if recommendation["status"] == "strongly_recommended":
-            reasoning.append("Strong indication for perioperative FLOT protocol")
-        elif recommendation["status"] == "recommended":
-            reasoning.append("FLOT protocol recommended with standard monitoring")
-        elif recommendation["status"] == "consider_with_caution":
-            reasoning.append("FLOT may be considered with dose modifications and enhanced monitoring")
-        else:
-            reasoning.append("FLOT not recommended - consider alternative treatment approaches")
-        
-        if "M1" in tumor_stage:
-            reasoning.append("Metastatic disease limits treatment to palliative intent")
-        
-        if age >= 75:
-            reasoning.append("Advanced age increases toxicity risk - enhanced monitoring required")
-        
-        return reasoning
-    
-    def _assess_flot_evidence_strength(self, tumor_stage: str, histology: str) -> float:
-        """Assess evidence strength for FLOT in this case"""
-        
-        # Strong evidence for locally advanced adenocarcinoma
-        if any(x in tumor_stage for x in ["T3", "T4", "N1", "N2"]) and "adenocarcinoma" in histology.lower():
-            return 0.95
-        elif any(x in tumor_stage for x in ["T2N1", "T2N2"]):
-            return 0.85
-        elif "M1" in tumor_stage:
-            return 0.6  # Limited evidence for metastatic
-        else:
-            return 0.7  # Moderate evidence
-    
-    def _get_monitoring_requirements(self, eligibility_score: float, age: int) -> List[str]:
-        """Get monitoring requirements for FLOT"""
-        
-        requirements = [
-            "Complete blood count before each cycle",
-            "Comprehensive metabolic panel before each cycle",
-            "Performance status assessment each visit",
-            "Neuropathy assessment using CTCAE grading"
-        ]
-        
-        if eligibility_score < 0.6 or age >= 70:
-            requirements.extend([
-                "Enhanced toxicity monitoring",
-                "Dose modification guidelines",
-                "Cardiology consultation if indicated"
-            ])
-        
-        if age >= 75:
-            requirements.append("Geriatric assessment and nutritional support")
-        
-        return requirements
-    
-    def _assess_contraindications(self, age: int, ecog_score: int, tumor_stage: str) -> List[str]:
-        """Assess contraindications and warnings"""
-        
-        warnings = []
-        
-        if ecog_score >= 3:
-            warnings.append("ECOG PS ≥3 is contraindication to FLOT")
-        
-        if age >= 80:
-            warnings.append("Age ≥80 years - very high toxicity risk")
-        
-        if "M1" in tumor_stage:
-            warnings.append("Metastatic disease - palliative intent only")
-        
-        return warnings
 
 
 # Decision Service
@@ -696,12 +389,20 @@ class DecisionService(BaseService):
         super().__init__()
         self.cache = CacheService()
         self.config = get_feature_config("decisions")
+        
+        # Initialize specialized engines using wrappers for consistent interface
         self.engines = {
-            "adci": ADCIEngine(),
+            "adci": ADCIEngineWrapper(),
             "gastrectomy": GastrectomyEngine(),
-            "flot": FLOTEngine()
+            "flot": FLOTEngineWrapper()
         }
+        
+        # Create impact calculator for metrics
+        self.impact_calculator = ImpactMetricsCalculator()
+        
         self.decisions: Dict[str, Decision] = {}  # In-memory store for MVP
+        
+        logger.info("Decision Service initialized with specialized engines")
     
     async def create_decision(
         self,
@@ -980,3 +681,46 @@ class DecisionService(BaseService):
             created_at=decision.created_at,
             processing_time_ms=decision.processing_time_ms
         )
+    
+    async def health_check(self) -> Dict[str, Any]:
+        """Perform a health check on all decision engines"""
+        health_status = {
+            "status": "healthy",
+            "engines": {}
+        }
+        
+        try:
+            # Check each engine
+            for engine_name, engine in self.engines.items():
+                try:
+                    # Basic validation test
+                    if hasattr(engine, "validate_input"):
+                        errors = engine.validate_input({"age": 65}, {"stage": "T2N0M0"})
+                        health_status["engines"][engine_name] = {
+                            "status": "healthy" if not errors else "degraded",
+                            "errors": errors
+                        }
+                    else:
+                        health_status["engines"][engine_name] = {"status": "unknown"}
+                except Exception as e:
+                    health_status["engines"][engine_name] = {
+                        "status": "error",
+                        "message": str(e)
+                    }
+                    health_status["status"] = "degraded"
+            
+            # Check cache
+            try:
+                await self.cache.ping()
+                health_status["cache"] = {"status": "connected"}
+            except Exception as e:
+                health_status["cache"] = {"status": "error", "message": str(e)}
+                health_status["status"] = "degraded"
+                
+            return health_status
+        except Exception as e:
+            logger.error(f"Health check failed: {str(e)}")
+            return {
+                "status": "error",
+                "message": str(e)
+            }

@@ -21,7 +21,7 @@ from core.models.base import ApiResponse, HealthStatus
 from core.services.logger import get_logger
 from core.utils.helpers import LoggingUtils
 from core.licensing_manager import licensing_manager
-from orchestrator.main import run as run_orchestrator
+from orches.main import run as run_orchestrator
 
 # Setup logging
 LoggingUtils.setup_structured_logging()
@@ -53,15 +53,15 @@ async def lifespan(app: FastAPI):
         logger.info("Starting orchestrator...")
         run_orchestrator()
         
-        # Pre-initialize ADCI engine
-        from features.decisions.adci_engine import ADCIEngine
-        adci_engine = ADCIEngine()
-        logger.info("✅ ADCI Engine initialized")
+        # Pre-initialize key engines - use lazy loading to improve startup time
+        logger.info("Pre-initializing key engines...")
         
-        # Pre-initialize FLOT analyzer
-        from features.protocols.flot_analyzer import FLOTAnalyzer
-        flot_analyzer = FLOTAnalyzer()
-        logger.info("✅ FLOT Protocol Analyzer initialized")
+        # Register initialization tasks to run concurrently
+        service_initialization_tasks.extend([
+            asyncio.create_task(initialize_adci_engine()),
+            asyncio.create_task(initialize_flot_analyzer()),
+            asyncio.create_task(initialize_impact_calculator())
+        ])
         
         # Import and initialize auth and decision services
         from features.auth.service import auth_service
@@ -213,6 +213,41 @@ async def health_check():
         api_available=api_available,
         environment=config.environment
     )
+
+
+# Engine initialization functions
+async def initialize_adci_engine():
+    """Initialize ADCI Engine with error handling"""
+    try:
+        from features.decisions.adci_engine import ADCIEngine
+        adci_engine = ADCIEngine()
+        logger.info("✅ ADCI Engine initialized successfully")
+        return adci_engine
+    except Exception as e:
+        logger.error(f"❌ Failed to initialize ADCI Engine: {e}")
+        return None
+
+async def initialize_flot_analyzer():
+    """Initialize FLOT Analyzer with error handling"""
+    try:
+        from features.protocols.flot_analyzer import FLOTAnalyzer
+        flot_analyzer = FLOTAnalyzer()
+        logger.info("✅ FLOT Analyzer initialized successfully")
+        return flot_analyzer
+    except Exception as e:
+        logger.error(f"❌ Failed to initialize FLOT Analyzer: {e}")
+        return None
+
+async def initialize_impact_calculator():
+    """Initialize Impact Metrics Calculator with error handling"""
+    try:
+        from features.analysis.impact_metrics import ImpactMetricsCalculator
+        impact_calculator = ImpactMetricsCalculator()
+        logger.info("✅ Impact Metrics Calculator initialized successfully")
+        return impact_calculator
+    except Exception as e:
+        logger.error(f"❌ Failed to initialize Impact Metrics Calculator: {e}")
+        return None
 
 
 if __name__ == "__main__":
