@@ -210,7 +210,7 @@ class PatientRepository(BaseRepository[PatientORM]):
                 "gender_distribution": gender_distribution,
                 "age_distribution": {
                     "under_50": age_stats.under_50,
-                    "50_to_70": age_stats.50_to_70,
+                    "50_to_70": age_stats["50_to_70"],
                     "over_70": age_stats.over_70
                 }
             }
