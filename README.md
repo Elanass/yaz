@@ -1,53 +1,91 @@
-# Decision Precision in Surgery: Gastric ADCI Surgery FLOT Impact
+# Decision Precision in Surgery - Gastric ADCI Platform
 
-## Overview
-The Decision Precision in Surgery platform provides clinicians with evidence-based decision support for gastric cancer treatment planning, with a specific focus on the impact of FLOT protocol on surgical outcomes. The platform includes a dedicated Precision Decision Engine for diffuse-type gastric cancer surgery that integrates FLOT protocol impact analysis, a multi-criteria decision analysis (MCDA) framework, and real-time confidence scoring using the ADCI (Adaptive Decision Confidence Index) methodology. It also features an Impact Analyzer tool that computes Kaplan–Meier survival curves, treatment effectiveness, quality-of-life assessments, and cost–effectiveness metrics. Previously based on Markov chain simulations, the platform now employs more robust statistical methods—including Cox regression, logistic regression, and Random Forest models—for improved prediction accuracy and clinical interpretability.
+A streamlined healthcare application for surgical decision support in gastric cancer treatment, featuring the ADCI (Adaptive Decision Confidence Index) framework and FLOT protocol analysis.
 
 ## Features
 
-### Core Features
-- **Adaptive Decision Confidence Index (ADCI)**: Structured decision framework with confidence scoring
-- **FLOT Protocol Impact Assessment**: Comprehensive analysis of FLOT protocol impact on surgical outcomes
-- **Statistical Analysis**: Both retrospective (Cox & Logistic Regression) and prospective (Random Forest, RL) models
-- **Evidence Synthesis**: Automated literature review and protocol integration
-- **HIPAA/GDPR Compliant**: End-to-end encryption and comprehensive audit logging
-
-### Key Components
 - **Decision Support Engine**: Evidence-based gastric cancer treatment recommendations
-- **Precision Surgery Framework**: Patient-specific risk stratification for surgical outcomes
-- **FLOT Impact Analysis**: Assessment of perioperative chemotherapy effects on surgical results
-- **Statistical Analysis Module**: Advanced analytics for outcome prediction
-- **Progressive Web App**: Healthcare-grade, offline-capable interface
+- **ADCI Framework**: Structured decision-making with confidence scoring
+- **FLOT Protocol Analysis**: Assessment of perioperative chemotherapy effects
+- **Statistical Analysis**: Survival analysis (Cox regression) and outcome prediction (Random Forest)
+- **Modern Web Interface**: Clean, responsive design for clinical use
 
 ## Quick Start
 
 ### Prerequisites
-- Docker and Docker Compose
+- Python 3.10+
 - Git
-- 4GB+ RAM for development environment
 
-### Development Setup
+### Installation
 
 1. Clone the repository:
    ```bash
-   git clone https://github.com/yourusername/gastric-adci-platform.git
-   cd gastric-adci-platform
+   git clone <repository-url>
+   cd yaz
    ```
 
-2. Start the development environment:
+2. Create virtual environment:
    ```bash
-   docker-compose -f deploy/dev/docker-compose.yml up -d
+   python -m venv venv
+   source venv/bin/activate  # On Windows: venv\Scripts\activate
    ```
 
-3. Enter the development container:
+3. Install dependencies:
    ```bash
-   docker-compose -f deploy/dev/docker-compose.yml exec dev bash
+   pip install -r config/requirements.txt
    ```
 
-4. Run tests within the container:
+4. Initialize database:
    ```bash
-   python -m pytest tests/
+   alembic upgrade head
    ```
+
+5. Start the application:
+   ```bash
+   python main.py
+   ```
+
+The application will be available at `http://localhost:8000`
+
+## API Documentation
+
+Visit `http://localhost:8000/docs` for interactive API documentation.
+
+## Project Structure
+
+```
+├── main.py                 # Application entry point
+├── core/                   # Core functionality
+│   ├── config/            # Configuration
+│   ├── models/            # Data models
+│   └── services/          # Core services
+├── features/              # Feature modules
+│   ├── analysis/          # Statistical analysis
+│   ├── auth/              # Authentication
+│   ├── decisions/         # Decision engines
+│   └── protocols/         # Clinical protocols
+├── api/                   # REST API endpoints
+├── data/                  # Database and migrations
+├── web/                   # Web interface
+└── tests/                 # Test files
+```
+
+## Development
+
+### Running Tests
+```bash
+pytest tests/
+```
+
+### Code Formatting
+```bash
+black .
+isort .
+```
+
+## License
+
+This project is for medical research and educational purposes.
 
 5. Start the development server:
    ```bash

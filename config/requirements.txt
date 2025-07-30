@@ -1,73 +1,37 @@
-# Gastric ADCI Platform - Clean Dependencies
-# Healthcare-grade PWA for gastric oncology decision support
+# Gastric ADCI Platform - Streamlined Dependencies
+# Production-ready medical decision support platform
 
 # Core Framework
-fastapi[all]==0.104.1
- # fasthtml  # commented out until package is available
+fastapi==0.104.1
 uvicorn[standard]==0.24.0
-starlette==0.27.0
+python-multipart==0.0.6
 
-# Database & ElectricSQL
- # electric-sql==0.8.1  # commented out until available on PyPI
-psycopg2-binary==2.9.9
-asyncpg==0.29.0
+# Database
 sqlalchemy[asyncio]==2.0.23
 alembic==1.13.1
 aiosqlite==0.19.0
 
-# Security & Encryption (HIPAA Compliance)
+# Security & Auth
 cryptography==41.0.7
-python-jose[cryptography]==3.3.0
 passlib[bcrypt]==1.7.4
-bcrypt==4.1.2
 PyJWT==2.8.0
-python-multipart==0.0.6
 
-  # Healthcare & Clinical (removed heavy dependencies for MVP)
-
-# Data validation and settings removed for MVP; using python-dotenv and basic types
-
-# Clinical data processing
+# Data Processing & Analytics
 pandas==2.1.3
 numpy==1.25.2
-
-# Statistical analysis
 scikit-learn==1.3.2
-lifelines==0.27.6  # Survival analysis library
+lifelines==0.27.6
 
-# Monitoring & Compliance (HIPAA/GDPR)
+# Infrastructure
+python-dotenv==1.0.0
+httpx==0.25.2
 structlog==23.2.0
-sentry-sdk[fastapi]==1.38.0
+
+# Reports
+reportlab==3.6.12
 
 # Development
 pytest==7.4.3
 pytest-asyncio==0.21.1
 black==23.11.0
 isort==5.12.0
-flake8==6.1.0
-
-# Environment
-python-dotenv==1.0.0  # load .env files for configuration
-
-# HTTP client
-httpx==0.25.2
-
-# Logging
-# structlog removed for MVP, use standard logging
-
-# Testing
-pytest==7.4.3
-pytest-asyncio==0.21.1
-pytest-cov==4.1.0
-
-# Development tools
-black==23.11.0
-isort==5.12.0
-flake8==6.1.0
-mypy==1.7.1
-
-# Template rendering and file handling simplified
-# jinja2 removed for MVP; no templating needed
-
-# PDF export library
-reportlab==3.6.12

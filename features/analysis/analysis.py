@@ -1,53 +1,90 @@
 """
-Consolidated Analysis Module
-
-Provides both prospective and retrospective analysis tools for gastric cancer data
-using various machine learning and statistical models.
+Simplified Analysis Module - Gastric Surgery Decision Support
 """
 
 import pandas as pd
 import numpy as np
 from sklearn.ensemble import RandomForestClassifier
-from sklearn.model_selection import cross_val_score, KFold, train_test_split
-from sklearn.metrics import roc_auc_score, accuracy_score, precision_score, recall_score, f1_score
-from sklearn.preprocessing import StandardScaler, OneHotEncoder
-from sklearn.pipeline import Pipeline
-from sklearn.compose import ColumnTransformer
 from sklearn.linear_model import LogisticRegression
-from lifelines import CoxPHFitter
-from typing import Dict, List, Optional, Tuple, Any
-import os
-import pickle
-import json
+from sklearn.metrics import roc_auc_score, accuracy_score
+from typing import Dict, Any
+import logging
 
-from .base_analysis import BaseAnalysis
-from core.services.logger import get_logger
+logger = logging.getLogger(__name__)
 
-logger = get_logger(__name__)
 
-class AnalysisEngine(BaseAnalysis):
-    """
-    Consolidated analysis engine that handles both prospective and retrospective
-    analysis methods for gastric cancer data.
-    """
+class AnalysisEngine:
+    """Consolidated analysis engine for surgical decision support"""
     
     def __init__(self):
-        """Initialize the analysis engine"""
         self.models = {}
-        self.scaler = StandardScaler()
         logger.info("Analysis engine initialized")
     
-    def analyze(self, data: dict, analysis_type: str = "prospective") -> dict:
+    def analyze(self, data: Dict[str, Any], analysis_type: str = "prospective") -> Dict[str, Any]:
         """
-        Perform analysis on the provided data using the specified analysis type.
+        Perform analysis on provided data
         
         Args:
-            data: Dictionary containing the data to analyze
-            analysis_type: Type of analysis to perform ("prospective" or "retrospective")
+            data: Analysis data
+            analysis_type: "prospective" or "retrospective"
             
         Returns:
-            Dictionary with analysis results
+            Analysis results
         """
+        if analysis_type == "prospective":
+            return self._prospective_analysis(data)
+        elif analysis_type == "retrospective":
+            return self._retrospective_analysis(data)
+        else:
+            raise ValueError(f"Unknown analysis type: {analysis_type}")
+    
+    def _prospective_analysis(self, data: Dict[str, Any]) -> Dict[str, Any]:
+        """Random Forest analysis for prospective prediction"""
+        try:
+            # Convert to DataFrame
+            df = pd.DataFrame(data)
+            
+            # Separate features and target
+            if 'outcome' in df.columns:
+                X = df.drop('outcome', axis=1)
+                y = df['outcome']
+            else:
+                raise ValueError("No outcome column found")
+            
+            # Train Random Forest
+            rf = RandomForestClassifier(n_estimators=100, random_state=42)
+            rf.fit(X, y)
+            
+            # Predictions and metrics
+            y_pred = rf.predict(X)
+            y_prob = rf.predict_proba(X)[:, 1]
+            
+            return {
+                "model_type": "Random Forest",
+                "accuracy": accuracy_score(y, y_pred),
+                "auc": roc_auc_score(y, y_prob),
+                "feature_importance": dict(zip(X.columns, rf.feature_importances_)),
+                "summary": "Prospective analysis completed successfully"
+            }
+            
+        except Exception as e:
+            logger.error(f"Prospective analysis failed: {e}")
+            return {"error": str(e)}
+    
+    def _retrospective_analysis(self, data: Dict[str, Any]) -> Dict[str, Any]:
+        """Simplified retrospective analysis without Cox regression for now"""
+        try:
+            # For MVP, return a simplified analysis result
+            # Can be enhanced later when scipy compatibility is resolved
+            return {
+                "model_type": "Simplified Retrospective Analysis",
+                "summary": "Retrospective analysis placeholder - will be enhanced in future versions",
+                "note": "Cox regression temporarily disabled due to library compatibility"
+            }
+            
+        except Exception as e:
+            logger.error(f"Retrospective analysis failed: {e}")
+            return {"error": str(e)}
         if not self.validate_data(data, analysis_type):
             return {"error": "Invalid data for analysis", "type": analysis_type}
         
