@@ -5,6 +5,8 @@ Reports page for the Gastric ADCI Platform
 from fastapi import APIRouter, Request, Depends, HTTPException, Form, Query
 from fastapi.responses import HTMLResponse, RedirectResponse, FileResponse
 from typing import Optional, Dict, Any, List
+from fasthtml.common import *
+import httpx
 
 from features.auth.service import get_current_user, require_role, Domain, Scope
 from web.components.layout import create_base_layout
@@ -20,9 +22,6 @@ async def list_reports(
     current_user = Depends(require_role(Domain.HEALTHCARE, Scope.READ))
 ):
     """List all generated reports with filtering and pagination"""
-    
-    from fasthtml.common import *
-    import httpx
     
     # Fetch reports from API
     async with httpx.AsyncClient() as client:
@@ -121,9 +120,6 @@ async def generate_report_form(
     current_user = Depends(require_role(Domain.HEALTHCARE, Scope.WRITE))
 ):
     """Form for generating a new report"""
-    
-    from fasthtml.common import *
-    import httpx
     
     # Fetch cases for dropdown if case_id not provided
     cases = []
@@ -231,9 +227,6 @@ async def view_report(
     current_user = Depends(require_role(Domain.HEALTHCARE, Scope.READ))
 ):
     """View a generated report"""
-    
-    from fasthtml.common import *
-    import httpx
     
     # Fetch report from API
     async with httpx.AsyncClient() as client:

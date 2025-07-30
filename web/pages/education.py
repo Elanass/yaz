@@ -5,6 +5,7 @@ Education page for the YAZ Surgery Analytics Platform
 from fastapi import APIRouter, Request, Depends
 from fastapi.responses import HTMLResponse
 from fastapi.templating import Jinja2Templates
+from fasthtml.common import *
 
 from features.auth.service import get_current_user, optional_user
 from web.components.layout import create_base_layout
@@ -16,8 +17,6 @@ templates = Jinja2Templates(directory="web/templates")
 @router.get("/", response_class=HTMLResponse)
 async def education_home(request: Request, current_user = Depends(optional_user)):
     """Education and training dashboard"""
-    
-    from fasthtml.common import *
     
     # Mock user data - in production this would come from the database
     user_data = {
@@ -221,7 +220,6 @@ async def education_home(request: Request, current_user = Depends(optional_user)
 async def education_programs(request: Request, current_user = Depends(optional_user)):
     """Training programs management"""
     
-    from fasthtml.common import *
     
     content = Div(
         H1("Training Programs", class_="text-3xl font-bold text-gray-900 mb-6"),
@@ -271,7 +269,6 @@ async def education_programs(request: Request, current_user = Depends(optional_u
 async def education_assessment(request: Request, current_user = Depends(optional_user)):
     """Skill assessment and evaluation"""
     
-    from fasthtml.common import *
     
     content = Div(
         H1("Skill Assessment", class_="text-3xl font-bold text-gray-900 mb-6"),
@@ -300,7 +297,6 @@ async def education_assessment(request: Request, current_user = Depends(optional
 async def continuing_education(request: Request, current_user = Depends(optional_user)):
     """Continuing education and professional development"""
     
-    from fasthtml.common import *
     
     content = Div(
         H1("Continuing Education", class_="text-3xl font-bold text-gray-900 mb-6"),
@@ -328,7 +324,6 @@ async def continuing_education(request: Request, current_user = Depends(optional
 async def simulation_lab(request: Request, current_user = Depends(optional_user)):
     """Virtual simulation laboratory"""
     
-    from fasthtml.common import *
     
     content = Div(
         H1("Simulation Lab", class_="text-3xl font-bold text-gray-900 mb-6"),

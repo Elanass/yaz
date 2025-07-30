@@ -5,6 +5,7 @@ Hospitality page for the YAZ Surgery Analytics Platform
 from fastapi import APIRouter, Request, Depends
 from fastapi.responses import HTMLResponse
 from fastapi.templating import Jinja2Templates
+from fasthtml.common import *
 
 from features.auth.service import get_current_user, optional_user
 from web.components.layout import create_base_layout
@@ -17,7 +18,6 @@ templates = Jinja2Templates(directory="web/templates")
 async def hospitality_home(request: Request, current_user = Depends(optional_user)):
     """Hospitality and patient experience dashboard"""
     
-    from fasthtml.common import *
     
     # Mock user data - in production this would come from the database
     user_data = {
@@ -245,7 +245,6 @@ async def hospitality_home(request: Request, current_user = Depends(optional_use
 async def hospitality_plans(request: Request, current_user = Depends(optional_user)):
     """Hospitality plans management"""
     
-    from fasthtml.common import *
     
     content = Div(
         H1("Hospitality Plans", class_="text-3xl font-bold text-gray-900 mb-6"),
@@ -295,7 +294,6 @@ async def hospitality_plans(request: Request, current_user = Depends(optional_us
 async def hospitality_accommodation(request: Request, current_user = Depends(optional_user)):
     """Accommodation management"""
     
-    from fasthtml.common import *
     
     content = Div(
         H1("Accommodation Management", class_="text-3xl font-bold text-gray-900 mb-6"),
@@ -324,7 +322,6 @@ async def hospitality_accommodation(request: Request, current_user = Depends(opt
 async def family_services(request: Request, current_user = Depends(optional_user)):
     """Family support services"""
     
-    from fasthtml.common import *
     
     content = Div(
         H1("Family Support Services", class_="text-3xl font-bold text-gray-900 mb-6"),
@@ -352,7 +349,6 @@ async def family_services(request: Request, current_user = Depends(optional_user
 async def dietary_management(request: Request, current_user = Depends(optional_user)):
     """Dietary management and meal planning"""
     
-    from fasthtml.common import *
     
     content = Div(
         H1("Dietary Management", class_="text-3xl font-bold text-gray-900 mb-6"),
@@ -380,7 +376,6 @@ async def dietary_management(request: Request, current_user = Depends(optional_u
 async def transportation_coordination(request: Request, current_user = Depends(optional_user)):
     """Transportation coordination"""
     
-    from fasthtml.common import *
     
     content = Div(
         H1("Transportation Coordination", class_="text-3xl font-bold text-gray-900 mb-6"),

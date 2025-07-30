@@ -5,6 +5,8 @@ Case management pages for the Gastric ADCI Platform
 from fastapi import APIRouter, Request, Depends, HTTPException, Form
 from fastapi.responses import HTMLResponse, RedirectResponse
 from typing import Optional, Dict, Any, List
+from fasthtml.common import *
+import httpx
 
 from features.auth.service import get_current_user, require_role, Domain, Scope
 from web.components.layout import create_base_layout
@@ -22,7 +24,6 @@ async def list_cases(
 ):
     """List all cases with filtering and pagination"""
     
-    from fasthtml.common import *
     import httpx
     
     # Fetch cases from API
@@ -147,7 +148,6 @@ async def new_case_form(
 ):
     """Form for creating a new case"""
     
-    from fasthtml.common import *
     
     # Define form fields
     fields = [
@@ -296,7 +296,6 @@ async def view_case(
 ):
     """View details of a specific case"""
     
-    from fasthtml.common import *
     import httpx
     
     # Fetch case from API
@@ -452,7 +451,6 @@ async def analyze_case(
 ):
     """Analysis page for a specific case"""
     
-    from fasthtml.common import *
     import httpx
     from web.components.interface import treatment_comparison, evidence_panel, risk_indicator
     

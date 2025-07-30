@@ -5,6 +5,7 @@ Home page for the Gastric ADCI Platform
 from fastapi import APIRouter, Request, Depends
 from fastapi.responses import HTMLResponse
 from fastapi.templating import Jinja2Templates
+from fasthtml.common import *
 
 from features.auth.service import get_current_user, optional_user
 from web.components.layout import create_base_layout
@@ -15,8 +16,6 @@ templates = Jinja2Templates(directory="web/templates")
 @router.get("/", response_class=HTMLResponse)
 async def home(request: Request, current_user = Depends(optional_user)):
     """Home page with platform overview and key metrics"""
-    
-    from fasthtml.common import *
     
     content = Div(
         # Hero section
