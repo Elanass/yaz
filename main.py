@@ -21,7 +21,7 @@ from core.models.base import ApiResponse, HealthStatus
 from core.services.logger import get_logger
 from core.utils.helpers import LoggingUtils
 from core.licensing_manager import licensing_manager
-from orches.main import run as run_orchestrator
+from core.orchestrator.main import run as run_orchestrator
 
 # Setup logging
 LoggingUtils.setup_structured_logging()

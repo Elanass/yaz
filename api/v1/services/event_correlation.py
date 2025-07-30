@@ -12,7 +12,7 @@ from pydantic import BaseModel
 
 from core.models.base import UserIdentity
 from core.services.logger import get_logger
-from services.event_correlation.service import (
+from core.services.service import (
     correlation_engine,
     CorrelationRule,
     CorrelatedEvent

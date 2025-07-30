@@ -4,7 +4,7 @@ Smoke tests for the orchestrator module.
 """
 
 import pytest
-from orches.main import run
+from core.orchestrator.main import run
 
 def test_run_smoke(monkeypatch):
     """Smoke test for orchestrator.run."""

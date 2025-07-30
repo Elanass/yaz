@@ -1,6 +1,25 @@
 # orchestrator/main.py
 """
 Main entrypoint for the orchestrator module.
+
+TERMS AND CONDITIONS:
+- This module is part of the Gastric ADCI Platform and is subject to the platform's
+  overall licensing terms.
+- Usage requires a valid license key.
+
+FEATURES:
+- Orchestrates all platform services and applications
+- Manages service initialization and lifecycle
+- Coordinates cross-component communication
+
+LIMITATIONS:
+- Single-instance deployment only
+- Requires configuration in platform_config.py
+
+LICENSE AND RESTRICTIONS:
+- HIPAA compliance required for medical data processing
+- Not for use in non-medical contexts
+- All data must be properly encrypted and anonymized
 """
 
 from core.config.platform_config import config
