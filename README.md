@@ -40,9 +40,9 @@ A streamlined healthcare application for surgical decision support in gastric ca
    alembic upgrade head
    ```
 
-5. Start the application:
+5. Start the application (development mode):
    ```bash
-   python main.py
+   uvicorn asgi:app --reload --host 0.0.0.0 --port 8000
    ```
 
 The application will be available at `http://localhost:8000`
@@ -129,8 +129,8 @@ This project is for medical research and educational purposes.
 
 1. Configure environment variables for production:
    ```bash
-   cp .env.example .env.prod
-   # Edit .env.prod with your production settings
+   cp .env.example .env
+   # Edit .env with your production settings
    ```
 
 2. Start the production stack:

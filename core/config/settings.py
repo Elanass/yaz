@@ -14,6 +14,8 @@ class Settings:
     # Basic config
     environment: str = os.getenv("ENVIRONMENT", "development")
     debug: bool = os.getenv("DEBUG", "true").lower() == "true"
+    # Application version
+    version: str = os.getenv("APP_VERSION", "1.0.0")
     
     # Server config
     host: str = os.getenv("HOST", "0.0.0.0")

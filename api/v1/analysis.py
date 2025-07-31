@@ -8,7 +8,8 @@ import pandas as pd
 import json
 from pathlib import Path
 from datetime import datetime
-import uuid
+from core.utils.id_generator import generate_id
+from fastapi.responses import FileResponse
 
 from core.dependencies import get_current_user
 from features.analysis.analysis import AnalysisEngine
@@ -443,7 +444,7 @@ async def generate_insights(
         logger.info(f"Generating insights for analysis type: {request.analysis_type}")
         
         # Create analysis ID for tracking
-        analysis_id = f"insight_{uuid.uuid4().hex[:12]}"
+        analysis_id = generate_id(prefix="insight_", length=12)
         
         # Log analysis request
         background_tasks.add_task(
@@ -522,7 +523,7 @@ async def prepare_publication(
         logger.info(f"Preparing {request.publication_type} for cohort: {request.cohort_id}")
         
         # Create publication ID for tracking
-        publication_id = f"pub_{uuid.uuid4().hex[:8]}"
+        publication_id = generate_id(prefix="pub_", length=8)
         
         # Generate filename
         filename = f"{request.publication_type}_{publication_id}.pdf"
@@ -572,6 +573,8 @@ async def download_publication(
     current_user=Depends(get_current_user)
 ):
     """Download a prepared publication"""
-    # Implementation will return the file for download
-    # This will be implemented when the generate_publication function is complete
-    pass
+    # Locate the prepared PDF
+    file_path = Path("data/uploads/publications") / f"{publication_id}.pdf"
+    if not file_path.exists():
+        raise HTTPException(status_code=404, detail=f"Publication not found: {publication_id}")
+    return FileResponse(path=str(file_path), media_type="application/pdf", filename=file_path.name)

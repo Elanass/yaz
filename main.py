@@ -90,7 +90,7 @@ async def health_check():
     """Health check endpoint"""
     return HealthStatus(
         status="healthy",
-        version="1.0.0",
+        version=settings.version,
         database_connected=True,
         api_available=True,
         environment=settings.environment

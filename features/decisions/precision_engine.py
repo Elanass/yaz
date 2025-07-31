@@ -11,6 +11,7 @@ import logging
 
 from core.services.logger import get_logger, audit_log
 from core.utils.validation import validate_patient_data
+from core.utils.metrics import weighted_sum, calculate_confidence
 
 logger = get_logger(__name__)
 
@@ -146,14 +147,12 @@ class PrecisionEngine:
         return insights
     
     def _compute_mcda_score(self, option: Dict[str, Any]) -> float:
-        """Compute Multi-Criteria Decision Analysis score"""
-        # Invert risk score because lower is better
-        risk_score_value = 1.0 - option['adjusted_risk']
-        confidence_value = option['confidence']
-        # Weighted sum
-        mcda_score = (risk_score_value * self.criteria_weights['risk_score'] + 
-                      confidence_value * self.criteria_weights['confidence'])
-        return mcda_score
+        """Compute MCDA score using shared weighted_sum"""
+        values = {
+            'risk_score': 1.0 - option['adjusted_risk'],
+            'confidence': option['confidence']
+        }
+        return weighted_sum(values, self.criteria_weights)
 
 
 class MCDAEngine:
@@ -705,32 +704,8 @@ class MCDAEngine:
         return justification
     
     def _calculate_confidence(self, overall_scores: Dict[str, float]) -> float:
-        """
-        Calculate confidence in the recommendation
-        
-        Args:
-            overall_scores: Dictionary with overall scores
-            
-        Returns:
-            Confidence score between 0 and 1
-        """
-        # Get scores as list
-        scores = list(overall_scores.values())
-        
-        if len(scores) < 2:
-            return 0.5
-            
-        # Sort scores in descending order
-        scores.sort(reverse=True)
-        
-        # Calculate margin between best and second best
-        margin = scores[0] - scores[1]
-        
-        # Calculate normalized confidence
-        # Margin of 0.2 or more gives maximum confidence
-        confidence = min(margin / 0.2, 1.0)
-        
-        return confidence
+        """Calculate confidence using shared calculate_confidence"""
+        return calculate_confidence(overall_scores)
     
     def _estimate_uncertainty(self, scores: Dict[str, Dict[str, float]]) -> float:
         """
