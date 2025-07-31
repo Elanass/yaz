@@ -69,6 +69,31 @@ class SurgicalCaseModel(BaseModel):
                                                description="Number of completed FLOT cycles")
     response_to_neoadjuvant: Optional[str] = Field(None, 
                                                  description="Response to neoadjuvant therapy")
+    # Enhanced FLOT-specific fields
+    flot_timing_weeks: Optional[int] = Field(None, ge=0, le=52, 
+                                           description="Timing of FLOT cycles in weeks before surgery")
+    flot_start_date: Optional[datetime] = Field(None, description="Date of first FLOT cycle")
+    flot_completion_date: Optional[datetime] = Field(None, description="Date of last FLOT cycle")
+    flot_dosage_adjustments: Optional[List[Dict[str, Any]]] = Field(None, 
+                                                                  description="History of FLOT dosage adjustments")
+    flot_toxicity_grade: Optional[int] = Field(None, ge=0, le=5, 
+                                             description="Maximum toxicity grade observed during FLOT")
+    
+    # Tumor Response Grading
+    trg_score: Optional[int] = Field(None, ge=0, le=5, 
+                                   description="Tumor Regression Grade score (0-5 scale)")
+    trg_assessment_method: Optional[str] = Field(None, 
+                                              description="Method used for TRG assessment")
+    
+    # Nutritional Status
+    albumin_level_pre_flot: Optional[float] = Field(None, ge=0.5, le=7.0, 
+                                                 description="Albumin level before FLOT therapy in g/dL")
+    albumin_level_post_flot: Optional[float] = Field(None, ge=0.5, le=7.0, 
+                                                  description="Albumin level after FLOT therapy in g/dL")
+    weight_loss_during_flot: Optional[float] = Field(None, ge=0.0, le=50.0, 
+                                                  description="Weight loss during FLOT therapy in percentage")
+    nutritional_support: Optional[bool] = Field(None, 
+                                             description="Whether nutritional support was provided during FLOT")
     
     # Risk Factors
     asa_score: Optional[int] = Field(None, ge=1, le=5, description="ASA physical status")

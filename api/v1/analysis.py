@@ -424,3 +424,154 @@ async def analyze_data(
         return {"success": True, "result": result}
     except Exception as e:
         return {"success": False, "error": str(e)}
+
+
+@router.post("/insights/generate", response_model=AnalysisResultsResponse)
+async def generate_insights(
+    request: AnalysisRequest,
+    background_tasks: BackgroundTasks,
+    current_user=Depends(get_current_user)
+):
+    """
+    Generate comprehensive insights from surgical case data for FLOT optimization in gastric surgery
+    
+    This endpoint processes surgical case data and generates insights for
+    FLOT optimization in gastric surgery, using Cox Regression and Random Forest models
+    for survival predictors and MCDA for decision-support scoring.
+    """
+    try:
+        logger.info(f"Generating insights for analysis type: {request.analysis_type}")
+        
+        # Create analysis ID for tracking
+        analysis_id = f"insight_{uuid.uuid4().hex[:12]}"
+        
+        # Log analysis request
+        background_tasks.add_task(
+            reproducibility_manager.log_analysis_request,
+            analysis_id=analysis_id,
+            analysis_type=request.analysis_type,
+            user_id=current_user.id,
+            input_data=request.data
+        )
+        
+        # Process the data and generate insights
+        results = await analysis_engine.generate_insights(
+            data=request.data,
+            analysis_type=request.analysis_type
+        )
+        
+        # Prepare metadata
+        metadata = {
+            "analysis_id": analysis_id,
+            "timestamp": datetime.now().isoformat(),
+            "user_id": current_user.id,
+            "analysis_type": request.analysis_type
+        }
+        
+        # Store the results for reproducibility
+        background_tasks.add_task(
+            reproducibility_manager.store_analysis_results,
+            analysis_id=analysis_id,
+            results=results,
+            metadata=metadata
+        )
+        
+        return AnalysisResultsResponse(
+            success=True,
+            analysis_id=analysis_id,
+            results=results,
+            metadata=metadata,
+            reproducible=True
+        )
+        
+    except Exception as e:
+        logger.error(f"Error generating insights: {str(e)}", exc_info=True)
+        raise HTTPException(status_code=500, detail=f"Error generating insights: {str(e)}")
+
+
+class PublicationRequest(BaseModel):
+    cohort_id: str
+    publication_type: str  # "memoir", "article", "infographic"
+    title: str
+    authors: List[str]
+    template_id: Optional[str] = None
+    custom_fields: Optional[Dict[str, Any]] = None
+
+
+class PublicationResponse(BaseModel):
+    success: bool
+    publication_id: str
+    download_url: str
+    message: str
+
+
+@router.post("/publication/prepare", response_model=PublicationResponse)
+async def prepare_publication(
+    request: PublicationRequest,
+    background_tasks: BackgroundTasks,
+    current_user=Depends(get_current_user)
+):
+    """
+    Prepare a publication (memoir, article, infographic) from cohort data
+    
+    This endpoint processes cohort data and generates a publication-ready document
+    based on the specified publication type and template. The publication is
+    stored for download and can include custom fields for further customization.
+    """
+    try:
+        logger.info(f"Preparing {request.publication_type} for cohort: {request.cohort_id}")
+        
+        # Create publication ID for tracking
+        publication_id = f"pub_{uuid.uuid4().hex[:8]}"
+        
+        # Generate filename
+        filename = f"{request.publication_type}_{publication_id}.pdf"
+        
+        # Get cohort data
+        uploads_dir = Path("data/uploads")
+        cohort_dir = uploads_dir / request.cohort_id
+        processed_file = cohort_dir / "processed_data.json"
+        
+        if not processed_file.exists():
+            raise HTTPException(status_code=404, detail=f"Cohort data not found: {request.cohort_id}")
+        
+        with open(processed_file, 'r') as f:
+            cohort_data = json.load(f)
+        
+        # Process the publication in the background
+        background_tasks.add_task(
+            analysis_engine.generate_publication,
+            publication_id=publication_id,
+            publication_type=request.publication_type,
+            title=request.title,
+            authors=request.authors,
+            cohort_data=cohort_data,
+            template_id=request.template_id,
+            custom_fields=request.custom_fields,
+            user_id=current_user.id
+        )
+        
+        # Create download URL
+        download_url = f"/api/v1/analysis/publication/download/{publication_id}"
+        
+        return PublicationResponse(
+            success=True,
+            publication_id=publication_id,
+            download_url=download_url,
+            message=f"{request.publication_type.capitalize()} is being prepared and will be available for download shortly."
+        )
+        
+    except Exception as e:
+        logger.error(f"Error preparing publication: {str(e)}", exc_info=True)
+        raise HTTPException(status_code=500, detail=f"Error preparing publication: {str(e)}")
+
+
+@router.get("/publication/download/{publication_id}")
+async def download_publication(
+    publication_id: str,
+    current_user=Depends(get_current_user)
+):
+    """Download a prepared publication"""
+    # Implementation will return the file for download
+    # This will be implemented when the generate_publication function is complete
+    pass
