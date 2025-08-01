@@ -1,6 +1,6 @@
 # Decision Precision in Surgery - Gastric ADCI Platform
 
-A streamlined healthcare application for surgical decision support in gastric cancer treatment, featuring the ADCI (Adaptive Decision Confidence Index) framework and FLOT protocol analysis.
+A streamlined healthcare application for surgical decision support in gastric cancer treatment, featuring the ADCI (Adaptive Decision Confidence Index) framework and FLOT protocol analysis. Now enhanced with multi-environment deployment and peer-to-peer collaboration capabilities.
 
 ## Features
 
@@ -8,15 +8,75 @@ A streamlined healthcare application for surgical decision support in gastric ca
 - **ADCI Framework**: Structured decision-making with confidence scoring
 - **FLOT Protocol Analysis**: Assessment of perioperative chemotherapy effects
 - **Statistical Analysis**: Survival analysis (Cox regression) and outcome prediction (Random Forest)
-- **Modern Web Interface**: Clean, responsive design for clinical use
+- **Modern Web Interface**: Redesigned Surgify interface with organized layout and functional navigation
+- **Multi-Environment Support**: Local, P2P, and Multi-cloud deployment options
+- **P2P Collaboration**: Real-time peer-to-peer data sharing and synchronization
+- **Offline-First**: Works seamlessly with or without internet connectivity
+
+## Web Interface (Surgify UI)
+
+The web interface has been redesigned for better user experience:
+
+### Layout Structure
+- **Header**: Surgify logo and main navigation
+- **Hero Section**: Welcome area with key information
+- **Navigation Bar**: Horizontal navigation for main sections
+- **Main Content**: Primary workspace area
+- **Sidebar**: Functional menu for surgical systems
+- **Footer**: Bottom navigation with workstation, add case, marketplace, and settings
+
+### Features
+- **Events Carousel**: Horizontally scrollable events display
+- **Cases Overview**: Scrollable case management interface
+- **Surgical Systems Menu**: Organized sidebar navigation for different surgical specialties
+- **Responsive Design**: Works across desktop and mobile devices
+
+### Logo Setup
+To complete the Surgify branding:
+
+1. Place your logo files in `/web/static/icons/` directory:
+   - `logo.svg` or `logo.png` for the main logo
+   - `favicon.ico` for browser favicon
+   - `apple-touch-icon.png` for mobile app icon
+
+2. See `/web/static/icons/README.md` for detailed logo specifications and requirements.
+
+## Deployment Modes
+
+### 🏠 Local Mode
+Standalone operation on local machine for development and isolated use.
+
+### 🔗 P2P Mode
+Peer-to-peer decentralized collaboration with real-time data sync and WebRTC connectivity.
+
+### ☁️ Multi-Cloud Mode
+Enterprise deployment across AWS, GCP, Azure with auto-scaling and load balancing.
 
 ## Quick Start
 
 ### Prerequisites
 - Python 3.10+
 - Git
+- Node.js (for P2P mode)
 
-### Installation
+### Automated Setup
+
+Choose your deployment mode and run the corresponding script:
+
+```bash
+# Local development
+./scripts/setup_local.sh
+
+# P2P collaboration
+./scripts/setup_p2p.sh
+
+# Multi-cloud deployment
+./scripts/setup_multicloud.sh
+```
+
+### Manual Installation
+
+### Manual Installation
 
 1. Clone the repository:
    ```bash
@@ -35,17 +95,57 @@ A streamlined healthcare application for surgical decision support in gastric ca
    pip install -r config/requirements.txt
    ```
 
-4. Initialize database:
+4. Set environment mode:
+   ```bash
+   export GASTRIC_ADCI_ENV=local  # or p2p, multicloud
+   ```
+
+5. Initialize database:
    ```bash
    alembic upgrade head
    ```
 
-5. Start the application (development mode):
+6. Start the application:
    ```bash
+   # Development mode
    uvicorn asgi:app --reload --host 0.0.0.0 --port 8000
+   
+   # Production mode
+   python main.py
    ```
 
 The application will be available at `http://localhost:8000`
+
+### Web Interface Development
+
+The Surgify web interface is built with modern web technologies:
+
+**Frontend Structure:**
+- Templates: Located in `/web/templates/` 
+- Static assets: Located in `/web/static/`
+- Islands: Interactive components in `/web/islands/`
+- Components: Reusable UI elements in `/web/components/`
+
+**Key Files:**
+- `layout.html`: Main layout template with header, navigation, and footer
+- `index.html`: Home page with hero section and case management
+- `sidebar.html`: Surgical systems navigation menu
+- `layout.css`: Main styling for the interface
+- `sidebar-menu.js`: Interactive sidebar functionality
+
+**Development Workflow:**
+1. Templates use Jinja2 for server-side rendering
+2. Islands provide interactive client-side functionality
+3. Static assets are served directly
+4. Sidebar menu dynamically loads surgical system content
+
+### Validation
+
+Run the comprehensive validation script to ensure everything is set up correctly:
+
+```bash
+python scripts/validate_platform.py
+```
 
 ## API Documentation
 
@@ -54,13 +154,13 @@ Visit `http://localhost:8000/docs` for interactive API documentation.
 ## Project Structure
 
 ```
-├── main.py                 # Application entry point
+├── main.py                 # Application entry point with multi-env support
 ├── core/                   # Core functionality
-│   ├── config/            # Configuration
+│   ├── config/            # Multi-environment configuration
 │   ├── models/            # Data models
 │   ├── operators/         # System operators (reorganized)
 │   │   ├── general_purpose/   # Cross-domain operators
-│   │   └── specific_purpose/  # Domain-specific operators
+│   │   └── specific_purpose/  # Domain-specific operators (includes P2P)
 │   └── services/          # Core services
 ├── features/              # Feature modules
 │   ├── analysis/          # Statistical analysis
@@ -69,9 +169,29 @@ Visit `http://localhost:8000/docs` for interactive API documentation.
 │   └── protocols/         # Clinical protocols
 ├── api/                   # REST API endpoints
 ├── data/                  # Database and migrations
-├── web/                   # Web interface
-└── tests/                 # Test files
+├── web/                   # Web interface (refactored)
+│   ├── components/        # FastHTML dynamic components only
+│   ├── templates/         # Static HTML templates and partials
+│   ├── static/           # CSS, JS (including P2P connector)
+│   └── router.py         # Web routing
+├── scripts/              # Automation and validation scripts
+└── tests/                # Test files
 ```
+
+## Web Architecture Refactoring
+
+The web layer has been completely refactored for modularity and maintainability:
+
+### 🔧 Separation of Concerns
+- **`/web/components/`**: Pure FastHTML dynamic components (Python)
+- **`/web/templates/`**: Static HTML templates and partials
+- **`/web/static/`**: Client-side assets (CSS, JS, images)
+
+### 🌐 P2P Integration
+- **WebRTC connectivity** for real-time peer-to-peer communication
+- **Gun.js integration** for decentralized data synchronization
+- **Automatic peer discovery** and room management
+- **Offline-first architecture** with conflict resolution
 
 ## Development
 
@@ -97,12 +217,45 @@ The YAZ platform features a reorganized operator architecture that separates cro
 - **HospitalityOperationsOperator**: Patient experience and accommodation services
 - **InsuranceOperationsOperator**: Insurance verification and claims processing
 - **LogisticsOperationsOperator**: Supply chain and resource logistics
+- **P2pSignalingOperator**: WebSocket-based P2P signaling for real-time collaboration
 
 See `core/operators/README.md` for detailed documentation and usage examples.
 
-### Running Tests
+### Environment Configuration
+
+The platform supports three operational environments:
+
+```python
+# Set environment mode
+export GASTRIC_ADCI_ENV=local      # Standalone local development
+export GASTRIC_ADCI_ENV=p2p        # P2P collaboration mode
+export GASTRIC_ADCI_ENV=multicloud # Cloud deployment mode
+```
+
+Each environment has specific configurations for database, storage, networking, and features.
+
+### P2P Development
+
+When developing P2P features:
+
+1. **Start P2P mode**: `./scripts/setup_p2p.sh`
+2. **Check P2P status**: Visit `/health` endpoint
+3. **Monitor peers**: View dashboard for peer connections
+4. **Test sync**: Open multiple browser windows to test real-time sync
+
+### Testing and Validation
+### Testing and Validation
+
+Run comprehensive platform validation:
 ```bash
-pytest tests/
+python scripts/validate_platform.py
+```
+
+Run specific tests:
+```bash
+pytest tests/                    # All tests
+pytest tests/integration/        # Integration tests only
+python -m pytest tests/integration/test_api_endpoints.py -v  # API tests
 ```
 
 ### Code Formatting

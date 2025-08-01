@@ -47,6 +47,7 @@ document.addEventListener('DOMContentLoaded', function() {
     
     if (sidebarOverlay) {
         sidebarOverlay.addEventListener('click', closeSidebar);
+    }
     
     // Category selection with navigation
     categoryItems.forEach(item => {
@@ -76,9 +77,6 @@ document.addEventListener('DOMContentLoaded', function() {
                 // Show feedback to user
                 const systemName = this.querySelector('p').textContent;
                 console.log(`Navigating to ${systemName} system...`);
-                
-                // In production, you might want to show a loading state or notification
-                // showNotification(`Loading ${systemName} system...`, 'info');
             }
             
             // On mobile, close the sidebar after selection

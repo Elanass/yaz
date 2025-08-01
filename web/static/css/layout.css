@@ -1,7 +1,7 @@
 /**
- * Gastric ADCI Platform - Layout Styles
+ * Surgify Platform - Layout Styles
  * 
- * Main layout styling for the application
+ * Main layout styling for the application with proper header, hero, main content, and footer structure
  */
 
 html, body {
@@ -20,6 +20,7 @@ body {
     flex-direction: column;
     overflow-x: hidden;
     position: relative;
+    min-height: 100vh;
 }
 
 /* Main container */
@@ -37,9 +38,16 @@ body {
 header {
     position: sticky;
     top: 0;
-    z-index: 10;
+    z-index: 40;
     background-color: var(--bg-primary);
     border-bottom: 1px solid var(--border-color);
+    backdrop-filter: blur(8px);
+}
+
+/* Hero Section */
+.hero-section {
+    position: relative;
+    z-index: 1;
 }
 
 /* Main content area */
@@ -47,6 +55,31 @@ main {
     flex: 1;
     overflow-x: hidden;
     position: relative;
+    min-height: calc(100vh - 120px); /* Account for header and footer */
+}
+
+/* Navigation Bar */
+.bottom-nav {
+    position: sticky;
+    bottom: 0;
+    z-index: 30;
+    background-color: var(--bg-primary);
+    border-top: 1px solid var(--border-color);
+}
+
+.nav-item {
+    color: var(--text-secondary);
+    transition: color 0.2s ease;
+    text-decoration: none;
+}
+
+.nav-item:hover,
+.nav-item.active {
+    color: var(--text-primary);
+}
+
+.nav-item.active svg {
+    color: #3b82f6; /* Blue color for active state */
 }
 
 /* Bottom navigation */
