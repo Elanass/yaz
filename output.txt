@@ -1,0 +1,628 @@
+.
+├── [-rw-r--r--]  .coverage
+├── [drwxrwxr-x]  .devcontainer
+│   └── [-rw-rw-r--]  devcontainer.json
+├── [-rw-r--r--]  .env
+├── [-rw-r--r--]  .env.example
+├── [drwxrwxr-x]  .git
+│   ├── [-rw-rw-r--]  COMMIT_EDITMSG
+│   ├── [-rw-r--r--]  FETCH_HEAD
+│   ├── [-rw-r--r--]  HEAD
+│   ├── [-rw-r--r--]  ORIG_HEAD
+│   ├── [drwxrwxr-x]  branches
+│   ├── [-rw-rw-r--]  config
+│   ├── [-rw-rw-r--]  description
+│   ├── [drwxrwxr-x]  hooks
+│   │   ├── [-rwxrwxr-x]  applypatch-msg.sample
+│   │   ├── [-rwxrwxr-x]  commit-msg.sample
+│   │   ├── [-rwxrwxr-x]  fsmonitor-watchman.sample
+│   │   ├── [-rwxrwxr-x]  post-update.sample
+│   │   ├── [-rwxrwxr-x]  pre-applypatch.sample
+│   │   ├── [-rwxrwxr-x]  pre-commit.sample
+│   │   ├── [-rwxrwxr-x]  pre-merge-commit.sample
+│   │   ├── [-rwxr-xr-x]  pre-push
+│   │   ├── [-rwxrwxr-x]  pre-push.sample
+│   │   ├── [-rwxrwxr-x]  pre-rebase.sample
+│   │   ├── [-rwxrwxr-x]  pre-receive.sample
+│   │   ├── [-rwxrwxr-x]  prepare-commit-msg.sample
+│   │   ├── [-rwxrwxr-x]  push-to-checkout.sample
+│   │   ├── [-rwxrwxr-x]  sendemail-validate.sample
+│   │   └── [-rwxrwxr-x]  update.sample
+│   ├── [-rw-r--r--]  index
+│   ├── [drwxrwxr-x]  info
+│   │   ├── [-rw-rw-r--]  exclude
+│   │   └── [-rw-r--r--]  refs
+│   ├── [drwxrwxr-x]  logs
+│   │   ├── [-rw-r--r--]  HEAD
+│   │   └── [drwxrwxr-x]  refs
+│   ├── [drwxrwxr-x]  objects
+│   │   ├── [drwxr-xr-x]  00
+│   │   ├── [drwxr-xr-x]  01
+│   │   ├── [drwxr-xr-x]  02
+│   │   ├── [drwxr-xr-x]  03
+│   │   ├── [drwxr-xr-x]  04
+│   │   ├── [drwxr-xr-x]  05
+│   │   ├── [drwxr-xr-x]  06
+│   │   ├── [drwxr-xr-x]  07
+│   │   ├── [drwxr-xr-x]  08
+│   │   ├── [drwxr-xr-x]  09
+│   │   ├── [drwxr-xr-x]  0a
+│   │   ├── [drwxr-xr-x]  0b
+│   │   ├── [drwxr-xr-x]  0c
+│   │   ├── [drwxr-xr-x]  0d
+│   │   ├── [drwxr-xr-x]  0e
+│   │   ├── [drwxr-xr-x]  0f
+│   │   ├── [drwxr-xr-x]  10
+│   │   ├── [drwxr-xr-x]  11
+│   │   ├── [drwxr-xr-x]  12
+│   │   ├── [drwxr-xr-x]  13
+│   │   ├── [drwxr-xr-x]  14
+│   │   ├── [drwxr-xr-x]  15
+│   │   ├── [drwxr-xr-x]  16
+│   │   ├── [drwxr-xr-x]  17
+│   │   ├── [drwxr-xr-x]  18
+│   │   ├── [drwxr-xr-x]  19
+│   │   ├── [drwxr-xr-x]  1a
+│   │   ├── [drwxr-xr-x]  1b
+│   │   ├── [drwxr-xr-x]  1c
+│   │   ├── [drwxr-xr-x]  1d
+│   │   ├── [drwxr-xr-x]  1e
+│   │   ├── [drwxr-xr-x]  1f
+│   │   ├── [drwxr-xr-x]  20
+│   │   ├── [drwxr-xr-x]  21
+│   │   ├── [drwxr-xr-x]  22
+│   │   ├── [drwxr-xr-x]  23
+│   │   ├── [drwxr-xr-x]  24
+│   │   ├── [drwxr-xr-x]  25
+│   │   ├── [drwxr-xr-x]  26
+│   │   ├── [drwxr-xr-x]  27
+│   │   ├── [drwxr-xr-x]  28
+│   │   ├── [drwxr-xr-x]  29
+│   │   ├── [drwxr-xr-x]  2a
+│   │   ├── [drwxr-xr-x]  2b
+│   │   ├── [drwxr-xr-x]  2c
+│   │   ├── [drwxr-xr-x]  2d
+│   │   ├── [drwxr-xr-x]  2e
+│   │   ├── [drwxr-xr-x]  2f
+│   │   ├── [drwxr-xr-x]  30
+│   │   ├── [drwxr-xr-x]  31
+│   │   ├── [drwxr-xr-x]  32
+│   │   ├── [drwxr-xr-x]  33
+│   │   ├── [drwxr-xr-x]  34
+│   │   ├── [drwxr-xr-x]  35
+│   │   ├── [drwxr-xr-x]  36
+│   │   ├── [drwxr-xr-x]  37
+│   │   ├── [drwxr-xr-x]  38
+│   │   ├── [drwxr-xr-x]  39
+│   │   ├── [drwxr-xr-x]  3a
+│   │   ├── [drwxr-xr-x]  3b
+│   │   ├── [drwxr-xr-x]  3c
+│   │   ├── [drwxr-xr-x]  3d
+│   │   ├── [drwxr-xr-x]  3e
+│   │   ├── [drwxr-xr-x]  3f
+│   │   ├── [drwxr-xr-x]  40
+│   │   ├── [drwxr-xr-x]  41
+│   │   ├── [drwxr-xr-x]  42
+│   │   ├── [drwxr-xr-x]  43
+│   │   ├── [drwxr-xr-x]  44
+│   │   ├── [drwxr-xr-x]  45
+│   │   ├── [drwxr-xr-x]  46
+│   │   ├── [drwxr-xr-x]  47
+│   │   ├── [drwxr-xr-x]  48
+│   │   ├── [drwxr-xr-x]  49
+│   │   ├── [drwxr-xr-x]  4a
+│   │   ├── [drwxr-xr-x]  4b
+│   │   ├── [drwxr-xr-x]  4c
+│   │   ├── [drwxr-xr-x]  4d
+│   │   ├── [drwxr-xr-x]  4e
+│   │   ├── [drwxr-xr-x]  4f
+│   │   ├── [drwxr-xr-x]  50
+│   │   ├── [drwxr-xr-x]  51
+│   │   ├── [drwxr-xr-x]  52
+│   │   ├── [drwxr-xr-x]  53
+│   │   ├── [drwxr-xr-x]  54
+│   │   ├── [drwxr-xr-x]  55
+│   │   ├── [drwxr-xr-x]  56
+│   │   ├── [drwxr-xr-x]  57
+│   │   ├── [drwxr-xr-x]  58
+│   │   ├── [drwxr-xr-x]  59
+│   │   ├── [drwxr-xr-x]  5a
+│   │   ├── [drwxr-xr-x]  5b
+│   │   ├── [drwxr-xr-x]  5c
+│   │   ├── [drwxr-xr-x]  5d
+│   │   ├── [drwxr-xr-x]  5e
+│   │   ├── [drwxr-xr-x]  5f
+│   │   ├── [drwxr-xr-x]  60
+│   │   ├── [drwxr-xr-x]  61
+│   │   ├── [drwxr-xr-x]  62
+│   │   ├── [drwxr-xr-x]  63
+│   │   ├── [drwxr-xr-x]  64
+│   │   ├── [drwxr-xr-x]  65
+│   │   ├── [drwxr-xr-x]  66
+│   │   ├── [drwxr-xr-x]  67
+│   │   ├── [drwxr-xr-x]  68
+│   │   ├── [drwxr-xr-x]  69
+│   │   ├── [drwxr-xr-x]  6a
+│   │   ├── [drwxr-xr-x]  6b
+│   │   ├── [drwxr-xr-x]  6c
+│   │   ├── [drwxr-xr-x]  6d
+│   │   ├── [drwxr-xr-x]  6e
+│   │   ├── [drwxr-xr-x]  6f
+│   │   ├── [drwxr-xr-x]  70
+│   │   ├── [drwxr-xr-x]  71
+│   │   ├── [drwxr-xr-x]  72
+│   │   ├── [drwxr-xr-x]  73
+│   │   ├── [drwxr-xr-x]  74
+│   │   ├── [drwxr-xr-x]  75
+│   │   ├── [drwxr-xr-x]  76
+│   │   ├── [drwxr-xr-x]  77
+│   │   ├── [drwxr-xr-x]  78
+│   │   ├── [drwxr-xr-x]  79
+│   │   ├── [drwxr-xr-x]  7a
+│   │   ├── [drwxr-xr-x]  7b
+│   │   ├── [drwxr-xr-x]  7c
+│   │   ├── [drwxr-xr-x]  7d
+│   │   ├── [drwxr-xr-x]  7e
+│   │   ├── [drwxr-xr-x]  7f
+│   │   ├── [drwxr-xr-x]  80
+│   │   ├── [drwxr-xr-x]  81
+│   │   ├── [drwxr-xr-x]  82
+│   │   ├── [drwxr-xr-x]  83
+│   │   ├── [drwxr-xr-x]  84
+│   │   ├── [drwxr-xr-x]  85
+│   │   ├── [drwxr-xr-x]  86
+│   │   ├── [drwxr-xr-x]  87
+│   │   ├── [drwxr-xr-x]  88
+│   │   ├── [drwxr-xr-x]  89
+│   │   ├── [drwxr-xr-x]  8a
+│   │   ├── [drwxr-xr-x]  8b
+│   │   ├── [drwxr-xr-x]  8c
+│   │   ├── [drwxr-xr-x]  8d
+│   │   ├── [drwxr-xr-x]  8e
+│   │   ├── [drwxr-xr-x]  8f
+│   │   ├── [drwxr-xr-x]  90
+│   │   ├── [drwxr-xr-x]  91
+│   │   ├── [drwxr-xr-x]  92
+│   │   ├── [drwxr-xr-x]  93
+│   │   ├── [drwxr-xr-x]  94
+│   │   ├── [drwxr-xr-x]  95
+│   │   ├── [drwxr-xr-x]  96
+│   │   ├── [drwxr-xr-x]  97
+│   │   ├── [drwxr-xr-x]  98
+│   │   ├── [drwxr-xr-x]  99
+│   │   ├── [drwxr-xr-x]  9a
+│   │   ├── [drwxr-xr-x]  9b
+│   │   ├── [drwxr-xr-x]  9c
+│   │   ├── [drwxr-xr-x]  9d
+│   │   ├── [drwxr-xr-x]  9e
+│   │   ├── [drwxr-xr-x]  9f
+│   │   ├── [drwxr-xr-x]  a0
+│   │   ├── [drwxr-xr-x]  a1
+│   │   ├── [drwxr-xr-x]  a2
+│   │   ├── [drwxr-xr-x]  a3
+│   │   ├── [drwxr-xr-x]  a4
+│   │   ├── [drwxr-xr-x]  a5
+│   │   ├── [drwxr-xr-x]  a6
+│   │   ├── [drwxr-xr-x]  a7
+│   │   ├── [drwxr-xr-x]  a8
+│   │   ├── [drwxr-xr-x]  a9
+│   │   ├── [drwxr-xr-x]  aa
+│   │   ├── [drwxr-xr-x]  ab
+│   │   ├── [drwxr-xr-x]  ac
+│   │   ├── [drwxr-xr-x]  ad
+│   │   ├── [drwxr-xr-x]  ae
+│   │   ├── [drwxr-xr-x]  af
+│   │   ├── [drwxr-xr-x]  b0
+│   │   ├── [drwxr-xr-x]  b1
+│   │   ├── [drwxr-xr-x]  b2
+│   │   ├── [drwxr-xr-x]  b3
+│   │   ├── [drwxr-xr-x]  b4
+│   │   ├── [drwxr-xr-x]  b5
+│   │   ├── [drwxr-xr-x]  b6
+│   │   ├── [drwxr-xr-x]  b7
+│   │   ├── [drwxr-xr-x]  b8
+│   │   ├── [drwxr-xr-x]  b9
+│   │   ├── [drwxr-xr-x]  ba
+│   │   ├── [drwxr-xr-x]  bb
+│   │   ├── [drwxr-xr-x]  bc
+│   │   ├── [drwxr-xr-x]  bd
+│   │   ├── [drwxr-xr-x]  be
+│   │   ├── [drwxr-xr-x]  bf
+│   │   ├── [drwxr-xr-x]  c0
+│   │   ├── [drwxr-xr-x]  c1
+│   │   ├── [drwxr-xr-x]  c2
+│   │   ├── [drwxr-xr-x]  c3
+│   │   ├── [drwxr-xr-x]  c4
+│   │   ├── [drwxr-xr-x]  c5
+│   │   ├── [drwxr-xr-x]  c6
+│   │   ├── [drwxr-xr-x]  c7
+│   │   ├── [drwxr-xr-x]  c8
+│   │   ├── [drwxr-xr-x]  c9
+│   │   ├── [drwxr-xr-x]  ca
+│   │   ├── [drwxr-xr-x]  cb
+│   │   ├── [drwxr-xr-x]  cc
+│   │   ├── [drwxr-xr-x]  cd
+│   │   ├── [drwxr-xr-x]  ce
+│   │   ├── [drwxr-xr-x]  cf
+│   │   ├── [drwxr-xr-x]  d0
+│   │   ├── [drwxr-xr-x]  d1
+│   │   ├── [drwxr-xr-x]  d2
+│   │   ├── [drwxr-xr-x]  d3
+│   │   ├── [drwxr-xr-x]  d4
+│   │   ├── [drwxr-xr-x]  d5
+│   │   ├── [drwxr-xr-x]  d6
+│   │   ├── [drwxr-xr-x]  d7
+│   │   ├── [drwxr-xr-x]  d8
+│   │   ├── [drwxr-xr-x]  d9
+│   │   ├── [drwxr-xr-x]  da
+│   │   ├── [drwxr-xr-x]  db
+│   │   ├── [drwxr-xr-x]  dc
+│   │   ├── [drwxr-xr-x]  dd
+│   │   ├── [drwxr-xr-x]  de
+│   │   ├── [drwxr-xr-x]  df
+│   │   ├── [drwxr-xr-x]  e0
+│   │   ├── [drwxr-xr-x]  e1
+│   │   ├── [drwxr-xr-x]  e2
+│   │   ├── [drwxr-xr-x]  e3
+│   │   ├── [drwxr-xr-x]  e4
+│   │   ├── [drwxr-xr-x]  e5
+│   │   ├── [drwxr-xr-x]  e6
+│   │   ├── [drwxr-xr-x]  e7
+│   │   ├── [drwxr-xr-x]  e8
+│   │   ├── [drwxr-xr-x]  e9
+│   │   ├── [drwxr-xr-x]  ea
+│   │   ├── [drwxr-xr-x]  eb
+│   │   ├── [drwxr-xr-x]  ec
+│   │   ├── [drwxr-xr-x]  ed
+│   │   ├── [drwxr-xr-x]  ee
+│   │   ├── [drwxr-xr-x]  ef
+│   │   ├── [drwxr-xr-x]  f0
+│   │   ├── [drwxr-xr-x]  f1
+│   │   ├── [drwxr-xr-x]  f2
+│   │   ├── [drwxr-xr-x]  f3
+│   │   ├── [drwxr-xr-x]  f4
+│   │   ├── [drwxr-xr-x]  f5
+│   │   ├── [drwxr-xr-x]  f6
+│   │   ├── [drwxr-xr-x]  f7
+│   │   ├── [drwxr-xr-x]  f8
+│   │   ├── [drwxr-xr-x]  f9
+│   │   ├── [drwxr-xr-x]  fa
+│   │   ├── [drwxr-xr-x]  fb
+│   │   ├── [drwxr-xr-x]  fc
+│   │   ├── [drwxr-xr-x]  fd
+│   │   ├── [drwxr-xr-x]  fe
+│   │   ├── [drwxr-xr-x]  ff
+│   │   ├── [drwxrwxr-x]  info
+│   │   └── [drwxrwxr-x]  pack
+│   ├── [-rw-r--r--]  packed-refs
+│   └── [drwxrwxr-x]  refs
+│       ├── [drwxrwxr-x]  heads
+│       ├── [drwxrwxr-x]  remotes
+│       ├── [-rw-r--r--]  stash
+│       └── [drwxrwxr-x]  tags
+├── [drwxrwxr-x]  .github
+│   └── [drwxr-xr-x]  workflows
+├── [-rw-r--r--]  .gitignore
+├── [drwxr-xr-x]  .pytest_cache
+│   ├── [-rw-r--r--]  .gitignore
+│   ├── [-rw-r--r--]  CACHEDIR.TAG
+│   ├── [-rw-r--r--]  README.md
+│   └── [drwxr-xr-x]  v
+│       └── [drwxr-xr-x]  cache
+├── [drwxr-xr-x]  .venv
+│   ├── [-rw-r--r--]  .gitignore
+│   ├── [drwxr-xr-x]  bin
+│   │   ├── [-rw-r--r--]  Activate.ps1
+│   │   ├── [-rw-r--r--]  activate
+│   │   ├── [-rw-r--r--]  activate.csh
+│   │   ├── [-rw-r--r--]  activate.fish
+│   │   ├── [-rwxr-xr-x]  alembic
+│   │   ├── [-rwxr-xr-x]  apsw
+│   │   ├── [-rwxr-xr-x]  black
+│   │   ├── [-rwxr-xr-x]  blackd
+│   │   ├── [-rwxr-xr-x]  coverage
+│   │   ├── [-rwxr-xr-x]  coverage-3.10
+│   │   ├── [-rwxr-xr-x]  coverage3
+│   │   ├── [-rwxr-xr-x]  docxcompose
+│   │   ├── [-rwxr-xr-x]  dotenv
+│   │   ├── [-rwxr-xr-x]  f2py
+│   │   ├── [-rwxr-xr-x]  f2py3
+│   │   ├── [-rwxr-xr-x]  f2py3.10
+│   │   ├── [-rwxr-xr-x]  fastapi
+│   │   ├── [-rwxr-xr-x]  fh_railway_deploy
+│   │   ├── [-rwxr-xr-x]  fh_railway_link
+│   │   ├── [-rwxr-xr-x]  fonttools
+│   │   ├── [-rwxr-xr-x]  get_gprof
+│   │   ├── [-rwxr-xr-x]  get_objgraph
+│   │   ├── [-rwxr-xr-x]  httpx
+│   │   ├── [-rwxr-xr-x]  isort
+│   │   ├── [-rwxr-xr-x]  isort-identify-imports
+│   │   ├── [-rwxr-xr-x]  mako-render
+│   │   ├── [-rwxr-xr-x]  normalizer
+│   │   ├── [-rwxr-xr-x]  pip
+│   │   ├── [-rwxr-xr-x]  pip3
+│   │   ├── [-rwxr-xr-x]  pip3.10
+│   │   ├── [-rwxr-xr-x]  py.test
+│   │   ├── [-rwxr-xr-x]  py2pyi
+│   │   ├── [-rwxr-xr-x]  pybabel
+│   │   ├── [-rwxr-xr-x]  pyftmerge
+│   │   ├── [-rwxr-xr-x]  pyftsubset
+│   │   ├── [-rwxr-xr-x]  pygmentize
+│   │   ├── [-rwxr-xr-x]  pylint
+│   │   ├── [-rwxr-xr-x]  pylint-config
+│   │   ├── [-rwxr-xr-x]  pyreverse
+│   │   ├── [-rwxr-xr-x]  pytest
+│   │   ├── [lrwxrwxrwx]  python -> /usr/local/bin/python
+│   │   ├── [lrwxrwxrwx]  python3 -> python
+│   │   ├── [lrwxrwxrwx]  python3.10 -> python
+│   │   ├── [-rwxr-xr-x]  replace_wildcards
+│   │   ├── [-rwxr-xr-x]  symilar
+│   │   ├── [-rwxr-xr-x]  ttx
+│   │   ├── [-rwxr-xr-x]  undill
+│   │   ├── [-rwxr-xr-x]  uvicorn
+│   │   ├── [-rwxr-xr-x]  watchfiles
+│   │   ├── [-rwxr-xr-x]  weasyprint
+│   │   └── [-rwxr-xr-x]  websockets
+│   ├── [drwxr-xr-x]  etc
+│   │   └── [drwxr-xr-x]  jupyter
+│   ├── [drwxr-xr-x]  include
+│   │   └── [drwxr-xr-x]  site
+│   ├── [drwxr-xr-x]  lib
+│   │   └── [drwxr-xr-x]  python3.10
+│   ├── [lrwxrwxrwx]  lib64 -> lib
+│   ├── [-rw-r--r--]  pyvenv.cfg
+│   └── [drwxr-xr-x]  share
+│       ├── [drwxr-xr-x]  jupyter
+│       └── [drwxr-xr-x]  man
+├── [drwxr-xr-x]  .vscode
+│   └── [-rw-r--r--]  tasks.json
+├── [-rw-r--r--]  README.md
+├── [drwxr-xr-x]  __pycache__
+│   ├── [-rw-r--r--]  asgi.cpython-310.pyc
+│   └── [-rw-r--r--]  main.cpython-310.pyc
+├── [drwxr-xr-x]  api
+│   ├── [-rw-r--r--]  __init__.py
+│   ├── [drwxr-xr-x]  __pycache__
+│   │   └── [-rw-r--r--]  __init__.cpython-310.pyc
+│   └── [drwxr-xr-x]  v1
+│       ├── [-rw-r--r--]  __init__.py
+│       ├── [drwxr-xr-x]  __pycache__
+│       ├── [-rw-r--r--]  analysis.py
+│       ├── [-rw-r--r--]  auth.py
+│       ├── [-rw-r--r--]  cases.py
+│       ├── [-rw-r--r--]  decisions.py
+│       ├── [-rw-r--r--]  education.py
+│       └── [-rw-r--r--]  hospitality.py
+├── [-rw-r--r--]  asgi.py
+├── [drwxr-xr-x]  config
+│   ├── [-rw-r--r--]  alembic.ini
+│   ├── [-rw-r--r--]  local.env
+│   ├── [-rw-r--r--]  pytest.ini
+│   └── [-rw-r--r--]  requirements.txt
+├── [drwxr-xr-x]  core
+│   ├── [-rw-r--r--]  __init__.py
+│   ├── [drwxr-xr-x]  __pycache__
+│   │   ├── [-rw-r--r--]  __init__.cpython-310.pyc
+│   │   └── [-rw-r--r--]  dependencies.cpython-310.pyc
+│   ├── [drwxr-xr-x]  adapters
+│   │   └── [drwxr-xr-x]  open_source
+│   ├── [drwxr-xr-x]  config
+│   │   ├── [-rw-r--r--]  __init__.py
+│   │   ├── [drwxr-xr-x]  __pycache__
+│   │   ├── [-rw-r--r--]  environment.py
+│   │   ├── [-rw-r--r--]  platform_config.py
+│   │   └── [-rw-r--r--]  settings.py
+│   ├── [-rw-r--r--]  dependencies.py
+│   ├── [drwxr-xr-x]  models
+│   │   ├── [-rw-r--r--]  __init__.py
+│   │   ├── [drwxr-xr-x]  __pycache__
+│   │   ├── [-rw-r--r--]  base.py
+│   │   ├── [-rw-r--r--]  medical.py
+│   │   └── [-rw-r--r--]  surgery.py
+│   ├── [drwxr-xr-x]  operators
+│   │   ├── [-rw-r--r--]  README.md
+│   │   ├── [-rw-r--r--]  __init__.py
+│   │   ├── [drwxr-xr-x]  __pycache__
+│   │   ├── [-rw-r--r--]  base_operator.py
+│   │   ├── [drwxr-xr-x]  general_purpose
+│   │   └── [drwxr-xr-x]  specific_purpose
+│   ├── [drwxr-xr-x]  reproducibility
+│   │   ├── [drwxr-xr-x]  __pycache__
+│   │   └── [-rw-r--r--]  manager.py
+│   ├── [drwxr-xr-x]  services
+│   │   ├── [-rw-r--r--]  __init__.py
+│   │   ├── [drwxr-xr-x]  __pycache__
+│   │   ├── [-rw-r--r--]  alerting.py
+│   │   ├── [-rw-r--r--]  base.py
+│   │   ├── [-rw-r--r--]  case_service.py
+│   │   ├── [-rw-r--r--]  encryption.py
+│   │   └── [-rw-r--r--]  logger.py
+│   └── [drwxr-xr-x]  utils
+│       ├── [-rw-r--r--]  __init__.py
+│       ├── [drwxr-xr-x]  __pycache__
+│       ├── [-rw-r--r--]  helpers.py
+│       ├── [-rw-r--r--]  id_generator.py
+│       ├── [-rw-r--r--]  license_validator.py
+│       ├── [-rw-r--r--]  metrics.py
+│       └── [-rw-r--r--]  validation.py
+├── [drwxr-xr-x]  data
+│   ├── [drwxr-xr-x]  backups
+│   ├── [drwxr-xr-x]  database
+│   │   ├── [-rw-r--r--]  __init__.py
+│   │   ├── [drwxr-xr-x]  __pycache__
+│   │   └── [-rw-r--r--]  gastric_adci.db
+│   ├── [drwxr-xr-x]  logs
+│   ├── [drwxr-xr-x]  metadata
+│   │   ├── [drwxr-xr-x]  configs
+│   │   └── [drwxr-xr-x]  runs
+│   ├── [drwxr-xr-x]  migrations
+│   │   ├── [drwxr-xr-x]  __pycache__
+│   │   ├── [-rw-r--r--]  env.py
+│   │   └── [-rw-r--r--]  script.py.mako
+│   ├── [drwxr-xr-x]  models
+│   │   ├── [-rw-r--r--]  __init__.py
+│   │   ├── [drwxr-xr-x]  __pycache__
+│   │   ├── [-rw-r--r--]  orm.py
+│   │   └── [-rw-r--r--]  users.py
+│   ├── [drwxr-xr-x]  publications
+│   ├── [drwxr-xr-x]  repositories
+│   │   ├── [-rw-r--r--]  __init__.py
+│   │   ├── [drwxr-xr-x]  __pycache__
+│   │   └── [-rw-r--r--]  base.py
+│   ├── [drwxr-xr-x]  results
+│   ├── [drwxr-xr-x]  test_samples
+│   │   ├── [-rw-r--r--]  sample_gastric_cohort.csv
+│   │   ├── [-rw-r--r--]  sample_gastric_cohort.json
+│   │   └── [-rw-r--r--]  sample_gastric_cohort.xlsx
+│   └── [drwxr-xr-x]  uploads
+├── [drwxr-xr-x]  deploy
+│   ├── [-rw-r--r--]  README.md
+│   ├── [drwxr-xr-x]  dev
+│   │   ├── [-rw-r--r--]  .env
+│   │   ├── [-rw-r--r--]  Dockerfile
+│   │   └── [-rw-r--r--]  docker-compose.yml
+│   ├── [drwxr-xr-x]  prod
+│   │   ├── [-rw-r--r--]  .env
+│   │   ├── [-rw-r--r--]  .env.example
+│   │   ├── [-rw-r--r--]  Dockerfile
+│   │   └── [-rw-r--r--]  docker-compose.yml
+│   └── [drwxr-xr-x]  test
+│       ├── [-rw-r--r--]  .env
+│       ├── [-rw-r--r--]  Dockerfile
+│       └── [-rw-r--r--]  docker-compose.yml
+├── [drwxr-xr-x]  docs
+│   ├── [-rw-r--r--]  API_DOCUMENTATION.md
+│   ├── [-rw-r--r--]  DATA_PIPELINE_GUIDE.md
+│   ├── [-rw-r--r--]  PLATFORM_READY.md
+│   ├── [-rw-r--r--]  README.md
+│   ├── [drwxr-xr-x]  development
+│   │   └── [-rw-r--r--]  CONTRIBUTING.md
+│   └── [drwxr-xr-x]  legal
+│       ├── [-rw-r--r--]  ATTRIBUTIONS.md
+│       └── [-rw-r--r--]  LICENSE_COMPLIANCE.md
+├── [drwxr-xr-x]  features
+│   ├── [-rw-r--r--]  __init__.py
+│   ├── [drwxr-xr-x]  __pycache__
+│   │   └── [-rw-r--r--]  __init__.cpython-310.pyc
+│   ├── [drwxr-xr-x]  analysis
+│   │   ├── [-rw-r--r--]  __init__.py
+│   │   ├── [drwxr-xr-x]  __pycache__
+│   │   ├── [-rw-r--r--]  analysis.py
+│   │   ├── [-rw-r--r--]  analysis_engine.py
+│   │   ├── [-rw-r--r--]  impact_metrics.py
+│   │   └── [-rw-r--r--]  surgery_analyzer.py
+│   ├── [drwxr-xr-x]  auth
+│   │   ├── [-rw-r--r--]  __init__.py
+│   │   ├── [drwxr-xr-x]  __pycache__
+│   │   └── [-rw-r--r--]  service.py
+│   ├── [drwxr-xr-x]  decisions
+│   │   ├── [-rw-r--r--]  __init__.py
+│   │   ├── [drwxr-xr-x]  __pycache__
+│   │   ├── [-rw-r--r--]  adci_engine.py
+│   │   ├── [-rw-r--r--]  base_decision_engine.py
+│   │   ├── [-rw-r--r--]  precision_engine.py
+│   │   └── [-rw-r--r--]  service.py
+│   └── [drwxr-xr-x]  protocols
+│       ├── [drwxr-xr-x]  __pycache__
+│       ├── [-rw-r--r--]  flot_analyzer.py
+│       └── [-rw-r--r--]  service.py
+├── [drwxr-xr-x]  logs
+│   └── [-rw-r--r--]  git-hooks.log
+├── [-rw-r--r--]  main.py
+├── [-rw-r--r--]  output.txt
+├── [drwxr-xr-x]  scripts
+│   ├── [drwxr-xr-x]  __pycache__
+│   │   ├── [-rw-r--r--]  analyze_imports.cpython-310.pyc
+│   │   ├── [-rw-r--r--]  cleanup_legacy.cpython-310.pyc
+│   │   ├── [-rw-r--r--]  comprehensive_refactor.cpython-310.pyc
+│   │   ├── [-rw-r--r--]  generate_api_docs.cpython-310.pyc
+│   │   ├── [-rw-r--r--]  license_validator.cpython-310.pyc
+│   │   ├── [-rw-r--r--]  update_status.cpython-310.pyc
+│   │   ├── [-rw-r--r--]  validate_data_pipeline.cpython-310.pyc
+│   │   ├── [-rw-r--r--]  validate_naming.cpython-310.pyc
+│   │   └── [-rw-r--r--]  validate_platform.cpython-310.pyc
+│   ├── [-rw-r--r--]  analyze_imports.py
+│   ├── [-rwxr-xr-x]  clean_cache.sh
+│   ├── [-rw-r--r--]  cleanup_legacy.py
+│   ├── [-rw-r--r--]  comprehensive_refactor.py
+│   ├── [-rwxr-xr-x]  generate_api_docs.py
+│   ├── [-rwxr-xr-x]  license_validator.py
+│   ├── [-rwxr-xr-x]  run.sh
+│   ├── [-rwxr-xr-x]  run_prod_enhanced.sh
+│   ├── [-rwxr-xr-x]  setup_local.sh
+│   ├── [-rwxr-xr-x]  setup_multicloud.sh
+│   ├── [-rwxr-xr-x]  setup_p2p.sh
+│   ├── [-rwxr-xr-x]  update_status.py
+│   ├── [-rw-r--r--]  validate_data_pipeline.py
+│   ├── [-rw-r--r--]  validate_naming.py
+│   └── [-rw-r--r--]  validate_platform.py
+├── [drwxr-xr-x]  tests
+│   └── [drwxr-xr-x]  integration
+│       ├── [drwxr-xr-x]  __pycache__
+│       ├── [-rw-r--r--]  test_analysis_endpoints.py
+│       └── [-rw-r--r--]  test_health.py
+└── [drwxr-xr-x]  web
+    ├── [-rw-r--r--]  __init__.py
+    ├── [drwxr-xr-x]  __pycache__
+    │   ├── [-rw-r--r--]  __init__.cpython-310.pyc
+    │   └── [-rw-r--r--]  router.cpython-310.pyc
+    ├── [drwxr-xr-x]  components
+    │   ├── [-rw-r--r--]  __init__.py
+    │   ├── [drwxr-xr-x]  __pycache__
+    │   ├── [-rw-r--r--]  clinical_platform.py
+    │   ├── [-rw-r--r--]  education_dashboard.py
+    │   ├── [-rw-r--r--]  hospitality_dashboard.py
+    │   ├── [-rw-r--r--]  interface.py
+    │   ├── [-rw-r--r--]  layout.py
+    │   ├── [-rw-rw-r--]  pwa.py
+    │   └── [-rw-r--r--]  surgery_dashboard.py
+    ├── [drwxr-xr-x]  frontend
+    │   └── [drwxr-xr-x]  static
+    ├── [drwxr-xr-x]  islands
+    │   ├── [drwxr-xr-x]  __pycache__
+    │   ├── [-rw-rw-r--]  decision.py
+    │   ├── [-rw-r--r--]  hero.py
+    │   ├── [-rw-r--r--]  index.py
+    │   └── [-rw-rw-r--]  protocols.py
+    ├── [drwxr-xr-x]  pages
+    │   ├── [drwxr-xr-x]  __pycache__
+    │   ├── [-rw-r--r--]  analysis.html
+    │   ├── [-rw-r--r--]  auth.py
+    │   ├── [-rw-r--r--]  cases.py
+    │   ├── [-rw-r--r--]  education.py
+    │   ├── [-rw-r--r--]  home.py
+    │   ├── [-rw-r--r--]  hospitality.py
+    │   ├── [-rw-r--r--]  reports.py
+    │   └── [-rw-r--r--]  surgify.html
+    ├── [-rw-r--r--]  router.py
+    ├── [drwxr-xr-x]  static
+    │   ├── [drwxr-xr-x]  avatars
+    │   ├── [drwxr-xr-x]  css
+    │   ├── [drwxr-xr-x]  icons
+    │   ├── [drwxr-xr-x]  js
+    │   ├── [-rw-r--r--]  manifest.json
+    │   ├── [-rw-r--r--]  offline.html
+    │   ├── [-rw-r--r--]  sw.js
+    │   ├── [drwxr-xr-x]  templates
+    │   └── [drwxr-xr-x]  uploads
+    └── [drwxr-xr-x]  templates
+        ├── [-rw-r--r--]  404.html
+        ├── [drwxr-xr-x]  __pycache__
+        ├── [-rw-r--r--]  add_case.html
+        ├── [-rw-r--r--]  assistance_bot.html
+        ├── [-rw-r--r--]  base.html
+        ├── [drwxr-xr-x]  dashboard
+        ├── [-rw-r--r--]  eras_protocol.html
+        ├── [-rw-r--r--]  index.html
+        ├── [-rw-r--r--]  layout.html
+        ├── [-rw-r--r--]  marketplace.html
+        ├── [-rw-r--r--]  offline.html
+        ├── [drwxr-xr-x]  partials
+        ├── [-rw-r--r--]  protocol_version_management.html
+        ├── [drwxr-xr-x]  reports
+        ├── [-rw-r--r--]  sidebar.html
+        ├── [-rw-r--r--]  surgery_analysis.html
+        ├── [-rw-r--r--]  surgify.html
+        └── [-rw-r--r--]  workstation.html
+
+375 directories, 250 files
