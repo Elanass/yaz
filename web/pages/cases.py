@@ -2,19 +2,19 @@
 Case management pages for the Gastric ADCI Platform
 """
 
-from fastapi import APIRouter, Request, Depends, HTTPException, Form
+from fastapi import APIRouter as FastAPIRouter, Request, Depends, HTTPException, Form
 from fastapi.responses import HTMLResponse, RedirectResponse
 from typing import Optional, Dict, Any, List
-from fasthtml.common import *
+from fasthtml.common import Div, H1, H2, H3, H4, P, Form as FHTMLForm, Input, Button, A, Br, Script, Table, Tr, Td, Th
 import httpx
 
-from features.auth.service import get_current_user, require_role, Domain, Scope
+from core.dependencies import require_auth, require_role, Domain, Scope
 from web.components.layout import create_base_layout
 from web.components.interface import clinical_form, clinical_table, clinical_card
 
-router = APIRouter(prefix="/cases")
+router = FastAPIRouter(prefix="/cases")
     
-@router.get("/", response_class=HTMLResponse)
+@router.get("/")
 async def list_cases(
     request: Request, 
     page: int = 1,
@@ -99,30 +99,21 @@ async def list_cases(
     
     # Create content
     content = Div(
-        H1("Case Management", class_="text-2xl font-bold text-gray-900 mb-6"),
-        
+        # Header with Add Case button
         Div(
+            H1("Case Management", class_="text-2xl font-bold text-[var(--text-primary)] mb-6"),
             A(
                 Div(
-                    Svg(
-                        Path(d="M12 6v6m0 0v6m0-6h6m-6 0H6"),
-                        class_="h-5 w-5",
-                        stroke="currentColor",
-                        stroke_width="2",
-                        fill="none",
-                        viewBox="0 0 24 24"
-                    ),
-                    Span("New Case", class_="ml-2"),
-                    class_="flex items-center"
+                    "✚",
+                    "Add New Case",
+                    class_="flex items-center gap-2"
                 ),
-                href="/cases/new",
-                class_="inline-flex items-center px-4 py-2 border border-transparent text-sm font-medium rounded-md shadow-sm text-white bg-blue-600 hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500"
+                href="/cases/add",
+                class_="inline-flex items-center px-4 py-2 bg-blue-600 hover:bg-blue-700 text-white font-medium rounded-md shadow-sm transition-colors focus:outline-none focus:ring-2 focus:ring-blue-500"
             ),
-            class_="mb-6"
+            class_="flex justify-between items-center mb-6"
         ),
-        
         search_form,
-        
         clinical_table(
             headers=headers,
             rows=rows,
@@ -130,7 +121,6 @@ async def list_cases(
             sortable=True,
             pagination=pagination
         ),
-        
         id="main-content",
         class_="container mx-auto px-4 py-8"
     )
@@ -141,7 +131,7 @@ async def list_cases(
         user=current_user
     )
 
-@router.get("/new", response_class=HTMLResponse)
+@router.get("/new")
 async def new_case_form(
     request: Request,
     current_user = Depends(require_role(Domain.HEALTHCARE, Scope.WRITE))
@@ -288,7 +278,7 @@ async def new_case_form(
         user=current_user
     )
 
-@router.get("/{case_id}", response_class=HTMLResponse)
+@router.get("/{case_id}")
 async def view_case(
     request: Request,
     case_id: str,
@@ -443,7 +433,7 @@ async def view_case(
         user=current_user
     )
 
-@router.get("/{case_id}/analyze", response_class=HTMLResponse)
+@router.get("/{case_id}/analyze")
 async def analyze_case(
     request: Request,
     case_id: str,
@@ -688,3 +678,144 @@ async def analyze_case(
         content=content,
         user=current_user
     )
+
+@router.get("/add")
+async def add_case_form(
+    request: Request,
+    current_user = Depends(require_role(Domain.HEALTHCARE, Scope.WRITE))
+):
+    """Display add case form"""
+    
+    content = Div(
+        H1("Add New Case", class_="text-2xl font-bold text-[var(--text-primary)] mb-6"),
+        
+        FHTMLForm(
+            Div(
+                # Patient Information
+                H3("Patient Information", class_="text-lg font-semibold mb-4 text-[var(--text-primary)]"),
+                Div(
+                    Div(
+                        Input(
+                            type_="text", 
+                            name="patient_id", 
+                            placeholder="Patient ID", 
+                            required=True,
+                            class_="w-full px-3 py-2 bg-[var(--bg-secondary)] border border-[var(--border-color)] rounded-md text-[var(--text-primary)] placeholder-[var(--text-tertiary)] focus:outline-none focus:ring-2 focus:ring-blue-500"
+                        ),
+                        class_="mb-4"
+                    ),
+                    Div(
+                        Input(
+                            type_="number", 
+                            name="age", 
+                            placeholder="Age", 
+                            required=True,
+                            class_="w-full px-3 py-2 bg-[var(--bg-secondary)] border border-[var(--border-color)] rounded-md text-[var(--text-primary)] placeholder-[var(--text-tertiary)] focus:outline-none focus:ring-2 focus:ring-blue-500"
+                        ),
+                        class_="mb-4"
+                    ),
+                    Div(
+                        Input(
+                            type_="text", 
+                            name="gender", 
+                            placeholder="Gender (M/F)", 
+                            required=True,
+                            class_="w-full px-3 py-2 bg-[var(--bg-secondary)] border border-[var(--border-color)] rounded-md text-[var(--text-primary)] placeholder-[var(--text-tertiary)] focus:outline-none focus:ring-2 focus:ring-blue-500"
+                        ),
+                        class_="mb-4"
+                    ),
+                    class_="grid grid-cols-1 md:grid-cols-3 gap-4"
+                ),
+                
+                # Clinical Information
+                H3("Clinical Information", class_="text-lg font-semibold mb-4 mt-6 text-[var(--text-primary)]"),
+                Div(
+                    Div(
+                        Input(
+                            type_="text", 
+                            name="tumor_stage", 
+                            placeholder="Tumor Stage (e.g., T3N1M0)", 
+                            required=True,
+                            class_="w-full px-3 py-2 bg-[var(--bg-secondary)] border border-[var(--border-color)] rounded-md text-[var(--text-primary)] placeholder-[var(--text-tertiary)] focus:outline-none focus:ring-2 focus:ring-blue-500"
+                        ),
+                        class_="mb-4"
+                    ),
+                    Div(
+                        Input(
+                            type_="text", 
+                            name="histology", 
+                            placeholder="Histology", 
+                            class_="w-full px-3 py-2 bg-[var(--bg-secondary)] border border-[var(--border-color)] rounded-md text-[var(--text-primary)] placeholder-[var(--text-tertiary)] focus:outline-none focus:ring-2 focus:ring-blue-500"
+                        ),
+                        class_="mb-4"
+                    ),
+                    class_="grid grid-cols-1 md:grid-cols-2 gap-4"
+                ),
+                
+                # Actions
+                Div(
+                    Button(
+                        "Create Case",
+                        type_="submit",
+                        class_="bg-blue-600 hover:bg-blue-700 text-white font-medium py-2 px-4 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 mr-4"
+                    ),
+                    A(
+                        "Cancel",
+                        href="/cases",
+                        class_="bg-gray-500 hover:bg-gray-600 text-white font-medium py-2 px-4 rounded-md"
+                    ),
+                    class_="mt-6"
+                ),
+                class_="bg-[var(--bg-secondary)] p-6 rounded-lg"
+            ),
+            action="/cases/add",
+            method="post"
+        ),
+        class_="max-w-4xl mx-auto p-6"
+    )
+    
+    return create_base_layout(
+        title="Add New Case",
+        content=content,
+        request=request
+    )
+
+@router.post("/add")
+async def create_case(
+    request: Request,
+    patient_id: str = Form(...),
+    age: int = Form(...),
+    gender: str = Form(...),
+    tumor_stage: str = Form(...),
+    histology: str = Form(""),
+    current_user = Depends(require_role(Domain.HEALTHCARE, Scope.WRITE))
+):
+    """Create a new case"""
+    
+    case_data = {
+        "patient_id": patient_id,
+        "age": age,
+        "gender": gender,
+        "tumor_stage": tumor_stage,
+        "histology": histology
+    }
+    
+    try:
+        async with httpx.AsyncClient() as client:
+            response = await client.post(
+                f"{request.base_url}api/v1/cases",
+                json=case_data,
+                headers={"Authorization": f"Bearer {current_user['token']}"}
+            )
+            
+            if response.status_code == 201:
+                # Case created successfully
+                case = response.json()
+                return RedirectResponse(url=f"/cases/{case['id']}", status_code=303)
+            else:
+                # Handle error
+                raise HTTPException(status_code=response.status_code, detail=response.text)
+                
+    except Exception as e:
+        # For now, redirect back to cases list
+        return RedirectResponse(url="/cases", status_code=303)

@@ -11,7 +11,8 @@ import asyncio
 from pydantic import BaseModel, Field
 
 from core.config.settings import get_feature_config
-from core.models.base import BaseEntity, ConfidenceLevel, DecisionStatus
+from core.models.base import BaseEntity, ConfidenceLevel
+from core.models.medical import DecisionStatus
 from core.services.base import BaseService, CacheService
 from core.services.logger import get_logger
 from core.utils.helpers import HashUtils

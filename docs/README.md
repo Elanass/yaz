@@ -1,32 +1,62 @@
-# Documentation Index
+# 🏥 Gastric ADCI Platform - Complete Documentation Index
 
-## Project Documentation Structure
+## 🚀 Quick Start
+1. **Setup**: `./scripts/setup_local.sh`
+2. **Upload Data**: Navigate to `/dashboard/upload`
+3. **Run Analysis**: Use the dashboard or API
+4. **Get Insights**: View results and generate reports
 
-### 📋 Legal & Compliance
-- [License Compliance Report](legal/LICENSE_COMPLIANCE.md)
-- [Third Party Attributions](legal/ATTRIBUTIONS.md)
-- [Security Compliance](legal/SECURITY_COMPLIANCE.md)
+## 📚 Documentation
 
-### 🏗️ Architecture
-- [System Architecture](architecture/SYSTEM_ARCHITECTURE.md)
-- [API Documentation](architecture/API_REFERENCE.md)
-- [Database Schema](architecture/DATABASE_SCHEMA.md)
+### Essential Guides
+- **[Data Pipeline Guide](DATA_PIPELINE_GUIDE.md)** - Complete workflow from data input to insights
+- **[API Documentation](http://localhost:8000/docs)** - Interactive API documentation (when server is running)
 
-### 🚀 Deployment
-- [Deployment Guide](deployment/DEPLOYMENT.md)
-- [Environment Configuration](deployment/ENVIRONMENT.md)
-- [Docker Setup](deployment/DOCKER.md)
+### Platform Architecture
+- **Multi-Environment Support**: Local, P2P, Multi-cloud deployment
+- **Data Input**: CSV, Excel, JSON files via web or API
+- **Analysis Engines**: ADCI, FLOT, Statistical algorithms
+- **Output**: Scientific publications, enterprise reports, data exports
 
-### 🧪 Development
-- [Developer Setup](development/SETUP.md)
-- [Contributing Guidelines](development/CONTRIBUTING.md)
-- [Testing Guide](development/TESTING.md)
+## 🔧 Development
 
-### 📊 Operations
-- [Monitoring Setup](operations/MONITORING.md)
-- [Backup Procedures](operations/BACKUP.md)
-- [Maintenance Tasks](operations/MAINTENANCE.md)
+### Validation Scripts
+- `python scripts/validate_platform.py` - Platform readiness check  
+- `python scripts/validate_data_pipeline.py` - Data pipeline validation
+
+### Environment Setup
+```bash
+export GASTRIC_ADCI_ENV=local     # Local development
+export GASTRIC_ADCI_ENV=p2p       # P2P collaboration  
+export GASTRIC_ADCI_ENV=multicloud # Cloud deployment
+```
+
+## 📊 Data Requirements
+
+### Required Columns
+- `patient_id`, `age`, `gender`
+- `tumor_stage`, `histology`
+- `flot_cycles`, `surgical_outcome`
+- `survival_months`
+
+### Supported Formats
+- CSV (`.csv`)
+- Excel (`.xlsx`) 
+- JSON (`.json`)
+
+## 🎯 Key Features
+
+✅ **Data Processing**: Automated validation, cleaning, standardization  
+✅ **Analysis Algorithms**: Cox regression, Random Forest, MCDA  
+✅ **Decision Support**: ADCI framework, FLOT optimization  
+✅ **Reproducibility**: Full audit trail and version control  
+✅ **Export Options**: Multiple formats for different audiences  
+
+## 📞 Support
+
+- **Health Check**: `http://localhost:8000/health`
+- **Validation**: `python scripts/validate_data_pipeline.py`
+- **Sample Data**: `data/test_samples/`
 
 ---
-
-*Last Updated: 2025-07-30*
+*Platform validated and ready for data processing*

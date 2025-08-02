@@ -1,50 +1,65 @@
 /**
- * Gastric ADCI Platform - Theme Styles
- * 
- * This file contains CSS variables for light and dark themes
- * and styling for theme-specific elements.
+ * Gastric ADCI Platform - Enhanced Theme Styles
+ * Supports light/dark mode toggle with smooth transitions
  */
 
 :root {
   /* Light theme variables */
-  --bg-primary: #fcfaf8;
-  --bg-secondary: #f4ece7;
-  --bg-tertiary: #fcfaf8;
-  --bg-accent: #f37b20;
-  --bg-icon: #493322;
-  --bg-icon-selected: #f37b20;
+  --bg-primary: #ffffff;
+  --bg-secondary: #f8fafc;
+  --bg-tertiary: #f1f5f9;
+  --bg-accent: #3b82f6;
+  --bg-icon: #475569;
+  --bg-icon-selected: #3b82f6;
   
-  --text-primary: #1c130d;
-  --text-secondary: #9c6d49;
-  --text-tertiary: #9c6d49;
-  --text-accent: #f37b20;
+  --text-primary: #0f172a;
+  --text-secondary: #475569;
+  --text-tertiary: #94a3b8;
+  --text-accent: #3b82f6;
   --text-on-accent: #ffffff;
   
-  --border-color: #f4ece7;
+  --border-color: #e2e8f0;
+  --shadow: 0 1px 3px 0 rgb(0 0 0 / 0.1), 0 1px 2px -1px rgb(0 0 0 / 0.1);
   
-  --sidebar-bg: #fcfaf8;
-  --sidebar-selected: #f4ece7;
+  --sidebar-bg: #ffffff;
+  --sidebar-selected: #f1f5f9;
 }
 
-:root.dark-mode {
-  /* Dark theme variables */
-  --bg-primary: #231810;
-  --bg-secondary: #342418;
-  --bg-tertiary: #231810;
-  --bg-accent: #f37b20;
-  --bg-icon: #493322;
-  --bg-icon-selected: #f37b20;
+/* Dark theme variables */
+[data-theme="dark"], 
+.dark-theme {
+  --bg-primary: #0f172a;
+  --bg-secondary: #1e293b;
+  --bg-tertiary: #334155;
+  --bg-accent: #3b82f6;
+  --bg-icon: #94a3b8;
+  --bg-icon-selected: #3b82f6;
   
-  --text-primary: #ffffff;
-  --text-secondary: #cba990;
-  --text-tertiary: #cba990;
-  --text-accent: #f37b20;
+  --text-primary: #f8fafc;
+  --text-secondary: #cbd5e1;
+  --text-tertiary: #64748b;
+  --text-accent: #60a5fa;
   --text-on-accent: #ffffff;
   
-  --border-color: #493322;
+  --border-color: #334155;
+  --shadow: 0 1px 3px 0 rgb(0 0 0 / 0.3), 0 1px 2px -1px rgb(0 0 0 / 0.3);
   
-  --sidebar-bg: #231810;
-  --sidebar-selected: #41342a;
+  --sidebar-bg: #1e293b;
+  --sidebar-selected: #334155;
+}
+
+/* Theme transition for smooth switching */
+* {
+  transition: background-color 0.2s ease, border-color 0.2s ease, color 0.2s ease;
+}
+
+/* Medical theme colors for healthcare context */
+:root {
+  --medical-primary: #059669;
+  --medical-secondary: #10b981;
+  --medical-error: #dc2626;
+  --medical-warning: #f59e0b;
+  --medical-info: #3b82f6;
 }
 
 /* Apply theme to elements */

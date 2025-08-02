@@ -2,19 +2,19 @@
 Reports page for the Gastric ADCI Platform
 """
 
-from fastapi import APIRouter, Request, Depends, HTTPException, Form, Query
+from fastapi import APIRouter as FastAPIRouter, Request, Depends, HTTPException, Form, Query
 from fastapi.responses import HTMLResponse, RedirectResponse, FileResponse
 from typing import Optional, Dict, Any, List
-from fasthtml.common import *
+from fasthtml.common import Div, H1, H2, H3, H4, P, Form as FHTMLForm, Input, Button, A, Br, Script, Table, Tr, Td, Th, Span, Strong
 import httpx
 
-from features.auth.service import get_current_user, require_role, Domain, Scope
+from core.dependencies import require_auth, require_role, Domain, Scope
 from web.components.layout import create_base_layout
 from web.components.interface import clinical_form, clinical_table, clinical_card
 
-router = APIRouter(prefix="/reports")
+router = FastAPIRouter(prefix="/reports")
 
-@router.get("/", response_class=HTMLResponse)
+@router.get("/")
 async def list_reports(
     request: Request, 
     page: int = 1,
@@ -113,7 +113,7 @@ async def list_reports(
         user=current_user
     )
 
-@router.get("/generate", response_class=HTMLResponse)
+@router.get("/generate")
 async def generate_report_form(
     request: Request,
     case_id: Optional[str] = None,
@@ -220,7 +220,7 @@ async def generate_report_form(
         user=current_user
     )
 
-@router.get("/{report_id}", response_class=HTMLResponse)
+@router.get("/{report_id}")
 async def view_report(
     request: Request,
     report_id: str,

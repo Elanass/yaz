@@ -12,9 +12,10 @@ from uuid import UUID, uuid4
 from pydantic import BaseModel, Field, validator, root_validator
 from pydantic import ConfigDict
 
-from core.models.base import (
-    BaseEntity, TumorStage, NodalStatus, MetastasisStatus, 
-    PatientPerformanceStatus, ConfidenceLevel, DecisionStatus
+from core.models.base import BaseEntity, ConfidenceLevel
+from core.models.medical import (
+    TumorStage, NodalStatus, MetastasisStatus, 
+    PatientPerformanceStatus, DecisionStatus
 )
 
 

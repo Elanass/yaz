@@ -58,7 +58,15 @@
     <script src="https://unpkg.com/htmx.org@1.9.6/dist/ext/loading-states.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
     <script src="https://unpkg.com/alpinejs@3.x.x/dist/cdn.min.js" defer></script>
+    
+    <!-- Gun.js for distributed data -->
+    <script src="https://cdn.jsdelivr.net/npm/gun/gun.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/gun/sea.js"></script>
+    
+    <!-- Application scripts -->
     <script src="/static/js/app.js"></script>
+    <script src="/static/js/gun-integration.js"></script>
+    <script src="/static/js/p2p_connector.js"></script>
     
     {% block extra_scripts %}{% endblock %}
 </body>

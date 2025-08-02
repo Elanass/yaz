@@ -17,7 +17,7 @@ from data.models import (
     GenderType, BloodType, ComorbidityType, TumorHistology, TumorLocation,
     SurgicalProcedure, TreatmentProtocol, DecisionStatus, ConfidenceLevel
 )
-from core.models.base import (
+from core.models.medical import (
     TumorStage, NodalStatus, MetastasisStatus, PatientPerformanceStatus
 )
 

@@ -15,12 +15,12 @@ from fastapi import BackgroundTasks
 from sklearn.ensemble import RandomForestClassifier
 from lifelines import CoxPHFitter
 
-from core.models.surgery_models import SurgicalCaseModel
-from features.analysis.surgery_analyzer import SurgeryAnalyzer
-from features.analysis.impact_metrics import ImpactMetrics
-from features.protocols.flot_analyzer import FLOTProtocolAnalyzer
+from core.models.surgery import SurgicalCaseModel
+from features.analysis.surgery_analyzer import IntegratedSurgeryAnalyzer
+from features.analysis.impact_metrics import ImpactMetricsCalculator
+from features.protocols.flot_analyzer import FLOTAnalyzer
 from core.services.logger import get_logger
-from web.templates.reports import ReportGenerator, PublicationType, OutputFormat
+from web.templates.reports.reports import ReportGenerator, PublicationType, OutputFormat
 
 logger = get_logger(__name__)
 
@@ -28,9 +28,9 @@ class AnalysisEngine:
     """Analysis engine for generating insights and publications from surgical data"""
     
     def __init__(self):
-        self.surgery_analyzer = SurgeryAnalyzer()
-        self.impact_metrics = ImpactMetrics()
-        self.flot_analyzer = FLOTProtocolAnalyzer()
+        self.surgery_analyzer = IntegratedSurgeryAnalyzer()
+        self.impact_metrics = ImpactMetricsCalculator()
+        self.flot_analyzer = FLOTAnalyzer()
         self.report_generator = ReportGenerator()
         
         # In-memory cache for storing publication results

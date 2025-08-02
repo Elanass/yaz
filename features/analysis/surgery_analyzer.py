@@ -22,7 +22,7 @@ from features.protocols.flot_analyzer import FLOTAnalyzer
 from features.decisions.adci_engine import ADCIEngine
 from features.analysis.impact_metrics import ImpactMetricsCalculator
 from core.services.logger import get_logger, audit_log
-from core.models.surgery_models import SurgicalCaseModel, SurgicalAnalysisResult
+from core.models.surgery import SurgicalCaseModel, SurgicalAnalysisResult
 from core.utils.validation import validate_surgical_case
 
 logger = get_logger(__name__)

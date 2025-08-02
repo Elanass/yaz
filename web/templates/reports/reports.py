@@ -14,9 +14,38 @@ from typing import Dict, Any, List, Optional, Union
 import logging
 import asyncio
 import uuid
+from enum import Enum
 
-from weasyprint import HTML, CSS
-from docxtpl import DocxTemplate
+# Temporarily commented out due to installation issues
+# from weasyprint import HTML, CSS
+try:
+    from weasyprint import HTML, CSS
+    WEASYPRINT_AVAILABLE = True
+except ImportError:
+    WEASYPRINT_AVAILABLE = False
+    print("Warning: weasyprint not available, PDF generation will be limited")
+    
+    # Placeholder classes
+    class HTML:
+        def __init__(self, *args, **kwargs):
+            print("Using placeholder HTML class - install weasyprint for full functionality")
+        def write_pdf(self, *args, **kwargs):
+            raise NotImplementedError("weasyprint not available")
+    
+    class CSS:
+        def __init__(self, *args, **kwargs):
+            print("Using placeholder CSS class - install weasyprint for full functionality")
+
+try:
+    from docxtpl import DocxTemplate
+    DOCXTPL_AVAILABLE = True
+except ImportError:
+    DOCXTPL_AVAILABLE = False
+    print("Warning: docxtpl not available, Word document generation will be limited")
+    
+    class DocxTemplate:
+        def __init__(self, *args, **kwargs):
+            print("Using placeholder DocxTemplate class - install docxtpl for full functionality")
 import matplotlib.pyplot as plt
 import plotly.graph_objects as go
 import plotly.express as px
@@ -31,6 +60,23 @@ logger = get_logger(__name__)
 # Initialize Jinja2 environment
 template_dir = Path(__file__).parent
 env = Environment(loader=FileSystemLoader(template_dir))
+
+
+class PublicationType(Enum):
+    """Types of publications that can be generated"""
+    ARTICLE = "article"
+    MEMOIR = "memoir" 
+    INFOGRAPHIC = "infographic"
+    SUMMARY = "summary"
+    PRESENTATION = "presentation"
+    POSTER = "poster"
+
+class OutputFormat(Enum):
+    """Output formats for reports"""
+    PDF = "pdf"
+    DOCX = "docx"
+    HTML = "html"
+    PPTX = "pptx"
 
 
 class ReportGenerator:

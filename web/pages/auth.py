@@ -2,17 +2,17 @@
 Authentication pages for the Gastric ADCI Platform
 """
 
-from fastapi import APIRouter, Request, Depends, HTTPException, Form
+from fastapi import APIRouter as FastAPIRouter, Request, Depends, HTTPException, Form
 from fastapi.responses import HTMLResponse, RedirectResponse
 from typing import Optional, Dict, Any
-from fasthtml.common import *
+from fasthtml.common import Div, H1, H2, H3, H4, P, Form as FHTMLForm, Input, Button, A, Br, Script, Nav, Footer
 
-from features.auth.service import get_current_user, authenticate_user, create_user, optional_user
+from core.dependencies import get_current_user, optional_user
 from web.components.layout import create_base_layout
 
-router = APIRouter(prefix="/auth")
+router = FastAPIRouter(prefix="/auth")
 
-@router.get("/login", response_class=HTMLResponse)
+@router.get("/login")
 async def login_page(request: Request, next: Optional[str] = None, current_user = Depends(optional_user)):
     """Login page"""
     
@@ -129,7 +129,7 @@ async def login_page(request: Request, next: Optional[str] = None, current_user 
         user=None
     )
 
-@router.get("/register", response_class=HTMLResponse)
+@router.get("/register")
 async def register_page(request: Request, current_user = Depends(optional_user)):
     """Registration page"""
     
@@ -280,13 +280,36 @@ async def register_page(request: Request, current_user = Depends(optional_user))
     )
 
 @router.get("/logout")
+@router.post("/logout")
 async def logout(request: Request):
-    """Logout and redirect to login page"""
+    """Logout user"""
     response = RedirectResponse(url="/auth/login", status_code=303)
-    response.delete_cookie(key="session")
+    response.delete_cookie("access_token")
+    response.delete_cookie("refresh_token")
     return response
 
-@router.get("/profile", response_class=HTMLResponse)
+@router.post("/login")
+async def login_submit(
+    request: Request,
+    username: str = Form(...),
+    password: str = Form(...),
+    next: Optional[str] = Form(None)
+):
+    """Handle login form submission"""
+    
+    # For demo purposes, accept any username/password
+    # In production, this would validate against a database
+    if username and password:
+        # Create a mock response (in real app, this would call the auth API)
+        response = RedirectResponse(url=next or "/", status_code=303)
+        # Set demo cookies
+        response.set_cookie("access_token", f"demo_token_{username}", httponly=True)
+        return response
+    else:
+        # Return to login with error
+        return RedirectResponse(url="/auth/login?error=invalid", status_code=303)
+
+@router.get("/profile")
 async def profile(request: Request, current_user = Depends(get_current_user)):
     """User profile page"""
     

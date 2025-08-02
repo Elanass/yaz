@@ -2,19 +2,19 @@
 Hospitality page for the YAZ Surgery Analytics Platform
 """
 
-from fastapi import APIRouter, Request, Depends
+from fastapi import APIRouter as FastAPIRouter, Request, Depends
 from fastapi.responses import HTMLResponse
 from fastapi.templating import Jinja2Templates
-from fasthtml.common import *
+from fasthtml.common import Div, H1, H2, H3, H4, P, Form as FHTMLForm, Input, Button, A, Br, Script, Table, Tr, Td, Th, Span, Strong
 
-from features.auth.service import get_current_user, optional_user
+from core.dependencies import require_auth, optional_user
 from web.components.layout import create_base_layout
 from web.components.hospitality_dashboard import render_hospitality_dashboard
 
-router = APIRouter(prefix="/hospitality")
+router = FastAPIRouter(prefix="/hospitality")
 templates = Jinja2Templates(directory="web/templates")
 
-@router.get("/", response_class=HTMLResponse)
+@router.get("/")
 async def hospitality_home(request: Request, current_user = Depends(optional_user)):
     """Hospitality and patient experience dashboard"""
     
@@ -241,7 +241,7 @@ async def hospitality_home(request: Request, current_user = Depends(optional_use
         extra_head=styles
     )
 
-@router.get("/plans", response_class=HTMLResponse)
+@router.get("/plans")
 async def hospitality_plans(request: Request, current_user = Depends(optional_user)):
     """Hospitality plans management"""
     
@@ -290,7 +290,7 @@ async def hospitality_plans(request: Request, current_user = Depends(optional_us
         title="Hospitality Plans - YAZ Surgery Analytics"
     )
 
-@router.get("/accommodation", response_class=HTMLResponse)
+@router.get("/accommodation")
 async def hospitality_accommodation(request: Request, current_user = Depends(optional_user)):
     """Accommodation management"""
     
@@ -318,7 +318,7 @@ async def hospitality_accommodation(request: Request, current_user = Depends(opt
         title="Accommodation Management - YAZ Surgery Analytics"
     )
 
-@router.get("/family", response_class=HTMLResponse)
+@router.get("/family")
 async def family_services(request: Request, current_user = Depends(optional_user)):
     """Family support services"""
     
@@ -345,7 +345,7 @@ async def family_services(request: Request, current_user = Depends(optional_user
         title="Family Support Services - YAZ Surgery Analytics"
     )
 
-@router.get("/dietary", response_class=HTMLResponse)
+@router.get("/dietary")
 async def dietary_management(request: Request, current_user = Depends(optional_user)):
     """Dietary management and meal planning"""
     
@@ -372,7 +372,7 @@ async def dietary_management(request: Request, current_user = Depends(optional_u
         title="Dietary Management - YAZ Surgery Analytics"
     )
 
-@router.get("/transport", response_class=HTMLResponse)
+@router.get("/transport")
 async def transportation_coordination(request: Request, current_user = Depends(optional_user)):
     """Transportation coordination"""
     

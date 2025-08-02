@@ -6,13 +6,14 @@ from pydantic import BaseModel
 from typing import Dict, Any, List, Optional
 import pandas as pd
 import json
+import uuid
 from pathlib import Path
 from datetime import datetime
 from core.utils.id_generator import generate_id
 from fastapi.responses import FileResponse
 
-from core.dependencies import get_current_user
-from features.analysis.analysis import AnalysisEngine
+from core.dependencies import require_auth
+from features.analysis.analysis_engine import AnalysisEngine
 from core.reproducibility.manager import ReproducibilityManager
 from core.services.logger import get_logger
 
@@ -49,7 +50,7 @@ async def upload_cohort_dataset(
     file: UploadFile = File(...),
     cohort_name: Optional[str] = None,
     description: Optional[str] = None,
-    current_user=Depends(get_current_user)
+    current_user=Depends(require_auth)
 ):
     """Upload cohort dataset for analysis"""
     
@@ -162,7 +163,7 @@ async def upload_cohort_dataset(
 @router.get("/cohort/{cohort_id}")
 async def get_cohort_info(
     cohort_id: str,
-    current_user=Depends(get_current_user)
+    current_user=Depends(require_auth)
 ):
     """Get cohort dataset information"""
     
@@ -192,7 +193,7 @@ async def get_cohort_info(
 async def analyze_cohort(
     cohort_id: str,
     analysis_config: Dict[str, Any],
-    current_user=Depends(get_current_user)
+    current_user=Depends(require_auth)
 ):
     """Analyze uploaded cohort dataset"""
     
@@ -284,7 +285,7 @@ async def analyze_cohort(
 @router.get("/results/{analysis_id}")
 async def get_analysis_results(
     analysis_id: str,
-    current_user=Depends(get_current_user)
+    current_user=Depends(require_auth)
 ):
     """Get analysis results"""
     
@@ -313,7 +314,7 @@ async def get_analysis_results(
 async def list_analysis_results(
     limit: int = 20,
     offset: int = 0,
-    current_user=Depends(get_current_user)
+    current_user=Depends(require_auth)
 ):
     """List all analysis results"""
     
@@ -364,7 +365,7 @@ async def list_analysis_results(
 @router.post("/reproduce/{run_id}")
 async def reproduce_analysis(
     run_id: str,
-    current_user=Depends(get_current_user)
+    current_user=Depends(require_auth)
 ):
     """Reproduce a previous analysis run"""
     
@@ -401,7 +402,7 @@ async def reproduce_analysis(
 
 @router.get("/reproducibility/report")
 async def get_reproducibility_report(
-    current_user=Depends(get_current_user)
+    current_user=Depends(require_auth)
 ):
     """Get comprehensive reproducibility report"""
     
@@ -417,7 +418,7 @@ async def get_reproducibility_report(
 @router.post("/analyze")
 async def analyze_data(
     request: AnalysisRequest,
-    current_user=Depends(get_current_user)
+    current_user=Depends(require_auth)
 ):
     """Perform statistical analysis"""
     try:
@@ -431,7 +432,7 @@ async def analyze_data(
 async def generate_insights(
     request: AnalysisRequest,
     background_tasks: BackgroundTasks,
-    current_user=Depends(get_current_user)
+    current_user=Depends(require_auth)
 ):
     """
     Generate comprehensive insights from surgical case data for FLOT optimization in gastric surgery
@@ -510,7 +511,7 @@ class PublicationResponse(BaseModel):
 async def prepare_publication(
     request: PublicationRequest,
     background_tasks: BackgroundTasks,
-    current_user=Depends(get_current_user)
+    current_user=Depends(require_auth)
 ):
     """
     Prepare a publication (memoir, article, infographic) from cohort data
@@ -570,7 +571,7 @@ async def prepare_publication(
 @router.get("/publication/download/{publication_id}")
 async def download_publication(
     publication_id: str,
-    current_user=Depends(get_current_user)
+    current_user=Depends(require_auth)
 ):
     """Download a prepared publication"""
     # Locate the prepared PDF

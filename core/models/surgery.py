@@ -43,7 +43,7 @@ class SurgicalCaseModel(BaseModel):
     
     # Patient Demographics
     age: int = Field(..., ge=0, le=120, description="Patient age in years")
-    gender: str = Field(..., regex="^(male|female|other)$", description="Patient gender")
+    gender: str = Field(..., pattern="^(male|female|other)$", description="Patient gender")
     bmi: Optional[float] = Field(None, ge=10, le=80, description="Body Mass Index")
     
     # Medical History
@@ -61,7 +61,7 @@ class SurgicalCaseModel(BaseModel):
     # Surgery-Specific Data
     tumor_stage: Optional[str] = Field(None, description="TNM staging if applicable")
     surgical_approach: Optional[str] = Field(None, description="Open/Laparoscopic/Robotic")
-    urgency: str = Field(default="elective", regex="^(elective|urgent|emergency)$", 
+    urgency: str = Field(default="elective", pattern="^(elective|urgent|emergency)$", 
                         description="Surgery urgency level")
     
     # FLOT-Specific Fields

@@ -1,22 +1,24 @@
 /**
  * Gun.js Integration for Gastric ADCI Platform
+ * Enhanced with P2P WebRTC connector integration
  * Provides real-time distributed state management and collaborative features
  */
 
 // Initialize Gun.js
 const gun = Gun(['http://localhost:8765/gun']);
 
-// Gastric ADCI Gun.js integration
+// Gastric ADCI Gun.js integration with P2P support
 window.GastricADCI.Gun = {
     instance: gun,
     user: null,
     collaborativeSpaces: {},
+    p2pConnector: null,
     
     /**
-     * Initialize Gun.js integration
+     * Initialize Gun.js integration with P2P support
      */
     init() {
-        console.log('Initializing Gun.js integration');
+        console.log('Initializing Gun.js integration with P2P support');
         
         // Setup user authentication
         this.setupAuthentication();
@@ -29,6 +31,79 @@ window.GastricADCI.Gun = {
         
         // Setup offline resilience
         this.setupOfflineSync();
+        
+        // Initialize P2P connector if available
+        this.initializeP2P();
+    },
+    
+    /**
+     * Initialize P2P connector integration
+     */
+    initializeP2P() {
+        if (window.GastricADCI.P2P && window.GastricADCI.P2P.connector) {
+            this.p2pConnector = window.GastricADCI.P2P.connector;
+            
+            // Setup P2P event handlers
+            this.p2pConnector.on('peer_data', (event) => {
+                this.handleP2PData(event.peer_id, event.data);
+            });
+            
+            this.p2pConnector.on('data_sync', (event) => {
+                this.handleP2PDataSync(event);
+            });
+            
+            console.log('P2P connector integrated with Gun.js');
+        }
+    },
+    
+    /**
+     * Handle data received from P2P peers
+     */
+    handleP2PData(peerId, data) {
+        if (data.type === 'gun_sync') {
+            // Sync Gun.js data from peer
+            const gunData = data.gun_data;
+            if (gunData && gunData.key && gunData.value) {
+                gun.get(gunData.key).put(gunData.value);
+                console.log('Synced Gun.js data from peer:', peerId);
+            }
+        } else if (data.type === 'collaboration_invite') {
+            this.handleCollaborationInvite(peerId, data);
+        }
+    },
+    
+    /**
+     * Handle P2P data synchronization
+     */
+    handleP2PDataSync(event) {
+        if (event.sync_type === 'gun_update') {
+            const { key, value } = event.data;
+            gun.get(key).put(value);
+            console.log('Received Gun.js sync via signaling:', key);
+        }
+    },
+    
+    /**
+     * Sync Gun.js data to P2P peers
+     */
+    syncToP2P(key, value) {
+        if (this.p2pConnector) {
+            // Try direct P2P first
+            const syncData = {
+                type: 'gun_sync',
+                gun_data: { key, value },
+                timestamp: Date.now()
+            };
+            
+            const peersSent = this.p2pConnector.broadcast(syncData);
+            
+            // Fallback to signaling for reliability
+            if (peersSent === 0) {
+                this.p2pConnector.syncData({
+                    key, value
+                }, 'gun_update');
+            }
+        }
     },
     
     /**

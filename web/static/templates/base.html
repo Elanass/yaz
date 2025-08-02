@@ -1,0 +1,132 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="theme-color" content="#2563eb">
+    <meta name="description" content="Gastric Oncology-Surgery Decision Support Platform - Multi-Environment Deployment">
+    <title>{{ title }} - Gastric ADCI Platform</title>
+    
+    <!-- Static CSS -->
+    <link rel="stylesheet" href="/static/css/base.css">
+    <link rel="stylesheet" href="/static/css/components.css">
+    
+    <!-- PWA Support -->
+    <link rel="manifest" href="/static/manifest.json">
+    <link rel="icon" type="image/x-icon" href="/static/favicon.ico">
+    <link rel="apple-touch-icon" href="/static/icons/apple-touch-icon.png">
+    
+    <!-- Environment-specific configuration -->
+    <script>
+        window.APP_CONFIG = {
+            environment: '{{ environment }}',
+            apiBaseUrl: '{{ api_base_url }}',
+            p2pEnabled: {{ p2p_enabled|lower }},
+            cloudProvider: '{{ cloud_provider }}',
+            features: {{ features|safe }}
+        };
+    </script>
+    
+    <!-- Base JavaScript -->
+    <script src="/static/js/base.js" defer></script>
+    <script src="/static/js/utils.js" defer></script>
+    
+    {% block head %}{% endblock %}
+</head>
+<body>
+    <div id="app">
+        <!-- Header with Environment Indication -->
+        <header class="header">
+            <div class="container">
+                <div class="header-content">
+                    <div class="nav-brand">
+                        <a href="/" class="brand-link">🏥 Gastric ADCI Platform</a>
+                        <span class="environment-badge environment-{{ environment }}">{{ environment_display }}</span>
+                    </div>
+                    
+                    <!-- Environment Status -->
+                    <div class="environment-status">
+                        {% if p2p_enabled %}
+                        <span class="p2p-status" id="p2p-status">P2P: Connecting...</span>
+                        {% endif %}
+                        <span id="connection-status" class="status-indicator">●</span>
+                        <span id="sync-status">{{ environment_display }}</span>
+                    </div>
+                </div>
+                
+                <!-- Navigation -->
+                <nav class="navbar">
+                    <div class="nav-menu">
+                        <a href="/" class="nav-link">Dashboard</a>
+                        <a href="/decisions" class="nav-link">Decision Support</a>
+                        <a href="/cases" class="nav-link">Cases</a>
+                        <a href="/education" class="nav-link">Education</a>
+                        <a href="/settings" class="nav-link">Settings</a>
+                    </div>
+                    <div class="nav-user">
+                        <div id="user-status">
+                            <!-- Dynamic user status will be injected here -->
+                        </div>
+                    </div>
+                </nav>
+            </div>
+        </header>
+
+        <!-- Notifications Area -->
+        <div id="notifications" class="notifications"></div>
+
+        <!-- Main Content Area -->
+        <main class="main-content">
+            <div class="container">
+                <!-- Breadcrumb -->
+                <div id="breadcrumb" class="breadcrumb" style="display: none;"></div>
+                
+                <!-- Dynamic Content Injection Point -->
+                <div id="dynamic-content" class="dynamic-content">
+                    {% block content %}{% endblock %}
+                </div>
+            </div>
+        </main>
+
+        <!-- Footer -->
+        <footer class="footer">
+            <div class="container">
+                <div class="footer-content">
+                    <div class="footer-info">
+                        <span>&copy; 2025 Gastric ADCI Platform</span>
+                        <span>Healthcare-grade decision support</span>
+                    </div>
+                    <div class="footer-links">
+                        <a href="/privacy">Privacy</a>
+                        <a href="/terms">Terms</a>
+                        <a href="/support">Support</a>
+                    </div>
+                    <div class="footer-status">
+                        <span>{{ cloud_provider }} | {{ environment_display }}</span>
+                    </div>
+                </div>
+            </div>
+        </footer>
+    </div>
+
+    <!-- Loading overlay -->
+    <div id="loading-overlay" class="loading-overlay" style="display: none;">
+        <div class="loading-spinner"></div>
+        <span class="loading-text">Loading...</span>
+    </div>
+</body>
+
+    <!-- Static JavaScript -->
+    <script src="/static/js/base.js"></script>
+    <script src="/static/js/utils.js"></script>
+    
+    {% block scripts %}{% endblock %}
+    
+    <!-- Service Worker for PWA -->
+    <script>
+        if ('serviceWorker' in navigator) {
+            navigator.serviceWorker.register('/static/sw.js');
+        }
+    </script>
+</body>
+</html>

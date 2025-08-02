@@ -18,6 +18,9 @@ from core.models.base import BaseEntity, Domain, Scope, UserRole
 from core.services.base import BaseService
 from core.utils.helpers import DateUtils, HashUtils
 
+# Import dependencies from core to avoid duplication
+from core.dependencies import security
+
 # Schemas
 class UserCreate(BaseModel):
     """User creation schema"""

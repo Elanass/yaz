@@ -2,10 +2,10 @@
 # Production-ready medical decision support platform
 
 # Core Framework
-fastapi==0.104.1
-uvicorn[standard]==0.24.0
+fastapi==0.115.0
+uvicorn[standard]==0.35.0
 python-multipart==0.0.6
-python-fasthtml==1.0.11
+python-fasthtml==0.12.22
 
 # Database
 sqlalchemy[asyncio]==2.0.23
@@ -20,8 +20,9 @@ PyJWT==2.8.0
 # Data Processing & Analytics
 pandas==2.1.3
 numpy==1.25.2
+scipy==1.11.4
 scikit-learn==1.3.2
-lifelines==0.27.6
+lifelines==0.28.0
 
 # Infrastructure & System Monitoring
 python-dotenv==1.0.0
@@ -29,8 +30,12 @@ httpx==0.25.2
 structlog==23.2.0
 psutil==5.9.6
 
-# Reports
+# Visualization & Reports
+plotly==5.17.0
+matplotlib==3.8.2
 reportlab==3.6.12
+weasyprint==62.3
+docxtpl==0.16.8
 
 # Development
 pytest==7.4.3

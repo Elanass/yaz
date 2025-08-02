@@ -2,19 +2,19 @@
 Education page for the YAZ Surgery Analytics Platform
 """
 
-from fastapi import APIRouter, Request, Depends
+from fastapi import APIRouter as FastAPIRouter, Request, Depends
 from fastapi.responses import HTMLResponse
 from fastapi.templating import Jinja2Templates
-from fasthtml.common import *
+from fasthtml.common import Div, H1, H2, H3, H4, P, Form as FHTMLForm, Input, Button, A, Br, Script, Table, Tr, Td, Th, Span, Strong
 
-from features.auth.service import get_current_user, optional_user
+from core.dependencies import require_auth, optional_user
 from web.components.layout import create_base_layout
 from web.components.education_dashboard import render_education_dashboard
 
-router = APIRouter(prefix="/education")
+router = FastAPIRouter(prefix="/education")
 templates = Jinja2Templates(directory="web/templates")
 
-@router.get("/", response_class=HTMLResponse)
+@router.get("/")
 async def education_home(request: Request, current_user = Depends(optional_user)):
     """Education and training dashboard"""
     
@@ -216,7 +216,7 @@ async def education_home(request: Request, current_user = Depends(optional_user)
         extra_head=styles
     )
 
-@router.get("/programs", response_class=HTMLResponse)
+@router.get("/programs")
 async def education_programs(request: Request, current_user = Depends(optional_user)):
     """Training programs management"""
     
@@ -265,7 +265,7 @@ async def education_programs(request: Request, current_user = Depends(optional_u
         title="Training Programs - YAZ Surgery Analytics"
     )
 
-@router.get("/assessment", response_class=HTMLResponse)
+@router.get("/assessment")
 async def education_assessment(request: Request, current_user = Depends(optional_user)):
     """Skill assessment and evaluation"""
     
@@ -293,7 +293,7 @@ async def education_assessment(request: Request, current_user = Depends(optional
         title="Skill Assessment - YAZ Surgery Analytics"
     )
 
-@router.get("/continuing", response_class=HTMLResponse)
+@router.get("/continuing")
 async def continuing_education(request: Request, current_user = Depends(optional_user)):
     """Continuing education and professional development"""
     
@@ -320,7 +320,7 @@ async def continuing_education(request: Request, current_user = Depends(optional
         title="Continuing Education - YAZ Surgery Analytics"
     )
 
-@router.get("/simulation", response_class=HTMLResponse) 
+@router.get("/simulation") 
 async def simulation_lab(request: Request, current_user = Depends(optional_user)):
     """Virtual simulation laboratory"""
     
