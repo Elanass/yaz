@@ -1,6 +1,7 @@
 """
 Database initialization module
 """
+import logging
 from sqlalchemy.ext.asyncio import create_async_engine, async_sessionmaker
 from sqlalchemy.orm import declarative_base
 from core.config.settings import settings

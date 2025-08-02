@@ -1,101 +1,118 @@
-<!-- Sidebar Menu Template -->
-<div class="sidebar-overlay fixed inset-0 z-40 bg-black/40 hidden"></div>
-<div class="sidebar fixed top-0 left-0 z-50 h-full w-10/12 max-w-xs -translate-x-full transform bg-[var(--sidebar-bg)] text-[var(--text-primary)] flex flex-col gap-4 p-4 transition-transform duration-300 ease-in-out md:w-80">
-  <div class="flex items-center justify-between mb-6">
-    <h2 class="text-xl font-bold leading-tight">Surgical Systems</h2>
-    <button class="text-current p-2" data-action="close-menu">
-      <svg xmlns="http://www.w3.org/2000/svg" width="24px" height="24px" fill="currentColor" viewBox="0 0 256 256">
-        <path d="M205.66,194.34a8,8,0,0,1-11.32,11.32L128,139.31,61.66,205.66a8,8,0,0,1-11.32-11.32L116.69,128,50.34,61.66A8,8,0,0,1,61.66,50.34L128,116.69l66.34-66.35a8,8,0,0,1,11.32,11.32L139.31,128Z"></path>
-      </svg>
-    </button>
-  </div>
-  
-  <ul class="flex flex-col gap-4">
-    <li class="category-item flex h-12 items-center gap-4 rounded-full px-4 active" data-category="gastrointestinal">
-      <div class="category-icon text-white flex items-center justify-center rounded-lg bg-[var(--bg-icon)] shrink-0 size-12" data-icon="SmileyNervous">
-        <svg xmlns="http://www.w3.org/2000/svg" width="24px" height="24px" fill="currentColor" viewBox="0 0 256 256">
-          <path d="M128,24A104,104,0,1,0,232,128,104.11,104.11,0,0,0,128,24Zm0,192a88,88,0,1,1,88-88A88.1,88.1,0,0,1,128,216Zm53.66-53.66a8,8,0,0,1-11.32,11.32L160,163.31l-10.34,10.35a8,8,0,0,1-11.32,0L128,163.31l-10.34,10.35a8,8,0,0,1-11.32,0L96,163.31,85.66,173.66a8,8,0,0,1-11.32-11.32l16-16a8,8,0,0,1,11.32,0L112,156.69l10.34-10.35a8,8,0,0,1,11.32,0L144,156.69l10.34-10.35a8,8,0,0,1,11.32,0ZM80,108a12,12,0,1,1,12,12A12,12,0,0,1,80,108Zm72,0a12,12,0,1,1,12,12A12,12,0,0,1,152,108Z"></path>
-        </svg>
-      </div>
-      <p class="text-base font-bold leading-tight truncate">Gastrointestinal</p>
-    </li>
-    <li class="category-item flex h-12 items-center gap-4 rounded-full px-4" data-category="cardiovascular">
-      <div class="category-icon text-white flex items-center justify-center rounded-lg bg-[var(--bg-icon)] shrink-0 size-12" data-icon="Heart">
-        <svg xmlns="http://www.w3.org/2000/svg" width="24px" height="24px" fill="currentColor" viewBox="0 0 256 256">
-          <path d="M240,94c0,70-103.79,126.66-108.21,129a8,8,0,0,1-7.58,0C119.79,220.66,16,164,16,94A62.07,62.07,0,0,1,78,32c20.65,0,38.73,8.88,50,23.89C139.27,40.88,157.35,32,178,32A62.07,62.07,0,0,1,240,94Z"></path>
-        </svg>
-      </div>
-      <p class="text-base font-bold leading-tight truncate">Cardiovascular</p>
-    </li>
-    <li class="category-item flex h-12 items-center gap-4 rounded-full px-4" data-category="orthopedic">
-      <div class="category-icon text-white flex items-center justify-center rounded-lg bg-[var(--bg-icon)] shrink-0 size-12" data-icon="Bone">
-        <svg xmlns="http://www.w3.org/2000/svg" width="24px" height="24px" fill="currentColor" viewBox="0 0 256 256">
-          <path d="M231.67,60.89a35.82,35.82,0,0,0-23.82-12.74,36,36,0,1,0-66.37,22.92.25.25,0,0,1,0,.08L71.17,141.51s0,0-.1,0a36,36,0,1,0-22.92,66.37,36,36,0,1,0,66.37-22.92.54.54,0,0,1,0-.08l70.35-70.36s0,0,.1,0a36,36,0,0,0,46.74-53.63ZM219.1,97.16a20,20,0,0,1-25.67,3.8,16,16,0,0,0-19.88,2.19l-70.4,70.4A16,16,0,0,0,101,193.43a20,20,0,1,1-36.75,7.5,8,8,0,0,0-7.91-9.24,8.5,8.5,0,0,0-1.23.1A20,20,0,1,1,62.57,155a16,16,0,0,0,19.88-2.19l70.4-70.4A16,16,0,0,0,155,62.57a20,20,0,1,1,36.75-7.5,8,8,0,0,0,9.14,9.14,20,20,0,0,1,18.17,33Z"></path>
-        </svg>
-      </div>
-      <p class="text-base font-bold leading-tight truncate">Orthopedic</p>
-    </li>
-    <li class="category-item flex h-12 items-center gap-4 rounded-full px-4" data-category="neurosurgery">
-      <div class="category-icon text-white flex items-center justify-center rounded-lg bg-[var(--bg-icon)] shrink-0 size-12" data-icon="Brain">
-        <svg xmlns="http://www.w3.org/2000/svg" width="24px" height="24px" fill="currentColor" viewBox="0 0 256 256">
-          <path d="M248,124a56.11,56.11,0,0,0-32-50.61V72a48,48,0,0,0-88-26.49A48,48,0,0,0,40,72v1.39a56,56,0,0,0,0,101.2V176a48,48,0,0,0,88,26.49A48,48,0,0,0,216,176v-1.41A56.09,56.09,0,0,0,248,124ZM88,208a32,32,0,0,1-31.81-28.56A55.87,55.87,0,0,0,64,180h8a8,8,0,0,0,0-16H64A40,40,0,0,1,50.67,86.27,8,8,0,0,0,56,78.73V72a32,32,0,0,1,64,0v68.26A47.8,47.8,0,0,0,88,128a8,8,0,0,0,0,16,32,32,0,0,1,0,64Zm104-44h-8a8,8,0,0,0,0,16h8a55.87,55.87,0,0,0,7.81-.56A32,32,0,1,1,168,144a8,8,0,0,0,0-16,47.8,47.8,0,0,0-32,12.26V72a32,32,0,0,1,64,0v6.73a8,8,0,0,0,5.33,7.54A40,40,0,0,1,192,164Zm16-52a8,8,0,0,1-8,8h-4a36,36,0,0,1-36-36V80a8,8,0,0,1,16,0v4a20,20,0,0,0,20,20h4A8,8,0,0,1,208,112ZM60,120H56a8,8,0,0,1,0-16h4A20,20,0,0,0,80,84V80a8,8,0,0,1,16,0v4A36,36,0,0,1,60,120Z"></path>
-        </svg>
-      </div>
-      <p class="text-base font-bold leading-tight truncate">Neurosurgery</p>
-    </li>
-    <li class="category-item flex h-12 items-center gap-4 rounded-full px-4" data-category="urologic">
-      <div class="category-icon text-white flex items-center justify-center rounded-lg bg-[var(--bg-icon)] shrink-0 size-12" data-icon="Cat">
-        <svg xmlns="http://www.w3.org/2000/svg" width="24px" height="24px" fill="currentColor" viewBox="0 0 256 256">
-          <path d="M96,140a12,12,0,1,1-12-12A12,12,0,0,1,96,140Zm76-12a12,12,0,1,0,12,12A12,12,0,0,0,172,128Zm60-80v88c0,52.93-46.65,96-104,96S24,188.93,24,136V48A16,16,0,0,1,51.31,36.69c.14.14.26.27.38.41L69,57a111.22,111.22,0,0,1,118.1,0L204.31,37.1c.12-.14.24-.27.38-.41A16,16,0,0,1,232,48Zm-16,0-21.56,24.8A8,8,0,0,1,183.63,74,88.86,88.86,0,0,0,168,64.75V88a8,8,0,1,1-16,0V59.05a97.43,97.43,0,0,0-16-2.72V88a8,8,0,1,1-16,0V56.33a97.43,97.43,0,0,0-16,2.72V88a8,8,0,1,1-16,0V64.75A88.86,88.86,0,0,0,72.37,74a8,8,0,0,1-10.81-1.17L40,48v88c0,41.66,35.21,76,80,79.67V195.31l-13.66-13.66a8,8,0,0,1,11.32-11.31L128,180.68l10.34-10.34a8,8,0,0,1,11.32,11.31L136,195.31v20.36c44.79-3.69,80-38,80-79.67Z"></path>
-        </svg>
-      </div>
-      <p class="text-base font-bold leading-tight truncate">Urologic</p>
-    </li>
-  </ul>
-  
-  <!-- Theme Toggle in Sidebar -->
-  <div class="mt-auto pt-4 border-t border-[var(--border-color)]">
-    <div class="flex items-center justify-between">
-      <span class="font-medium">Dark Mode</span>
-      <label class="relative inline-flex items-center cursor-pointer">
-        <input type="checkbox" class="sr-only peer theme-toggle">
-        <div class="w-11 h-6 bg-gray-200 peer-focus:outline-none rounded-full peer dark:bg-gray-700 peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:border-gray-300 after:border after:rounded-full after:h-5 after:w-5 after:transition-all dark:border-gray-600 peer-checked:bg-[var(--bg-accent)]"></div>
-      </label>
+<!-- Entity-Concept Based Sidebar -->
+<div id="sidebar" class="sidebar-menu fixed left-0 top-0 z-40 h-full w-80 bg-[var(--sidebar-bg)] border-r border-[var(--border-color)] transform -translate-x-full transition-transform duration-300 ease-in-out lg:translate-x-0 lg:static lg:z-auto">
+    <div class="flex h-full flex-col">
+        <!-- Sidebar Header -->
+        <div class="flex items-center justify-between p-6 border-b border-[var(--border-color)]">
+            <div class="flex items-center gap-3">
+                <img src="/static/icons/surgify-logo.png" alt="Surgify" class="h-6 w-auto" onerror="this.style.display='none';">
+                <span class="text-lg font-semibold text-[var(--text-primary)]">Entities</span>
+            </div>
+            <button class="lg:hidden text-[var(--text-secondary)] hover:text-[var(--text-primary)]" data-action="close-menu">
+                <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"></path>
+                </svg>
+            </button>
+        </div>
+
+        <!-- Sidebar Content -->
+        <div class="flex-1 overflow-y-auto p-4">
+            <!-- Core Medical Entities -->
+            <div class="mb-6">
+                <h3 class="text-sm font-semibold text-[var(--text-secondary)] uppercase tracking-wider mb-3">Medical Entities</h3>
+                <div class="space-y-2">
+                    <a href="/entities/patients" class="flex items-center gap-3 p-3 rounded-lg hover:bg-[var(--sidebar-selected)] text-[var(--text-secondary)] hover:text-[var(--text-primary)] transition-colors">
+                        <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z"></path>
+                        </svg>
+                        <span>Patients</span>
+                    </a>
+                    <a href="/entities/procedures" class="flex items-center gap-3 p-3 rounded-lg hover:bg-[var(--sidebar-selected)] text-[var(--text-secondary)] hover:text-[var(--text-primary)] transition-colors">
+                        <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19.428 15.428a2 2 0 00-1.022-.547l-2.387-.477a6 6 0 00-3.86.517l-.318.158a6 6 0 01-3.86.517L6.05 15.21a2 2 0 00-1.806.547M8 4h8l-1 1v5.172a2 2 0 00.586 1.414l5 5c1.26 1.26.367 3.414-1.415 3.414H4.828c-1.782 0-2.674-2.154-1.414-3.414l5-5A2 2 0 009 10.172V5L8 4z"></path>
+                        </svg>
+                        <span>Procedures</span>
+                    </a>
+                    <a href="/entities/surgeons" class="flex items-center gap-3 p-3 rounded-lg hover:bg-[var(--sidebar-selected)] text-[var(--text-secondary)] hover:text-[var(--text-primary)] transition-colors">
+                        <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"></path>
+                        </svg>
+                        <span>Surgeons</span>
+                    </a>
+                    <a href="/entities/diagnoses" class="flex items-center gap-3 p-3 rounded-lg hover:bg-[var(--sidebar-selected)] text-[var(--text-secondary)] hover:text-[var(--text-primary)] transition-colors">
+                        <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5H7a2 2 0 00-2 2v10a2 2 0 002 2h8a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2m-6 9l2 2 4-4"></path>
+                        </svg>
+                        <span>Diagnoses</span>
+                    </a>
+                </div>
+            </div>
+
+            <!-- Business Concepts -->
+            <div class="mb-6">
+                <h3 class="text-sm font-semibold text-[var(--text-secondary)] uppercase tracking-wider mb-3">Business Concepts</h3>
+                <div class="space-y-2">
+                    <a href="/concepts/workflows" class="flex items-center gap-3 p-3 rounded-lg hover:bg-[var(--sidebar-selected)] text-[var(--text-secondary)] hover:text-[var(--text-primary)] transition-colors">
+                        <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 10V3L4 14h7v7l9-11h-7z"></path>
+                        </svg>
+                        <span>Workflows</span>
+                    </a>
+                    <a href="/concepts/protocols" class="flex items-center gap-3 p-3 rounded-lg hover:bg-[var(--sidebar-selected)] text-[var(--text-secondary)] hover:text-[var(--text-primary)] transition-colors">
+                        <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"></path>
+                        </svg>
+                        <span>Protocols</span>
+                    </a>
+                    <a href="/concepts/resources" class="flex items-center gap-3 p-3 rounded-lg hover:bg-[var(--sidebar-selected)] text-[var(--text-secondary)] hover:text-[var(--text-primary)] transition-colors">
+                        <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 11H5m14 0a2 2 0 012 2v6a2 2 0 01-2 2H5a2 2 0 01-2-2v-6a2 2 0 012-2m14 0V9a2 2 0 00-2-2M5 11V9a2 2 0 012-2m0 0V5a2 2 0 012-2h6a2 2 0 012 2v2M7 7h10"></path>
+                        </svg>
+                        <span>Resources</span>
+                    </a>
+                    <a href="/concepts/quality" class="flex items-center gap-3 p-3 rounded-lg hover:bg-[var(--sidebar-selected)] text-[var(--text-secondary)] hover:text-[var(--text-primary)] transition-colors">
+                        <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"></path>
+                        </svg>
+                        <span>Quality Metrics</span>
+                    </a>
+                </div>
+            </div>
+
+            <!-- Domain Knowledge -->
+            <div class="mb-6">
+                <h3 class="text-sm font-semibold text-[var(--text-secondary)] uppercase tracking-wider mb-3">Domain Knowledge</h3>
+                <div class="space-y-2">
+                    <a href="/knowledge/guidelines" class="flex items-center gap-3 p-3 rounded-lg hover:bg-[var(--sidebar-selected)] text-[var(--text-secondary)] hover:text-[var(--text-primary)] transition-colors">
+                        <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 6.253v13m0-13C10.832 5.477 9.246 5 7.5 5S4.168 5.477 3 6.253v13C4.168 18.477 5.754 18 7.5 18s3.332.477 4.5 1.253m0-13C13.168 5.477 14.754 5 16.5 5c1.747 0 3.332.477 4.5 1.253v13C19.832 18.477 18.246 18 16.5 18c-1.746 0-3.332.477-4.5 1.253"></path>
+                        </svg>
+                        <span>Clinical Guidelines</span>
+                    </a>
+                    <a href="/knowledge/evidence" class="flex items-center gap-3 p-3 rounded-lg hover:bg-[var(--sidebar-selected)] text-[var(--text-secondary)] hover:text-[var(--text-primary)] transition-colors">
+                        <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 19v-6a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2a2 2 0 002-2zm0 0V9a2 2 0 012-2h2a2 2 0 012 2v10m-6 0a2 2 0 002 2h2a2 2 0 002-2m0 0V5a2 2 0 012-2h2a2 2 0 012 2v14a2 2 0 01-2 2h-2a2 2 0 01-2-2z"></path>
+                        </svg>
+                        <span>Evidence Base</span>
+                    </a>
+                    <a href="/knowledge/research" class="flex items-center gap-3 p-3 rounded-lg hover:bg-[var(--sidebar-selected)] text-[var(--text-secondary)] hover:text-[var(--text-primary)] transition-colors">
+                        <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M7 12l3-3 3 3 4-4M8 21l4-4 4 4M3 4h18M4 4h16v12a1 1 0 01-1 1H5a1 1 0 01-1-1V4z"></path>
+                        </svg>
+                        <span>Research Data</span>
+                    </a>
+                </div>
+            </div>
+        </div>
+
+        <!-- Sidebar Footer -->
+        <div class="p-4 border-t border-[var(--border-color)]">
+            <div class="flex items-center gap-3 p-3 rounded-lg bg-[var(--bg-secondary)]">
+                <div class="w-2 h-2 bg-emerald-400 rounded-full animate-pulse"></div>
+                <span class="text-sm text-[var(--text-secondary)]">Knowledge Graph Active</span>
+            </div>
+        </div>
     </div>
-  </div>
-</div>
-      </div>
-      <p class="text-base font-bold leading-tight truncate">Gastrointestinal</p>
-    </li>
-    <li class="category-item flex h-12 items-center gap-4 rounded-full px-4" data-category="ent">
-      <div class="category-icon text-white flex items-center justify-center rounded-lg bg-[#493322] shrink-0 size-12" data-icon="Ear">
-        <svg xmlns="http://www.w3.org/2000/svg" width="24px" height="24px" fill="currentColor" viewBox="0 0 256 256">
-          <path d="M216,104a8,8,0,0,1-16,0,72,72,0,0,0-144,0c0,26.7,8.53,34.92,17.57,43.64C82.21,156,92,165.41,92,188a36,36,0,0,0,36,36c10.24,0,18.45-4.16,25.83-13.09a8,8,0,1,1,12.34,10.18C155.81,233.64,143,240,128,240a52.06,52.06,0,0,1-52-52c0-15.79-5.68-21.27-13.54-28.84C52.46,149.5,40,137.5,40,104a88,88,0,0,1,176,0Zm-38.13,57.08A8,8,0,0,0,166.93,164,8,8,0,0,1,152,160c0-9.33,4.82-15.76,10.4-23.2,6.37-8.5,13.6-18.13,13.6-32.8a48,48,0,0,0-96,0,8,8,0,0,0,16,0,32,32,0,0,1,64,0c0,9.33-4.82,15.76-10.4,23.2-6.37,8.5-13.6,18.13-13.6,32.8a24,24,0,0,0,44.78,12A8,8,0,0,0,177.87,161.08Z"></path>
-        </svg>
-      </div>
-    
-    </li>
-    <li class="category-item flex h-12 items-center gap-4 rounded-full px-4" data-category="hemostasis">
-      <div class="category-icon text-white flex items-center justify-center rounded-lg bg-[#493322] shrink-0 size-12" data-icon="Pulse">
-        <svg xmlns="http://www.w3.org/2000/svg" width="24px" height="24px" fill="currentColor" viewBox="0 0 256 256">
-          <path d="M240,128a8,8,0,0,1-8,8H204.94l-37.78,75.58A8,8,0,0,1,160,216h-.4a8,8,0,0,1-7.08-5.14L95.35,60.76,63.28,131.31A8,8,0,0,1,56,136H24a8,8,0,0,1,0-16H50.85L88.72,36.69a8,8,0,0,1,14.76.46l57.51,151,31.85-63.71A8,8,0,0,1,200,120h32A8,8,0,0,1,240,128Z"></path>
-        </svg>
-      </div>
-      <p class="text-base font-bold leading-tight truncate">Hemostasis</p>
-    </li>
-  </ul>
 </div>
 
-<script>
-  document.addEventListener('DOMContentLoaded', function() {
-    // Close menu button
-    const closeButton = document.querySelector('[data-action="close-menu"]');
-    if (closeButton) {
-      closeButton.addEventListener('click', function() {
-        document.querySelector('.sidebar').classList.remove('sidebar-open');
-        document.querySelector('.sidebar-overlay').classList.add('hidden');
-        document.body.classList.remove('overflow-hidden');
-      });
-    }
-  });
-</script>
+<!-- Sidebar Overlay for Mobile -->
+<div id="sidebar-overlay" class="fixed inset-0 bg-black bg-opacity-50 z-30 hidden lg:hidden" data-action="close-menu"></div>

@@ -10,6 +10,9 @@ from .surgery import router as surgery_router
 from .insurance import router as insurance_router
 from .logistics import router as logistics_router
 from .reporter import router as reporter_router
+from .entities import router as entities_router
+from .concepts import router as concepts_router
+from .knowledge import router as knowledge_router
 
 # Create main router
 router = APIRouter()
@@ -20,6 +23,9 @@ router.include_router(surgery_router, prefix="/surgery", tags=["Surgery Manageme
 router.include_router(insurance_router, prefix="/insurance", tags=["Insurance Management"])
 router.include_router(logistics_router, prefix="/logistics", tags=["Logistics Management"])
 router.include_router(reporter_router, prefix="/reporter", tags=["Reporting & Analytics"])
+router.include_router(entities_router, prefix="/entities", tags=["Medical Entities"])
+router.include_router(concepts_router, prefix="/concepts", tags=["Business Concepts"])
+router.include_router(knowledge_router, prefix="/knowledge", tags=["Domain Knowledge"])
 
 @router.get("/")
 async def api_root():

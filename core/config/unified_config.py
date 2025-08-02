@@ -81,3 +81,7 @@ def is_development() -> bool:
 def is_production() -> bool:
     """Check if running in production mode"""
     return config.is_production
+
+def get_settings() -> PlatformConfig:
+    """Get the global configuration settings"""
+    return config

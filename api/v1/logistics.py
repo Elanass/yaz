@@ -80,7 +80,8 @@ async def logistics_root():
             "transport": "/api/v1/logistics/transport",
             "resources": "/api/v1/logistics/resources", 
             "inventory": "/api/v1/logistics/inventory",
-            "staff": "/api/v1/logistics/staff"
+            "staff": "/api/v1/logistics/staff",
+            "supply-chain": "/api/v1/logistics/supply-chain"
         }
     }
 
@@ -406,3 +407,36 @@ async def get_logistics_statistics():
             "icu": 10
         }
     }
+
+
+@router.get("/supply-chain")
+async def get_supply_chain():
+    """Get supply chain management dashboard - for sidebar link"""
+    supply_chain = {
+        "suppliers": [
+            {"name": "MedEquip Inc", "status": "active", "reliability": 95, "orders": 12},
+            {"name": "SurgicalSupply Co", "status": "active", "reliability": 88, "orders": 8},
+            {"name": "BioMed Solutions", "status": "pending", "reliability": 92, "orders": 5}
+        ],
+        "orders": {
+            "pending": 15,
+            "in_transit": 8,
+            "delivered": 45,
+            "overdue": 2
+        },
+        "critical_items": [
+            {"item": "Surgical Gloves", "stock": 150, "minimum": 200, "status": "low"},
+            {"item": "Anesthesia Masks", "stock": 25, "minimum": 50, "status": "critical"},
+            {"item": "Gauze Pads", "stock": 85, "minimum": 100, "status": "low"}
+        ],
+        "delivery_performance": {
+            "on_time_percentage": 92.5,
+            "average_delay_days": 1.2,
+            "last_30_days": {
+                "total_deliveries": 38,
+                "on_time": 35,
+                "delayed": 3
+            }
+        }
+    }
+    return supply_chain

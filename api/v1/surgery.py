@@ -54,29 +54,28 @@ async def surgery_root():
 
 @router.get("/procedures")
 async def get_procedures():
-    """Get all surgical procedures"""
-    # Mock data for now
+    """Get all surgery procedures - for sidebar link"""
     procedures = [
         {
-            "id": "surg-001",
-            "name": "Laparoscopic Gastrectomy",
-            "type": "gastric_surgery",
-            "duration_minutes": 240,
-            "complexity_level": "high",
-            "surgeon_id": "dr-001",
-            "patient_id": "pat-001",
-            "scheduled_date": "2025-08-05T09:00:00",
+            "id": "SURG001",
+            "name": "Gastric Sleeve Surgery",
+            "type": "Bariatric",
+            "duration_minutes": 120,
+            "complexity_level": "moderate",
+            "surgeon_id": "DR001",
+            "patient_id": "PAT001",
+            "scheduled_date": "2025-08-15T09:00:00",
             "status": "scheduled"
         },
         {
-            "id": "surg-002", 
-            "name": "Endoscopic Resection",
-            "type": "gastric_surgery",
-            "duration_minutes": 90,
-            "complexity_level": "medium",
-            "surgeon_id": "dr-002",
-            "patient_id": "pat-002",
-            "scheduled_date": "2025-08-06T14:00:00",
+            "id": "SURG002", 
+            "name": "Gastric Bypass Surgery",
+            "type": "Bariatric",
+            "duration_minutes": 180,
+            "complexity_level": "high",
+            "surgeon_id": "DR002",
+            "patient_id": "PAT002",
+            "scheduled_date": "2025-08-16T10:00:00",
             "status": "scheduled"
         }
     ]
@@ -113,11 +112,11 @@ async def get_surgery_schedule():
         "today": [
             {
                 "id": "surg-003",
-                "procedure": "Diagnostic Laparoscopy", 
+                "procedure": "Gastric Sleeve",
                 "surgeon": "Dr. Smith",
-                "time": "08:00",
-                "duration": "60 min",
-                "status": "in_progress"
+                "time": "09:00",
+                "duration": "120 min",
+                "status": "scheduled"
             }
         ],
         "upcoming": [
@@ -132,6 +131,49 @@ async def get_surgery_schedule():
         ]
     }
     return schedule
+
+
+@router.get("/scheduling")
+async def get_surgery_scheduling():
+    """Get surgery scheduling dashboard - for sidebar link"""
+    schedule = {
+        "today": [
+            {"time": "09:00", "procedure": "Gastric Sleeve", "surgeon": "Dr. Smith", "room": "OR-1"},
+            {"time": "11:30", "procedure": "Gastric Bypass", "surgeon": "Dr. Johnson", "room": "OR-2"}
+        ],
+        "upcoming": [
+            {"date": "2025-08-03", "procedures": 3},
+            {"date": "2025-08-04", "procedures": 2},
+            {"date": "2025-08-05", "procedures": 4}
+        ],
+        "availability": {
+            "or_rooms": {"total": 4, "available": 2},
+            "surgeons": {"total": 8, "available": 5}
+        }
+    }
+    return schedule
+
+
+@router.get("/resources")
+async def get_surgery_resources():
+    """Get surgery resource management - for sidebar link"""
+    resources = {
+        "equipment": {
+            "laparoscopes": {"total": 6, "available": 4, "maintenance": 1},
+            "monitors": {"total": 12, "available": 8, "in_use": 4},
+            "surgical_robots": {"total": 2, "available": 1, "scheduled": 1}
+        },
+        "personnel": {
+            "surgeons": {"total": 8, "available": 5, "on_call": 2},
+            "nurses": {"total": 20, "available": 12, "scheduled": 8},
+            "anesthesiologists": {"total": 6, "available": 4, "on_call": 1}
+        },
+        "rooms": {
+            "operating_rooms": {"total": 6, "available": 3, "occupied": 2, "maintenance": 1},
+            "recovery_rooms": {"total": 10, "available": 6, "occupied": 4}
+        }
+    }
+    return resources
 
 
 @router.post("/outcomes")

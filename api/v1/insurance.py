@@ -56,7 +56,9 @@ async def insurance_root():
             "providers": "/api/v1/insurance/providers",
             "claims": "/api/v1/insurance/claims",
             "preauth": "/api/v1/insurance/preauth",
-            "coverage": "/api/v1/insurance/coverage"
+            "coverage": "/api/v1/insurance/coverage",
+            "verification": "/api/v1/insurance/verification",
+            "billing": "/api/v1/insurance/billing"
         }
     }
 
@@ -233,3 +235,56 @@ async def get_insurance_statistics():
         "approval_rate": 80.0,
         "average_processing_time_days": 7.5
     }
+
+
+@router.get("/verification")
+async def get_verification_dashboard():
+    """Get coverage verification dashboard - for sidebar link"""
+    verification = {
+        "pending_verifications": [
+            {"patient_id": "PAT001", "insurance": "BlueCross", "procedure": "Gastric Sleeve", "priority": "high"},
+            {"patient_id": "PAT002", "insurance": "Aetna", "procedure": "Gastric Bypass", "priority": "medium"},
+            {"patient_id": "PAT003", "insurance": "UnitedHealth", "procedure": "Endoscopy", "priority": "low"}
+        ],
+        "verification_stats": {
+            "today": {"completed": 15, "pending": 8, "rejected": 2},
+            "this_week": {"completed": 89, "pending": 12, "rejected": 6},
+            "success_rate": 93.5
+        },
+        "insurance_providers": [
+            {"name": "BlueCross BlueShield", "response_time": "2.1 hours", "approval_rate": 94},
+            {"name": "Aetna", "response_time": "3.2 hours", "approval_rate": 91},
+            {"name": "UnitedHealth", "response_time": "1.8 hours", "approval_rate": 96}
+        ]
+    }
+    return verification
+
+
+@router.get("/billing")
+async def get_billing_dashboard():
+    """Get billing management dashboard - for sidebar link"""
+    billing = {
+        "outstanding_bills": [
+            {"invoice_id": "INV001", "patient": "John Doe", "amount": 12500, "days_overdue": 15},
+            {"invoice_id": "INV002", "patient": "Jane Smith", "amount": 8750, "days_overdue": 8},
+            {"invoice_id": "INV003", "patient": "Bob Johnson", "amount": 15200, "days_overdue": 22}
+        ],
+        "billing_summary": {
+            "total_outstanding": 485600,
+            "average_collection_days": 32,
+            "collection_rate": 87.5,
+            "rejected_claims": 15
+        },
+        "monthly_revenue": {
+            "june": 125000,
+            "july": 142000,
+            "august": 138000
+        },
+        "payment_methods": {
+            "insurance": 78,
+            "cash": 12,
+            "credit_card": 8,
+            "payment_plan": 2
+        }
+    }
+    return billing
