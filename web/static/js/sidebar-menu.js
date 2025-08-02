@@ -3,7 +3,11 @@
  * 
  * This file contains functionality for the sidebar menu system,
  * including opening/closing and surgical system navigation.
+ * Updated to use SharedUtils for DRY compliance.
  */
+
+// Use shared utilities for consistency
+const showNotification = UnifiedUtils.notifications.show;
 
 document.addEventListener('DOMContentLoaded', function() {
     // Elements

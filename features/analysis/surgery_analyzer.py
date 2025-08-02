@@ -13,7 +13,6 @@ The module follows HIPAA/GDPR compliance patterns with proper audit logging
 and error handling with clinical context.
 """
 
-import logging
 import asyncio
 from datetime import datetime
 from typing import Dict, List, Any, Optional

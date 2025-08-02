@@ -1,53 +1,44 @@
-{% extends "base.html" %}
+{% extends "surgify-base.html" %}
 
 {% block title %}Surgify - Clinical Research Interface{% endblock %}
 
-{% block extra_head %}
-<link rel="preconnect" href="https://fonts.gstatic.com/" crossorigin />
-<link rel="stylesheet" as="style" onload="this.rel='stylesheet'" href="https://fonts.googleapis.com/css2?display=swap&family=Noto+Sans:wght@400;500;700;900&family=Plus+Jakarta+Sans:wght@400;500;700;800" />
-<script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
-{% endblock %}
-
 {% block content %}
-<div class="relative flex w-full min-h-screen flex-col bg-neutral-50 justify-between group/design-root overflow-x-hidden" style='font-family: "Plus Jakarta Sans", "Noto Sans", sans-serif;'>
-  <div>
-    <div class="flex items-center bg-neutral-50 p-4 pb-2 justify-between">
-      <div class="text-[#141414] flex size-12 shrink-0 items-center" data-icon="List" data-size="24px" data-weight="regular">
-        <svg xmlns="http://www.w3.org/2000/svg" width="24px" height="24px" fill="currentColor" viewBox="0 0 256 256">
-          <path d="M224,128a8,8,0,0,1-8,8H40a8,8,0,0,1,0-16H216A8,8,0,0,1,224,128ZM40,72H216a8,8,0,0,0,0-16H40a8,8,0,0,0,0,16ZM216,184H40a8,8,0,0,0,0,16H216a8,8,0,0,0,0-16Z"></path>
-        </svg>
-      </div>
-      <h2 class="text-[#141414] text-lg font-bold leading-tight tracking-[-0.015em] flex-1 text-center">Surgify</h2>
-      <div class="flex w-12 items-center justify-end">
-        <button class="flex max-w-[480px] cursor-pointer items-center justify-center overflow-hidden rounded-full h-12 bg-transparent text-[#141414] gap-2 text-base font-bold leading-normal tracking-[0.015em] min-w-0 p-0">
-          <div class="text-[#141414]" data-icon="User" data-size="24px" data-weight="regular">
-            <svg xmlns="http://www.w3.org/2000/svg" width="24px" height="24px" fill="currentColor" viewBox="0 0 256 256">
-              <path d="M230.92,212c-15.23-26.33-38.7-45.21-66.09-54.16a72,72,0,1,0-73.66,0C63.78,166.78,40.31,185.66,25.08,212a8,8,0,1,0,13.85,8c18.84-32.56,52.14-52,89.07-52s70.23,19.44,89.07,52a8,8,0,1,0,13.85-8ZM72,96a56,56,0,1,1,56,56A56.06,56.06,0,0,1,72,96Z"></path>
+<!-- Surgify Main Interface -->
+<div class="surgify-container">
+    
+    <!-- Search Section -->
+    <section class="surgify-p-6">
+        <div class="surgify-search mx-auto max-w-lg">
+            <svg class="surgify-search-icon w-5 h-5" fill="currentColor" viewBox="0 0 256 256">
+                <path d="M229.66,218.34l-50.07-50.06a88.11,88.11,0,1,0-11.31,11.31l50.06,50.07a8,8,0,0,0,11.32-11.32ZM40,112a72,72,0,1,1,72,72A72.08,72.08,0,0,1,40,112Z"></path>
             </svg>
-          </div>
-        </button>
-      </div>
-    </div>
-    <div class="px-4 py-3">
-      <label class="flex flex-col min-w-40 h-12 w-full">
-        <div class="flex w-full flex-1 items-stretch rounded-xl h-full">
-          <div class="text-neutral-500 flex border-none bg-[#ededed] items-center justify-center pl-4 rounded-l-xl border-r-0" data-icon="MagnifyingGlass" data-size="24px" data-weight="regular">
-            <svg xmlns="http://www.w3.org/2000/svg" width="24px" height="24px" fill="currentColor" viewBox="0 0 256 256"><path d="M229.66,218.34l-50.07-50.06a88.11,88.11,0,1,0-11.31,11.31l50.06,50.07a8,8,0,0,0,11.32-11.32ZM40,112a72,72,0,1,1,72,72A72.08,72.08,0,0,1,40,112Z"></path></svg>
-          </div>
-          <input placeholder="Search" class="form-input flex w-full min-w-0 flex-1 resize-none overflow-hidden rounded-xl text-[#141414] focus:outline-0 focus:ring-0 border-none bg-[#ededed] focus:border-none h-full placeholder:text-neutral-500 px-4 rounded-l-none border-l-0 pl-2 text-base font-normal leading-normal" />
+            <input type="text" placeholder="Search patients, cases, protocols..." class="surgify-search-input surgify-input">
         </div>
-      </label>
-    </div>
+    </section>
 
-    <!-- Tabs -->
-    <div class="flex gap-3 p-3 overflow-x-hidden">
-      <button class="flex h-8 shrink-0 items-center justify-center gap-x-2 rounded-full bg-[#ededed] pl-4 pr-2">
-        <p class="text-[#141414] text-sm font-medium leading-normal">Journal</p>
-        <div class="text-[#141414]" data-icon="CaretDown" data-size="20px" data-weight="regular"><svg><!-- SVG --></svg></div>
-      </button>
-      <button class="flex h-8 shrink-0 items-center justify-center gap-x-2 rounded-full bg-[#ededed] pl-4 pr-2"><p class="text-[#141414] text-sm font-medium leading-normal">Events</p><div class="text-[#141414]" data-icon="CaretDown" data-size="20px" data-weight="regular"><svg><!-- SVG --></svg></div></button>
-      <button class="flex h-8 shrink-0 items-center justify-center gap-x-2 rounded-full bg-[#ededed] pl-4 pr-2"><p class="text-[#141414] text-sm font-medium leading-normal">Series</p><div class="text-[#141414]" data-icon="CaretDown" data-size="20px" data-weight="regular"><svg><!-- SVG --></svg></div></button>
-    </div>
+    <!-- Category Tabs -->
+    <section class="surgify-p-6">
+        <div class="surgify-tabs">
+            <button class="surgify-tab active" data-category="journal">
+                Journal
+                <svg class="w-4 h-4 ml-1" fill="currentColor" viewBox="0 0 256 256">
+                    <path d="M213.66,101.66l-80,80a8,8,0,0,1-11.32,0l-80-80A8,8,0,0,1,53.66,90.34L128,164.69l74.34-74.35a8,8,0,0,1,11.32,11.32Z"></path>
+                </svg>
+            </button>
+            <button class="surgify-tab" data-category="events">
+                Events
+                <svg class="w-4 h-4 ml-1" fill="currentColor" viewBox="0 0 256 256">
+                    <path d="M213.66,101.66l-80,80a8,8,0,0,1-11.32,0l-80-80A8,8,0,0,1,53.66,90.34L128,164.69l74.34-74.35a8,8,0,0,1,11.32,11.32Z"></path>
+                </svg>
+            </button>
+            <button class="surgify-tab" data-category="series">
+                Series
+                <svg class="w-4 h-4 ml-1" fill="currentColor" viewBox="0 0 256 256">
+                    <path d="M213.66,101.66l-80,80a8,8,0,0,1-11.32,0l-80-80A8,8,0,0,1,53.66,90.34L128,164.69l74.34-74.35a8,8,0,0,1,11.32,11.32Z"></path>
+                </svg>
+            </button>
+        </div>
+    </section>
 
     <!-- Featured Series -->
     <h2 class="px-4 pt-5 pb-3 text-[22px] font-bold text-[#141414]">Featured Series</h2>

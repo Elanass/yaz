@@ -5,7 +5,6 @@ Handles healthcare-specific operations including surgery, patient management, an
 
 from typing import Dict, Any, List, Optional
 from datetime import datetime
-import logging
 from core.models.base import BaseEntity
 from core.services.logger import get_logger
 

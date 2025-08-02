@@ -7,7 +7,6 @@ data interchange, allowing interoperability with other FHIR-compliant systems.
 
 import asyncio
 import json
-import logging
 import base64
 from datetime import datetime
 from typing import Dict, List, Optional, Any, Union, TypeVar, Generic

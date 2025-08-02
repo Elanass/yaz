@@ -8,7 +8,6 @@ from datetime import datetime, timedelta
 from enum import Enum
 import json
 import hashlib
-import logging
 from core.services.logger import get_logger
 
 logger = get_logger(__name__)

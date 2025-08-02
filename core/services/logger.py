@@ -1,7 +1,6 @@
 """
 Simplified logging service
 """
-import logging
 import structlog
 
 

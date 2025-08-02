@@ -6,7 +6,6 @@ perioperative chemotherapy for gastric cancer patients with impact assessment on
 """
 
 from typing import Dict, Any, List, Optional, Tuple
-import logging
 from datetime import datetime
 import json
 

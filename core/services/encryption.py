@@ -5,12 +5,10 @@ This service provides encryption and decryption functionality for sensitive medi
 ensuring HIPAA/GDPR compliance with proper key management.
 """
 
-import os
 import base64
 import bcrypt
 import json
 from typing import Any, Dict, Union, Optional
-import logging
 from datetime import datetime
 
 from cryptography.fernet import Fernet, InvalidToken

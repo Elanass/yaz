@@ -5,7 +5,6 @@ Abstract base class for all operator implementations
 
 from abc import ABC, abstractmethod
 from typing import Any, Dict, Optional
-import logging
 
 logger = logging.getLogger(__name__)
 

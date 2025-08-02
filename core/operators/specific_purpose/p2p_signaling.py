@@ -4,7 +4,6 @@ Handles WebSocket connections for peer-to-peer collaboration in the Gastric ADCI
 """
 
 import json
-import logging
 import asyncio
 import uuid
 from typing import Dict, Set, Optional, Any, List

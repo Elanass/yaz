@@ -196,7 +196,6 @@ class SurgeryDashboard:
         """Get basic system health metrics."""
         
         import psutil
-        import os
         
         try:
             # Basic system metrics

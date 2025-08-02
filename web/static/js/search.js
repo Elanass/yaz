@@ -20,16 +20,7 @@ document.addEventListener('DOMContentLoaded', function() {
         { type: 'term', id: 'term2', title: 'FLOT', description: 'Fluorouracil, Leucovorin, Oxaliplatin, and Docetaxel', date: null }
     ];
     
-    // Debounce function to prevent excessive searches while typing
-    function debounce(func, timeout = 300) {
-        let timer;
-        return (...args) => {
-            clearTimeout(timer);
-            timer = setTimeout(() => { func.apply(this, args); }, timeout);
-        };
-    }
-    
-    // Search function
+    // Use shared utilities instead of duplicate functions
     function performSearch(query) {
         if (!query || query.length < 2) {
             resultsContainer.classList.add('hidden');
@@ -56,7 +47,7 @@ document.addEventListener('DOMContentLoaded', function() {
                         <h3 class="font-bold">${result.title}</h3>
                     </div>
                     <p class="text-[var(--text-secondary)] text-sm">${result.description}</p>
-                    ${result.date ? `<p class="text-[var(--text-tertiary)] text-xs mt-1">Last updated: ${formatDate(result.date)}</p>` : ''}
+                    ${result.date ? `<p class="text-[var(--text-tertiary)] text-xs mt-1">Last updated: ${SharedUtils.utils.formatDate(result.date)}</p>` : ''}
                 `;
                 resultsContainer.appendChild(resultItem);
             });
@@ -66,18 +57,8 @@ document.addEventListener('DOMContentLoaded', function() {
         }
     }
     
-    // Format date helper
-    function formatDate(dateString) {
-        const date = new Date(dateString);
-        return date.toLocaleDateString('en-US', { 
-            year: 'numeric', 
-            month: 'short', 
-            day: 'numeric' 
-        });
-    }
-    
-    // Set up event listener with debounce
-    const debouncedSearch = debounce(performSearch);
+    // Set up event listener with shared debounce
+    const debouncedSearch = SharedUtils.utils.debounce(performSearch);
     searchInput.addEventListener('input', (e) => {
         debouncedSearch(e.target.value);
     });

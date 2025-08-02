@@ -8,7 +8,6 @@ from datetime import datetime, timedelta
 import json
 import hashlib
 import hmac
-import logging
 from core.services.logger import get_logger
 
 logger = get_logger(__name__)

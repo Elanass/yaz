@@ -11,7 +11,6 @@ from sqlalchemy import and_, or_, select, func
 from sqlalchemy.ext.asyncio import AsyncSession
 from sqlalchemy.orm import selectinload, joinedload
 
-from data.repositories.base import BaseRepository
 from data.models.orm import (
     PatientORM, ComorbidityORM, TumorCharacteristicsORM, 
     PerformanceStatusORM, LaboratoryResultsORM, TreatmentPlanORM,

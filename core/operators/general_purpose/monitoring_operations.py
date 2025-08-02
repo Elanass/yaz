@@ -6,7 +6,6 @@ Handles application monitoring, metrics collection, and alerting
 from typing import Dict, Any, List, Optional, Callable
 from datetime import datetime, timedelta
 from collections import defaultdict
-import logging
 from core.services.logger import get_logger
 
 logger = get_logger(__name__)

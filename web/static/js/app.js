@@ -10,80 +10,14 @@ window.YazApp = {
     debug: true
 };
 
-// Utility functions
+// Import shared utilities to eliminate code duplication
+// Backward compatibility mapping
 const utils = {
-    /**
-     * Format number as percentage
-     */
-    formatPercent: (value, decimals = 1) => {
-        return (value * 100).toFixed(decimals) + '%';
-    },
-
-    /**
-     * Format ADCI score with appropriate styling
-     */
-    formatADCIScore: (score) => {
-        const formattedScore = score.toFixed(1);
-        if (score >= 80) return `<span class="text-green-600 font-bold">${formattedScore}</span>`;
-        if (score >= 65) return `<span class="text-yellow-600 font-bold">${formattedScore}</span>`;
-        return `<span class="text-red-600 font-bold">${formattedScore}</span>`;
-    },
-
-    /**
-     * Show notification
-     */
-    showNotification: (message, type = 'info', duration = 5000) => {
-        const notification = document.createElement('div');
-        notification.className = `notification ${type} fixed top-4 right-4 z-50 max-w-sm`;
-        notification.innerHTML = `
-            <div class="flex items-center">
-                <div class="flex-1">${message}</div>
-                <button onclick="this.parentElement.parentElement.remove()" class="ml-2 text-gray-500 hover:text-gray-700">
-                    <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"></path>
-                    </svg>
-                </button>
-            </div>
-        `;
-        
-        document.body.appendChild(notification);
-        
-        if (duration > 0) {
-            setTimeout(() => {
-                if (notification.parentElement) {
-                    notification.remove();
-                }
-            }, duration);
-        }
-    },
-
-    /**
-     * Debounce function calls
-     */
-    debounce: (func, wait) => {
-        let timeout;
-        return function executedFunction(...args) {
-            const later = () => {
-                clearTimeout(timeout);
-                func(...args);
-            };
-            clearTimeout(timeout);
-            timeout = setTimeout(later, wait);
-        };
-    },
-
-    /**
-     * Copy text to clipboard
-     */
-    copyToClipboard: async (text) => {
-        try {
-            await navigator.clipboard.writeText(text);
-            utils.showNotification('Copied to clipboard', 'success');
-        } catch (err) {
-            console.error('Failed to copy text: ', err);
-            utils.showNotification('Failed to copy to clipboard', 'error');
-        }
-    }
+    formatPercent: SharedUtils.utils.formatPercent,
+    formatADCIScore: SharedUtils.adci.formatScore,
+    showNotification: SharedUtils.notifications.show,
+    debounce: SharedUtils.utils.debounce,
+    copyToClipboard: SharedUtils.utils.copyToClipboard
 };
 
 // HTMX event handlers
@@ -134,52 +68,22 @@ document.addEventListener('htmx:afterRequest', (event) => {
     }
 });
 
-// Clinical data processing functions
+// Clinical data processing functions - using shared utilities
 const clinical = {
     /**
      * Calculate risk level from ADCI score
      */
-    calculateRiskLevel: (adciScore) => {
-        if (adciScore >= 85) return { level: 'low', class: 'risk-low', text: 'Low Risk' };
-        if (adciScore >= 65) return { level: 'medium', class: 'risk-medium', text: 'Medium Risk' };
-        return { level: 'high', class: 'risk-high', text: 'High Risk' };
-    },
+    calculateRiskLevel: SharedUtils.adci.calculateRiskLevel,
 
     /**
      * Generate clinical recommendation
      */
-    generateRecommendation: (adciScore, flotEligible = false) => {
-        if (adciScore >= 85) {
-            return flotEligible ? 
-                'Proceed with FLOT protocol + surgery' : 
-                'Proceed with standard treatment protocol';
-        }
-        if (adciScore >= 65) {
-            return 'Consider neoadjuvant therapy with close monitoring';
-        }
-        return 'Requires multidisciplinary team review and risk assessment';
-    },
+    generateRecommendation: SharedUtils.adci.generateRecommendation,
 
     /**
      * Validate clinical data
      */
-    validateClinicalData: (data) => {
-        const errors = [];
-        
-        if (!data.value || data.value < 0 || data.value > 100) {
-            errors.push('Clinical value must be between 0 and 100');
-        }
-        
-        if (!data.title || data.title.trim().length < 5) {
-            errors.push('Title must be at least 5 characters long');
-        }
-        
-        if (!data.author || data.author.trim().length < 2) {
-            errors.push('Author name is required');
-        }
-        
-        return errors;
-    }
+    validateClinicalData: SharedUtils.validation.validateClinicalData
 };
 
 // Data visualization utilities
@@ -267,26 +171,7 @@ const exports = {
      * Download data as CSV
      */
     downloadCSV: (data, filename = 'clinical_data.csv') => {
-        if (!data || data.length === 0) {
-            utils.showNotification('No data to export', 'warning');
-            return;
-        }
-        
-        const headers = Object.keys(data[0]);
-        const csvContent = [
-            headers.join(','),
-            ...data.map(row => headers.map(header => 
-                JSON.stringify(row[header] || '')
-            ).join(','))
-        ].join('\n');
-        
-        const blob = new Blob([csvContent], { type: 'text/csv;charset=utf-8;' });
-        const link = document.createElement('a');
-        link.href = URL.createObjectURL(blob);
-        link.download = filename;
-        link.click();
-        
-        utils.showNotification('Data exported successfully', 'success');
+        SharedUtils.export.toCSV(data, filename);
     },
 
     /**

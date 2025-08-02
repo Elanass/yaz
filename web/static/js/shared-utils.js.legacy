@@ -1,0 +1,356 @@
+/**
+ * Shared Utilities - DRY Compliance
+ * Centralized utility functions to avoid code duplication
+ */
+
+// Global Utility Namespace
+window.SharedUtils = window.SharedUtils || {};
+
+/**
+ * Notification System - Centralized Implementation
+ */
+SharedUtils.notifications = {
+    /**
+     * Show notification message
+     * @param {string} message - The message to display
+     * @param {string} type - Type: 'info', 'success', 'warning', 'error'
+     * @param {number} duration - Auto-hide duration in ms (0 = no auto-hide)
+     */
+    show: (message, type = 'info', duration = 5000) => {
+        // Remove existing duplicate notification if exists
+        const existingNotification = document.querySelector(`.notification[data-message="${message}"]`);
+        if (existingNotification) {
+            existingNotification.remove();
+        }
+
+        const notification = document.createElement('div');
+        notification.className = `notification ${type} fixed top-4 right-4 z-50 max-w-sm p-4 rounded-lg shadow-lg`;
+        notification.setAttribute('data-message', message);
+        
+        // Type-specific styling
+        const typeStyles = {
+            info: 'bg-blue-500 text-white',
+            success: 'bg-green-500 text-white',
+            warning: 'bg-yellow-500 text-black',
+            error: 'bg-red-500 text-white'
+        };
+        
+        notification.className += ` ${typeStyles[type] || typeStyles.info}`;
+        
+        notification.innerHTML = `
+            <div class="flex items-center justify-between">
+                <span class="flex-1">${message}</span>
+                <button class="ml-2 text-current opacity-70 hover:opacity-100" onclick="this.parentElement.parentElement.remove()">
+                    <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"></path>
+                    </svg>
+                </button>
+            </div>
+        `;
+        
+        document.body.appendChild(notification);
+        
+        if (duration > 0) {
+            setTimeout(() => {
+                if (notification.parentElement) {
+                    notification.remove();
+                }
+            }, duration);
+        }
+    },
+
+    success: (message, duration = 3000) => SharedUtils.notifications.show(message, 'success', duration),
+    error: (message, duration = 5000) => SharedUtils.notifications.show(message, 'error', duration),
+    warning: (message, duration = 4000) => SharedUtils.notifications.show(message, 'warning', duration),
+    info: (message, duration = 3000) => SharedUtils.notifications.show(message, 'info', duration)
+};
+
+/**
+ * ADCI Score Utilities - Centralized Implementation
+ */
+SharedUtils.adci = {
+    /**
+     * Format ADCI score with appropriate styling
+     * @param {number} score - The ADCI score (0-100)
+     * @returns {string} HTML formatted score
+     */
+    formatScore: (score) => {
+        const formattedScore = score.toFixed(1);
+        if (score >= 80) return `<span class="text-green-600 font-bold">${formattedScore}</span>`;
+        if (score >= 65) return `<span class="text-yellow-600 font-bold">${formattedScore}</span>`;
+        return `<span class="text-red-600 font-bold">${formattedScore}</span>`;
+    },
+
+    /**
+     * Calculate risk level from ADCI score
+     * @param {number} score - The ADCI score
+     * @returns {object} Risk level information
+     */
+    calculateRiskLevel: (score) => {
+        if (score >= 85) return { level: 'low', class: 'risk-low', text: 'Low Risk' };
+        if (score >= 65) return { level: 'medium', class: 'risk-medium', text: 'Medium Risk' };
+        return { level: 'high', class: 'risk-high', text: 'High Risk' };
+    },
+
+    /**
+     * Generate clinical recommendation based on ADCI score
+     * @param {number} score - The ADCI score
+     * @param {boolean} flotEligible - FLOT protocol eligibility
+     * @returns {string} Clinical recommendation
+     */
+    generateRecommendation: (score, flotEligible = false) => {
+        if (score >= 85) {
+            return flotEligible ? 
+                'Proceed with FLOT protocol + surgery' : 
+                'Proceed with standard treatment protocol';
+        }
+        if (score >= 65) {
+            return 'Consider neoadjuvant therapy with close monitoring';
+        }
+        return 'Requires multidisciplinary team review and risk assessment';
+    }
+};
+
+/**
+ * Form Validation Utilities - Centralized Implementation
+ */
+SharedUtils.validation = {
+    /**
+     * Highlight invalid form field
+     * @param {HTMLElement} element - Form element to highlight
+     */
+    highlightInvalid: (element) => {
+        element.classList.add('border-red-500', 'bg-red-50');
+        element.classList.remove('border-gray-300');
+    },
+
+    /**
+     * Reset validation styling
+     * @param {HTMLElement} element - Form element to reset
+     */
+    resetValidation: (element) => {
+        element.classList.remove('border-red-500', 'bg-red-50');
+        element.classList.add('border-gray-300');
+    },
+
+    /**
+     * Validate clinical data
+     * @param {object} data - Clinical data to validate
+     * @returns {array} Array of validation errors
+     */
+    validateClinicalData: (data) => {
+        const errors = [];
+        
+        if (!data.value || data.value < 0 || data.value > 100) {
+            errors.push('Clinical value must be between 0 and 100');
+        }
+        
+        if (!data.title || data.title.trim().length < 5) {
+            errors.push('Title must be at least 5 characters long');
+        }
+        
+        if (!data.author || data.author.trim().length < 2) {
+            errors.push('Author name is required');
+        }
+        
+        return errors;
+    }
+};
+
+/**
+ * Data Export Utilities - Centralized Implementation
+ */
+SharedUtils.export = {
+    /**
+     * Export data as CSV
+     * @param {array} data - Data array to export
+     * @param {string} filename - Export filename
+     */
+    toCSV: (data, filename = 'export.csv') => {
+        if (!data || data.length === 0) {
+            SharedUtils.notifications.warning('No data to export');
+            return;
+        }
+
+        // Get headers from first object
+        const headers = Object.keys(data[0]);
+        
+        // Create CSV content
+        const csvContent = [
+            headers.join(','),
+            ...data.map(row => headers.map(field => {
+                const value = row[field] || '';
+                return typeof value === 'string' && value.includes(',') ? `"${value}"` : value;
+            }).join(','))
+        ].join('\n');
+
+        // Download file
+        const blob = new Blob([csvContent], { type: 'text/csv' });
+        const link = document.createElement('a');
+        link.href = URL.createObjectURL(blob);
+        link.download = filename;
+        link.click();
+        
+        SharedUtils.notifications.success('Data exported successfully');
+    },
+
+    /**
+     * Export data as JSON
+     * @param {any} data - Data to export
+     * @param {string} filename - Export filename
+     */
+    toJSON: (data, filename = 'export.json') => {
+        if (!data) {
+            SharedUtils.notifications.warning('No data to export');
+            return;
+        }
+
+        const blob = new Blob([JSON.stringify(data, null, 2)], { 
+            type: 'application/json' 
+        });
+        const link = document.createElement('a');
+        link.href = URL.createObjectURL(blob);
+        link.download = filename;
+        link.click();
+        
+        SharedUtils.notifications.success('Data exported successfully');
+    }
+};
+
+/**
+ * Utility Functions - Centralized Implementation
+ */
+SharedUtils.utils = {
+    /**
+     * Format percentage value
+     * @param {number} value - Value to format (0-1)
+     * @param {number} decimals - Number of decimal places
+     * @returns {string} Formatted percentage
+     */
+    formatPercent: (value, decimals = 1) => {
+        return (value * 100).toFixed(decimals) + '%';
+    },
+
+    /**
+     * Debounce function calls
+     * @param {function} func - Function to debounce
+     * @param {number} wait - Delay in milliseconds
+     * @returns {function} Debounced function
+     */
+    debounce: (func, wait) => {
+        let timeout;
+        return function executedFunction(...args) {
+            const later = () => {
+                clearTimeout(timeout);
+                func(...args);
+            };
+            clearTimeout(timeout);
+            timeout = setTimeout(later, wait);
+        };
+    },
+
+    /**
+     * Copy text to clipboard
+     * @param {string} text - Text to copy
+     */
+    copyToClipboard: async (text) => {
+        try {
+            await navigator.clipboard.writeText(text);
+            SharedUtils.notifications.success('Copied to clipboard');
+        } catch (err) {
+            console.error('Failed to copy text: ', err);
+            SharedUtils.notifications.error('Failed to copy to clipboard');
+        }
+    },
+
+    /**
+     * Format date for display
+     * @param {string|Date} dateString - Date to format
+     * @returns {string} Formatted date
+     */
+    formatDate: (dateString) => {
+        if (!dateString) return '';
+        const date = new Date(dateString);
+        return date.toLocaleDateString();
+    }
+};
+
+/**
+ * Loading State Management - Centralized Implementation
+ */
+SharedUtils.loading = {
+    /**
+     * Show loading state on element
+     * @param {HTMLElement} element - Element to show loading on
+     * @param {string} text - Loading text
+     */
+    show: (element, text = 'Loading...') => {
+        if (!element) return;
+        
+        element.dataset.originalText = element.innerHTML;
+        element.innerHTML = `<span class="loading-spinner"></span> ${text}`;
+        element.disabled = true;
+    },
+
+    /**
+     * Hide loading state
+     * @param {HTMLElement} element - Element to hide loading from
+     */
+    hide: (element) => {
+        if (!element) return;
+        
+        element.innerHTML = element.dataset.originalText || element.innerHTML;
+        element.disabled = false;
+        delete element.dataset.originalText;
+    }
+};
+
+/**
+ * Event Handlers - Centralized Implementation
+ */
+SharedUtils.events = {
+    /**
+     * Setup global event delegation
+     */
+    setupGlobalEvents: () => {
+        // Global click handlers for common actions
+        document.addEventListener('click', (e) => {
+            // Copy to clipboard
+            if (e.target.matches('[data-copy]')) {
+                const text = e.target.dataset.copy || e.target.textContent;
+                SharedUtils.utils.copyToClipboard(text);
+            }
+            
+            // Toggle visibility
+            if (e.target.matches('[data-toggle]')) {
+                const target = document.querySelector(e.target.dataset.toggle);
+                if (target) {
+                    target.classList.toggle('hidden');
+                }
+            }
+        });
+    }
+};
+
+// Initialize global events when DOM is ready
+if (document.readyState === 'loading') {
+    document.addEventListener('DOMContentLoaded', SharedUtils.events.setupGlobalEvents);
+} else {
+    SharedUtils.events.setupGlobalEvents();
+}
+
+// Backward compatibility - map old utils to new SharedUtils
+if (typeof window.utils === 'undefined') {
+    window.utils = {
+        showNotification: SharedUtils.notifications.show,
+        formatPercent: SharedUtils.utils.formatPercent,
+        formatADCIScore: SharedUtils.adci.formatScore,
+        debounce: SharedUtils.utils.debounce,
+        copyToClipboard: SharedUtils.utils.copyToClipboard
+    };
+}
+
+// Export for module systems
+if (typeof module !== 'undefined' && module.exports) {
+    module.exports = SharedUtils;
+}

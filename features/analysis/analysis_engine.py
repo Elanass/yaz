@@ -4,9 +4,7 @@ Analysis Engine for generating insights and publications from surgical data
 
 from typing import Dict, List, Optional, Union, Any
 import asyncio
-import logging
 from datetime import datetime
-import os
 import uuid
 
 import pandas as pd

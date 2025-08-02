@@ -11,7 +11,6 @@ from web.pages.auth import router as auth_router
 from web.pages.cases import router as cases_router
 from web.pages.reports import router as reports_router
 from web.pages.education import router as education_router
-from web.pages.hospitality import router as hospitality_router
 
 # Create main web router
 router = APIRouter()

@@ -4,9 +4,6 @@ Database migration environment for Gastric ADCI Platform
 """
 
 import asyncio
-import os
-import sys
-from logging.config import fileConfig
 from pathlib import Path
 
 from sqlalchemy import pool

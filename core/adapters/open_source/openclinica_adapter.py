@@ -7,7 +7,6 @@ and protocol management, allowing synchronization of study protocols, forms, and
 
 import asyncio
 import json
-import logging
 import base64
 from datetime import datetime
 from typing import Dict, List, Optional, Any, Union

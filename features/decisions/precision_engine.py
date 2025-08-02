@@ -7,7 +7,6 @@ from typing import Dict, List, Any, Optional, Tuple
 import asyncio
 from datetime import datetime
 import numpy as np
-import logging
 
 from core.services.logger import get_logger, audit_log
 from core.utils.validation import validate_patient_data

@@ -7,7 +7,6 @@ from typing import Dict, Any, List, Optional
 from datetime import datetime, timedelta
 import psutil
 import platform
-import logging
 from core.services.logger import get_logger
 
 logger = get_logger(__name__)

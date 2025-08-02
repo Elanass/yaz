@@ -6,7 +6,6 @@ Specialized operations for surgical procedures, OR management, and surgical work
 from typing import Dict, Any, List, Optional
 from datetime import datetime, timedelta
 from enum import Enum
-import logging
 from core.services.logger import get_logger
 
 logger = get_logger(__name__)

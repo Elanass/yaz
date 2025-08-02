@@ -8,7 +8,6 @@ from typing import Dict, Any, List, Optional
 from datetime import datetime
 
 from core.dependencies import get_current_user
-from core.operators.specific_purpose.education_operations import EducationOperationsOperator
 from core.services.logger import get_logger
 
 logger = get_logger(__name__)

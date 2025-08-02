@@ -5,7 +5,6 @@ Handles insurance claims, coverage verification, and billing operations
 
 from typing import Dict, Any, List, Optional
 from datetime import datetime
-import logging
 from core.services.logger import get_logger
 
 logger = get_logger(__name__)

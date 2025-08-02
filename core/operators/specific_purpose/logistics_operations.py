@@ -5,7 +5,6 @@ Handles equipment, supplies, scheduling, and resource management
 
 from typing import Dict, Any, List, Optional
 from datetime import datetime, timedelta
-import logging
 from core.services.logger import get_logger
 
 logger = get_logger(__name__)

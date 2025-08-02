@@ -9,7 +9,6 @@ from sqlalchemy import (
     Integer, JSON, String, Text, UUID, Index, UniqueConstraint
 )
 from sqlalchemy.orm import relationship
-from sqlalchemy.dialects.postgresql import UUID as PostgreSQLUUID
 import uuid
 
 from data.database import Base

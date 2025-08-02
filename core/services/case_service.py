@@ -4,7 +4,6 @@ Handles all case-related operations in a single, efficient service
 """
 
 from typing import Dict, Any, List, Optional
-import logging
 
 from features.analysis.impact_metrics import ImpactMetricsAnalyzer
 from features.decisions.adci_engine import ADCIEngine

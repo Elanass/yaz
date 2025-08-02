@@ -6,12 +6,10 @@ various types of reports, publications, and visualizations from surgical data,
 supporting PDF, Word, and HTML formats.
 """
 
-import os
 import json
 from datetime import datetime
 from pathlib import Path
 from typing import Dict, Any, List, Optional, Union
-import logging
 import asyncio
 import uuid
 from enum import Enum

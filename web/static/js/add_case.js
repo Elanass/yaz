@@ -107,15 +107,13 @@ document.addEventListener('DOMContentLoaded', function() {
         });
     }
     
-    // Helper functions
+    // Helper functions - using shared utilities
     function highlightInvalid(element) {
-        element.style.boxShadow = '0 0 0 2px var(--bg-accent)';
-        element.style.backgroundColor = 'rgba(243, 123, 32, 0.1)';
+        UnifiedUtils.ValidationRules.highlightInvalid(element);
     }
     
     function resetValidation(element) {
-        element.style.boxShadow = '';
-        element.style.backgroundColor = '';
+        UnifiedUtils.ValidationRules.resetValidation(element);
     }
     
     function submitCaseData() {

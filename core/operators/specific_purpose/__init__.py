@@ -13,7 +13,6 @@ from .education_operations import EducationOperationsOperator
 # TODO: Add training_operations and certification_operations modules
 
 # Hospitality domain
-from .hospitality_operations import HospitalityOperationsOperator
 # TODO: Add patient_experience_operations and accommodation_operations modules
 
 # Insurance domain
