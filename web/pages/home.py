@@ -16,32 +16,16 @@ async def home(request: Request):
     """Home page - Surgify template"""
     return templates.TemplateResponse("index.html", {
         "request": request,
-        "page_title": "Surgify - Advanced Decision Support for Surgical Excellence"
+        "page_title": "Surgify - Decision Precision Engine"
     })
 
 @router.get("/workstation")
 async def workstation(request: Request):
     """Clinical workstation - main dashboard for surgeons"""
-    try:
-        # Fetch user cases and statistics from database
-        cases_count = await get_user_cases_count()
-        pending_reviews = await get_pending_reviews()
-        recent_cases = await get_recent_cases(limit=5)
-        
-        return templates.TemplateResponse("workstation.html", {
-            "request": request,
-            "page_title": "Clinical Workstation",
-            "cases_count": cases_count,
-            "pending_reviews": pending_reviews,
-            "recent_cases": recent_cases
-        })
-    except Exception as e:
-        logger.error(f"Error loading workstation: {e}")
-        return templates.TemplateResponse("workstation.html", {
-            "request": request,
-            "page_title": "Clinical Workstation",
-            "error": "Failed to load workstation data"
-        })
+    return templates.TemplateResponse("workstation.html", {
+        "request": request,
+        "page_title": "Clinical Workstation"
+    })
 
 @router.get("/add-case")
 async def add_case_form(request: Request):
@@ -51,7 +35,7 @@ async def add_case_form(request: Request):
         specialties = await get_available_specialties()
         protocols = await get_available_protocols()
         
-        return templates.TemplateResponse("add-case.html", {
+        return templates.TemplateResponse("add_case.html", {
             "request": request,
             "page_title": "Add New Case",
             "specialties": specialties,
@@ -59,7 +43,7 @@ async def add_case_form(request: Request):
         })
     except Exception as e:
         logger.error(f"Error loading add case form: {e}")
-        return templates.TemplateResponse("add-case.html", {
+        return templates.TemplateResponse("add_case.html", {
             "request": request,
             "page_title": "Add New Case",
             "error": "Failed to load form data"
@@ -67,49 +51,19 @@ async def add_case_form(request: Request):
 
 @router.get("/marketplace")
 async def marketplace(request: Request):
-    """Protocol marketplace - browse and download surgical protocols"""
-    try:
-        # Fetch available protocols from database
-        featured_protocols = await get_featured_protocols()
-        categories = await get_protocol_categories()
-        user_downloads = await get_user_downloads()
-        
-        return templates.TemplateResponse("marketplace.html", {
-            "request": request,
-            "page_title": "Protocol Marketplace",
-            "featured_protocols": featured_protocols,
-            "categories": categories,
-            "user_downloads": user_downloads
-        })
-    except Exception as e:
-        logger.error(f"Error loading marketplace: {e}")
-        return templates.TemplateResponse("marketplace.html", {
-            "request": request,
-            "page_title": "Protocol Marketplace",
-            "error": "Failed to load marketplace data"
-        })
+    """Marketplace page"""
+    return templates.TemplateResponse("marketplace.html", {
+        "request": request,
+        "page_title": "Marketplace"
+    })
 
 @router.get("/settings")
 async def settings(request: Request):
-    """User settings and preferences"""
-    try:
-        # Get user preferences from database
-        user_preferences = await get_user_preferences()
-        system_settings = await get_system_settings()
-        
-        return templates.TemplateResponse("settings.html", {
-            "request": request,
-            "page_title": "Settings",
-            "user_preferences": user_preferences,
-            "system_settings": system_settings
-        })
-    except Exception as e:
-        logger.error(f"Error loading settings: {e}")
-        return templates.TemplateResponse("settings.html", {
-            "request": request,
-            "page_title": "Settings",
-            "error": "Failed to load settings"
-        })
+    """Settings page"""
+    return templates.TemplateResponse("settings.html", {
+        "request": request,
+        "page_title": "Settings"
+    })
 
 @router.get("/dashboard")
 async def dashboard(request: Request):

@@ -1,131 +1,236 @@
 {% extends "layout.html" %}
 
+{% block title %}Decision Precision in Surgery{% endblock %}
+
+{% block head %}
+<link rel="stylesheet" href="/static/css/index.css">
+{% endblock %}
+
 {% block content %}
-<!-- Hero Section -->
-<section class="hero-section bg-gradient-to-br from-blue-300 to-blue-400 text-white px-4 py-12">
-    <div class="max-w-4xl mx-auto text-center">
-        <h1 class="text-4xl md:text-5xl font-bold mb-4">
-            Welcome to Surgify
-        </h1>
-        <p class="text-xl mb-8 opacity-90">
-            Advanced Surgical Decision Support Platform with ADCI Framework
-        </p>
-        <div class="flex flex-col sm:flex-row gap-4 justify-center">
-            <a href="/workstation" class="btn-primary bg-white text-blue-400 px-8 py-3 rounded-lg font-semibold hover:bg-blue-50 transition-colors shadow-lg">
-                Open Workstation
-            </a>
-            <a href="/add-case" class="btn-secondary border-2 border-white text-white px-8 py-3 rounded-lg font-semibold hover:bg-white hover:text-blue-400 transition-colors">
-                Add New Case
-            </a>
-        </div>
+<div class="main-content">
+    <div id="vertical-scroll">
+        <h1 class="text-2xl font-bold mb-4">Gastric ADCI</h1>
+        <p class="mb-4">Select a case or protocol to view analysis details.</p>
     </div>
-</section>
-
-<!-- Features Grid -->
-<section class="py-16 px-4">
-    <div class="max-w-6xl mx-auto">
-        <h2 class="text-3xl font-bold text-center mb-12">Platform Features</h2>
-        <div class="grid md:grid-cols-3 gap-8">
-            <div class="feature-card bg-white p-6 rounded-lg shadow-lg border border-gray-100">
-                <div class="w-12 h-12 bg-blue-50 rounded-lg flex items-center justify-center mb-4">
-                    <svg class="w-6 h-6 text-blue-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 19v-6a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2a2 2 0 002-2zm0 0V9a2 2 0 012-2h2a2 2 0 012 2v10m-6 0a2 2 0 002 2h2a2 2 0 002-2m0 0V5a2 2 0 012-2h2a2 2 0 012 2v14a2 2 0 01-2 2h-2a2 2 0 01-2-2z"></path>
-                    </svg>
-                </div>
-                <h3 class="text-xl font-semibold mb-2">Analysis Dashboard</h3>
-                <p class="text-gray-600">Comprehensive statistical analysis and survival modeling for gastric cancer cases.</p>
-                <a href="/api/analysis" class="text-blue-400 font-medium mt-4 inline-block hover:text-blue-500">Explore Analysis →</a>
+    
+    <section class="mb-8">
+        <h2 class="text-xl font-bold mb-2">Recent Cases</h2>
+        <div id="horizontal-scroll">
+            <div class="card">
+                <h3>Patient: J.D.</h3>
+                <p>Stage III Gastric Cancer</p>
+                <p class="text-xs text-[var(--text-tertiary)] mt-2">Updated: 2h ago</p>
             </div>
-
-            <div class="feature-card bg-white p-6 rounded-lg shadow-lg border border-gray-100">
-                <div class="w-12 h-12 bg-green-100 rounded-lg flex items-center justify-center mb-4">
-                    <svg class="w-6 h-6 text-green-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"></path>
-                    </svg>
-                </div>
-                <h3 class="text-xl font-semibold mb-2">ADCI Framework</h3>
-                <p class="text-gray-600">Adaptive Decision Confidence Index for evidence-based surgical decision making.</p>
-                <a href="/api/decisions" class="text-green-600 font-medium mt-4 inline-block hover:text-green-700">View Decisions →</a>
+            <div class="card">
+                <h3>Patient: A.S.</h3>
+                <p>Post-FLOT Assessment</p>
+                <p class="text-xs text-[var(--text-tertiary)] mt-2">Updated: Yesterday</p>
             </div>
-
-            <div class="feature-card bg-white p-6 rounded-lg shadow-lg border border-gray-100">
-                <div class="w-12 h-12 bg-purple-100 rounded-lg flex items-center justify-center mb-4">
-                    <svg class="w-6 h-6 text-purple-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 11H5m14 0a2 2 0 012 2v6a2 2 0 01-2 2H5a2 2 0 01-2-2v-6a2 2 0 012-2m14 0V9a2 2 0 00-2-2M5 9a2 2 0 012-2m0 0V5a2 2 0 012-2h6a2 2 0 012 2v2M7 7h10"></path>
-                    </svg>
-                </div>
-                <h3 class="text-xl font-semibold mb-2">Case Management</h3>
-                <p class="text-gray-600">Organize and track gastric cancer cases with comprehensive patient data.</p>
-                <a href="/api/cases" class="text-purple-600 font-medium mt-4 inline-block hover:text-purple-700">Manage Cases →</a>
+            <div class="card">
+                <h3>Patient: M.R.</h3>
+                <p>Pre-surgical Planning</p>
+                <p class="text-xs text-[var(--text-tertiary)] mt-2">Updated: 3d ago</p>
             </div>
         </div>
-    </div>
-</section>
-
-<!-- Quick Actions -->
-<section class="bg-gray-50 py-16 px-4">
-    <div class="max-w-4xl mx-auto text-center">
-        <h2 class="text-3xl font-bold mb-8">Quick Actions</h2>
-        <div class="grid sm:grid-cols-2 lg:grid-cols-4 gap-4">
-            <a href="/workstation" class="quick-action bg-white p-6 rounded-lg shadow hover:shadow-lg transition-shadow">
-                <div class="w-8 h-8 bg-blue-100 rounded-lg mx-auto mb-3 flex items-center justify-center">
-                    <svg class="w-4 h-4 text-blue-600" fill="currentColor" viewBox="0 0 20 20">
-                        <path d="M3 4a1 1 0 011-1h12a1 1 0 011 1v2a1 1 0 01-1 1H4a1 1 0 01-1-1V4zM3 10a1 1 0 011-1h6a1 1 0 011 1v6a1 1 0 01-1 1H4a1 1 0 01-1-1v-6zM14 9a1 1 0 00-1 1v6a1 1 0 001 1h2a1 1 0 001-1v-6a1 1 0 00-1-1h-2z"></path>
-                    </svg>
-                </div>
-                <h3 class="font-semibold mb-1">Workstation</h3>
-                <p class="text-sm text-gray-600">Main workspace</p>
-            </a>
-
-            <a href="/add-case" class="quick-action bg-white p-6 rounded-lg shadow hover:shadow-lg transition-shadow">
-                <div class="w-8 h-8 bg-green-100 rounded-lg mx-auto mb-3 flex items-center justify-center">
-                    <svg class="w-4 h-4 text-green-600" fill="currentColor" viewBox="0 0 20 20">
-                        <path fill-rule="evenodd" d="M10 3a1 1 0 011 1v5h5a1 1 0 110 2h-5v5a1 1 0 11-2 0v-5H4a1 1 0 110-2h5V4a1 1 0 011-1z" clip-rule="evenodd"></path>
-                    </svg>
-                </div>
-                <h3 class="font-semibold mb-1">Add Case</h3>
-                <p class="text-sm text-gray-600">New patient case</p>
-            </a>
-
-            <a href="/marketplace" class="quick-action bg-white p-6 rounded-lg shadow hover:shadow-lg transition-shadow">
-                <div class="w-8 h-8 bg-purple-100 rounded-lg mx-auto mb-3 flex items-center justify-center">
-                    <svg class="w-4 h-4 text-purple-600" fill="currentColor" viewBox="0 0 20 20">
-                        <path d="M3 4a1 1 0 011-1h12a1 1 0 011 1v2a1 1 0 01-1 1H4a1 1 0 01-1-1V4zM3 10a1 1 0 011-1h6a1 1 0 011 1v6a1 1 0 01-1 1H4a1 1 0 01-1-1v-6zM14 9a1 1 0 00-1 1v6a1 1 0 001 1h2a1 1 0 001-1v-6a1 1 0 00-1-1h-2z"></path>
-                    </svg>
-                </div>
-                <h3 class="font-semibold mb-1">Marketplace</h3>
-                <p class="text-sm text-gray-600">Browse resources</p>
-            </a>
-
-            <a href="/api/health" class="quick-action bg-white p-6 rounded-lg shadow hover:shadow-lg transition-shadow">
-                <div class="w-8 h-8 bg-orange-100 rounded-lg mx-auto mb-3 flex items-center justify-center">
-                    <svg class="w-4 h-4 text-orange-600" fill="currentColor" viewBox="0 0 20 20">
-                        <path fill-rule="evenodd" d="M3 6a3 3 0 013-3h10a1 1 0 01.8 1.6L14.25 8l2.55 3.4A1 1 0 0116 13H6a1 1 0 00-1 1v3a1 1 0 11-2 0V6z" clip-rule="evenodd"></path>
-                    </svg>
-                </div>
-                <h3 class="font-semibold mb-1">System Health</h3>
-                <p class="text-sm text-gray-600">Platform status</p>
-            </a>
+    </section>
+    
+    <section class="mb-8">
+        <h2 class="text-xl font-bold mb-2">Treatment Protocols</h2>
+        <div id="horizontal-scroll">
+            <div class="card">
+                <h3>FLOT Protocol</h3>
+                <p>Impact Analysis Available</p>
+                <p class="text-xs text-[var(--text-tertiary)] mt-2">Updated: 1w ago</p>
+            </div>
+            <div class="card">
+                <h3>Gastrectomy</h3>
+                <p>Surgical Procedure Assessment</p>
+                <p class="text-xs text-[var(--text-tertiary)] mt-2">Updated: 2w ago</p>
+            </div>
+            <div class="card">
+                <h3>ADCI Guidance</h3>
+                <p>Decision Confidence Analysis</p>
+                <p class="text-xs text-[var(--text-tertiary)] mt-2">Updated: 2d ago</p>
+            </div>
         </div>
-    </div>
-</section>
+    </section>
+    
+    <section>
+        <h2 class="text-xl font-bold mb-2">Search</h2>
+        <input type="text" id="search-input" placeholder="Search cases, protocols, or medical terms..." 
+            class="w-full p-3 rounded-lg bg-[var(--bg-secondary)] border-none focus:ring-2 focus:ring-[var(--text-accent)]">
+        <div id="results-container" class="mt-4 p-4 rounded-lg bg-[var(--bg-secondary)] hidden"></div>
+    </section>
+</div>
 {% endblock %}
 
 {% block scripts %}
-<script>
-// Simple interactivity for demo
-document.addEventListener('DOMContentLoaded', function() {
-    // Add hover effects to feature cards
-    document.querySelectorAll('.feature-card').forEach(card => {
-        card.addEventListener('mouseenter', function() {
-            this.style.transform = 'translateY(-2px)';
-        });
-        card.addEventListener('mouseleave', function() {
-            this.style.transform = 'translateY(0)';
-        });
-    });
-    
-    console.log('Surgify Platform Loaded Successfully');
-});
-</script>
+<script src="/static/js/search.js" defer></script>
 {% endblock %}
+      <div>
+        <div class="flex items-center bg-[#fcfaf8] p-4 pb-2 justify-between">      <div class="text-[#1c130d] flex size-12 shrink-0 items-center cursor-pointer" data-icon="List" data-size="24px" data-weight="regular" data-action="toggle-menu">
+        <svg xmlns="http://www.w3.org/2000/svg" width="24px" height="24px" fill="currentColor" viewBox="0 0 256 256">
+          <path
+            d="M224,128a8,8,0,0,1-8,8H40a8,8,0,0,1,0-16H216A8,8,0,0,1,224,128ZM40,72H216a8,8,0,0,0,0-16H40a8,8,0,0,0,0,16ZM216,184H40a8,8,0,0,0,0,16H216a8,8,0,0,0,0-16Z"
+          ></path>
+        </svg>
+      </div>
+          <h2 class="text-[#1c130d] text-lg font-bold leading-tight tracking-[-0.015em] flex-1 text-center">Surgify</h2>
+          <div class="flex w-12 items-center justify-end">
+            <button
+              class="flex max-w-[480px] cursor-pointer items-center justify-center overflow-hidden rounded-full h-12 bg-transparent text-[#1c130d] gap-2 text-base font-bold leading-normal tracking-[0.015em] min-w-0 p-0"
+            >
+              <div class="text-[#1c130d]" data-icon="User" data-size="24px" data-weight="regular">
+                <svg xmlns="http://www.w3.org/2000/svg" width="24px" height="24px" fill="currentColor" viewBox="0 0 256 256">
+                  <path
+                    d="M230.92,212c-15.23-26.33-38.7-45.21-66.09-54.16a72,72,0,1,0-73.66,0C63.78,166.78,40.31,185.66,25.08,212a8,8,0,1,0,13.85,8c18.84-32.56,52.14-52,89.07-52s70.23,19.44,89.07,52a8,8,0,1,0,13.85-8ZM72,96a56,56,0,1,1,56,56A56.06,56.06,0,0,1,72,96Z"
+                  ></path>
+                </svg>
+              </div>
+            </button>
+          </div>
+        </div>
+        <div class="px-4 py-3">
+          <label class="flex flex-col min-w-40 h-12 w-full">
+            <div class="flex w-full flex-1 items-stretch rounded-xl h-full">
+              <div
+                class="text-[#9c6d49] flex border-none bg-[#f4ece7] items-center justify-center pl-4 rounded-l-xl border-r-0"
+                data-icon="MagnifyingGlass"
+                data-size="24px"
+                data-weight="regular"
+              >
+                <svg xmlns="http://www.w3.org/2000/svg" width="24px" height="24px" fill="currentColor" viewBox="0 0 256 256">
+                  <path d="M229.66,218.34l-50.07-50.06a88.11,88.11,0,1,0-11.31,11.31l50.06,50.07a8,8,0,0,0,11.32-11.32ZM40,112a72,72,0,1,1,72,72A72.08,72.08,0,0,1,40,112Z"></path>
+                </svg>
+              </div>
+              <input
+                placeholder="Search"
+                class="form-input flex w-full min-w-0 flex-1 resize-none overflow-hidden rounded-xl text-[#1c130d] focus:outline-0 focus:ring-0 border-none bg-[#f4ece7] focus:border-none h-full placeholder:text-[#9c6d49] px-4 rounded-l-none border-l-0 pl-2 text-base font-normal leading-normal"
+                value=""
+              />
+            </div>
+          </label>
+        </div>
+        <div class="flex gap-3 p-3 overflow-x-hidden">
+          <button class="flex h-8 shrink-0 items-center justify-center gap-x-2 rounded-full bg-[#f4ece7] pl-4 pr-2">
+            <p class="text-[#1c130d] text-sm font-medium leading-normal">Specialty</p>
+            <div class="text-[#1c130d]" data-icon="CaretDown" data-size="20px" data-weight="regular">
+              <svg xmlns="http://www.w3.org/2000/svg" width="20px" height="20px" fill="currentColor" viewBox="0 0 256 256">
+                <path d="M213.66,101.66l-80,80a8,8,0,0,1-11.32,0l-80-80A8,8,0,0,1,53.66,90.34L128,164.69l74.34-74.35a8,8,0,0,1,11.32,11.32Z"></path>
+              </svg>
+            </div>
+          </button>
+          <button class="flex h-8 shrink-0 items-center justify-center gap-x-2 rounded-full bg-[#f4ece7] pl-4 pr-2">
+            <p class="text-[#1c130d] text-sm font-medium leading-normal">Location</p>
+            <div class="text-[#1c130d]" data-icon="CaretDown" data-size="20px" data-weight="regular">
+              <svg xmlns="http://www.w3.org/2000/svg" width="20px" height="20px" fill="currentColor" viewBox="0 0 256 256">
+                <path d="M213.66,101.66l-80,80a8,8,0,0,1-11.32,0l-80-80A8,8,0,0,1,53.66,90.34L128,164.69l74.34-74.35a8,8,0,0,1,11.32,11.32Z"></path>
+              </svg>
+            </div>
+          </button>
+        </div>
+        <div class="p-4">
+          <div
+            class="bg-cover bg-center flex flex-col items-stretch justify-end rounded-xl pt-[132px]"
+            style='background-image: linear-gradient(0deg, rgba(0, 0, 0, 0.4) 0%, rgba(0, 0, 0, 0) 100%), url("/static/images/hero-bg.jpg");'
+          >
+            <div class="flex w-full items-end justify-between gap-4 p-4">
+              <p class="text-white tracking-light text-2xl font-bold leading-tight flex-1">Share your clinical cases</p>
+              <button
+                class="flex min-w-[84px] max-w-[480px] cursor-pointer items-center justify-center overflow-hidden rounded-full h-10 px-4 bg-[#f37b20] text-[#1c130d] text-sm font-bold leading-normal tracking-[0.015em]"
+              >
+                <span class="truncate">Add Case</span>
+              </button>
+            </div>
+          </div>
+        </div>
+        <h2 class="text-[#1c130d] text-[22px] font-bold leading-tight tracking-[-0.015em] px-4 pb-3 pt-5">Featured Cases</h2>
+        <div class="flex overflow-y-auto [-ms-scrollbar-style:none] [scrollbar-width:none] [&amp;::-webkit-scrollbar]:hidden">
+          <div class="flex items-stretch p-4 gap-3">
+            <div class="flex h-full flex-1 flex-col gap-4 rounded-lg min-w-60">
+              <div
+                class="w-full bg-center bg-no-repeat aspect-video bg-cover rounded-xl flex flex-col"
+                style='background-image: url("/static/images/case1.jpg");'
+              ></div>
+              <div>
+                <p class="text-[#1c130d] text-base font-medium leading-normal">Robotic-Assisted Surgery Outcomes</p>
+                <p class="text-[#9c6d49] text-sm font-normal leading-normal">Dr. Liam Chen</p>
+              </div>
+            </div>
+            <div class="flex h-full flex-1 flex-col gap-4 rounded-lg min-w-60">
+              <div
+                class="w-full bg-center bg-no-repeat aspect-video bg-cover rounded-xl flex flex-col"
+                style='background-image: url("/static/images/case2.jpg");'
+              ></div>
+              <div>
+                <p class="text-[#1c130d] text-base font-medium leading-normal">Pediatric Cardiac Surgery Innovations</p>
+                <p class="text-[#9c6d49] text-sm font-normal leading-normal">Dr. Anika Sharma</p>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+      <div>
+        <div class="flex gap-2 border-t border-[#f4ece7] bg-[#fcfaf8] px-4 pb-3 pt-2">
+          <a class="just flex flex-1 flex-col items-center justify-end gap-1 rounded-full text-[#1c130d]" href="#">
+            <div class="text-[#1c130d] flex h-8 items-center justify-center" data-icon="Briefcase" data-size="24px" data-weight="fill">
+              <svg xmlns="http://www.w3.org/2000/svg" width="24px" height="24px" fill="currentColor" viewBox="0 0 256 256">
+                <path
+                  d="M152,112a8,8,0,0,1-8,8H112a8,8,0,0,1,0-16h32A8,8,0,0,1,152,112Zm80-40V200a16,16,0,0,1-16,16H40a16,16,0,0,1-16-16V72A16,16,0,0,1,40,56H80V48a24,24,0,0,1,24-24h48a24,24,0,0,1,24,24v8h40A16,16,0,0,1,232,72ZM96,56h64V48a8,8,0,0,0-8-8H104a8,8,0,0,0-8,8Zm120,57.61V72H40v41.61A184,184,0,0,0,128,136,184,184,0,0,0,216,113.61Z"
+                ></path>
+              </svg>
+            </div>
+            <p class="text-[#1c130d] text-xs font-medium leading-normal tracking-[0.015em]">Workstation</p>
+          </a>
+          <a class="just flex flex-1 flex-col items-center justify-end gap-1 text-[#9c6d49]" href="#">
+            <div class="text-[#9c6d49] flex h-8 items-center justify-center" data-icon="Plus" data-size="24px" data-weight="regular">
+              <svg xmlns="http://www.w3.org/2000/svg" width="24px" height="24px" fill="currentColor" viewBox="0 0 256 256">
+                <path d="M224,128a8,8,0,0,1-8,8H136v80a8,8,0,0,1-16,0V136H40a8,8,0,0,1,0-16h80V40a8,8,0,0,1,16,0v80h80A8,8,0,0,1,224,128Z"></path>
+              </svg>
+            </div>
+            <p class="text-[#9c6d49] text-xs font-medium leading-normal tracking-[0.015em]">Add Case</p>
+          </a>
+          <a class="just flex flex-1 flex-col items-center justify-end gap-1 text-[#9c6d49]" href="{{ url_for('api_router.settings_page') }}">
+            <div class="text-[#9c6d49] flex h-8 items-center justify-center" data-icon="Gear" data-size="24px" data-weight="regular">
+              <svg xmlns="http://www.w3.org/2000/svg" width="24px" height="24px" fill="currentColor" viewBox="0 0 256 256">
+                <path
+                  d="M128,80a48,48,0,1,0,48,48A48.05,48.05,0,0,0,128,80Zm0,80a32,32,0,1,1,32-32A32,32,0,0,1,128,160Zm88-29.84q.06-2.16,0-4.32l14.92-18.64a8,8,0,0,0,1.48-7.06,107.6,107.6,0,0,0-10.88-26.25,8,8,0,0,0-6-3.93l-23.72-2.64q-1.48-1.56-3-3L186,40.54a8,8,0,0,0-3.94-6,107.29,107.29,0,0,0-26.25-10.86,8,8,0,0,0-7.06,1.48L130.16,40Q128,40,125.84,40L107.2,25.11a8,8,0,0,0-7.06-1.48A107.6,107.6,0,0,0,73.89,34.51a8,8,0,0,0-3.93,6L67.32,64.27q-1.56,1.49-3,3L40.54,70a8,8,0,0,0-6,3.94,107.71,107.71,0,0,0-10.87,26.25,8,8,0,0,0,1.49,7.06L40,125.84Q40,128,40,130.16L25.11,148.8a8,8,0,0,0-1.48,7.06,107.6,107.6,0,0,0,10.88,26.25,8,8,0,0,0,6,3.93l23.72,2.64q1.49,1.56,3,3L70,215.46a8,8,0,0,0,3.94,6,107.71,107.71,0,0,0,26.25,10.87,8,8,0,0,0,7.06-1.49L125.84,216q2.16.06,4.32,0l18.64,14.92a8,8,0,0,0,7.06,1.48,107.21,107.21,0,0,0,26.25-10.88,8,8,0,0,0,3.93-6l2.64-23.72q1.56-1.48,3-3L215.46,186a8,8,0,0,0,6-3.94,107.71,107.71,0,0,0,10.87-26.25,8,8,0,0,0-1.49-7.06ZM128,168a40,40,0,1,1,40-40A40,40,0,0,1,128,168Z"
+                ></path>
+              </svg>
+            </div>
+            <p class="text-[#9c6d49] text-xs font-medium leading-normal tracking-[0.015em]">Settings</p>
+          </a>
+        </div>
+        <div class="h-5 bg-[#fcfaf8]"></div>
+      </div>
+    </div>
+    
+    <!-- Service Worker Registration -->
+    <script>
+      if ('serviceWorker' in navigator) {
+        window.addEventListener('load', () => {
+          navigator.serviceWorker.register('/static/sw.js')
+            .then(registration => {
+              console.log('ServiceWorker registered with scope:', registration.scope);
+              
+              // Check for updates
+              registration.onupdatefound = () => {
+                const installingWorker = registration.installing;
+                installingWorker.onstatechange = () => {
+                  if (installingWorker.state === 'installed' && 
+                      navigator.serviceWorker.controller) {
+                    if (confirm('New version available. Reload to update?')) {
+                      window.location.reload();
+                    }
+                  }
+                };
+              };
+            })
+            .catch(error => {
+              console.error('ServiceWorker registration failed:', error);
+            });
+        });
+      }
+    </script>
+  </body>
+</html>
