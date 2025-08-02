@@ -34,6 +34,9 @@
     <!-- Surgify UI compatibility enhancements -->
     <script src="/static/js/surgify-compatibility.js"></script>
     
+    <!-- WebAuthn Authentication -->
+    <script src="/static/js/webauthn-auth.js" defer></script>
+    
     <script src="/static/js/theme-switcher.js" defer></script>
     <script src="/static/js/sidebar-menu.js" defer></script>
     
@@ -66,7 +69,7 @@
                         type="text" 
                         id="global-search"
                         placeholder="Search cases, protocols, patients..." 
-                        class="w-full px-4 py-2 pl-10 pr-4 bg-[var(--bg-secondary)] border border-[var(--border-color)] rounded-lg text-[var(--text-primary)] placeholder-[var(--text-tertiary)] focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+                        class="w-full px-4 py-2 pl-10 pr-4 bg-[var(--bg-secondary)] border border-[var(--border-color)] rounded-lg text-[var(--text-primary)] placeholder-[var(--text-tertiary)] focus:outline-none focus:ring-2 focus:ring-blue-400 focus:border-transparent"
                     >
                     <svg class="absolute left-3 top-2.5 w-5 h-5 text-[var(--text-tertiary)]" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                         <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"></path>
@@ -74,8 +77,109 @@
                 </div>
             </div>
             
-            <!-- Theme Toggle -->
+            <!-- User Authentication & Theme Toggle -->
             <div class="flex items-center gap-4">
+                <!-- User Menu -->
+                <div class="relative" id="user-menu">
+                    <button 
+                        id="user-menu-toggle"
+                        class="flex items-center gap-2 p-2 rounded-lg bg-[var(--bg-secondary)] hover:bg-[var(--bg-tertiary)] text-[var(--text-primary)] transition-colors"
+                        title="User Menu"
+                    >
+                        <svg class="w-5 h-5" fill="currentColor" viewBox="0 0 256 256">
+                            <path d="M230.92,212c-15.23-26.33-38.7-45.21-66.09-54.16a72,72,0,1,0-73.66,0C63.78,166.78,40.31,185.66,25.08,212a8,8,0,1,0,13.85,8c18.84-32.56,52.14-52,89.07-52s70.23,19.44,89.07,52a8,8,0,1,0,13.85-8ZM72,96a56,56,0,1,1,56,56A56.06,56.06,0,0,1,72,96Z"></path>
+                        </svg>
+                        <span class="hidden sm:inline text-sm font-medium" id="user-display-name">Guest</span>
+                    </button>
+                    
+                    <!-- User Dropdown Menu -->
+                    <div 
+                        id="user-dropdown" 
+                        class="absolute right-0 mt-2 w-64 bg-white dark:bg-gray-800 rounded-lg shadow-lg border border-gray-200 dark:border-gray-700 hidden z-50"
+                    >
+                        <div class="p-4 border-b border-gray-200 dark:border-gray-700">
+                            <div id="authenticated-section" class="hidden">
+                                <div class="flex items-center gap-3">
+                                    <div class="w-10 h-10 bg-blue-50 dark:bg-blue-900 rounded-full flex items-center justify-center">
+                                        <svg class="w-5 h-5 text-blue-400 dark:text-blue-400" fill="currentColor" viewBox="0 0 256 256">
+                                            <path d="M230.92,212c-15.23-26.33-38.7-45.21-66.09-54.16a72,72,0,1,0-73.66,0C63.78,166.78,40.31,185.66,25.08,212a8,8,0,1,0,13.85,8c18.84-32.56,52.14-52,89.07-52s70.23,19.44,89.07,52a8,8,0,1,0,13.85-8ZM72,96a56,56,0,1,1,56,56A56.06,56.06,0,0,1,72,96Z"></path>
+                                        </svg>
+                                    </div>
+                                    <div>
+                                        <div class="font-medium text-gray-900 dark:text-white" id="user-name">Dr. Smith</div>
+                                        <div class="text-sm text-gray-500 dark:text-gray-400" id="user-email">dr.smith@hospital.com</div>
+                                    </div>
+                                </div>
+                            </div>
+                            
+                            <div id="guest-section">
+                                <div class="text-center">
+                                    <p class="text-gray-600 dark:text-gray-300 mb-3">Access your surgical workspace</p>
+                                    
+                                    <!-- Biometric Authentication Section -->
+                                    <div id="biometric-auth-section" class="hidden mb-4">
+                                        <button 
+                                            id="biometric-login" 
+                                            class="w-full bg-blue-400 hover:bg-blue-500 text-white font-medium py-2 px-4 rounded-lg transition-colors mb-2 flex items-center justify-center gap-2"
+                                        >
+                                            <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 15v2m-6 4h12a2 2 0 002-2v-6a2 2 0 00-2-2H6a2 2 0 00-2 2v6a2 2 0 002 2zm10-10V7a4 4 0 00-8 0v4h8z"></path>
+                                            </svg>
+                                            Use Biometric Login
+                                        </button>
+                                        <div class="text-xs text-gray-500 mb-3">or</div>
+                                    </div>
+                                    
+                                    <button 
+                                        id="login-btn" 
+                                        class="w-full bg-blue-400 hover:bg-blue-500 text-white font-medium py-2 px-4 rounded-lg transition-colors"
+                                    >
+                                        Sign In
+                                    </button>
+                                    
+                                    <!-- WebAuthn Registration -->
+                                    <div class="mt-3">
+                                        <button 
+                                            id="register-webauthn" 
+                                            class="text-sm text-blue-400 hover:text-blue-500 underline"
+                                        >
+                                            Set up passwordless login
+                                        </button>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                        
+                        <div class="py-2">
+                            <div id="authenticated-menu" class="hidden">
+                                <a href="/profile" class="flex items-center gap-3 px-4 py-2 text-gray-700 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-gray-700">
+                                    <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z"></path>
+                                    </svg>
+                                    Profile Settings
+                                </a>
+                                <a href="/workstation" class="flex items-center gap-3 px-4 py-2 text-gray-700 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-gray-700">
+                                    <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 17V7m0 10a2 2 0 01-2 2H5a2 2 0 01-2-2V7a2 2 0 012-2h2a2 2 0 012 2m0 10a2 2 0 002 2h2a2 2 0 002-2M9 7a2 2 0 012-2h2a2 2 0 012 2m0 10V7m0 10a2 2 0 002 2h2a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2-2h2a2 2 0 012 2"></path>
+                                    </svg>
+                                    My Workstation
+                                </a>
+                                <hr class="my-2 border-gray-200 dark:border-gray-700">
+                                <button 
+                                    id="logout-btn" 
+                                    class="w-full flex items-center gap-3 px-4 py-2 text-red-600 dark:text-red-400 hover:bg-red-50 dark:hover:bg-red-900/20"
+                                >
+                                    <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 16l4-4m0 0l-4-4m4 4H7m6 4v1a3 3 0 01-3 3H6a3 3 0 01-3-3V7a3 3 0 013-3h4a3 3 0 013 3v1"></path>
+                                    </svg>
+                                    Sign Out
+                                </button>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                
+                <!-- Theme Toggle -->
                 <button 
                     id="theme-toggle" 
                     class="p-2 rounded-lg bg-[var(--bg-secondary)] hover:bg-[var(--bg-tertiary)] text-[var(--text-primary)] transition-colors"
@@ -101,39 +205,229 @@
             {% endblock %}
         </main>
 
-        <!-- Bottom Navigation -->
-        <nav class="bottom-nav bg-[var(--bg-primary)] border-t border-[var(--border-color)] px-4 py-2">
-            <div class="flex justify-around items-center">
-                <a href="/" class="nav-item flex flex-col items-center gap-1 py-2 {% if request.path == '/' %}active{% endif %}">
-                    <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" fill="currentColor" viewBox="0 0 256 256">
-                        <path d="M218.83,103.77l-80-75.48a1.14,1.14,0,0,1-.11-.11,16,16,0,0,0-21.53,0l-.11.11L37.17,103.77A16,16,0,0,0,32,115.55V208a16,16,0,0,0,16,16H96a16,16,0,0,0,16-16V160h32v48a16,16,0,0,0,16,16h48a16,16,0,0,0,16-16V115.55A16,16,0,0,0,218.83,103.77ZM208,208H160V160a16,16,0,0,0-16-16H112a16,16,0,0,0-16,16v48H48V115.55l.11-.1L128,40l79.9,75.43.11.1Z"></path>
-                    </svg>
-                    <span class="text-xs">Home</span>
-                </a>
-                <a href="/workstation" class="nav-item flex flex-col items-center gap-1 py-2 {% if request.path == '/workstation' %}active{% endif %}">
-                    <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" fill="currentColor" viewBox="0 0 256 256">
-                        <path d="M152,112a8,8,0,0,1-8,8H112a8,8,0,0,1,0-16h32A8,8,0,0,1,152,112Zm80-40V200a16,16,0,0,1-16,16H40a16,16,0,0,1-16-16V72A16,16,0,0,1,40,56H80V48a24,24,0,0,1,24-24h48a24,24,0,0,1,24,24v8h40A16,16,0,0,1,232,72ZM96,56h64V48a8,8,0,0,0-8-8H104a8,8,0,0,0-8,8Zm120,57.61V72H40v41.61A184,184,0,0,0,128,136,184,184,0,0,0,216,113.61Z"></path>
-                    </svg>
-                    <span class="text-xs">Workstation</span>
-                </a>
-                <a href="/add_case" class="nav-item flex flex-col items-center gap-1 py-2 {% if request.path == '/add_case' %}active{% endif %}">
-                    <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" fill="currentColor" viewBox="0 0 256 256">
-                        <path d="M224,128a8,8,0,0,1-8,8H136v80a8,8,0,0,1-16,0V136H40a8,8,0,0,1,0-16h80V40a8,8,0,0,1,16,0v80h80A8,8,0,0,1,224,128Z"></path>
-                    </svg>
-                    <span class="text-xs">Add Case</span>
-                </a>
-                <a href="/marketplace" class="nav-item flex flex-col items-center gap-1 py-2 {% if request.path == '/marketplace' %}active{% endif %}">
-                    <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" fill="currentColor" viewBox="0 0 256 256">
-                        <path d="M96,216a16,16,0,1,1-16-16A16,16,0,0,1,96,216Zm88-16a16,16,0,1,0,16,16A16,16,0,0,0,184,200ZM231.65,74.35l-28.53,92.71A23.89,23.89,0,0,1,180.18,184H84.07A24.11,24.11,0,0,1,61,166.59L24.82,40H8A8,8,0,0,1,8,24H24.82A8.08,8.08,0,0,1,32.54,29.41L52.92,72H224a8,8,0,0,1,7.65,10.35ZM213.17,88H57.37l26.13,73.89a8.08,8.08,0,0,0,7.7,5.11H180.18a8,8,0,0,0,7.65-5.78Z"></path>
-                    </svg>
-                    <span class="text-xs">Marketplace</span>
-                </a>
-                <a href="/settings" class="nav-item flex flex-col items-center gap-1 py-2 {% if request.path == '/settings' %}active{% endif %}">
-                    <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" fill="currentColor" viewBox="0 0 256 256">
-                        <path d="M128,80a48,48,0,1,0,48,48A48.05,48.05,0,0,0,128,80Zm0,80a32,32,0,1,1,32-32A32,32,0,0,1,128,160Zm88-29.84q.06-2.16,0-4.32l14.92-18.64a8,8,0,0,0,1.48-7.06,107.21,107.21,0,0,0-10.88-26.25,8,8,0,0,0-6-3.93l-23.72-2.64a63.73,63.73,0,0,0-3.08-3.07l-2.64-23.73a8,8,0,0,0-3.93-6,107.21,107.21,0,0,0-26.25-10.88,8,8,0,0,0-7.06,1.49L130.16,40a61.25,61.25,0,0,0-4.32,0L107.2,25.07a8,8,0,0,0-7.06-1.49A107.21,107.21,0,0,0,73.89,34.46a8,8,0,0,0-3.93,6L67.32,64.18a63.73,63.73,0,0,0-3.07,3.08L40.53,69.89a8,8,0,0,0-6,3.93,107.21,107.21,0,0,0-10.88,26.25,8,8,0,0,0,1.49,7.06L40.06,125.84q-.06,2.16,0,4.32L25.14,148.8a8,8,0,0,0-1.49,7.06,107.21,107.21,0,0,0,10.88,26.25,8,8,0,0,0,6,3.93l23.72,2.64a63.73,63.73,0,0,0,3.08,3.07l2.64,23.73a8,8,0,0,0,3.93,6,107.21,107.21,0,0,0,26.25,10.88,8,8,0,0,0,7.06-1.49L125.84,216a61.25,61.25,0,0,0,4.32,0l18.64,14.92a8,8,0,0,0,7.06,1.49,107.21,107.21,0,0,0,26.25-10.88,8,8,0,0,0,3.93-6l2.64-23.73a63.73,63.73,0,0,0,3.07-3.08l23.73-2.63a8,8,0,0,0,6-3.93,107.21,107.21,0,0,0,10.88-26.25,8,8,0,0,0-1.49-7.06ZM201,171.47l-22.15,2.45a8,8,0,0,0-5.82,3.32,49.87,49.87,0,0,1-7.75,7.75,8,8,0,0,0-3.33,5.82L159.53,213a91.83,91.83,0,0,1-15.76,6.54l-17.37-13.89a8,8,0,0,0-5-1.74c-1.48,0-3,.06-4.44.06a8,8,0,0,0-5,1.74L94.6,219.55a91.83,91.83,0,0,1-15.76-6.54L76.39,190.82A8,8,0,0,0,73.07,185a49.87,49.87,0,0,1-7.75-7.75,8,8,0,0,0-5.82-3.32L37.35,171.47a91.83,91.83,0,0,1-6.54-15.76l13.89-17.37a8,8,0,0,0,1.74-5c0-1.48-.06-3-.06-4.44a8,8,0,0,0-1.74-5L30.75,106.53a91.83,91.83,0,0,1,6.54-15.76l22.19-2.45a8,8,0,0,0,5.82-3.32,49.87,49.87,0,0,1,7.75-7.75,8,8,0,0,0,3.32-5.82L78.82,49.24a91.83,91.83,0,0,1,15.76-6.54l17.37,13.89a8,8,0,0,0,5,1.74c1.48,0,3-.06,4.44-.06a8,8,0,0,0,5-1.74l17.37-13.89a91.83,91.83,0,0,1,15.76,6.54l2.45,22.19a8,8,0,0,0,3.32,5.82,49.87,49.87,0,0,1,7.75,7.75,8,8,0,0,0,5.82,3.32l22.19,2.45a91.83,91.83,0,0,1,6.54,15.76l-13.89,17.37a8,8,0,0,0-1.74,5c0,1.48.06,3,.06,4.44a8,8,0,0,0,1.74,5l13.89,17.37A91.83,91.83,0,0,1,201,171.47Z"></path>
-                    </svg>
-                    <span class="text-xs">Settings</span>
-                </a>
+        <!-- Enhanced Footer Navigation -->
+        <nav class="bottom-nav bg-[var(--bg-primary)] border-t border-[var(--border-color)] px-4 py-4">
+            <div class="max-w-6xl mx-auto">
+                <!-- Mobile Footer Navigation -->
+                <div class="flex justify-around items-center md:hidden">
+                    <a href="/" class="nav-item flex flex-col items-center gap-1 py-3 px-3 rounded-xl transition-all duration-200 {% if request.path == '/' %}active bg-blue-50 text-blue-400{% else %}hover:bg-[var(--bg-secondary)]{% endif %}">
+                        <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" fill="currentColor" viewBox="0 0 256 256">
+                            <path d="M218.83,103.77l-80-75.48a1.14,1.14,0,0,1-.11-.11,16,16,0,0,0-21.53,0l-.11.11L37.17,103.77A16,16,0,0,0,32,115.55V208a16,16,0,0,0,16,16H96a16,16,0,0,0,16-16V160h32v48a16,16,0,0,0,16,16h48a16,16,0,0,0,16-16V115.55A16,16,0,0,0,218.83,103.77ZM208,208H160V160a16,16,0,0,0-16-16H112a16,16,0,0,0-16,16v48H48V115.55l.11-.1L128,40l79.9,75.43.11.10Z"></path>
+                        </svg>
+                        <span class="text-xs font-medium">Home</span>
+                    </a>
+                    
+                    <a href="/workstation" class="nav-item flex flex-col items-center gap-1 py-3 px-3 rounded-xl transition-all duration-200 {% if request.path == '/workstation' %}active bg-blue-50 text-blue-400{% else %}hover:bg-[var(--bg-secondary)]{% endif %}">
+                        <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" fill="currentColor" viewBox="0 0 256 256">
+                            <path d="M152,112a8,8,0,0,1-8,8H112a8,8,0,0,1,0-16h32A8,8,0,0,1,152,112Zm80-40V200a16,16,0,0,1-16,16H40a16,16,0,0,1-16-16V72A16,16,0,0,1,40,56H80V48a24,24,0,0,1,24-24h48a24,24,0,0,1,24,24v8h40A16,16,0,0,1,232,72ZM96,56h64V48a8,8,0,0,0-8-8H104a8,8,0,0,0-8,8Zm120,57.61V72H40v41.61A184,184,0,0,0,128,136A184,184,0,0,0,216,113.61Z"></path>
+                        </svg>
+                        <span class="text-xs font-medium">Workstation</span>
+                    </a>
+                    
+                    <a href="/add-case" class="nav-item flex flex-col items-center gap-1 py-3 px-3 rounded-xl transition-all duration-200 {% if request.path == '/add-case' %}active bg-green-50 text-green-500{% else %}hover:bg-[var(--bg-secondary)]{% endif %}">
+                        <div class="relative">
+                            <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" fill="currentColor" viewBox="0 0 256 256">
+                                <path d="M224,128a8,8,0,0,1-8,8H136v80a8,8,0,0,1-16,0V136H40a8,8,0,0,1,0-16h80V40a8,8,0,0,1,16,0v80h80A8,8,0,0,1,224,128Z"></path>
+                            </svg>
+                            <div class="absolute -top-1 -right-1 w-3 h-3 bg-green-400 rounded-full"></div>
+                        </div>
+                        <span class="text-xs font-medium">Add Case</span>
+                    </a>
+                    
+                    <a href="/marketplace" class="nav-item flex flex-col items-center gap-1 py-3 px-3 rounded-xl transition-all duration-200 {% if request.path == '/marketplace' %}active bg-purple-50 text-purple-500{% else %}hover:bg-[var(--bg-secondary)]{% endif %}">
+                        <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" fill="currentColor" viewBox="0 0 256 256">
+                            <path d="M96,216a16,16,0,1,1-16-16A16,16,0,0,1,96,216Zm88-16a16,16,0,1,0,16,16A16,16,0,0,0,184,200ZM231.65,74.35l-28.53,92.71A23.89,23.89,0,0,1,180.18,184H84.07A24.11,24.11,0,0,1,61,166.59L24.82,40H8A8,8,0,0,1,8,24H24.82A8.08,8.08,0,0,1,32.54,29.41L52.92,72H224a8,8,0,0,1,7.65,10.35ZM213.17,88H57.37l26.13,73.89a8.08,8.08,0,0,0,7.7,5.11H180.18a8,8,0,0,0,7.65-5.78Z"></path>
+                        </svg>
+                        <span class="text-xs font-medium">Market</span>
+                    </a>
+                    
+                    <a href="/surgery-analysis" class="nav-item flex flex-col items-center gap-1 py-3 px-3 rounded-xl transition-all duration-200 {% if request.path == '/surgery-analysis' %}active bg-orange-50 text-orange-500{% else %}hover:bg-[var(--bg-secondary)]{% endif %}">
+                        <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" fill="currentColor" viewBox="0 0 256 256">
+                            <path d="M230.91,172A8,8,0,0,1,216,181.09a7.53,7.53,0,0,1-2.91-.58l-16-6.4L180.91,200a8,8,0,0,1-13.82,0L152,175.82l-40,16a8,8,0,0,1-10.91-10.91l16-40L92.18,125.82a8,8,0,0,1,0-13.82L118.09,96l-6.4-16A8,8,0,0,1,122.18,70.91l16,6.4L164.09,56a8,8,0,0,1,13.82,0L193,80.18l40-16a8,8,0,0,1,10.91,10.91l-16,40L252.82,130.18a8,8,0,0,1,0,13.82L227.91,159l6.4,16A8,8,0,0,1,230.91,172Z"></path>
+                        </svg>
+                        <span class="text-xs font-medium">Analysis</span>
+                    </a>
+                </div>
+
+                <!-- Desktop Footer Links -->
+                <div class="hidden md:block">
+                    <div class="grid grid-cols-1 md:grid-cols-4 gap-8">
+                        <!-- Platform Section -->
+                        <div>
+                            <h3 class="text-lg font-semibold mb-4 text-[var(--text-primary)]">Platform</h3>
+                            <ul class="space-y-3">
+                                <li>
+                                    <a href="/workstation" class="text-[var(--text-secondary)] hover:text-blue-400 transition-colors flex items-center gap-2">
+                                        <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 17V7m0 10a2 2 0 01-2 2H5a2 2 0 01-2-2V7a2 2 0 012-2h2a2 2 0 012 2m0 10a2 2 0 002 2h2a2 2 0 002-2M9 7a2 2 0 012-2h2a2 2 0 012 2m0 10V7m0 10a2 2 0 002 2h2a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2-2h2a2 2 0 012 2"></path>
+                                        </svg>
+                                        Clinical Workstation
+                                    </a>
+                                </li>
+                                <li>
+                                    <a href="/add-case" class="text-[var(--text-secondary)] hover:text-green-500 transition-colors flex items-center gap-2">
+                                        <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 6v6m0 0v6m0-6h6m-6 0H6"></path>
+                                        </svg>
+                                        Add New Case
+                                    </a>
+                                </li>
+                                <li>
+                                    <a href="/surgery-analysis" class="text-[var(--text-secondary)] hover:text-orange-500 transition-colors flex items-center gap-2">
+                                        <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 19v-6a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2a2 2 0 002-2zm0 0V9a2 2 0 012-2h2a2 2 0 012 2v10m-6 0a2 2 0 002 2h2a2 2 0 002-2m0 0V5a2 2 0 012-2h2a2 2 0 012 2v14a2 2 0 01-2 2h-2a2 2 0 01-2-2z"></path>
+                                        </svg>
+                                        Surgery Analysis
+                                    </a>
+                                </li>
+                                <li>
+                                    <a href="/marketplace" class="text-[var(--text-secondary)] hover:text-purple-500 transition-colors flex items-center gap-2">
+                                        <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M16 11V7a4 4 0 00-8 0v4M5 9h14l1 12H4L5 9z"></path>
+                                        </svg>
+                                        Protocol Marketplace
+                                    </a>
+                                </li>
+                            </ul>
+                        </div>
+
+                        <!-- Analysis Section -->
+                        <div>
+                            <h3 class="text-lg font-semibold mb-4 text-[var(--text-primary)]">Analysis & Insights</h3>
+                            <ul class="space-y-3">
+                                <li>
+                                    <a href="/api/analysis" class="text-[var(--text-secondary)] hover:text-blue-400 transition-colors flex items-center gap-2">
+                                        <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M16 8v8m-4-5v5m-4-2v2m-2 4h12a2 2 0 002-2V6a2 2 0 00-2-2H6a2 2 0 00-2 2v12a2 2 0 002 2z"></path>
+                                        </svg>
+                                        Statistical Dashboard
+                                    </a>
+                                </li>
+                                <li>
+                                    <a href="/api/decisions" class="text-[var(--text-secondary)] hover:text-green-500 transition-colors flex items-center gap-2">
+                                        <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4M7.835 4.697a3.42 3.42 0 001.946-.806 3.42 3.42 0 014.438 0 3.42 3.42 0 001.946.806 3.42 3.42 0 013.138 3.138 3.42 3.42 0 00.806 1.946 3.42 3.42 0 010 4.438 3.42 3.42 0 00-.806 1.946 3.42 3.42 0 01-3.138 3.138 3.42 3.42 0 00-1.946.806 3.42 3.42 0 01-4.438 0 3.42 3.42 0 00-1.946-.806 3.42 3.42 0 01-3.138-3.138 3.42 3.42 0 00-.806-1.946 3.42 3.42 0 010-4.438 3.42 3.42 0 00.806-1.946 3.42 3.42 0 013.138-3.138z"></path>
+                                        </svg>
+                                        ADCI Decision Engine
+                                    </a>
+                                </li>
+                                <li>
+                                    <a href="/api/education" class="text-[var(--text-secondary)] hover:text-indigo-500 transition-colors flex items-center gap-2">
+                                        <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 6.253v13m0-13C10.832 5.477 9.246 5 7.5 5S4.168 5.477 3 6.253v13C4.168 18.477 5.754 18 7.5 18s3.332.477 4.5 1.253m0-13C13.168 5.477 14.754 5 16.5 5c1.747 0 3.332.477 4.5 1.253v13C19.832 18.477 18.246 18 16.5 18c-1.746 0-3.332.477-4.5 1.253"></path>
+                                        </svg>
+                                        Education Resources
+                                    </a>
+                                </li>
+                                <li>
+                                    <a href="/api/hospitality" class="text-[var(--text-secondary)] hover:text-teal-500 transition-colors flex items-center gap-2">
+                                        <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 21V5a2 2 0 00-2-2H7a2 2 0 00-2 2v16m14 0h2m-2 0h-5m-9 0H3m2 0h5M9 7h1m-1 4h1m4-4h1m-1 4h1m-5 10v-5a1 1 0 011-1h2a1 1 0 011 1v5m-4 0h4"></path>
+                                        </svg>
+                                        Hospitality Management
+                                    </a>
+                                </li>
+                            </ul>
+                        </div>
+
+                        <!-- Resources Section -->
+                        <div>
+                            <h3 class="text-lg font-semibold mb-4 text-[var(--text-primary)]">Resources</h3>
+                            <ul class="space-y-3">
+                                <li>
+                                    <a href="/docs" class="text-[var(--text-secondary)] hover:text-blue-400 transition-colors flex items-center gap-2">
+                                        <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"></path>
+                                        </svg>
+                                        Documentation
+                                    </a>
+                                </li>
+                                <li>
+                                    <a href="/api-docs" class="text-[var(--text-secondary)] hover:text-green-500 transition-colors flex items-center gap-2">
+                                        <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 20l4-16m4 4l4 4-4 4M6 16l-4-4 4-4"></path>
+                                        </svg>
+                                        API Reference
+                                    </a>
+                                </li>
+                                <li>
+                                    <a href="/support" class="text-[var(--text-secondary)] hover:text-orange-500 transition-colors flex items-center gap-2">
+                                        <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M18.364 5.636l-3.536 3.536m0 5.656l3.536 3.536M9.172 9.172L5.636 5.636m3.536 9.192L5.636 18.364M12 2.25a9.75 9.75 0 100 19.5 9.75 9.75 0 000-19.5z"></path>
+                                        </svg>
+                                        Support Center
+                                    </a>
+                                </li>
+                                <li>
+                                    <a href="/community" class="text-[var(--text-secondary)] hover:text-purple-500 transition-colors flex items-center gap-2">
+                                        <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 20h5v-2a3 3 0 00-5.356-1.857M17 20H7m10 0v-2c0-.656-.126-1.283-.356-1.857M7 20H2v-2a3 3 0 015.356-1.857M7 20v-2c0-.656.126-1.283.356-1.857m0 0a5.002 5.002 0 019.288 0M15 7a3 3 0 11-6 0 3 3 0 016 0zm6 3a2 2 0 11-4 0 2 2 0 014 0zM7 10a2 2 0 11-4 0 2 2 0 014 0z"></path>
+                                        </svg>
+                                        Community Forum
+                                    </a>
+                                </li>
+                            </ul>
+                        </div>
+
+                        <!-- Company Section -->
+                        <div>
+                            <h3 class="text-lg font-semibold mb-4 text-[var(--text-primary)]">About</h3>
+                            <ul class="space-y-3">
+                                <li>
+                                    <a href="/about" class="text-[var(--text-secondary)] hover:text-blue-400 transition-colors flex items-center gap-2">
+                                        <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"></path>
+                                        </svg>
+                                        About Surgify
+                                    </a>
+                                </li>
+                                <li>
+                                    <a href="/privacy" class="text-[var(--text-secondary)] hover:text-green-500 transition-colors flex items-center gap-2">
+                                        <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m5.618-4.016A11.955 11.955 0 0112 2.944a11.955 11.955 0 01-8.618 3.04A12.02 12.02 0 003 9c0 5.591 3.824 10.29 9 11.622 5.176-1.332 9-6.03 9-11.622 0-1.042-.133-2.052-.382-3.016z"></path>
+                                        </svg>
+                                        Privacy Policy
+                                    </a>
+                                </li>
+                                <li>
+                                    <a href="/terms" class="text-[var(--text-secondary)] hover:text-orange-500 transition-colors flex items-center gap-2">
+                                        <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"></path>
+                                        </svg>
+                                        Terms of Service
+                                    </a>
+                                </li>
+                                <li>
+                                    <a href="/contact" class="text-[var(--text-secondary)] hover:text-purple-500 transition-colors flex items-center gap-2">
+                                        <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 8l7.89 4.26a2 2 0 002.22 0L21 8M5 19h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z"></path>
+                                        </svg>
+                                        Contact Us
+                                    </a>
+                                </li>
+                            </ul>
+                        </div>
+                    </div>
+
+                    <!-- Copyright Section -->
+                    <div class="mt-8 pt-6 border-t border-[var(--border-color)] flex flex-col md:flex-row justify-between items-center gap-4">
+                        <div class="flex items-center gap-3">
+                            <img src="/static/icons/surgify-logo.png" alt="Surgify" class="h-5 w-auto opacity-75" onerror="this.style.display='none';">
+                            <span class="text-sm text-[var(--text-tertiary)] font-medium">
+                                © 2025 Gastric ADCI Platform
+                            </span>
+                        </div>
+                        <div class="flex items-center gap-6">
+                            <span class="text-xs text-[var(--text-tertiary)] bg-[var(--bg-secondary)] px-3 py-1 rounded-full">
+                                ADCI Framework v2.0
+                            </span>
+                            <div class="flex items-center gap-2">
+                                <div class="w-2 h-2 bg-emerald-400 rounded-full animate-pulse"></div>
+                                <span class="text-xs text-[var(--text-tertiary)] font-medium">Operational</span>
+                            </div>
+                        </div>
+                    </div>
+                </div>
             </div>
         </nav>
     </div>

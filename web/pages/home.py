@@ -19,8 +19,8 @@ async def home(request: Request):
 
 @router.get("/dashboard")
 async def dashboard(request: Request):
-    """Dashboard page"""
-    return templates.TemplateResponse("dashboard.html", {"request": request})
+    """Dashboard page - redirect to workstation"""
+    return templates.TemplateResponse("workstation.html", {"request": request})
 
 @router.get("/test")
 async def test_page(request: Request):
