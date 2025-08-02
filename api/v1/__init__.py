@@ -10,6 +10,7 @@ from .decisions import router as decisions_router
 from .analysis import router as analysis_router
 from .cases import router as cases_router
 from .education import router as education_router
+from .hospitality import router as hospitality_router
 
 # Create main router
 router = APIRouter()

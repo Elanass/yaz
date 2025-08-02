@@ -1,5 +1,5 @@
 """
-Core dependencies for API endpoints - Simple and clean
+Core dependencies for API endpoints
 """
 from typing import Dict, Any, Optional
 from enum import Enum
@@ -42,5 +42,20 @@ def require_role(domain: Domain = None, scope: Scope = None, required_role: str 
     def role_checker(current_user: Dict[str, Any] = Depends(require_auth)):
         if current_user.get("role") != required_role:
             raise HTTPException(status_code=status.HTTP_403_FORBIDDEN, detail="Insufficient permissions")
+        # Simplified permission check - in real implementation, check domain/scope permissions
         return current_user
     return role_checker
+
+class AuthService:
+    """Authentication service for dependency injection"""
+    
+    def __init__(self):
+        self.security = security
+    
+    async def get_current_user(self, credentials: Optional[HTTPAuthorizationCredentials] = None) -> Optional[Dict[str, Any]]:
+        """Get current user from token"""
+        return await get_current_user(credentials)
+    
+    async def require_auth(self, current_user: Optional[Dict[str, Any]] = None) -> Dict[str, Any]:
+        """Require authentication"""
+        return await require_auth(current_user)

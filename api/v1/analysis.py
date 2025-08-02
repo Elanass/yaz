@@ -13,7 +13,7 @@ from core.utils.id_generator import generate_id
 from fastapi.responses import FileResponse
 
 from core.dependencies import require_auth
-from features.analysis.analysis_engine import AnalysisEngine
+from feature.analysis.analysis_engine import AnalysisEngine
 from core.reproducibility.manager import ReproducibilityManager
 from core.services.logger import get_logger
 

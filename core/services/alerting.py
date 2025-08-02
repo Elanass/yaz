@@ -13,7 +13,7 @@ from typing import Dict, List, Optional, Any, Callable, Awaitable
 
 from core.config.settings import get_feature_config
 from core.services.base import BaseService
-from core.services.logger import Logger
+from core.services.logger import get_logger
 
 
 class AlertSeverity(str, Enum):
@@ -146,8 +146,8 @@ class AlertingService(BaseService):
     
     def __init__(self):
         super().__init__()
-        self.config = get_feature_config("alerting")
-        self.logger = Logger()
+        self.config = get_feature_config().get("alerting", {})
+        self.logger = get_logger(__name__)
         self.active_alerts: Dict[str, Alert] = {}
         self.alert_listeners: List[Callable[[Alert], Awaitable[None]]] = []
         self.expiration_task = None

@@ -10,8 +10,8 @@ import json
 from pathlib import Path
 
 from core.dependencies import get_current_user
-from features.decisions.adci_engine import ADCIEngine
-from features.decisions.precision_engine import MCDAEngine
+from feature.decisions.adci_engine import ADCIEngine
+from feature.decisions.precision_engine import MCDAEngine
 from core.reproducibility.manager import ReproducibilityManager
 from core.services.logger import get_logger
 

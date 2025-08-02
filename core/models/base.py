@@ -4,10 +4,12 @@ Core Models - Streamlined base models for the platform
 
 from datetime import datetime
 from enum import Enum
-from typing import Any, Dict, List, Optional
+from typing import Any, Dict, Generic, List, Optional, TypeVar
 from uuid import UUID, uuid4
 
 from pydantic import BaseModel, Field
+
+T = TypeVar('T')
 
 
 class BaseEntity(BaseModel):
@@ -21,12 +23,12 @@ class BaseEntity(BaseModel):
         from_attributes = True
 
 
-class ApiResponse(BaseModel):
+class ApiResponse(BaseModel, Generic[T]):
     """Standard API response wrapper"""
     
     success: bool = True
     message: str = "Success"
-    data: Optional[Any] = None
+    data: Optional[T] = None
     errors: Optional[List[str]] = None
 
 

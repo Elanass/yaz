@@ -5,8 +5,8 @@ Handles all case-related operations in a single, efficient service
 
 from typing import Dict, Any, List, Optional
 
-from features.analysis.impact_metrics import ImpactMetricsAnalyzer
-from features.decisions.adci_engine import ADCIEngine
+from feature.analysis.impact_metrics import ImpactMetricsAnalyzer
+from feature.decisions.adci_engine import ADCIEngine
 from core.services.logger import get_logger
 
 logger = get_logger(__name__)
