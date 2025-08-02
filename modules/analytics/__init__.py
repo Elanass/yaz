@@ -1,7 +1,3 @@
 """
-Analytics Module - Data analysis and reporting
+Analytics Module
 """
-
-from .router import router
-
-__all__ = ["router"]

@@ -24,10 +24,6 @@ from core.services.logger import setup_logging
 
 # API imports
 from api.v1 import router as api_v1_router
-from api.v1.surgery import router as surgery_router
-from api.v1.insurance import router as insurance_router  
-from api.v1.logistics import router as logistics_router
-from api.v1.analysis import router as analytics_router
 from web.router import web_router
 
 # Setup logging
@@ -50,7 +46,9 @@ class DecisionPrecisionEngine:
             "surgery": "Surgical procedure planning and execution",
             "insurance": "Insurance coverage and authorization", 
             "logistics": "Resource scheduling and supply chain",
-            "analytics": "Data analysis and reporting"
+            "analytics": "Data analysis and reporting",
+            "education": "Medical education and training",
+            "hospitality": "Patient experience and hospitality"
         }
         
         logger.info(f"✅ Initialized {len(self.modules)} application modules")
@@ -126,14 +124,23 @@ def setup_routes(app: FastAPI):
     # Include web UI router (Surgify frontend)
     app.include_router(web_router)
     
-    # Include main API routes
-    app.include_router(api_v1_router, prefix="/api/v1")
+    # Include general purpose API routes 
+    app.include_router(api_v1_router, prefix="/api/v1", tags=["General API"])
     
-    # Include modular API routes with separate prefixes
-    app.include_router(surgery_router, prefix="/api/v1/surgery", tags=["Surgery Module"])
-    app.include_router(insurance_router, prefix="/api/v1/insurance", tags=["Insurance Module"])
-    app.include_router(logistics_router, prefix="/api/v1/logistics", tags=["Logistics Module"])
-    app.include_router(analytics_router, prefix="/api/v1/analytics", tags=["Analytics Module"])
+    # Include specific business system modules
+    from modules.surgery.router import router as surgery_router
+    from modules.insurance.router import router as insurance_router
+    from modules.logistics.router import router as logistics_router
+    from modules.analytics.router import router as analytics_router
+    from modules.education.router import router as education_router
+    from modules.hospitality.router import router as hospitality_router
+    
+    app.include_router(surgery_router, prefix="/modules/surgery", tags=["Surgery System"])
+    app.include_router(insurance_router, prefix="/modules/insurance", tags=["Insurance System"])
+    app.include_router(logistics_router, prefix="/modules/logistics", tags=["Logistics System"])
+    app.include_router(analytics_router, prefix="/modules/analytics", tags=["Analytics System"])
+    app.include_router(education_router, prefix="/modules/education", tags=["Education System"])
+    app.include_router(hospitality_router, prefix="/modules/hospitality", tags=["Hospitality System"])
     
     # Core API endpoints
     @app.get("/api/v1/")
@@ -142,11 +149,20 @@ def setup_routes(app: FastAPI):
         return JSONResponse({
             "message": "Gastric ADCI Decision Precision Engine API v1",
             "version": "2.0.0",
-            "modules": {
-                "surgery": "/api/v1/surgery",
-                "insurance": "/api/v1/insurance", 
-                "logistics": "/api/v1/logistics",
-                "analytics": "/api/v1/analytics"
+            "general_api": {
+                "auth": "/api/v1/auth",
+                "entities": "/api/v1/entities",
+                "concepts": "/api/v1/concepts",
+                "knowledge": "/api/v1/knowledge",
+                "reporter": "/api/v1/reporter"
+            },
+            "business_modules": {
+                "surgery": "/modules/surgery",
+                "insurance": "/modules/insurance", 
+                "logistics": "/modules/logistics",
+                "analytics": "/modules/analytics",
+                "education": "/modules/education",
+                "hospitality": "/modules/hospitality"
             },
             "ui": "/",
             "docs": "/docs"
@@ -159,7 +175,8 @@ def setup_routes(app: FastAPI):
             "status": "healthy",
             "version": "2.0.0",
             "timestamp": asyncio.get_event_loop().time(),
-            "modules": ["surgery", "insurance", "logistics", "analytics"],
+            "api_modules": ["auth", "entities", "concepts", "knowledge", "reporter"],
+            "business_modules": ["surgery", "insurance", "logistics", "analytics", "education", "hospitality"],
             "decision_engine": "operational"
         })
     
@@ -170,7 +187,8 @@ def setup_routes(app: FastAPI):
             "message": "Gastric ADCI Decision Precision Engine",
             "version": "2.0.0",
             "platform": "Surgify",
-            "modules": 4,
+            "api_modules": 5,
+            "business_modules": 6,
             "ui": "Active",
             "docs": "/docs"
         })
@@ -181,11 +199,19 @@ def setup_routes(app: FastAPI):
         """Get status of all modules"""
         engine = app.state.decision_engine
         return JSONResponse({
-            "modules": {
-                module: {"status": "active", "endpoint": f"/api/v1/{module}", "description": desc}
+            "api_modules": {
+                "auth": {"status": "active", "endpoint": "/api/v1/auth"},
+                "entities": {"status": "active", "endpoint": "/api/v1/entities"},
+                "concepts": {"status": "active", "endpoint": "/api/v1/concepts"},
+                "knowledge": {"status": "active", "endpoint": "/api/v1/knowledge"},
+                "reporter": {"status": "active", "endpoint": "/api/v1/reporter"}
+            },
+            "business_modules": {
+                module: {"status": "active", "endpoint": f"/modules/{module}", "description": desc}
                 for module, desc in engine.modules.items()
             },
-            "total_modules": len(engine.modules),
+            "total_api_modules": 5,
+            "total_business_modules": len(engine.modules),
             "decision_engine": "operational"
         })
 
@@ -217,7 +243,8 @@ def main():
     logger.info(f"🚀 Starting Gastric ADCI Decision Precision Engine")
     logger.info(f"🎨 Surgify UI: http://{settings.host}:{settings.port}")
     logger.info(f"📚 API docs: http://{settings.host}:{settings.port}/docs")
-    logger.info(f"🧠 Decision Engine: 4 modules (surgery, insurance, logistics, analytics)")
+    logger.info(f"🔧 General API: 5 modules (auth, entities, concepts, knowledge, reporter)")
+    logger.info(f"🏗️  Business Systems: 6 modules (surgery, insurance, logistics, analytics, education, hospitality)")
     logger.info(f"🔐 Security: WebAuthn + P2P ready")
     
     uvicorn.run(
