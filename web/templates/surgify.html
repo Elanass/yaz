@@ -18,10 +18,23 @@
         </svg>
       </div>
       <h2 class="text-[#141414] text-lg font-bold leading-tight tracking-[-0.015em] flex-1 text-center">Surgify</h2>
-      <div class="flex w-12 items-center justify-end">
-        <button class="flex max-w-[480px] cursor-pointer items-center justify-center overflow-hidden rounded-full h-12 bg-transparent text-[#141414] gap-2 text-base font-bold leading-normal tracking-[0.015em] min-w-0 p-0">
-          <div class="text-[#141414]" data-icon="User" data-size="24px" data-weight="regular">
-            <svg xmlns="http://www.w3.org/2000/svg" width="24px" height="24px" fill="currentColor" viewBox="0 0 256 256">
+      <div class="flex items-center gap-3">
+        <!-- Auth Logo -->
+        <div class="flex items-center justify-center w-8 h-8 bg-blue-600 rounded-full">
+          <svg xmlns="http://www.w3.org/2000/svg" width="16px" height="16px" fill="white" viewBox="0 0 256 256">
+            <path d="M208,80H176V56a48,48,0,0,0-96,0V80H48A16,16,0,0,0,32,96V208a16,16,0,0,0,16,16H208a16,16,0,0,0,16-16V96A16,16,0,0,0,208,80ZM96,56a32,32,0,0,1,64,0V80H96ZM208,208H48V96H208V208Z"></path>
+          </svg>
+        </div>
+        <!-- Light Toggle -->
+        <button id="theme-toggle" class="flex items-center justify-center w-8 h-8 rounded-full hover:bg-gray-200 transition-colors">
+          <svg xmlns="http://www.w3.org/2000/svg" width="20px" height="20px" fill="currentColor" viewBox="0 0 256 256">
+            <path d="M233.54,142.23a8,8,0,0,0-8-2,88.08,88.08,0,0,1-109.8-109.8,8,8,0,0,0-10-10,104.84,104.84,0,0,0-52.91,37A104,104,0,0,0,136,224a103.09,103.09,0,0,0,62.52-20.88,104.84,104.84,0,0,0,37-52.91A8,8,0,0,0,233.54,142.23Z"></path>
+          </svg>
+        </button>
+        <!-- User Profile -->
+        <button class="flex max-w-[480px] cursor-pointer items-center justify-center overflow-hidden rounded-full h-8 w-8 bg-transparent text-[#141414] hover:bg-gray-200 transition-colors">
+          <div class="text-[#141414]" data-icon="User" data-size="20px" data-weight="regular">
+            <svg xmlns="http://www.w3.org/2000/svg" width="20px" height="20px" fill="currentColor" viewBox="0 0 256 256">
               <path d="M230.92,212c-15.23-26.33-38.7-45.21-66.09-54.16a72,72,0,1,0-73.66,0C63.78,166.78,40.31,185.66,25.08,212a8,8,0,1,0,13.85,8c18.84-32.56,52.14-52,89.07-52s70.23,19.44,89.07,52a8,8,0,1,0,13.85-8ZM72,96a56,56,0,1,1,56,56A56.06,56.06,0,0,1,72,96Z"></path>
             </svg>
           </div>
@@ -101,25 +114,104 @@
       <div id="peek-article-{{ article.id }}" class="absolute z-10 bg-white shadow-lg hidden"></div>
       {% endfor %}
     </div>
+
+    <!-- Content Sections -->
+    <div class="px-4 py-8 space-y-8">
+      <!-- About Section -->
+      <section id="about" class="bg-white rounded-xl p-6 shadow-sm border border-gray-100">
+        <h2 class="text-2xl font-bold text-[#141414] mb-4">About Surgify</h2>
+        <p class="text-gray-600 leading-relaxed mb-4">
+          Surgify is a cutting-edge clinical research platform designed to revolutionize surgical decision-making. 
+          Our platform combines advanced analytics, real-time data processing, and evidence-based protocols to 
+          support healthcare professionals in delivering optimal patient outcomes.
+        </p>
+        <p class="text-gray-600 leading-relaxed">
+          With a focus on gastric and oncological procedures, Surgify provides comprehensive tools for case management, 
+          protocol adherence, and continuous learning through our extensive medical literature database.
+        </p>
+      </section>
+
+      <!-- Partners Section -->
+      <section id="partners" class="bg-white rounded-xl p-6 shadow-sm border border-gray-100">
+        <h2 class="text-2xl font-bold text-[#141414] mb-4">Our Partners</h2>
+        <p class="text-gray-600 leading-relaxed mb-4">
+          Surgify collaborates with leading medical institutions, research centers, and healthcare technology 
+          companies worldwide to advance surgical excellence and patient safety.
+        </p>
+        <div class="grid grid-cols-1 md:grid-cols-2 gap-4 mt-4">
+          <div class="flex items-center space-x-3">
+            <div class="w-12 h-12 bg-blue-100 rounded-lg flex items-center justify-center">
+              <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" fill="#2563eb" viewBox="0 0 256 256">
+                <path d="M224,48H32A16,16,0,0,0,16,64V192a16,16,0,0,0,16,16H224a16,16,0,0,0,16-16V64A16,16,0,0,0,224,48ZM32,192V64H224V192Z"></path>
+              </svg>
+            </div>
+            <div>
+              <h3 class="font-semibold text-[#141414]">Medical Research Centers</h3>
+              <p class="text-sm text-gray-500">Leading academic institutions</p>
+            </div>
+          </div>
+          <div class="flex items-center space-x-3">
+            <div class="w-12 h-12 bg-green-100 rounded-lg flex items-center justify-center">
+              <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" fill="#10b981" viewBox="0 0 256 256">
+                <path d="M224,48H32A16,16,0,0,0,16,64V192a16,16,0,0,0,16,16H224a16,16,0,0,0,16-16V64A16,16,0,0,0,224,48ZM32,192V64H224V192Z"></path>
+              </svg>
+            </div>
+            <div>
+              <h3 class="font-semibold text-[#141414]">Healthcare Systems</h3>
+              <p class="text-sm text-gray-500">Global hospital networks</p>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <!-- Terms & Conditions Section -->
+      <section id="terms" class="bg-white rounded-xl p-6 shadow-sm border border-gray-100">
+        <h2 class="text-2xl font-bold text-[#141414] mb-4">Terms & Conditions</h2>
+        <div class="space-y-3 text-gray-600">
+          <p class="leading-relaxed">
+            <strong>Privacy & Data Security:</strong> All patient data and clinical information processed through 
+            Surgify is encrypted and complies with HIPAA, GDPR, and other applicable healthcare data protection regulations.
+          </p>
+          <p class="leading-relaxed">
+            <strong>Clinical Use:</strong> Surgify is designed as a decision support tool and should be used in 
+            conjunction with professional medical judgment. Final clinical decisions remain the responsibility of the healthcare provider.
+          </p>
+          <p class="leading-relaxed">
+            <strong>Licensing:</strong> Use of this platform is subject to institutional licensing agreements. 
+            Unauthorized access or distribution of platform content is strictly prohibited.
+          </p>
+          <div class="mt-4 p-3 bg-blue-50 rounded-lg">
+            <p class="text-sm text-blue-800">
+              For complete terms and conditions, please contact your system administrator or visit our legal documentation center.
+            </p>
+          </div>
+        </div>
+      </section>
+    </div>
   </div>
 
-  <!-- Bottom Nav -->
-  <div>
-    <div class="flex justify-between items-center border-t bg-neutral-50 p-4 gap-2">
-      <a href="#" class="flex flex-col items-center text-[#141414] gap-1">
-        <!-- Briefcase icon -->
+  <!-- Fixed Bottom Navigation -->
+  <div class="sticky bottom-0 bg-white border-t border-gray-200 shadow-lg">
+    <div class="flex justify-between items-center p-4 max-w-md mx-auto">
+      <a href="/workstation" class="flex flex-col items-center text-blue-600 gap-1 hover:text-blue-700 transition-colors">
+        <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" fill="currentColor" viewBox="0 0 256 256">
+          <path d="M216,72H56a8,8,0,0,1,0-16H192a8,8,0,0,0,0-16H56A24,24,0,0,0,32,64V192a24,24,0,0,0,24,24H216a8,8,0,0,0,8-8V80A8,8,0,0,0,216,72ZM208,200H56a8,8,0,0,1-8-8V81.58A23.84,23.84,0,0,0,56,88H208Z"></path>
+        </svg>
         <p class="text-xs font-medium">Workstation</p>
       </a>
-      <a href="#" class="flex flex-col items-center text-neutral-500 gap-1">
-        <!-- Plus icon -->
-        <p class="text-xs font-medium">Add Case</p>
+      <a href="/dashboard/cases" class="flex flex-col items-center text-gray-500 gap-1 hover:text-gray-700 transition-colors">
+        <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" fill="currentColor" viewBox="0 0 256 256">
+          <path d="M224,128a8,8,0,0,1-8,8H40a8,8,0,0,1,0-16H216A8,8,0,0,1,224,128ZM40,72H216a8,8,0,0,0,0-16H40a8,8,0,0,0,0,16ZM216,184H40a8,8,0,0,0,0,16H216a8,8,0,0,0,0-16Z"></path>
+        </svg>
+        <p class="text-xs font-medium">Cases</p>
       </a>
-      <a href="#" class="flex flex-col items-center text-neutral-500 gap-1">
-        <!-- Storefront icon -->
-        <p class="text-xs font-medium">Marketplace</p>
+      <a href="/dashboard/analytics" class="flex flex-col items-center text-gray-500 gap-1 hover:text-gray-700 transition-colors">
+        <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" fill="currentColor" viewBox="0 0 256 256">
+          <path d="M232,208a8,8,0,0,1-8,8H32a8,8,0,0,1-8-8V48a8,8,0,0,1,16,0V156.69l50.34-50.35a8,8,0,0,1,11.32,0L128,132.69l58.34-58.35a8,8,0,0,1,11.32,11.32l-64,64a8,8,0,0,1-11.32,0L96,123.31,48,171.31V200H224A8,8,0,0,1,232,208Z"></path>
+        </svg>
+        <p class="text-xs font-medium">Analytics</p>
       </a>
     </div>
-    <div class="h-5 bg-neutral-50"></div>
   </div>
 </div>
 {% endblock %}
@@ -129,11 +221,50 @@
 function surgifyApp() {
     return {
         showInsightsModal: false,
+        darkMode: false,
         init() {
             // Initialize any data or event listeners
             console.log('Surgify app initialized');
+            
+            // Theme toggle functionality
+            const themeToggle = document.getElementById('theme-toggle');
+            if (themeToggle) {
+                themeToggle.addEventListener('click', this.toggleTheme.bind(this));
+            }
+            
+            // Load saved theme preference
+            const savedTheme = localStorage.getItem('surgify-theme');
+            if (savedTheme === 'dark') {
+                this.enableDarkMode();
+            }
+        },
+        
+        toggleTheme() {
+            if (this.darkMode) {
+                this.disableDarkMode();
+            } else {
+                this.enableDarkMode();
+            }
+        },
+        
+        enableDarkMode() {
+            this.darkMode = true;
+            document.documentElement.classList.add('dark');
+            localStorage.setItem('surgify-theme', 'dark');
+        },
+        
+        disableDarkMode() {
+            this.darkMode = false;
+            document.documentElement.classList.remove('dark');
+            localStorage.setItem('surgify-theme', 'light');
         }
     }
 }
+
+// Initialize the app when DOM is loaded
+document.addEventListener('DOMContentLoaded', function() {
+    const app = surgifyApp();
+    app.init();
+});
 </script>
 {% endblock %}

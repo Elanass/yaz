@@ -14,7 +14,7 @@ templates = Jinja2Templates(directory="web/templates")
 @router.get("/", response_class=HTMLResponse)
 async def home(request: Request):
     """Main landing page - Surgify template"""
-    return templates.TemplateResponse("index_simple.html", {
+    return templates.TemplateResponse("index.html", {
         "request": request,
         "page_title": "Surgify - Advanced Decision Support"
     })

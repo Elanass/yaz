@@ -1,43 +1,49 @@
-# Gastric ADCI Platform - Medical Decision Support
+# Surgify - Advanced Surgery Analytics Platform
 
-A **professional** and **minimalist** healthcare application for medical decision support in gastric cancer treatment, featuring the ADCI (Adaptive Decision Confidence Index) framework, comprehensive surgery management, and integrated healthcare operations.
+A **professional** and **minimalist** clinical research platform for surgical decision support, featuring the Surgify interface for comprehensive surgery management, medical analytics, and healthcare operations.
 
-## 🎯 Current Status: CLEAN & PRODUCTION-READY
+## 🎯 Current Status: PRODUCTION-READY SURGIFY PLATFORM
 
-This platform has been **completely cleaned and modernized** with a professional, minimalist architecture:
+This platform delivers a **clean, modern Surgify interface** with comprehensive backend integration:
 
-### ✅ Clean Architecture
-- **Streamlined Codebase**: No bloat - only essential files (py, html, css, md)
+### ✅ Surgify Platform Features
+- **Clean Surgify UI**: Modern, professional interface with clinical research focus
 - **Complete API Integration**: All endpoints functional and tested
-- **Professional UI/UX**: Minimalist medical-grade design with improved color scheme
-- **Secure Authentication**: WebAuthn and traditional auth methods fully integrated
-- **Enterprise Adapters**: Support for both open-source and closed-source integrations
-- **Cohesive Database Integration**: All UI components connected to backend logic
+- **Professional Design**: Medical-grade UI with improved navigation and theming
+- **Secure Authentication**: Integrated auth system with role-based access
+- **Real-time Analytics**: Comprehensive dashboard for surgery management
+- **Database Integration**: All UI components connected to backend logic
+- **Content Sections**: About, Partners, and Terms & Conditions sections
 
-### 🏗️ Clean Project Structure
+### 🏗️ Project Structure
 ```
 /workspaces/yaz/
-├── app.py                    # Main FastAPI application (single entry point)
+├── main.py                   # Main FastAPI application (Surgify entry point)
 ├── api/v1/                   # Complete API endpoints
-│   ├── auth.py              # Authentication & WebAuthn
-│   ├── surgery.py           # Surgery management (NEW)
-│   ├── insurance.py         # Insurance processing (NEW)
-│   ├── logistics.py         # Healthcare logistics (NEW)
-│   ├── reporter.py          # Analytics & reporting (NEW)
-│   ├── analysis.py          # Medical analysis
 │   ├── cases.py             # Case management
-│   └── decisions.py         # Decision support
+│   ├── dashboard.py         # Analytics dashboard
+│   └── auth.py              # Authentication
 ├── core/                     # Core business logic
-│   ├── adapters/            # Integration adapters
-│   │   ├── open_source/     # Open source integrations
-│   │   └── closed_source/   # Enterprise integrations (NEW)
-│   ├── services/            # Business services
-│   └── models/              # Data models
-├── web/                      # Professional web interface
-│   ├── templates/           # Clean, cohesive templates
-│   ├── static/              # Minimalist styling (updated)
-│   └── components/          # Essential UI components only
-└── data/                     # Data management & database
+│   ├── database.py          # Database configuration
+│   ├── models/              # Data models
+│   └── services/            # Business services
+├── web/                      # Surgify web interface
+│   ├── templates/           # Surgify templates
+│   │   ├── surgify.html     # Main Surgify interface
+│   │   ├── index_simple.html # Landing page
+│   │   └── base.html        # Base template
+│   ├── static/              # Assets (CSS, JS, images)
+│   │   ├── css/            # Stylesheets
+│   │   ├── js/             # JavaScript
+│   │   └── images/         # SVG placeholders
+│   └── pages/               # Page routers
+│       ├── home.py         # Surgify routing
+│       ├── dashboard.py    # Dashboard pages
+│       └── auth.py         # Authentication pages
+└── data/                    # Data management
+    ├── database/           # SQLite database
+    ├── test_samples/       # Sample data
+    └── load_data.py        # Data initialization
 ```
 
 ## ⚡ Quick Start
@@ -47,7 +53,66 @@ This platform has been **completely cleaned and modernized** with a professional
 pip install -r requirements.txt
 ```
 
-### 2. Run the Application
+### 2. Initialize Database
+```bash
+python data/load_data.py
+```
+
+### 3. Run Surgify Platform
+```bash
+python main.py
+```
+
+### 4. Access Surgify Interface
+- **Main Interface**: http://localhost:8000/surgify
+- **Landing Page**: http://localhost:8000/
+- **API Documentation**: http://localhost:8000/api/docs
+
+## 🩺 Surgify Features
+
+### Clinical Interface
+- **Modern Design**: Clean, professional interface optimized for clinical use
+- **Research Focus**: Journal articles, events, and clinical series management
+- **Search Functionality**: Advanced search across clinical content
+- **Responsive Layout**: Mobile-optimized for tablets and smartphones
+
+### Authentication & Security
+- **Secure Login**: Integrated authentication with role-based access
+- **Theme Toggle**: Light/dark mode support with persistent preferences
+- **User Management**: Profile management and session handling
+
+### Content Management
+- **About Section**: Platform overview and clinical focus
+- **Partners Section**: Institutional partnerships and collaborations
+- **Terms & Conditions**: Compliance and usage guidelines
+- **Fixed Navigation**: Persistent bottom navigation for key functions
+
+## 📊 Backend Integration
+
+### Database
+- **SQLite Database**: Pre-configured with sample medical data
+- **Sample Cases**: 5 surgical cases with various statuses
+- **User Management**: Sample surgeons and staff accounts
+- **Protocol Library**: Standard surgical protocols and guidelines
+
+### API Endpoints
+- **Cases API**: `/api/v1/cases` - Case management and retrieval
+- **Dashboard API**: `/api/v1/dashboard` - Analytics and statistics  
+- **Health Check**: `/health` - System status monitoring
+
+## 🔧 Development
+
+### File Structure
+- **Clean Codebase**: Removed unnecessary files and templates
+- **Organized Assets**: Consolidated CSS/JS into essential files only
+- **Template Hierarchy**: Logical template inheritance structure
+- **Static Assets**: SVG placeholders for medical imagery
+
+### Key Components
+- **Surgify Template**: Main interface in `/web/templates/surgify.html`
+- **Home Router**: Surgify routing logic in `/web/pages/home.py`
+- **Database Models**: SQLAlchemy models in `/core/models/`
+- **Sample Data**: Medical test data in `/data/test_samples/`
 ```bash
 python app.py
 ```
