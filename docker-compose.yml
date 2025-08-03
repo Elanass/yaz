@@ -1,0 +1,44 @@
+version: '3.8'
+
+services:
+  surgify:
+    build: .
+    ports:
+      - "8000:8000"
+    environment:
+      - ENVIRONMENT=development
+      - DEBUG=true
+      - DATABASE_URL=sqlite:///data/database/surgify.db
+    volumes:
+      - ./data:/app/data
+      - ./logs:/app/logs
+    restart: unless-stopped
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://localhost:8000/health"]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+
+  surgify-prod:
+    build: .
+    ports:
+      - "80:8000"
+    environment:
+      - ENVIRONMENT=production
+      - DEBUG=false
+      - DATABASE_URL=sqlite:///data/database/surgify.db
+      - SECRET_KEY=${SECRET_KEY:-$(openssl rand -hex 32)}
+      - ENCRYPTION_KEY=${ENCRYPTION_KEY:-$(openssl rand -base64 32)}
+    volumes:
+      - surgify_data:/app/data
+      - surgify_logs:/app/logs
+    restart: unless-stopped
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://localhost:8000/health"]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+
+volumes:
+  surgify_data:
+  surgify_logs:
