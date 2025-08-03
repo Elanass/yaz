@@ -1,0 +1,126 @@
+{% extends "layout.html" %}
+
+{% block content %}
+<!-- Hero Section -->
+<section class="hero-section bg-gradient-to-br from-blue-600 to-indigo-700 text-white px-4 py-12">
+    <div class="max-w-4xl mx-auto text-center">
+        <h1 class="text-4xl md:text-5xl font-bold mb-4">
+            Welcome to Surgify
+        </h1>
+        <p class="text-xl mb-8 opacity-90">
+            Advanced Decision Support for Surgical Excellence
+        </p>
+        <div class="flex flex-col sm:flex-row gap-4 justify-center">
+            <a href="/workstation" class="bg-white text-blue-600 px-8 py-3 rounded-lg font-semibold hover:bg-gray-100 transition-colors">
+                Start Clinical Workstation
+            </a>
+            <a href="/surgify" class="border-2 border-white text-white px-8 py-3 rounded-lg font-semibold hover:bg-white hover:text-blue-600 transition-colors">
+                Launch Surgify Interface
+            </a>
+        </div>
+    </div>
+</section>
+
+<!-- Features Grid -->
+<section class="px-4 py-12">
+    <div class="max-w-7xl mx-auto">
+        <h2 class="text-3xl font-bold text-center mb-12 text-gray-800">Platform Features</h2>
+        <div class="grid grid-cols-1 md:grid-cols-3 gap-8">
+            <!-- Clinical Workstation -->
+            <div class="bg-white rounded-xl shadow-md p-6 hover:shadow-lg transition-shadow">
+                <div class="w-12 h-12 bg-blue-100 rounded-lg flex items-center justify-center mb-4">
+                    <svg class="w-6 h-6 text-blue-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"></path>
+                    </svg>
+                </div>
+                <h3 class="text-xl font-bold mb-2">Clinical Workstation</h3>
+                <p class="text-gray-600">Comprehensive case management and surgical planning tools</p>
+                <a href="/workstation" class="text-blue-600 font-medium mt-4 inline-block">Access Workstation →</a>
+            </div>
+
+            <!-- Decision Support -->
+            <div class="bg-white rounded-xl shadow-md p-6 hover:shadow-lg transition-shadow">
+                <div class="w-12 h-12 bg-green-100 rounded-lg flex items-center justify-center mb-4">
+                    <svg class="w-6 h-6 text-green-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9.663 17h4.673M12 3v1m6.364 1.636l-.707.707M21 12h-1M4 12H3m3.343-5.657l-.707-.707m2.828 9.9a5 5 0 117.072 0l-.548.547A3.374 3.374 0 0014 18.469V19a2 2 0 11-4 0v-.531c0-.895-.356-1.754-.988-2.386l-.548-.547z"></path>
+                    </svg>
+                </div>
+                <h3 class="text-xl font-bold mb-2">Decision Support</h3>
+                <p class="text-gray-600">AI-powered recommendations and risk assessment</p>
+                <a href="/api/docs" class="text-green-600 font-medium mt-4 inline-block">View API →</a>
+            </div>
+
+            <!-- Analytics -->
+            <div class="bg-white rounded-xl shadow-md p-6 hover:shadow-lg transition-shadow">
+                <div class="w-12 h-12 bg-purple-100 rounded-lg flex items-center justify-center mb-4">
+                    <svg class="w-6 h-6 text-purple-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 19v-6a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2a2 2 0 002-2zm0 0V9a2 2 0 012-2h2a2 2 0 012 2v10m-6 0a2 2 0 002 2h2a2 2 0 002-2m0 0V5a2 2 0 012-2h2a2 2 0 012 2v14a2 2 0 01-2 2h-2a2 2 0 01-2-2z"></path>
+                    </svg>
+                </div>
+                <h3 class="text-xl font-bold mb-2">Analytics Dashboard</h3>
+                <p class="text-gray-600">Real-time metrics and performance insights</p>
+                <a href="/dashboard" class="text-purple-600 font-medium mt-4 inline-block">View Dashboard →</a>
+            </div>
+        </div>
+    </div>
+</section>
+
+<!-- Recent Activity -->
+<section class="bg-gray-50 px-4 py-12">
+    <div class="max-w-7xl mx-auto">
+        <div class="flex justify-between items-center mb-8">
+            <h2 class="text-2xl font-bold text-gray-800">Recent Cases</h2>
+            <a href="/dashboard/cases" class="text-blue-600 hover:text-blue-700 font-medium">View All Cases</a>
+        </div>
+        
+        <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6" id="recent-cases">
+            <!-- Cases will be loaded here -->
+            <div class="bg-white rounded-lg shadow-sm p-6">
+                <div class="flex justify-between items-start mb-4">
+                    <span class="bg-green-100 text-green-800 text-xs font-medium px-2.5 py-0.5 rounded">Completed</span>
+                    <span class="text-sm text-gray-500">2 days ago</span>
+                </div>
+                <h3 class="font-bold text-gray-900 mb-2">SURG-003</h3>
+                <p class="text-gray-600 text-sm mb-2">Advanced gastric cancer</p>
+                <p class="text-gray-500 text-xs">Dr. Smith</p>
+            </div>
+
+            <div class="bg-white rounded-lg shadow-sm p-6">
+                <div class="flex justify-between items-start mb-4">
+                    <span class="bg-blue-100 text-blue-800 text-xs font-medium px-2.5 py-0.5 rounded">In Progress</span>
+                    <span class="text-sm text-gray-500">Today</span>
+                </div>
+                <h3 class="font-bold text-gray-900 mb-2">SURG-002</h3>
+                <p class="text-gray-600 text-sm mb-2">Gastric ulcer perforation</p>
+                <p class="text-gray-500 text-xs">Dr. Johnson</p>
+            </div>
+
+            <div class="bg-white rounded-lg shadow-sm p-6">
+                <div class="flex justify-between items-start mb-4">
+                    <span class="bg-yellow-100 text-yellow-800 text-xs font-medium px-2.5 py-0.5 rounded">Planned</span>
+                    <span class="text-sm text-gray-500">In 3 days</span>
+                </div>
+                <h3 class="font-bold text-gray-900 mb-2">SURG-001</h3>
+                <p class="text-gray-600 text-sm mb-2">Gastric adenocarcinoma</p>
+                <p class="text-gray-500 text-xs">Dr. Smith</p>
+            </div>
+        </div>
+    </div>
+</section>
+{% endblock %}
+
+{% block scripts %}
+<script>
+// Load recent cases from API
+document.addEventListener('DOMContentLoaded', function() {
+    console.log('Surgify Platform Loaded');
+    
+    // You can add API calls here to load real data
+    // fetch('/api/v1/cases')
+    //     .then(response => response.json())
+    //     .then(data => {
+    //         // Update the recent-cases section with real data
+    //     });
+});
+</script>
+{% endblock %}

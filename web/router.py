@@ -1,25 +1,36 @@
 """
-Web router for YAZ Surgery Analytics Platform
-Includes all web page routes and handles front-end navigation
+Web Router for YAZ Surgery Analytics Platform
+
+Surgify template integration with backend logic
 """
 
-from fastapi import APIRouter
+from fastapi import APIRouter, Request
+from fastapi.responses import HTMLResponse
+from fastapi.staticfiles import StaticFiles
+from fastapi.templating import Jinja2Templates
 
-# Import page routers
-from web.pages.home import router as home_router
-from web.pages.auth import router as auth_router
-from web.pages.cases import router as cases_router
-from web.pages.reports import router as reports_router
-from web.pages.education import router as education_router
-from web.pages.hospitality import router as hospitality_router
+# Core page routers
+from .pages import home, dashboard, auth
+
+# Templates
+templates = Jinja2Templates(directory="web/templates")
 
 # Create main web router
-web_router = APIRouter()
+web_router = APIRouter(tags=["Web Interface"])
 
-# Include all page routers
-web_router.include_router(home_router, tags=["Web Pages"])
-web_router.include_router(auth_router, tags=["Web Auth"])
-web_router.include_router(cases_router, tags=["Web Cases"])
-web_router.include_router(reports_router, tags=["Web Reports"])
-web_router.include_router(education_router, tags=["Web Education"])
-web_router.include_router(hospitality_router, tags=["Web Hospitality"])
+# Static files with efficient caching
+web_router.mount("/static", StaticFiles(directory="web/static"), name="static")
+
+# Core routes with Surgify templates
+web_router.include_router(home.router, prefix="", tags=["Home"])
+web_router.include_router(dashboard.router, prefix="/dashboard", tags=["Dashboard"])
+web_router.include_router(auth.router, prefix="/auth", tags=["Authentication"])
+
+# Health check for web interface
+@web_router.get("/health", response_class=HTMLResponse)
+async def web_health():
+    """Web interface health check"""
+    return HTMLResponse(
+        content="<h1>Web Interface OK - Surgify Ready</h1>",
+        status_code=200
+    )

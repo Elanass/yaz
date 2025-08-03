@@ -1,0 +1,111 @@
+<!-- FastHTML Component Integration for Surgify Templates -->
+<!-- Add this to your existing templates where you want interactive components -->
+
+<!-- Enhanced Dashboard with FastHTML Components -->
+<div id="main-content" class="surgify-main-content">
+    <!-- Static Template Content (your existing Surgify design) -->
+    {{ original_template_content }}
+    
+    <!-- FastHTML Interactive Components -->
+    <div class="fasthtml-components-area">
+        
+        <!-- Live Case Dashboard -->
+        <div id="live-dashboard" 
+             hx-get="/components/analysis-dashboard" 
+             hx-trigger="load, every 30s"
+             hx-swap="innerHTML"
+             class="mb-6">
+            <!-- Component loads here -->
+        </div>
+        
+        <!-- Interactive Case Cards -->
+        <div class="cases-grid grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4 mb-6">
+            <div hx-get="/components/case-card?case_id=001" 
+                 hx-trigger="load" 
+                 hx-swap="innerHTML"
+                 class="case-card-slot">
+                <!-- Case card component loads here -->
+            </div>
+            <div hx-get="/components/case-card?case_id=002" 
+                 hx-trigger="load" 
+                 hx-swap="innerHTML"
+                 class="case-card-slot">
+                <!-- Case card component loads here -->
+            </div>
+            <div hx-get="/components/case-card?case_id=003" 
+                 hx-trigger="load" 
+                 hx-swap="innerHTML"
+                 class="case-card-slot">
+                <!-- Case card component loads here -->
+            </div>
+        </div>
+        
+        <!-- Quick Actions Panel -->
+        <div class="quick-actions bg-white rounded-lg shadow p-6">
+            <h3 class="text-lg font-semibold mb-4">Quick Actions</h3>
+            <div class="grid grid-cols-1 md:grid-cols-3 gap-4">
+                
+                <!-- Add Case Form (FastHTML) -->
+                <div id="add-case-form" 
+                     hx-get="/components/case-form" 
+                     hx-trigger="load"
+                     hx-swap="innerHTML">
+                    <!-- Form component loads here -->
+                </div>
+                
+                <!-- Analysis Trigger -->
+                <div class="action-card">
+                    <h4 class="font-medium mb-2">Run Analysis</h4>
+                    <button class="w-full bg-green-600 text-white py-2 px-4 rounded hover:bg-green-700"
+                            hx-post="/api/analysis/run"
+                            hx-target="#analysis-results"
+                            hx-swap="innerHTML">
+                        Start ADCI Analysis
+                    </button>
+                </div>
+                
+                <!-- Protocol Selection -->
+                <div class="action-card">
+                    <h4 class="font-medium mb-2">Protocol Tools</h4>
+                    <select class="w-full border rounded px-3 py-2 mb-2"
+                            hx-get="/components/protocol-details"
+                            hx-target="#protocol-info"
+                            hx-trigger="change">
+                        <option value="">Select Protocol...</option>
+                        <option value="flot">FLOT Protocol</option>
+                        <option value="neo-adjuvant">Neo-adjuvant</option>
+                        <option value="surgery-only">Surgery Only</option>
+                    </select>
+                    <div id="protocol-info"></div>
+                </div>
+                
+            </div>
+        </div>
+        
+        <!-- Results Area -->
+        <div id="case-results" class="mt-6"></div>
+        <div id="analysis-results" class="mt-6"></div>
+        <div id="report-section" class="mt-6"></div>
+        
+    </div>
+</div>
+
+<!-- Modal for case details -->
+<div id="case-details-modal" class="hidden fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
+    <!-- Modal content loads here via HTMX -->
+</div>
+
+<!-- HTMX Configuration -->
+<script>
+    // Global HTMX configuration for Surgify integration
+    document.body.addEventListener('htmx:configRequest', function(evt) {
+        evt.detail.headers['X-CSRFToken'] = '{{ csrf_token }}';
+    });
+    
+    // Close modals on outside click
+    document.addEventListener('click', function(e) {
+        if (e.target.id === 'case-details-modal') {
+            document.getElementById('case-details-modal').classList.add('hidden');
+        }
+    });
+</script>

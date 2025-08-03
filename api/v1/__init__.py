@@ -1,53 +1,38 @@
 """
-API v1 endpoints - Complete Gastric ADCI Platform API
+Surgify API v1 - Clean Surgery Analytics Platform API
 """
 
 from fastapi import APIRouter
 
-# Import all API routers
+# Import core API routers
+from .dashboard import router as dashboard_router
+from .cases import router as cases_router
 from .auth import router as auth_router
-from .surgery import router as surgery_router
-from .insurance import router as insurance_router
-from .logistics import router as logistics_router
-from .reporter import router as reporter_router
-from .entities import router as entities_router
-from .concepts import router as concepts_router
-from .knowledge import router as knowledge_router
 
 # Create main router
 router = APIRouter()
 
-# Include all routers
+# Include core routers
+router.include_router(dashboard_router, prefix="/dashboard", tags=["Dashboard"])
+router.include_router(cases_router, prefix="/cases", tags=["Cases"])
 router.include_router(auth_router, prefix="/auth", tags=["Authentication"])
-router.include_router(surgery_router, prefix="/surgery", tags=["Surgery Management"])
-router.include_router(insurance_router, prefix="/insurance", tags=["Insurance Management"])
-router.include_router(logistics_router, prefix="/logistics", tags=["Logistics Management"])
-router.include_router(reporter_router, prefix="/reporter", tags=["Reporting & Analytics"])
-router.include_router(entities_router, prefix="/entities", tags=["Medical Entities"])
-router.include_router(concepts_router, prefix="/concepts", tags=["Business Concepts"])
-router.include_router(knowledge_router, prefix="/knowledge", tags=["Domain Knowledge"])
 
 @router.get("/")
 async def api_root():
     """API v1 root endpoint"""
     return {
-        "message": "Gastric ADCI Platform API v1",
-        "version": "1.0.0",
-        "description": "Complete API for gastric surgery case management, insurance processing, and logistics coordination",
+        "service": "Surgify - Decision Precision Engine",
+        "version": "2.0.0",
+        "description": "Surgery Analytics Platform with AI-Powered Decision Support",
         "endpoints": {
-            "auth": "/api/v1/auth",
-            "surgery": "/api/v1/surgery", 
-            "insurance": "/api/v1/insurance",
-            "logistics": "/api/v1/logistics",
-            "reporter": "/api/v1/reporter"
+            "dashboard": "/api/v1/dashboard",
+            "cases": "/api/v1/cases",
+            "auth": "/api/v1/auth"
         },
         "features": [
-            "WebAuthn Authentication",
-            "Surgery Procedure Management",
-            "Insurance Claims Processing", 
-            "Patient Transport Logistics",
-            "Resource Management",
-            "Staff Scheduling",
-            "Reporting & Analytics"
+            "Clinical Decision Support",
+            "Case Management",
+            "Analytics Dashboard",
+            "Real-time Monitoring"
         ]
     }

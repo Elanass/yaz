@@ -1,45 +1,51 @@
-# Gastric ADCI Platform - Streamlined Dependencies
-# Production-ready medical decision support platform
-
-# Core Framework
-fastapi==0.115.0
-uvicorn[standard]==0.35.0
-python-multipart==0.0.6
-python-fasthtml==0.12.22
-jinja2==3.1.6
+# Core FastAPI and web framework
+fastapi==0.104.1
+uvicorn[standard]==0.24.0
+gunicorn==21.2.0
 
 # Database
-sqlalchemy[asyncio]==2.0.23
-alembic==1.13.1
-aiosqlite==0.19.0
+sqlalchemy==2.0.23
+alembic==1.12.1
 
-# Security & Auth
-cryptography==41.0.7
+# Authentication and Security
+python-jose[cryptography]==3.3.0
 passlib[bcrypt]==1.7.4
-PyJWT==2.8.0
+python-multipart==0.0.6
 
-# Data Processing & Analytics
+# Data processing and analysis
 pandas==2.1.3
 numpy==1.25.2
 scipy==1.11.4
 scikit-learn==1.3.2
-lifelines==0.28.0
 
-# Infrastructure & System Monitoring
-python-dotenv==1.0.0
+# Medical/Clinical
+pydicom==2.4.3
+nibabel==5.1.0
+
+# Web and templates
+jinja2==3.1.2
+aiofiles==23.2.1
+
+# HTTP and requests
 httpx==0.25.2
+requests==2.31.0
+
+# Configuration and environment
+pydantic==2.5.0
+pydantic-settings==2.1.0
+python-dotenv==1.0.0
+
+# Logging and monitoring
 structlog==23.2.0
-psutil==5.9.6
+rich==13.7.0
 
-# Visualization & Reports
-plotly==5.17.0
-matplotlib==3.8.2
-reportlab==3.6.12
-weasyprint==62.3
-docxtpl==0.16.8
-
-# Development
+# Development and testing
 pytest==7.4.3
 pytest-asyncio==0.21.1
 black==23.11.0
-isort==5.12.0
+flake8==6.1.0
+
+# Additional utilities
+click==8.1.7
+python-dateutil==2.8.2
+tqdm==4.66.1
