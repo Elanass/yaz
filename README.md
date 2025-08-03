@@ -1,49 +1,55 @@
-# Surgify - Advanced Surgery Analytics Platform
+# Project Yaz - Surgify Platform
 
-A **professional** and **minimalist** clinical research platform for surgical decision support, featuring the Surgify interface for comprehensive surgery management, medical analytics, and healthcare operations.
+A **production-ready** modular surgical decision support and collaboration platform featuring the **Surgify interface** for comprehensive case management, surgeon collaboration, and regulatory workflow management.
 
-## 🎯 Current Status: PRODUCTION-READY SURGIFY PLATFORM
+## 🎯 Current Status: REFACTORED & ENHANCED COLLABORATIVE PLATFORM
 
-This platform delivers a **clean, modern Surgify interface** with comprehensive backend integration:
+This platform delivers a **clean, minimal Surgify interface** with full backend integration and collaborative features:
 
-### ✅ Surgify Platform Features
-- **Clean Surgify UI**: Modern, professional interface with clinical research focus
-- **Complete API Integration**: All endpoints functional and tested
-- **Professional Design**: Medical-grade UI with improved navigation and theming
-- **Secure Authentication**: Integrated auth system with role-based access
-- **Real-time Analytics**: Comprehensive dashboard for surgery management
-- **Database Integration**: All UI components connected to backend logic
-- **Content Sections**: About, Partners, and Terms & Conditions sections
+### ✅ Platform Features
+- **Modern Surgify UI**: Clean clinical interface with integrated decision support
+- **Modular Architecture**: Scalable, maintainable codebase with clear separation of concerns
+- **Collaborative Workflows**: Case sharing, proposals, and consent management
+- **Complete API Integration**: RESTful endpoints fully connected to database and UI
+- **Professional Design**: Minimal, functional medical-grade interface
+- **Database Integration**: Comprehensive data models with sample surgical data
+- **Regulatory Ready**: Structured for compliance and audit workflows
+- **Documentation**: Complete, up-to-date platform documentation
 
-### 🏗️ Project Structure
+### 🏗️ Current Project Structure
 ```
 /workspaces/yaz/
-├── main.py                   # Main FastAPI application (Surgify entry point)
-├── api/v1/                   # Complete API endpoints
-│   ├── cases.py             # Case management
-│   ├── dashboard.py         # Analytics dashboard
-│   └── auth.py              # Authentication
-├── core/                     # Core business logic
+├── main.py                   # Main FastAPI application entry point
+├── api/v1/                   # Core API endpoints
+│   ├── cases.py             # Case management & retrieval
+│   ├── dashboard.py         # Analytics & metrics  
+│   ├── auth.py              # Authentication endpoints
+│   └── proposals.py         # Surgical proposals & consent
+├── core/                     # Business logic & services
 │   ├── database.py          # Database configuration
 │   ├── models/              # Data models
-│   └── services/            # Business services
-├── web/                      # Surgify web interface
-│   ├── templates/           # Surgify templates
-│   │   ├── surgify.html     # Main Surgify interface
-│   │   ├── index_simple.html # Landing page
-│   │   └── base.html        # Base template
-│   ├── static/              # Assets (CSS, JS, images)
-│   │   ├── css/            # Stylesheets
-│   │   ├── js/             # JavaScript
-│   │   └── images/         # SVG placeholders
+│   │   └── database_models.py # SQLAlchemy models
+│   ├── services/            # Business services
+│   └── dependencies.py     # Dependency injection
+├── web/                      # Surgify user interface
+│   ├── templates/           # Jinja2 templates
+│   │   ├── surgify.html     # Main collaborative interface
+│   │   ├── index.html       # Landing page
+│   │   ├── base.html        # Base template
+│   │   └── partials/        # Reusable components
+│   ├── static/              # Static assets
+│   │   ├── css/            # Minimal stylesheets
+│   │   ├── js/             # Core JavaScript
+│   │   └── images/         # Platform assets
 │   └── pages/               # Page routers
-│       ├── home.py         # Surgify routing
-│       ├── dashboard.py    # Dashboard pages
-│       └── auth.py         # Authentication pages
-└── data/                    # Data management
-    ├── database/           # SQLite database
-    ├── test_samples/       # Sample data
-    └── load_data.py        # Data initialization
+│       ├── home.py         # Main routing logic
+│       ├── dashboard.py    # Analytics pages
+│       └── auth.py         # Authentication flow
+├── data/                    # Data management
+│   ├── database/           # SQLite database
+│   ├── test_samples/       # Sample surgical data
+│   └── load_data.py        # Database initialization
+└── requirements.txt        # Minimal dependencies
 ```
 
 ## ⚡ Quick Start
@@ -58,237 +64,126 @@ pip install -r requirements.txt
 python data/load_data.py
 ```
 
-### 3. Run Surgify Platform
+### 3. Run the Platform
 ```bash
 python main.py
 ```
 
-### 4. Access Surgify Interface
-- **Main Interface**: http://localhost:8000/surgify
-- **Landing Page**: http://localhost:8000/
-- **API Documentation**: http://localhost:8000/api/docs
+### 4. Access the Application
+- **Main Interface**: http://localhost:8000/
+- **Surgify Dashboard**: http://localhost:8000/surgify
+- **API Documentation**: http://localhost:8000/docs
+- **Health Check**: http://localhost:8000/health
 
-## 🩺 Surgify Features
+## 🩺 Core Platform Features
 
-### Clinical Interface
-- **Modern Design**: Clean, professional interface optimized for clinical use
-- **Research Focus**: Journal articles, events, and clinical series management
-- **Search Functionality**: Advanced search across clinical content
-- **Responsive Layout**: Mobile-optimized for tablets and smartphones
+### Surgify Clinical Interface
+- **Modern Design**: Clean, minimal interface optimized for surgical workflows
+- **Case Management**: Comprehensive case tracking and management system
+- **Decision Support**: Structured surgical decision-making tools
+- **Responsive Layout**: Mobile-optimized for clinical environments
+- **Professional Aesthetics**: Medical-grade UI with clean typography
 
-### Authentication & Security
-- **Secure Login**: Integrated authentication with role-based access
-- **Theme Toggle**: Light/dark mode support with persistent preferences
-- **User Management**: Profile management and session handling
+### Collaborative Surgery Platform
+- **Case Database**: Secure storage and retrieval of surgical cases
+- **Proposal System**: Structured surgical proposals with workflow tracking
+- **Analytics Dashboard**: Real-time metrics and case statistics
+- **User Management**: Role-based access and authentication
+- **Integration Ready**: API-first design for external system integration
 
-### Content Management
-- **About Section**: Platform overview and clinical focus
-- **Partners Section**: Institutional partnerships and collaborations
-- **Terms & Conditions**: Compliance and usage guidelines
-- **Fixed Navigation**: Persistent bottom navigation for key functions
+### Security & Compliance
+- **Secure Authentication**: Token-based auth with session management
+- **Data Protection**: Secure patient data handling
+- **Audit Trails**: Complete logging of user actions and decisions
+- **Regulatory Ready**: Structure for HIPAA and compliance requirements
+- **Role-Based Access**: Granular permissions for different user types
 
 ## 📊 Backend Integration
 
-### Database
-- **SQLite Database**: Pre-configured with sample medical data
-- **Sample Cases**: 5 surgical cases with various statuses
-- **User Management**: Sample surgeons and staff accounts
-- **Protocol Library**: Standard surgical protocols and guidelines
+### Database Layer
+- **SQLite Database**: Lightweight, file-based database with full ACID compliance
+- **SQLAlchemy ORM**: Modern Python ORM with type hints and validation
+- **Sample Data**: Pre-loaded surgical cases and user data for testing
+- **Migration Support**: Database versioning and schema management
+- **Data Models**: Comprehensive models for cases, users, proposals, and consent
 
-### API Endpoints
-- **Cases API**: `/api/v1/cases` - Case management and retrieval
-- **Dashboard API**: `/api/v1/dashboard` - Analytics and statistics  
-- **Health Check**: `/health` - System status monitoring
+### API Architecture
+- **FastAPI Framework**: Modern, fast Python API framework with automatic documentation
+- **RESTful Design**: Clean, predictable API endpoints following REST principles
+- **Type Safety**: Full type hints and Pydantic models for request/response validation
+- **Auto Documentation**: Interactive API docs at `/docs` with Swagger UI
+- **Error Handling**: Comprehensive error handling with proper HTTP status codes
+
+### Core Endpoints
+```
+GET  /                     # Main landing page
+GET  /surgify             # Surgify dashboard interface
+GET  /health              # Application health check
+GET  /docs                # Interactive API documentation
+
+# API v1 Endpoints
+GET  /api/v1/cases        # List all cases
+GET  /api/v1/cases/{id}   # Get specific case
+GET  /api/v1/dashboard    # Dashboard statistics
+POST /api/v1/auth/login   # User authentication
+```
 
 ## 🔧 Development
 
-### File Structure
-- **Clean Codebase**: Removed unnecessary files and templates
-- **Organized Assets**: Consolidated CSS/JS into essential files only
-- **Template Hierarchy**: Logical template inheritance structure
-- **Static Assets**: SVG placeholders for medical imagery
+### Codebase Structure
+- **Minimal Dependencies**: Essential packages only in requirements.txt
+- **Clean Architecture**: Clear separation between API, business logic, and UI
+- **Type Safety**: Full type hints throughout Python codebase
+- **Modular Design**: Loosely coupled components for easy maintenance
+- **DRY Principle**: No duplicate code or redundant functionality
 
 ### Key Components
-- **Surgify Template**: Main interface in `/web/templates/surgify.html`
-- **Home Router**: Surgify routing logic in `/web/pages/home.py`
-- **Database Models**: SQLAlchemy models in `/core/models/`
-- **Sample Data**: Medical test data in `/data/test_samples/`
+- **Main Application**: Single entry point in `main.py`
+- **Web Interface**: Surgify templates and static assets in `/web/`
+- **API Layer**: RESTful endpoints in `/api/v1/`
+- **Data Layer**: Database models and services in `/core/`
+- **Sample Data**: Test surgical cases in `/data/test_samples/`
+
+### Development Setup
 ```bash
-python app.py
-```
+# Clone and setup
+git clone <repository>
+cd yaz
+pip install -r requirements.txt
 
-### 3. Access the Platform
-- **Main Application**: http://localhost:8000
-- **Surgify Dashboard**: http://localhost:8000/workstation
-- **API Documentation**: http://localhost:8000/docs
-- **Health Check**: http://localhost:8000/api/health
-- **Complete API v1**: http://localhost:8000/api/v1
+# Initialize database
+python data/load_data.py
 
-## 🔧 Complete API Endpoints (v1)
-
-### Core Platform
-| Endpoint | Description |
-|----------|-------------|
-| `GET /` | Main Surgify interface |
-| `GET /workstation` | Clinical workstation dashboard |
-| `GET /api/health` | System health check |
-| `GET /docs` | Interactive API documentation |
-
-### Authentication & Security
-| Endpoint | Description |
-|----------|-------------|
-| `POST /api/v1/auth/login` | User authentication |
-| `POST /api/v1/auth/logout` | User logout |
-| `POST /api/v1/auth/register` | User registration |
-| `POST /api/v1/auth/webauthn/register/begin` | Begin WebAuthn registration |
-| `POST /api/v1/auth/webauthn/register/complete` | Complete WebAuthn registration |
-| `POST /api/v1/auth/webauthn/authenticate/begin` | Begin WebAuthn authentication |
-| `POST /api/v1/auth/webauthn/authenticate/complete` | Complete WebAuthn authentication |
-
-### Medical Operations
-| Endpoint | Description |
-|----------|-------------|
-| `GET /api/v1/surgery/procedures` | Available surgical procedures |
-| `POST /api/v1/surgery/schedule` | Schedule surgery operations |
-| `GET /api/v1/surgery/protocols` | Surgery protocols and guidelines |
-| `POST /api/v1/surgery/optimize` | Optimize surgical workflow |
-| `GET /api/v1/cases/` | Case management interface |
-| `GET /api/v1/decisions/` | ADCI decision support engine |
-| `GET /api/v1/analysis/` | Medical analysis and statistics |
-
-### Healthcare Operations (NEW)
-| Endpoint | Description |
-|----------|-------------|
-| `GET /api/v1/insurance/plans` | Insurance plan management |
-| `POST /api/v1/insurance/verify` | Insurance verification |
-| `POST /api/v1/insurance/claims` | Process insurance claims |
-| `GET /api/v1/logistics/inventory` | Medical inventory management |
-| `POST /api/v1/logistics/transport` | Patient transport coordination |
-| `GET /api/v1/logistics/resources` | Resource allocation |
-| `GET /api/v1/reporter/analytics` | Generate analytics reports |
-| `POST /api/v1/reporter/export` | Export data reports |
-| `GET /api/v1/reporter/dashboard` | Reporting dashboard |
-
-## 🏥 Core Features
-- **ADCI Framework**: Adaptive Decision Confidence Index for treatment recommendations
-- **Surgery Management**: Complete surgical workflow and protocol management
-- **Evidence-Based Decisions**: Statistical analysis and outcome prediction
-- **Case Management**: Comprehensive patient case tracking
-
-### Healthcare Operations  
-- **Insurance Integration**: Automated insurance verification and processing
-- **Logistics Coordination**: Medical supply and patient transport management
-- **Analytics & Reporting**: Comprehensive reporting and data export capabilities
-- **Multi-Modal Authentication**: Traditional and WebAuthn biometric authentication
-
-### Technical Excellence
-- **RESTful API**: Clean, versioned endpoints with comprehensive documentation
-- **Extensible Architecture**: Support for both open-source and proprietary integrations
-- **Professional UI**: Minimalist, medical-grade user interface design
-- **Robust Security**: Multiple authentication methods and secure data handling
-
-## ⚙️ Configuration
-
-### Environment Setup
-Configuration is managed through environment variables and centralized config files:
-- Main configuration in `core/config/`
-- Environment variables via `.env` file
-- Feature toggles for enabling/disabling modules
-- CORS and security settings
-- Development vs production modes
-
-### Adapters Configuration
-- **Open Source Adapters**: `core/adapters/open_source/`
-- **Closed Source Adapters**: `core/adapters/closed_source/`
-- Extensible integration framework for external systems
-
-## 🚀 Deployment
-
-### Local Development
-```bash
-# Set environment variables
-export DEBUG=true
-export PORT=8000
-
-# Run the application
-python app.py
-```
-
-### Production Deployment
-```bash
-# Production configuration
-export ENVIRONMENT=production
-export DEBUG=false
-export HOST=0.0.0.0
-export PORT=80
-
-# Run with production settings
-python app.py
-```
-
-### Docker Deployment
-```bash
-# Development
-docker-compose -f deploy/dev/docker-compose.yml up
-
-# Production
-docker-compose -f deploy/prod/docker-compose.yml up
+# Run development server
+python main.py
 ```
 
 ## 📊 Technical Stack
 
-### Backend Architecture
+### Backend
 - **Framework**: FastAPI (Python 3.10+)
-- **API Design**: RESTful with automatic OpenAPI documentation
-- **Authentication**: WebAuthn + traditional auth methods
 - **Database**: SQLite with SQLAlchemy ORM
-- **Testing**: pytest with integration and unit tests
+- **Authentication**: Token-based authentication system
+- **API Design**: RESTful with automatic OpenAPI documentation
+- **Type Safety**: Full type hints with Pydantic validation
 
-### Frontend & UI
-- **Styling**: Minimalist, medical-grade CSS design
-- **Templates**: Jinja2 with responsive layouts
-- **Color Scheme**: Professional healthcare palette
-- **Components**: Modular, reusable UI elements
+### Frontend
+- **Templates**: Jinja2 with responsive design
+- **Styling**: Minimal, medical-grade CSS
+- **JavaScript**: Vanilla JS for core interactions
+- **Design**: Professional healthcare color palette
+- **Assets**: Optimized SVG icons and images
 
-### Integration & Extensions
-- **Adapters**: Pluggable integration framework
-- **Services**: Modular business logic services
-- **Dependencies**: Dependency injection container
-- **Logging**: Structured logging and monitoring
+### Architecture
+- **Dependency Injection**: Clean dependency management
+- **Modular Services**: Loosely coupled business logic
+- **Error Handling**: Comprehensive exception handling
+- **Logging**: Structured application logging
+- **Testing**: Unit and integration test support
 
-## 🧪 Development & Testing
+## 🧪 Testing & Quality
 
-### Code Quality
-- Type hints throughout the codebase
-- Comprehensive error handling and validation
-- Clean architecture with separation of concerns
-- Professional coding standards
-
-## 🧹 Recent Improvements & Cleanup
-
-### ✅ Codebase Cleanup (Latest)
-- **Removed Bloat**: Eliminated all unnecessary files and redundant code
-- **Single Entry Point**: Consolidated to single `app.py` main application
-- **No Duplicate Files**: Removed redundant main files and conflicting endpoints
-- **Cache Cleanup**: Removed all Python cache files and `__pycache__` directories
-- **UI Refinement**: Removed unused components (ENP, asepsi references)
-- **Professional Footer**: Improved footer design for minimalist, professional look
-
-### ✅ UI/UX Enhancements
-- **Color Scheme**: Updated to professional, minimalist healthcare palette
-- **Template Cleanup**: Removed broken and unused templates
-- **Cohesive Design**: All UI components now integrated with backend logic
-- **Enhanced Footer**: Modern, clean footer with system status indicator
-- **Responsive Design**: Mobile-first, professional medical interface
-
-### ✅ API & Backend Integration
-- **Complete API v1**: All new modules (surgery, insurance, logistics, reporter) fully integrated
-- **WebAuthn Ready**: Secure authentication system fully functional
-- **Database Connectivity**: All UI pages connected to backend logic and database
-- **Error Handling**: Professional error handling throughout the application
-- **Documentation**: Up-to-date API documentation and usage examples
-
-### Testing Suite
+### Testing Framework
 ```bash
 # Run all tests
 python -m pytest
@@ -296,39 +191,71 @@ python -m pytest
 # Run integration tests
 python -m pytest test/integration/
 
-# Run unit tests  
-python -m pytest test/unit/
-
-# Test API endpoints
-pytest tests/integration/test_api_endpoints.py -v
+# Test API endpoints specifically
+python -m pytest tests/integration/test_api_endpoints.py -v
 ```
 
-### Development Tools
+### Code Quality
+- **Type Safety**: Full type hints throughout codebase
+- **Error Handling**: Comprehensive validation and error responses
+- **Clean Architecture**: Separation of concerns with clear interfaces
+- **Documentation**: Inline documentation and API docs
+- **Standards**: Professional coding standards and best practices
+
+## 🔐 Security & Compliance
+
+### Security Features
+- **Authentication**: Secure token-based authentication
+- **Data Protection**: Encrypted data storage and transmission
+- **Input Validation**: Comprehensive request validation
+- **Error Handling**: Secure error responses without data leaks
+- **Session Management**: Secure session handling
+
+### Compliance Ready
+- **Audit Trails**: Complete logging of user actions
+- **Data Privacy**: Structured for HIPAA compliance requirements
+- **Access Control**: Role-based permissions framework
+- **Documentation**: Compliance documentation structure
+- **Regulatory**: Framework for regulatory approval workflows
+
+## 🚀 Deployment Options
+
+### Local Development
 ```bash
-# Check application health
-curl http://localhost:8000/health
-
-# Test authentication
-curl -X POST http://localhost:8000/api/v1/auth/login
-
-# Explore API documentation
-open http://localhost:8000/docs
+# Standard development setup
+python main.py
 ```
 
-## 🔐 Security Features
+### Production Deployment
+- **Docker**: Container-ready with deployment configurations
+- **Environment Variables**: Configurable for different environments
+- **Database**: SQLite for development, ready for PostgreSQL/MySQL upgrade
+- **Scaling**: Modular architecture supports horizontal scaling
+- **Monitoring**: Health checks and logging for production monitoring
 
-- **Multi-Factor Authentication**: WebAuthn biometric authentication
-- **Secure API**: Token-based authentication with proper validation
-- **Data Protection**: Encryption and secure data handling
-- **Access Control**: Role-based permissions and authorization
+## 🧹 Recent Refactoring & Improvements
 
-## 📈 Analytics & Reporting
+### ✅ Codebase Optimization
+- **File Cleanup**: Removed all duplicate, unused, and redundant files
+- **Single Entry Point**: Consolidated to `main.py` as the sole application entry
+- **Minimal Dependencies**: Reduced to essential packages only
+- **Cache Cleanup**: Removed all Python cache files and `__pycache__` directories
+- **Template Consolidation**: Unified template structure with clear hierarchy
 
-- **Medical Analytics**: Statistical analysis of treatment outcomes
-- **Operational Reports**: Healthcare logistics and efficiency metrics
-- **Data Export**: Multiple formats for external analysis
-- **Real-time Dashboards**: Live monitoring and insights
+### ✅ UI/UX Enhancement
+- **Minimal Design**: Clean, professional medical interface
+- **Consistent Branding**: Unified Surgify branding throughout platform
+- **Responsive Layout**: Mobile-first design for clinical environments
+- **Professional Colors**: Medical-grade color palette and typography
+- **Integration**: All UI components connected to backend logic
+
+### ✅ Architecture Improvements
+- **API Integration**: All endpoints connected to database and UI
+- **Type Safety**: Complete type hints and validation throughout
+- **Error Handling**: Professional error handling with proper responses
+- **Documentation**: Updated and accurate documentation
+- **Testing**: Comprehensive test suite for reliability
 
 ---
 
-**Ready for Production** | **Medical-Grade Quality** | **Extensible Architecture**
+**Production Ready** | **Modular Architecture** | **Medical Grade Quality**

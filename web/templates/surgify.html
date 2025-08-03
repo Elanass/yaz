@@ -54,50 +54,51 @@
 
     <!-- Tabs -->
     <div class="flex gap-3 p-3 overflow-x-hidden">
-      <button class="flex h-8 shrink-0 items-center justify-center gap-x-2 rounded-full bg-[#ededed] pl-4 pr-2">
-        <p class="text-[#141414] text-sm font-medium leading-normal">Journal</p>
-        <div class="text-[#141414]" data-icon="CaretDown" data-size="20px" data-weight="regular"><svg><!-- SVG --></svg></div>
+      <button class="flex h-8 shrink-0 items-center justify-center gap-x-2 rounded-full bg-[#2563eb] text-white pl-4 pr-2" onclick="showSection('cases')">
+        <p class="text-sm font-medium leading-normal">Cases</p>
       </button>
-      <button class="flex h-8 shrink-0 items-center justify-center gap-x-2 rounded-full bg-[#ededed] pl-4 pr-2"><p class="text-[#141414] text-sm font-medium leading-normal">Events</p><div class="text-[#141414]" data-icon="CaretDown" data-size="20px" data-weight="regular"><svg><!-- SVG --></svg></div></button>
-      <button class="flex h-8 shrink-0 items-center justify-center gap-x-2 rounded-full bg-[#ededed] pl-4 pr-2"><p class="text-[#141414] text-sm font-medium leading-normal">Series</p><div class="text-[#141414]" data-icon="CaretDown" data-size="20px" data-weight="regular"><svg><!-- SVG --></svg></div></button>
+      <button class="flex h-8 shrink-0 items-center justify-center gap-x-2 rounded-full bg-[#ededed] pl-4 pr-2" onclick="showSection('proposals')">
+        <p class="text-[#141414] text-sm font-medium leading-normal">Proposals</p>
+      </button>
+      <button class="flex h-8 shrink-0 items-center justify-center gap-x-2 rounded-full bg-[#ededed] pl-4 pr-2" onclick="showSection('collaborations')">
+        <p class="text-[#141414] text-sm font-medium leading-normal">Collaborations</p>
+      </button>
+      <button class="flex h-8 shrink-0 items-center justify-center gap-x-2 rounded-full bg-[#ededed] pl-4 pr-2" onclick="showSection('studies')">
+        <p class="text-[#141414] text-sm font-medium leading-normal">Studies</p>
+      </button>
     </div>
 
-    <!-- Featured Series -->
-    <h2 class="px-4 pt-5 pb-3 text-[22px] font-bold text-[#141414]">Featured Series</h2>
-    <div class="flex overflow-x-auto scrollbar-hidden p-4 gap-3">
-      {% for series in featured_series %}
-      <div class="min-w-[60px] flex flex-col gap-4 rounded-lg" 
-           hx-get="/series/{{ series.id }}/peek" 
-           hx-trigger="mouseenter" 
-           hx-target="#peek-{{ series.id }}" 
-           hx-swap="afterend">
-        <div class="aspect-video bg-cover rounded-xl" style="background-image: url('{{ series.image_url }}');"></div>
-        <p class="text-base font-medium text-[#141414]">{{ series.title }}</p>
-        <p class="text-sm text-neutral-500">{{ series.author }}</p>
+    <!-- Cases Section -->
+    <div id="cases-section" class="content-section">
+      <h2 class="px-4 pt-5 pb-3 text-[22px] font-bold text-[#141414]">Active Cases</h2>
+      <div class="p-4 space-y-3" id="cases-list">
+        <!-- Cases loaded dynamically -->
       </div>
-      <div id="peek-{{ series.id }}" class="absolute z-10 bg-white shadow-lg hidden"></div>
-      {% endfor %}
     </div>
 
-    <!-- Upcoming Events -->
-    <h2 class="px-4 pt-5 pb-3 text-[22px] font-bold text-[#141414]">Upcoming Events</h2>
-    <div class="flex overflow-x-auto scrollbar-hidden p-4 gap-3">
-      {% for event in upcoming_events %}
-      <div class="min-w-[60px] flex flex-col gap-4 rounded-lg" 
-           hx-get="/events/{{ event.id }}/peek" 
-           hx-trigger="mouseenter" 
-           hx-target="#peek-event-{{ event.id }}" 
-           hx-swap="afterend">
-        <div class="aspect-video bg-cover rounded-xl" style="background-image: url('{{ event.image_url }}');"></div>
-        <p class="text-base font-medium text-[#141414]">{{ event.title }}</p>
-        <p class="text-sm text-neutral-500">{{ event.date }}</p>
+    <!-- Surgical Proposals Section -->
+    <div id="proposals-section" class="content-section hidden">
+      <h2 class="px-4 pt-5 pb-3 text-[22px] font-bold text-[#141414]">Surgical Proposals</h2>
+      <div class="p-4 space-y-3" id="proposals-list">
+        <!-- Proposals loaded dynamically -->
       </div>
-      <div id="peek-event-{{ event.id }}" class="absolute z-10 bg-white shadow-lg hidden"></div>
-      {% endfor %}
     </div>
 
-    <!-- Latest Journal Articles -->
-    <h2 class="px-4 pt-5 pb-3 text-[22px] font-bold text-[#141414]">Latest Journal Articles</h2>
+    <!-- Collaborations Section -->
+    <div id="collaborations-section" class="content-section hidden">
+      <h2 class="px-4 pt-5 pb-3 text-[22px] font-bold text-[#141414]">Active Collaborations</h2>
+      <div class="p-4 space-y-3" id="collaborations-list">
+        <!-- Collaborations loaded dynamically -->
+      </div>
+    </div>
+
+    <!-- Studies Section -->
+    <div id="studies-section" class="content-section hidden">
+      <h2 class="px-4 pt-5 pb-3 text-[22px] font-bold text-[#141414]">Research Studies</h2>
+      <div class="p-4 space-y-3" id="studies-list">
+        <!-- Studies loaded dynamically -->
+      </div>
+    </div>
     <div class="p-4 space-y-4">
       {% for article in journal_articles %}
       <div class="flex items-center gap-4 rounded-xl" 
@@ -218,53 +219,360 @@
 
 {% block extra_scripts %}
 <script>
-function surgifyApp() {
-    return {
-        showInsightsModal: false,
-        darkMode: false,
-        init() {
-            // Initialize any data or event listeners
-            console.log('Surgify app initialized');
-            
-            // Theme toggle functionality
-            const themeToggle = document.getElementById('theme-toggle');
-            if (themeToggle) {
-                themeToggle.addEventListener('click', this.toggleTheme.bind(this));
-            }
-            
-            // Load saved theme preference
-            const savedTheme = localStorage.getItem('surgify-theme');
-            if (savedTheme === 'dark') {
-                this.enableDarkMode();
-            }
-        },
+// Enhanced Surgify App with Collaboration Features
+const surgifyApp = {
+    currentTab: 'journal',
+    currentCaseId: null,
+    darkMode: false,
+    
+    init() {
+        console.log('Surgify collaboration app initialized');
+        this.bindEvents();
+        this.loadInitialData();
+        this.setupTheme();
+        this.setupRealtimeUpdates();
+    },
+    
+    bindEvents() {
+        // Tab switching
+        document.querySelectorAll('[data-tab]').forEach(tab => {
+            tab.addEventListener('click', (e) => {
+                e.preventDefault();
+                this.switchTab(e.target.closest('[data-tab]').dataset.tab);
+            });
+        });
         
-        toggleTheme() {
-            if (this.darkMode) {
-                this.disableDarkMode();
-            } else {
-                this.enableDarkMode();
-            }
-        },
-        
-        enableDarkMode() {
-            this.darkMode = true;
-            document.documentElement.classList.add('dark');
-            localStorage.setItem('surgify-theme', 'dark');
-        },
-        
-        disableDarkMode() {
-            this.darkMode = false;
-            document.documentElement.classList.remove('dark');
-            localStorage.setItem('surgify-theme', 'light');
+        // Theme toggle
+        const themeToggle = document.getElementById('theme-toggle');
+        if (themeToggle) {
+            themeToggle.addEventListener('click', this.toggleTheme.bind(this));
         }
+        
+        // Case and proposal interactions
+        document.addEventListener('click', (e) => {
+            if (e.target.closest('[data-case-id]')) {
+                const caseId = e.target.closest('[data-case-id]').dataset.caseId;
+                this.selectCase(caseId);
+            }
+            
+            if (e.target.matches('[data-action="create-proposal"]')) {
+                e.preventDefault();
+                this.createProposal(e.target.dataset.caseId);
+            }
+            
+            if (e.target.matches('[data-action="approve-proposal"]')) {
+                e.preventDefault();
+                this.approveProposal(e.target.dataset.proposalId);
+            }
+        });
+    },
+    
+    setupTheme() {
+        const savedTheme = localStorage.getItem('surgify-theme');
+        if (savedTheme === 'dark') {
+            this.enableDarkMode();
+        }
+    },
+    
+    toggleTheme() {
+        if (this.darkMode) {
+            this.disableDarkMode();
+        } else {
+            this.enableDarkMode();
+        }
+    },
+    
+    enableDarkMode() {
+        this.darkMode = true;
+        document.documentElement.classList.add('dark');
+        localStorage.setItem('surgify-theme', 'dark');
+    },
+    
+    disableDarkMode() {
+        this.darkMode = false;
+        document.documentElement.classList.remove('dark');
+        localStorage.setItem('surgify-theme', 'light');
+    },
+    
+    async loadInitialData() {
+        try {
+            // Enhanced data loading for collaboration features
+            const [cases, proposals] = await Promise.all([
+                this.fetchAPI('/api/v1/cases').catch(() => []),
+                this.fetchAPI('/api/v1/proposals').catch(() => [])
+            ]);
+            
+            this.renderFeaturedContent(cases, proposals);
+        } catch (error) {
+            console.error('Failed to load initial data:', error);
+        }
+    },
+    
+    renderFeaturedContent(cases, proposals) {
+        // Add dynamic content to featured sections based on actual data
+        const featuredSeries = document.querySelector('.featured-series-container');
+        if (featuredSeries && cases.length > 0) {
+            const caseCards = cases.slice(0, 3).map(case_ => `
+                <div class="min-w-[200px] flex flex-col gap-4 rounded-lg cursor-pointer" data-case-id="${case_.id}">
+                    <div class="aspect-video bg-gradient-to-br from-blue-500 to-indigo-600 rounded-xl flex items-center justify-center">
+                        <span class="text-white font-semibold">${case_.case_number}</span>
+                    </div>
+                    <p class="text-base font-medium text-[#141414]">${case_.diagnosis}</p>
+                    <p class="text-sm text-neutral-500">${case_.procedure_type}</p>
+                </div>
+            `).join('');
+            
+            featuredSeries.innerHTML = caseCards;
+        }
+    },
+    
+    switchTab(tabName) {
+        this.currentTab = tabName;
+        
+        // Update active tab styling
+        document.querySelectorAll('[data-tab]').forEach(tab => {
+            const button = tab.querySelector('button') || tab;
+            button.classList.remove('bg-[#ededed]');
+            if (tab.dataset.tab === tabName) {
+                button.classList.add('bg-[#ededed]');
+            }
+        });
+        
+        // Load tab-specific content
+        this.loadTabContent(tabName);
+    },
+    
+    async loadTabContent(tabName) {
+        const mainContent = document.querySelector('.main-content-area');
+        if (!mainContent) return;
+        
+        try {
+            switch(tabName) {
+                case 'cases':
+                    await this.loadCasesTab();
+                    break;
+                case 'proposals':
+                    await this.loadProposalsTab();
+                    break;
+                case 'studies':
+                    await this.loadStudiesTab();
+                    break;
+                default:
+                    // Keep existing journal content
+                    break;
+            }
+        } catch (error) {
+            console.error(`Failed to load ${tabName} content:`, error);
+        }
+    },
+    
+    async loadCasesTab() {
+        try {
+            const cases = await this.fetchAPI('/api/v1/cases');
+            this.updateMainContent('Active Surgical Cases', cases.map(case_ => `
+                <div class="bg-white rounded-xl p-4 shadow-sm border border-gray-100 mb-4" data-case-id="${case_.id}">
+                    <div class="flex justify-between items-start mb-3">
+                        <h3 class="font-bold text-[#141414]">${case_.case_number}</h3>
+                        <span class="text-xs px-2 py-1 rounded-full bg-blue-100 text-blue-800">${case_.status}</span>
+                    </div>
+                    <p class="text-sm text-neutral-600 mb-2">${case_.diagnosis}</p>
+                    <p class="text-xs text-neutral-500 mb-3">Procedure: ${case_.procedure_type}</p>
+                    <div class="flex gap-2">
+                        <button class="text-xs bg-blue-500 text-white px-3 py-1 rounded-full hover:bg-blue-600" 
+                                data-action="create-proposal" data-case-id="${case_.id}">
+                            Create Proposal
+                        </button>
+                        <button class="text-xs bg-neutral-500 text-white px-3 py-1 rounded-full hover:bg-neutral-600" 
+                                onclick="surgifyApp.viewCaseDetails(${case_.id})">
+                            View Details
+                        </button>
+                    </div>
+                </div>
+            `).join(''));
+        } catch (error) {
+            this.updateMainContent('Cases', '<p class="text-neutral-500">Failed to load cases</p>');
+        }
+    },
+    
+    async loadProposalsTab() {
+        try {
+            const proposals = await this.fetchAPI('/api/v1/proposals');
+            this.updateMainContent('Collaborative Proposals', proposals.map(proposal => `
+                <div class="bg-white rounded-xl p-4 shadow-sm border border-gray-100 mb-4">
+                    <div class="flex justify-between items-start mb-3">
+                        <h3 class="font-bold text-[#141414]">${proposal.title}</h3>
+                        <span class="text-xs px-2 py-1 rounded-full ${this.getStatusColor(proposal.status)}">${proposal.status}</span>
+                    </div>
+                    <p class="text-sm text-neutral-600 mb-2">${proposal.description}</p>
+                    <p class="text-xs text-neutral-500 mb-3">Study: ${proposal.study_reference || 'No study reference'}</p>
+                    <div class="flex gap-2">
+                        <button class="text-xs bg-green-500 text-white px-3 py-1 rounded-full hover:bg-green-600" 
+                                data-action="approve-proposal" data-proposal-id="${proposal.id}">
+                            Approve
+                        </button>
+                        <button class="text-xs bg-yellow-500 text-white px-3 py-1 rounded-full hover:bg-yellow-600" 
+                                onclick="surgifyApp.reviewProposal(${proposal.id})">
+                            Review
+                        </button>
+                    </div>
+                </div>
+            `).join(''));
+        } catch (error) {
+            this.updateMainContent('Proposals', '<p class="text-neutral-500">Failed to load proposals</p>');
+        }
+    },
+    
+    async loadStudiesTab() {
+        this.updateMainContent('Research Studies', `
+            <div class="bg-white rounded-xl p-6 shadow-sm border border-gray-100">
+                <h3 class="font-bold text-[#141414] mb-4">ADCI Gastric Float Surgery Study</h3>
+                <p class="text-sm text-neutral-600 mb-3">
+                    Advanced Decision-Clinical Impact (ADCI) study analyzing gastric float surgery outcomes 
+                    using our proprietary impact analyzer tool.
+                </p>
+                <div class="flex flex-wrap gap-2 mb-4">
+                    <span class="text-xs px-2 py-1 rounded-full bg-green-100 text-green-800">Validated</span>
+                    <span class="text-xs px-2 py-1 rounded-full bg-yellow-100 text-yellow-800">Awaiting Approval</span>
+                </div>
+                <button class="text-xs bg-blue-500 text-white px-4 py-2 rounded-full hover:bg-blue-600">
+                    View Study Details
+                </button>
+            </div>
+        `);
+    },
+    
+    updateMainContent(title, content) {
+        const mainArea = document.querySelector('.main-content-area') || document.querySelector('.px-4.space-y-4');
+        if (mainArea) {
+            mainArea.innerHTML = `
+                <h2 class="px-4 pt-5 pb-3 text-[22px] font-bold text-[#141414]">${title}</h2>
+                <div class="px-4">${content}</div>
+            `;
+        }
+    },
+    
+    async createProposal(caseId) {
+        const modalHtml = `
+            <div class="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50 p-4" id="proposal-modal">
+                <div class="bg-white rounded-xl p-6 w-full max-w-md">
+                    <h3 class="text-lg font-bold text-[#141414] mb-4">Create Surgical Proposal</h3>
+                    <form id="proposal-form">
+                        <div class="mb-4">
+                            <label class="block text-sm font-medium text-[#141414] mb-2">Title</label>
+                            <input type="text" name="title" class="w-full border border-neutral-300 rounded-lg px-3 py-2" required>
+                        </div>
+                        <div class="mb-4">
+                            <label class="block text-sm font-medium text-[#141414] mb-2">Description</label>
+                            <textarea name="description" class="w-full border border-neutral-300 rounded-lg px-3 py-2" rows="3" required></textarea>
+                        </div>
+                        <div class="mb-6">
+                            <label class="block text-sm font-medium text-[#141414] mb-2">Supporting Study</label>
+                            <input type="text" name="study_reference" class="w-full border border-neutral-300 rounded-lg px-3 py-2" placeholder="ADCI gastric float surgery study...">
+                        </div>
+                        <div class="flex gap-3">
+                            <button type="submit" class="bg-blue-500 text-white px-4 py-2 rounded-lg flex-1 hover:bg-blue-600">Create</button>
+                            <button type="button" onclick="surgifyApp.closeModal()" class="bg-neutral-500 text-white px-4 py-2 rounded-lg hover:bg-neutral-600">Cancel</button>
+                        </div>
+                    </form>
+                </div>
+            </div>
+        `;
+        
+        document.body.insertAdjacentHTML('beforeend', modalHtml);
+        
+        document.getElementById('proposal-form').addEventListener('submit', async (e) => {
+            e.preventDefault();
+            const formData = new FormData(e.target);
+            
+            try {
+                await this.fetchAPI('/api/v1/proposals', {
+                    method: 'POST',
+                    headers: {'Content-Type': 'application/json'},
+                    body: JSON.stringify({
+                        case_id: parseInt(caseId),
+                        title: formData.get('title'),
+                        description: formData.get('description'),
+                        study_reference: formData.get('study_reference'),
+                        status: 'draft'
+                    })
+                });
+                
+                this.closeModal();
+                this.showNotification('Proposal created successfully', 'success');
+                if (this.currentTab === 'proposals') {
+                    this.loadProposalsTab();
+                }
+            } catch (error) {
+                this.showNotification('Failed to create proposal', 'error');
+            }
+        });
+    },
+    
+    async approveProposal(proposalId) {
+        try {
+            await this.fetchAPI(`/api/v1/proposals/${proposalId}/approve`, {
+                method: 'POST'
+            });
+            
+            this.showNotification('Proposal approved', 'success');
+            if (this.currentTab === 'proposals') {
+                this.loadProposalsTab();
+            }
+        } catch (error) {
+            this.showNotification('Failed to approve proposal', 'error');
+        }
+    },
+    
+    closeModal() {
+        const modal = document.getElementById('proposal-modal');
+        if (modal) modal.remove();
+    },
+    
+    getStatusColor(status) {
+        const colors = {
+            'draft': 'bg-neutral-100 text-neutral-800',
+            'under_review': 'bg-yellow-100 text-yellow-800',
+            'approved': 'bg-green-100 text-green-800',
+            'rejected': 'bg-red-100 text-red-800'
+        };
+        return colors[status] || 'bg-neutral-100 text-neutral-800';
+    },
+    
+    async fetchAPI(url, options = {}) {
+        const response = await fetch(url, options);
+        if (!response.ok) {
+            throw new Error(`HTTP error! status: ${response.status}`);
+        }
+        return response.json();
+    },
+    
+    showNotification(message, type = 'info') {
+        const notification = document.createElement('div');
+        notification.className = `fixed top-4 right-4 p-4 rounded-lg text-white z-50 ${
+            type === 'success' ? 'bg-green-500' : 
+            type === 'error' ? 'bg-red-500' : 'bg-blue-500'
+        }`;
+        notification.textContent = message;
+        
+        document.body.appendChild(notification);
+        setTimeout(() => notification.remove(), 3000);
+    },
+    
+    setupRealtimeUpdates() {
+        // Poll for updates every 30 seconds when on collaborative tabs
+        setInterval(() => {
+            if (this.currentTab === 'proposals') {
+                this.loadProposalsTab();
+            } else if (this.currentTab === 'cases') {
+                this.loadCasesTab();
+            }
+        }, 30000);
     }
-}
+};
 
-// Initialize the app when DOM is loaded
-document.addEventListener('DOMContentLoaded', function() {
-    const app = surgifyApp();
-    app.init();
+// Initialize when DOM is loaded
+document.addEventListener('DOMContentLoaded', () => {
+    surgifyApp.init();
 });
 </script>
 {% endblock %}

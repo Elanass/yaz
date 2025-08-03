@@ -83,3 +83,104 @@ class Protocol(Base):
     steps = Column(Text, nullable=True)
     guidelines = Column(Text, nullable=True)
     created_at = Column(DateTime, default=datetime.utcnow)
+
+# Additional models for collaborative surgery platform
+
+class CollaborationStatus(str, Enum):
+    DRAFT = "draft"
+    PENDING_REVIEW = "pending_review"
+    APPROVED = "approved"
+    REJECTED = "rejected"
+
+class RegulatoryStatus(str, Enum):
+    NOT_SUBMITTED = "not_submitted"
+    SUBMITTED = "submitted"
+    UNDER_REVIEW = "under_review"
+    APPROVED = "approved"
+    REJECTED = "rejected"
+
+class SurgicalProposal(Base):
+    """Hypothetical surgical solutions proposed by surgeons"""
+    __tablename__ = "surgical_proposals"
+    
+    id = Column(Integer, primary_key=True, index=True)
+    case_id = Column(Integer, ForeignKey("cases.id"), nullable=False)
+    proposed_by = Column(Integer, ForeignKey("users.id"), nullable=False)
+    
+    title = Column(String(200), nullable=False)
+    description = Column(Text, nullable=False)
+    technique = Column(String(100), nullable=True)
+    estimated_duration = Column(Integer, nullable=True)  # minutes
+    
+    # Study validation
+    study_reference = Column(String(200), nullable=True)
+    validation_data = Column(Text, nullable=True)  # JSON as text
+    success_rate = Column(Float, nullable=True)
+    
+    # Collaboration
+    status = Column(String(20), default=CollaborationStatus.DRAFT)
+    
+    # Regulatory
+    regulatory_status = Column(String(20), default=RegulatoryStatus.NOT_SUBMITTED)
+    regulatory_notes = Column(Text, nullable=True)
+    
+    created_at = Column(DateTime, default=datetime.utcnow)
+    updated_at = Column(DateTime, default=datetime.utcnow)
+
+class SurgeonConsent(Base):
+    """Surgeon consent and approval records"""
+    __tablename__ = "surgeon_consents"
+    
+    id = Column(Integer, primary_key=True, index=True)
+    proposal_id = Column(Integer, ForeignKey("surgical_proposals.id"), nullable=False)
+    surgeon_id = Column(Integer, ForeignKey("users.id"), nullable=False)
+    
+    consent_type = Column(String(50), nullable=False)  # "review", "approve", "reject"
+    comments = Column(Text, nullable=True)
+    confidence_score = Column(Float, nullable=True)  # 0.0 to 1.0
+    
+    created_at = Column(DateTime, default=datetime.utcnow)
+
+class StudyResult(Base):
+    """Study results and impact analysis data"""
+    __tablename__ = "study_results"
+    
+    id = Column(Integer, primary_key=True, index=True)
+    study_name = Column(String(200), nullable=False)
+    study_type = Column(String(50), nullable=False)  # "ADCI", "clinical_trial", etc.
+    
+    # Study metadata
+    participants = Column(Integer, nullable=True)
+    duration_months = Column(Integer, nullable=True)
+    methodology = Column(Text, nullable=True)
+    
+    # Results
+    success_rate = Column(Float, nullable=True)
+    complication_rate = Column(Float, nullable=True)
+    outcomes_data = Column(Text, nullable=True)  # JSON as text
+    
+    # Publication
+    published = Column(Boolean, default=False)
+    publication_date = Column(DateTime, nullable=True)
+    doi = Column(String(100), nullable=True)
+    
+    created_at = Column(DateTime, default=datetime.utcnow)
+
+class CaseCollaboration(Base):
+    """Collaboration sessions for surgical cases"""
+    __tablename__ = "case_collaborations"
+    
+    id = Column(Integer, primary_key=True, index=True)
+    case_id = Column(Integer, ForeignKey("cases.id"), nullable=False)
+    session_name = Column(String(200), nullable=False)
+    
+    # Participants
+    primary_surgeon = Column(Integer, ForeignKey("users.id"), nullable=False)
+    participants = Column(Text, nullable=True)  # JSON list of surgeon IDs
+    
+    # Session details
+    scheduled_at = Column(DateTime, nullable=True)
+    status = Column(String(20), default="scheduled")  # scheduled, active, completed
+    notes = Column(Text, nullable=True)
+    
+    created_at = Column(DateTime, default=datetime.utcnow)

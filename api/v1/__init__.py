@@ -8,6 +8,7 @@ from fastapi import APIRouter
 from .dashboard import router as dashboard_router
 from .cases import router as cases_router
 from .auth import router as auth_router
+from .proposals import router as proposals_router
 
 # Create main router
 router = APIRouter()
@@ -16,6 +17,7 @@ router = APIRouter()
 router.include_router(dashboard_router, prefix="/dashboard", tags=["Dashboard"])
 router.include_router(cases_router, prefix="/cases", tags=["Cases"])
 router.include_router(auth_router, prefix="/auth", tags=["Authentication"])
+router.include_router(proposals_router, prefix="/collaboration", tags=["Collaboration"])
 
 @router.get("/")
 async def api_root():
@@ -27,7 +29,8 @@ async def api_root():
         "endpoints": {
             "dashboard": "/api/v1/dashboard",
             "cases": "/api/v1/cases",
-            "auth": "/api/v1/auth"
+            "auth": "/api/v1/auth",
+            "collaboration": "/api/v1/collaboration"
         },
         "features": [
             "Clinical Decision Support",
