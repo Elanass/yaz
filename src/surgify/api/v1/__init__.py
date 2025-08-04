@@ -12,6 +12,8 @@ from .proposals import router as proposals_router
 from .search import router as search_router
 from .mobile import router as mobile_router
 from .feedback import router as feedback_router
+from .recommendations import router as recommendations_router
+from .downloads import router as downloads_router
 
 # Create main router
 router = APIRouter()
@@ -24,6 +26,8 @@ router.include_router(proposals_router, prefix="/collaboration", tags=["Collabor
 router.include_router(search_router, tags=["Search"])
 router.include_router(mobile_router, tags=["Mobile"])
 router.include_router(feedback_router, tags=["Feedback"])
+router.include_router(recommendations_router, prefix="/recommendations", tags=["Recommendations"])
+router.include_router(downloads_router, prefix="/downloads", tags=["Downloads"])
 
 @router.get("/")
 async def api_root():

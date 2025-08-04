@@ -1,0 +1,274 @@
+{% extends "layout.html" %}
+
+{% block title %}{{ page_title }} - Surgify{% endblock %}
+
+{% block content %}
+<div class="min-h-screen bg-gray-50">
+    <!-- Header -->
+    <div class="bg-white shadow-sm border-b">
+        <div class="max-w-7xl mx-auto px-4 py-6">
+            <div class="flex justify-between items-center">
+                <div>
+                    <h1 class="text-3xl font-bold text-gray-900">Analytics Dashboard</h1>
+                    <p class="text-gray-600 mt-1">Surgical outcomes and performance analytics</p>
+                </div>
+                <div class="flex space-x-3">
+                    <select class="border border-gray-300 rounded-lg px-3 py-2 text-sm">
+                        <option>Last 30 days</option>
+                        <option>Last 90 days</option>
+                        <option>Last year</option>
+                        <option>All time</option>
+                    </select>
+                    <button class="bg-blue-600 text-white px-4 py-2 rounded-lg hover:bg-blue-700 transition-colors">
+                        Export Report
+                    </button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Content -->
+    <div class="max-w-7xl mx-auto px-4 py-8">
+        <!-- Key Metrics -->
+        <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 mb-8">
+            <div class="bg-white rounded-lg shadow-sm p-6">
+                <div class="flex items-center">
+                    <div class="p-2 bg-blue-100 rounded-lg">
+                        <svg class="w-6 h-6 text-blue-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 7h8m0 0v8m0-8l-8 8-4-4-6 6"></path>
+                        </svg>
+                    </div>
+                    <div class="ml-4">
+                        <p class="text-sm font-medium text-gray-600">Total Surgeries</p>
+                        <p class="text-2xl font-bold text-gray-900">1,847</p>
+                    </div>
+                </div>
+                <div class="mt-4">
+                    <div class="w-full bg-gray-200 rounded-full h-2">
+                        <div class="bg-blue-600 h-2 rounded-full" style="width: 75%"></div>
+                    </div>
+                    <p class="text-xs text-gray-500 mt-1">75% of annual target</p>
+                </div>
+            </div>
+
+            <div class="bg-white rounded-lg shadow-sm p-6">
+                <div class="flex items-center">
+                    <div class="p-2 bg-green-100 rounded-lg">
+                        <svg class="w-6 h-6 text-green-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"></path>
+                        </svg>
+                    </div>
+                    <div class="ml-4">
+                        <p class="text-sm font-medium text-gray-600">Success Rate</p>
+                        <p class="text-2xl font-bold text-gray-900">96.2%</p>
+                    </div>
+                </div>
+                <div class="mt-4">
+                    <div class="w-full bg-gray-200 rounded-full h-2">
+                        <div class="bg-green-600 h-2 rounded-full" style="width: 96%"></div>
+                    </div>
+                    <p class="text-xs text-gray-500 mt-1">+2.3% from last period</p>
+                </div>
+            </div>
+
+            <div class="bg-white rounded-lg shadow-sm p-6">
+                <div class="flex items-center">
+                    <div class="p-2 bg-yellow-100 rounded-lg">
+                        <svg class="w-6 h-6 text-yellow-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z"></path>
+                        </svg>
+                    </div>
+                    <div class="ml-4">
+                        <p class="text-sm font-medium text-gray-600">Avg Duration</p>
+                        <p class="text-2xl font-bold text-gray-900">2.3h</p>
+                    </div>
+                </div>
+                <div class="mt-4">
+                    <div class="w-full bg-gray-200 rounded-full h-2">
+                        <div class="bg-yellow-600 h-2 rounded-full" style="width: 65%"></div>
+                    </div>
+                    <p class="text-xs text-gray-500 mt-1">-12min from target</p>
+                </div>
+            </div>
+
+            <div class="bg-white rounded-lg shadow-sm p-6">
+                <div class="flex items-center">
+                    <div class="p-2 bg-purple-100 rounded-lg">
+                        <svg class="w-6 h-6 text-purple-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9.663 17h4.673M12 3v1m6.364 1.636l-.707.707M21 12h-1M4 12H3m3.343-5.657l-.707-.707m2.828 9.9a5 5 0 117.072 0l-.548.547A3.374 3.374 0 0014 18.469V19a2 2 0 11-4 0v-.531c0-.895-.356-1.754-.988-2.386l-.548-.547z"></path>
+                        </svg>
+                    </div>
+                    <div class="ml-4">
+                        <p class="text-sm font-medium text-gray-600">AI Accuracy</p>
+                        <p class="text-2xl font-bold text-gray-900">98.1%</p>
+                    </div>
+                </div>
+                <div class="mt-4">
+                    <div class="w-full bg-gray-200 rounded-full h-2">
+                        <div class="bg-purple-600 h-2 rounded-full" style="width: 98%"></div>
+                    </div>
+                    <p class="text-xs text-gray-500 mt-1">+0.7% improvement</p>
+                </div>
+            </div>
+        </div>
+
+        <!-- Charts Row -->
+        <div class="grid grid-cols-1 lg:grid-cols-2 gap-8 mb-8">
+            <!-- Surgery Trends Chart -->
+            <div class="bg-white rounded-lg shadow-sm p-6">
+                <h3 class="text-lg font-semibold text-gray-900 mb-4">Surgery Trends</h3>
+                <div class="h-64 flex items-center justify-center bg-gray-50 rounded-lg">
+                    <div class="text-center">
+                        <svg class="mx-auto h-16 w-16 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 19v-6a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2a2 2 0 002-2zm0 0V9a2 2 0 012-2h2a2 2 0 012 2v10m-6 0a2 2 0 002 2h2a2 2 0 002-2m0 0V5a2 2 0 012-2h2a2 2 0 012 2v4a2 2 0 01-2 2h-2a2 2 0 01-2-2z"></path>
+                        </svg>
+                        <p class="mt-2 text-sm text-gray-500">Interactive chart would be displayed here</p>
+                        <p class="text-xs text-gray-400">Showing monthly surgery volume trends</p>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Success Rate by Procedure -->
+            <div class="bg-white rounded-lg shadow-sm p-6">
+                <h3 class="text-lg font-semibold text-gray-900 mb-4">Success Rate by Procedure</h3>
+                <div class="space-y-4">
+                    <div>
+                        <div class="flex justify-between text-sm mb-1">
+                            <span class="font-medium text-gray-700">Gastric Cancer Surgery</span>
+                            <span class="text-gray-500">94.5%</span>
+                        </div>
+                        <div class="w-full bg-gray-200 rounded-full h-2">
+                            <div class="bg-green-600 h-2 rounded-full" style="width: 94.5%"></div>
+                        </div>
+                    </div>
+                    <div>
+                        <div class="flex justify-between text-sm mb-1">
+                            <span class="font-medium text-gray-700">Laparoscopic Surgery</span>
+                            <span class="text-gray-500">97.8%</span>
+                        </div>
+                        <div class="w-full bg-gray-200 rounded-full h-2">
+                            <div class="bg-green-600 h-2 rounded-full" style="width: 97.8%"></div>
+                        </div>
+                    </div>
+                    <div>
+                        <div class="flex justify-between text-sm mb-1">
+                            <span class="font-medium text-gray-700">Emergency Surgery</span>
+                            <span class="text-gray-500">89.2%</span>
+                        </div>
+                        <div class="w-full bg-gray-200 rounded-full h-2">
+                            <div class="bg-yellow-600 h-2 rounded-full" style="width: 89.2%"></div>
+                        </div>
+                    </div>
+                    <div>
+                        <div class="flex justify-between text-sm mb-1">
+                            <span class="font-medium text-gray-700">Gastric Resection</span>
+                            <span class="text-gray-500">96.1%</span>
+                        </div>
+                        <div class="w-full bg-gray-200 rounded-full h-2">
+                            <div class="bg-green-600 h-2 rounded-full" style="width: 96.1%"></div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Performance Metrics -->
+        <div class="bg-white rounded-lg shadow-sm p-6 mb-8">
+            <h3 class="text-lg font-semibold text-gray-900 mb-6">Performance Metrics</h3>
+            <div class="grid grid-cols-1 md:grid-cols-3 gap-6">
+                <!-- Average Duration by Procedure -->
+                <div>
+                    <h4 class="text-sm font-medium text-gray-700 mb-3">Average Duration</h4>
+                    <div class="space-y-3">
+                        <div class="flex justify-between items-center">
+                            <span class="text-sm text-gray-600">Gastric Surgery</span>
+                            <span class="text-sm font-medium text-gray-900">3.2h</span>
+                        </div>
+                        <div class="flex justify-between items-center">
+                            <span class="text-sm text-gray-600">Laparoscopic</span>
+                            <span class="text-sm font-medium text-gray-900">1.8h</span>
+                        </div>
+                        <div class="flex justify-between items-center">
+                            <span class="text-sm text-gray-600">Emergency</span>
+                            <span class="text-sm font-medium text-gray-900">2.1h</span>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Complications Rate -->
+                <div>
+                    <h4 class="text-sm font-medium text-gray-700 mb-3">Complications Rate</h4>
+                    <div class="space-y-3">
+                        <div class="flex justify-between items-center">
+                            <span class="text-sm text-gray-600">Minor</span>
+                            <span class="text-sm font-medium text-orange-600">2.3%</span>
+                        </div>
+                        <div class="flex justify-between items-center">
+                            <span class="text-sm text-gray-600">Major</span>
+                            <span class="text-sm font-medium text-red-600">0.8%</span>
+                        </div>
+                        <div class="flex justify-between items-center">
+                            <span class="text-sm text-gray-600">None</span>
+                            <span class="text-sm font-medium text-green-600">96.9%</span>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Recovery Time -->
+                <div>
+                    <h4 class="text-sm font-medium text-gray-700 mb-3">Avg Recovery Time</h4>
+                    <div class="space-y-3">
+                        <div class="flex justify-between items-center">
+                            <span class="text-sm text-gray-600">Hospital Stay</span>
+                            <span class="text-sm font-medium text-gray-900">4.2 days</span>
+                        </div>
+                        <div class="flex justify-between items-center">
+                            <span class="text-sm text-gray-600">Full Recovery</span>
+                            <span class="text-sm font-medium text-gray-900">3.1 weeks</span>
+                        </div>
+                        <div class="flex justify-between items-center">
+                            <span class="text-sm text-gray-600">Return to Work</span>
+                            <span class="text-sm font-medium text-gray-900">5.5 weeks</span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- AI Insights -->
+        <div class="bg-white rounded-lg shadow-sm p-6">
+            <h3 class="text-lg font-semibold text-gray-900 mb-6">AI-Powered Insights</h3>
+            <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+                <div class="p-4 bg-blue-50 border-l-4 border-blue-400 rounded-r-lg">
+                    <h4 class="text-sm font-medium text-blue-900 mb-2">Optimization Opportunity</h4>
+                    <p class="text-sm text-blue-700">
+                        Laparoscopic procedures show 15% faster recovery when scheduled in morning slots. 
+                        Consider optimizing schedule for better outcomes.
+                    </p>
+                </div>
+                <div class="p-4 bg-green-50 border-l-4 border-green-400 rounded-r-lg">
+                    <h4 class="text-sm font-medium text-green-900 mb-2">Best Practice</h4>
+                    <p class="text-sm text-green-700">
+                        Cases with pre-operative AI assessment show 8% better success rates. 
+                        Current adoption rate: 87%.
+                    </p>
+                </div>
+                <div class="p-4 bg-yellow-50 border-l-4 border-yellow-400 rounded-r-lg">
+                    <h4 class="text-sm font-medium text-yellow-900 mb-2">Risk Alert</h4>
+                    <p class="text-sm text-yellow-700">
+                        Emergency surgeries on weekends show higher complication rates. 
+                        Enhanced monitoring protocols recommended.
+                    </p>
+                </div>
+                <div class="p-4 bg-purple-50 border-l-4 border-purple-400 rounded-r-lg">
+                    <h4 class="text-sm font-medium text-purple-900 mb-2">Trend Analysis</h4>
+                    <p class="text-sm text-purple-700">
+                        Monthly surgery volume increased by 12% with new AI decision support integration. 
+                        Patient satisfaction up 18%.
+                    </p>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

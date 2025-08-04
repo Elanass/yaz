@@ -15,7 +15,7 @@ sys.path.insert(0, str(src_path))
 # Set PYTHONPATH environment variable
 os.environ['PYTHONPATH'] = str(src_path)
 
-from surgify.main import app, main
+from surgify.main import main
 
 if __name__ == "__main__":
     main()

@@ -20,15 +20,15 @@ from fastapi.responses import JSONResponse, HTMLResponse
 from fastapi.staticfiles import StaticFiles
 
 # Core imports
-from surgify.core.config.unified_config import get_settings
-from surgify.core.services.logger import setup_logging, log_request, log_error
-from surgify.core.database import create_tables, engine
-from surgify.core.models.database_models import Base
-from surgify.core.services.registry import get_service_registry
+from .core.config.unified_config import get_settings
+from .core.services.logger import setup_logging, log_request, log_error
+from .core.database import create_tables, engine
+from .core.models.database_models import Base
+from .core.services.registry import get_service_registry
 
 # API imports
-from surgify.api.v1 import router as api_v1_router
-from surgify.ui.web.router import web_router
+from .api.v1 import router as api_v1_router
+from .ui.web.router import web_router
 
 # Setup logging first
 setup_logging()

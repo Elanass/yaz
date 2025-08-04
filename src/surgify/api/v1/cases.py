@@ -10,6 +10,8 @@ from typing import List, Dict, Any
 from fastapi import APIRouter, HTTPException, Depends
 from pydantic import BaseModel
 
+from surgify.core.services.case_service import CaseService
+
 router = APIRouter(tags=["Cases"])
 
 # Database path
@@ -30,6 +32,17 @@ class CaseCreate(BaseModel):
     procedure_type: str
     diagnosis: str
     status: str = "planned"
+
+# Pydantic models for request/response
+class CaseCreateRequest(BaseModel):
+    patient_id: str
+    surgery_type: str
+    status: str
+    pre_op_notes: str
+    post_op_notes: str
+
+# Dependency
+case_service = CaseService()
 
 def get_db_connection():
     """Get database connection"""
@@ -181,3 +194,43 @@ def get_mitigation_strategies(procedure_type: str) -> List[str]:
         strategies.extend(["Anastomotic leak prevention", "Nutritional support planning"])
     
     return strategies
+
+@router.post("/cases", response_model=CaseResponse)
+def create_case(request: CaseCreateRequest):
+    try:
+        case = case_service.create_case(request)
+        return case
+    except Exception as e:
+        raise HTTPException(status_code=400, detail=str(e))
+
+@router.get("/cases", response_model=List[CaseResponse])
+def list_cases():
+    try:
+        cases = case_service.list_cases()
+        return cases
+    except Exception as e:
+        raise HTTPException(status_code=400, detail=str(e))
+
+@router.get("/cases/{case_id}", response_model=CaseResponse)
+def get_case(case_id: int):
+    try:
+        case = case_service.get_case(case_id)
+        return case
+    except Exception as e:
+        raise HTTPException(status_code=404, detail=str(e))
+
+@router.put("/cases/{case_id}", response_model=CaseResponse)
+def update_case(case_id: int, request: CaseCreateRequest):
+    try:
+        case = case_service.update_case(case_id, request)
+        return case
+    except Exception as e:
+        raise HTTPException(status_code=400, detail=str(e))
+
+@router.delete("/cases/{case_id}")
+def delete_case(case_id: int):
+    try:
+        case_service.delete_case(case_id)
+        return {"detail": "Case deleted successfully"}
+    except Exception as e:
+        raise HTTPException(status_code=400, detail=str(e))

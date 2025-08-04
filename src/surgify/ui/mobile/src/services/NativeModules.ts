@@ -64,13 +64,44 @@ export interface CameraResult {
 
 // Native Module Interfaces
 interface ISurgifyBridge {
+  /**
+   * Retrieves device information such as platform and model.
+   */
   getDeviceInfo(): Promise<DeviceInfo>;
+
+  /**
+   * Enables screen recording protection.
+   */
   enableScreenRecordingProtection(): Promise<boolean>;
-  checkJailbreakStatus?(): Promise<SecurityStatus>;
-  checkRootStatus?(): Promise<SecurityStatus>;
-  enableCertificatePinning(pins: string[]): Promise<boolean>;
+
+  /**
+   * Validates network connection with certificate pinning.
+   */
   validateNetworkConnection(url: string): Promise<NetworkValidationResult>;
+
+  /**
+   * Checks if the device is jailbroken.
+   */
+  checkJailbreakStatus?(): Promise<SecurityStatus>;
+
+  /**
+   * Checks if the device is rooted.
+   */
+  checkRootStatus?(): Promise<SecurityStatus>;
+
+  /**
+   * Enables certificate pinning with the given pins.
+   */
+  enableCertificatePinning(pins: string[]): Promise<boolean>;
+
+  /**
+   * Stores data securely with the given key.
+   */
   secureStoreData(key: string, data: string): Promise<boolean>;
+
+  /**
+   * Retrieves securely stored data with the given key.
+   */
   secureRetrieveData(key: string): Promise<string>;
 }
 

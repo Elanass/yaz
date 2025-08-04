@@ -8,6 +8,7 @@ from pathlib import Path
 from fastapi import APIRouter, Request
 from fastapi.responses import HTMLResponse
 from fastapi.templating import Jinja2Templates
+from flask import render_template
 
 router = APIRouter()
 
@@ -47,3 +48,6 @@ async def analytics_dashboard(request: Request):
         "request": request,
         "page_title": "Analytics Dashboard"
     })
+
+def dashboard_page():
+    return render_template("dashboard.html")

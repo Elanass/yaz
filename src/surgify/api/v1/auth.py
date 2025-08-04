@@ -8,6 +8,7 @@ import secrets
 import base64
 import json
 from typing import Optional, Dict, Any
+from surgify.core.services.auth_service import AuthService
 
 router = APIRouter()
 
@@ -57,6 +58,9 @@ class RegisterRequest(BaseModel):
     full_name: Optional[str] = None
 
 
+# Dependency
+auth_service = AuthService()
+
 @router.post("/login", response_model=TokenResponse)
 async def login(request: LoginRequest):
     """User login endpoint"""
@@ -87,8 +91,8 @@ async def logout():
     return {"message": "Successfully logged out"}
 
 
-@router.post("/register")
-async def register(request: RegisterRequest):
+@router.post("/register", response_model=TokenResponse)
+def register_user(request: RegisterRequest):
     """User registration endpoint"""
     # Check for duplicate users
     user_key = (request.username, request.email)

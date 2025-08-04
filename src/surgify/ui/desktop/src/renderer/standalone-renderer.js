@@ -319,32 +319,9 @@ class ConnectionManager {
     }
 
     async connect() {
-        this.setStatus('connecting');
-        
         try {
-            const isOnline = await window.electronAPI?.isOnline?.() ?? navigator.onLine;
-            
-            if (!isOnline) {
-                this.setStatus('disconnected');
-                return;
-            }
-
-            const startTime = Date.now();
-            const response = await fetch('https://api.surgify.com/health', {
-                method: 'GET'
-            });
-
-            if (response.ok) {
-                const latency = Date.now() - startTime;
-                this.currentStatus = {
-                    status: 'connected',
-                    lastConnected: new Date(),
-                    latency
-                };
-                this.setStatus('connected');
-            } else {
-                throw new Error('Health check failed');
-            }
+            const response = await fetch('https://api.surgify.com/health');
+            this.setStatus(response.ok ? 'connected' : 'error');
         } catch (error) {
             console.error('Connection failed:', error);
             this.setStatus('error');
@@ -406,7 +383,7 @@ class ConnectionManager {
     }
 
     setStatus(status) {
-        this.currentStatus.status = status;
+        this.currentStatus = { status, lastUpdated: new Date() };
         this.listeners.forEach(callback => callback(status));
     }
 }

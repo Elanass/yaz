@@ -4,14 +4,18 @@ Dashboard API - Surgify Platform
 
 import sqlite3
 from pathlib import Path
-from typing import Dict, Any
+from typing import Dict, Any, List
 
 from fastapi import APIRouter, HTTPException
+from surgify.modules.analytics.analytics_engine import AnalyticsEngine
 
 router = APIRouter(tags=["Dashboard"])
 
 # Database path
 DB_PATH = Path(__file__).parent.parent.parent / "data" / "database" / "surgify.db"
+
+# Dependency
+analytics_engine = AnalyticsEngine()
 
 def get_db_connection():
     """Get database connection"""
@@ -124,3 +128,27 @@ async def get_dashboard_metrics():
             "active_cases": 0,
             "completion_rate": 0.0
         }
+
+@router.get("/dashboard/metrics", response_model=Dict[str, float])
+def get_metrics():
+    try:
+        metrics = analytics_engine.get_metrics()
+        return metrics
+    except Exception as e:
+        raise HTTPException(status_code=500, detail=str(e))
+
+@router.get("/dashboard/trends", response_model=Dict[str, List[float]])
+def get_trends():
+    try:
+        trends = analytics_engine.get_trends()
+        return trends
+    except Exception as e:
+        raise HTTPException(status_code=500, detail=str(e))
+
+@router.get("/dashboard/export", response_model=str)
+def export_report():
+    try:
+        report_path = analytics_engine.export_report()
+        return {"report_path": report_path}
+    except Exception as e:
+        raise HTTPException(status_code=500, detail=str(e))

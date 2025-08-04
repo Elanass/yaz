@@ -3,20 +3,28 @@ Production-ready configuration using environment variables for Precision Decisio
 """
 import os
 import secrets
-from typing import List, Optional
+from typing import Any, List, Optional
 from dotenv import load_dotenv
 
 # Load environment variables from .env file if it exists
 load_dotenv()
 
+# Extract environment variable parsing to a utility function
+def parse_env_var(key: str, default: Any, cast_type: type = str) -> Any:
+    value = os.getenv(key, default)
+    try:
+        return cast_type(value)
+    except ValueError:
+        return default
+
 class PlatformConfig:
     """Production-ready configuration settings"""
     # Core settings
-    environment: str = os.getenv("ENVIRONMENT", "development")
-    debug_mode: bool = os.getenv("DEBUG", "False").lower() in ("true", "1", "yes")
+    environment: str = parse_env_var("ENVIRONMENT", "development")
+    debug_mode: bool = parse_env_var("DEBUG", "False", bool)
     debug: bool = debug_mode  # Alias for compatibility
-    host: str = os.getenv("HOST", "0.0.0.0")
-    port: int = int(os.getenv("PORT", "8000"))
+    host: str = parse_env_var("HOST", "0.0.0.0")
+    port: int = parse_env_var("PORT", 8000, int)
     
     # API configuration
     api_title: str = os.getenv("API_TITLE", "Precision Decision Platform")
@@ -60,7 +68,7 @@ class PlatformConfig:
     
     # Cache and optimization settings
     enable_response_compression: bool = os.getenv("ENABLE_RESPONSE_COMPRESSION", "True").lower() in ("true", "1", "yes")
-    static_files_max_age: int = int(os.getenv("STATIC_FILES_MAX_AGE", "86400"))  # 1 day in seconds
+    static_files_max_age: int = parse_env_var("STATIC_FILES_MAX_AGE", 86400, int)  # 1 day in seconds
     
     # Logging
     log_level: str = os.getenv("LOG_LEVEL", "INFO")

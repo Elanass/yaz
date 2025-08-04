@@ -2,7 +2,6 @@
 Database Configuration and Connection Management
 """
 
-import os
 from pathlib import Path
 from typing import Generator
 from sqlalchemy import create_engine, MetaData, event

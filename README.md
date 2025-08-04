@@ -1,6 +1,6 @@
-# Surgify - Make Your Way
+# Surgify - Advanced Surgical Platform
 
-🏥 Advanced Decision Support Platform for Surgical Excellence
+🏥 Empowering Healthcare Professionals with AI-Powered Decision Support
 
 [![Python](https://img.shields.io/badge/Python-3.11+-blue.svg)](https://python.org)
 [![FastAPI](https://img.shields.io/badge/FastAPI-0.100+-green.svg)](https://fastapi.tiangolo.com)
@@ -10,7 +10,28 @@
 
 Surgify is a comprehensive surgical decision support platform that empowers healthcare professionals with AI-powered insights, comprehensive case management, and evidence-based clinical tools. Our mission is to enhance surgical outcomes through cutting-edge technology and intuitive design.
 
-**Tagline:** *Make your way* - Empowering surgeons to navigate complex clinical decisions with confidence.
+## 🌟 Key Features
+
+### ✨ **Modern UI/UX**
+- **Responsive Design**: Beautiful, mobile-first interface that works seamlessly across all devices
+- **Interactive Elements**: Smooth animations, hover effects, and intuitive navigation
+- **Dark/Light Theme**: Toggle between themes with persistent preference storage
+- **Smart Search**: Global search functionality for cases, patients, and procedures
+- **Interactive Auth**: Stylish authentication modal with gradient buttons
+
+### 🏥 **Core Functionality**
+- **Case Management**: Complete CRUD operations for surgical cases with status tracking
+- **Analytics Dashboard**: Real-time metrics, trends, and performance indicators
+- **AI Decision Support**: Risk assessment, outcome prediction, and clinical recommendations
+- **User Management**: Role-based access control with secure JWT authentication
+- **API Integration**: RESTful API with comprehensive documentation
+
+### 🎨 **Enhanced User Experience**
+- **No Sidebar Clutter**: Clean header-focused navigation without overwhelming side panels
+- **Gradient Logo**: Stylish branding with modern gradient effects
+- **Quick Actions**: Easy access to common tasks from the homepage
+- **Interactive Cards**: Hover effects and animations on feature cards
+- **Mobile Optimized**: Dedicated mobile search bar and touch-friendly controls
 
 ## 🏗️ Architecture
 
@@ -48,39 +69,197 @@ src/surgify/
 └── main.py              # Application entry point
 ```
 
-## 🚀 Features
+## 🚀 Quick Start
 
-### Web Platform
-- **Clinical Workstation**: Comprehensive case management and surgical planning
-- **Decision Support**: AI-powered recommendations and risk assessment
-- **Analytics Dashboard**: Real-time metrics and performance insights
-- **Collaboration Tools**: Team communication and knowledge sharing
+### Prerequisites
+- Python 3.11+
+- pip (Python package installer)
 
-### Desktop Application
-- **Native Performance**: Electron-based desktop wrapper for optimal performance
-- **Offline Capability**: Work without internet connectivity
-- **Security**: Enhanced security with certificate validation and sandboxing
-- **Cross-platform**: Support for Windows, macOS, and Linux
-- **Auto-updates**: Seamless application updates and maintenance
+### Installation & Setup
 
-### Mobile Apps (Coming Soon)
-- **iOS App**: Native iPhone & iPad experience
-- **Android App**: Native Android interface
-- **Cross-platform Sync**: Seamless data synchronization
-- **Offline Access**: Work without internet connectivity
+1. **Clone the repository:**
+   ```bash
+   git clone <repository-url>
+   cd yaz
+   ```
 
-### Core Capabilities
-- ✅ Case management and tracking
-- ✅ Evidence-based decision support
-- ✅ Real-time analytics and reporting
-- ✅ Multi-user collaboration
-- ✅ Secure data handling
-- ✅ Responsive web design
-- ✅ Desktop application (Electron wrapper)
-- 🔄 Mobile applications (in development)
-- 🔄 AI-powered insights (expanding)
+2. **Install dependencies:**
+   ```bash
+   pip install -r requirements.txt
+   ```
 
-## 🛠️ Technology Stack
+3. **Initialize the database:**
+   ```bash
+   cd data && alembic upgrade head
+   ```
+
+4. **Run the application:**
+   ```bash
+   python main.py
+   ```
+   
+   Or with uvicorn directly:
+   ```bash
+   PYTHONPATH=src uvicorn surgify.main:app --host 0.0.0.0 --port 8000 --reload
+   ```
+
+5. **Access the application:**
+   - **Web Interface**: http://localhost:8000
+   - **API Documentation**: http://localhost:8000/api/docs
+   - **Interactive API**: http://localhost:8000/api/redoc
+
+### 🎯 What's New in This Version
+
+- ✅ **Removed sidebar menu** - Clean, header-focused navigation
+- ✅ **Enhanced auth button** - Wider, more stylish gradient design
+- ✅ **Added logo to header** - Beautiful gradient Surgify branding
+- ✅ **Integrated search bar** - Global search functionality in header
+- ✅ **Theme toggle** - Dark/light mode with sun/moon icons
+- ✅ **Removed "Make Your Way"** - Cleaner hero section messaging
+- ✅ **Mobile optimizations** - Dedicated mobile search and responsive design
+- ✅ **Interactive elements** - Hover effects, animations, and smooth transitions
+
+## 🎨 **Recent UI Updates:**
+
+### Modern Hero Section
+- **Eye-Catching Design**: New gradient backgrounds with animated elements
+- **Glassmorphism Effects**: Modern backdrop blur and transparency effects  
+- **Interactive Animations**: Smooth hover effects and transitions
+- **Mobile Responsive**: Optimized for all device sizes
+
+### Simplified Authentication
+- **Single Auth Element**: Replaced login/signup buttons with elegant auth logo
+- **Gradient Design**: Modern gradient-based UI elements
+- **Clean Interface**: Removed brand logo clutter for cleaner look
+
+### Enhanced Visual Appeal
+- **Modern Gradients**: Purple-to-blue gradient themes throughout
+- **Animated Backgrounds**: Floating particle effects in hero section
+- **Typography**: Improved font choices and text gradient effects
+- **Micro-interactions**: Subtle animations for better user experience
+
+---
+
+### ✅ **Completed Features:**
+
+1. **Core Authentication System** 🔐
+   - JWT-based authentication with refresh tokens
+   - User registration and login endpoints (`/api/v1/auth/`)
+   - Password hashing with bcrypt
+   - Role-based access control structure
+
+2. **Multi-Platform App Downloads** 📱
+   - Desktop app download system (`/api/v1/downloads/download/desktop`)
+   - iOS App Store integration (`/api/v1/downloads/download/ios`)
+   - Android Play Store integration (`/api/v1/downloads/download/android`)
+   - Interactive download modal with platform detection
+   - Cross-platform sync capabilities
+
+2. **Case Management System** 📋
+   - CRUD operations for surgical cases (`/api/v1/cases/`)
+   - Case status tracking (Planned, Active, Completed, Cancelled)
+   - Patient information management
+   - Pre/post-operative notes handling
+
+3. **Analytics Dashboard** 📊
+   - Real-time metrics endpoint (`/api/v1/dashboard/metrics`)
+   - Time-based analytics (daily, weekly, monthly trends)
+   - Export functionality for reports
+   - Performance indicators tracking
+
+4. **Decision Support Engine** 🤖
+   - Risk assessment algorithms (`/api/v1/recommendations/risk`)
+   - Evidence-based recommendations (`/api/v1/recommendations/`)
+   - Outcome prediction models (`/api/v1/recommendations/outcome`)
+   - Alert system for high-risk cases (`/api/v1/recommendations/alerts`)
+
+5. **Database Architecture** 🗄️
+   - SQLAlchemy models for User and Case entities
+   - Database connection and session management
+   - Alembic migration system setup
+   - Initial migration scripts
+
+6. **API Infrastructure** 🔌
+   - RESTful API design with FastAPI
+   - Comprehensive API utilities
+   - Input validation and error handling
+   - Complete testing suite for all endpoints
+
+7. **Modern Web Interface** 🖥️
+   - Landing page with "Start" and "Doc" buttons
+   - Fixed bottom navigation component
+   - Tailwind CSS styling framework setup
+   - Mobile-responsive design structure
+
+### 🔄 **API Endpoints Available:**
+
+#### Authentication
+- `POST /api/v1/auth/register` - User registration
+- `POST /api/v1/auth/login` - User login
+- `POST /api/v1/auth/refresh` - Token refresh
+
+#### Case Management
+- `GET /api/v1/cases/cases` - List all cases
+- `POST /api/v1/cases/cases` - Create new case
+- `GET /api/v1/cases/cases/{id}` - Get specific case
+- `PUT /api/v1/cases/cases/{id}` - Update case
+- `DELETE /api/v1/cases/cases/{id}` - Delete case
+
+#### Analytics Dashboard
+- `GET /api/v1/dashboard/dashboard/metrics` - Get metrics
+- `GET /api/v1/dashboard/dashboard/trends` - Get trends
+- `GET /api/v1/dashboard/dashboard/export` - Export report
+
+#### Decision Support
+- `POST /api/v1/recommendations/recommendations/risk` - Assess risk
+- `POST /api/v1/recommendations/recommendations` - Get recommendations
+- `POST /api/v1/recommendations/recommendations/outcome` - Predict outcome
+- `POST /api/v1/recommendations/recommendations/alerts` - Generate alerts
+
+## 🧪 Testing
+
+### Run All Tests
+```bash
+pytest
+```
+
+### Run Specific Test Categories
+```bash
+# API tests
+pytest tests/api/
+
+# Unit tests
+pytest tests/unit/
+
+# Integration tests
+pytest tests/integration/
+```
+
+### Test Coverage
+```bash
+pytest --cov=src/surgify --cov-report=html
+```
+
+## 🚀 Deployment
+
+### Production Deployment
+```bash
+# Using Gunicorn
+gunicorn surgify.main:app -w 4 -k uvicorn.workers.UvicornWorker --bind 0.0.0.0:8000
+
+# Using Docker
+docker build -t surgify .
+docker run -p 8000:8000 surgify
+```
+
+### Environment Variables
+Create a `.env` file:
+```env
+DATABASE_URL=sqlite:///./surgify.db
+SECRET_KEY=your-secret-key-here
+DEBUG=False
+CORS_ORIGINS=http://localhost:3000,http://localhost:8080
+```
 
 ### Backend
 - **FastAPI**: Modern, fast web framework for building APIs
@@ -312,6 +491,22 @@ cd src/surgify/ui/mobile/ios
 cd src/surgify/ui/mobile/android
 # Android-specific setup instructions will be added
 ```
+
+## Mobile App Setup
+
+### iOS
+1. Install Xcode and development tools.
+2. Run `setup-ios.sh` to initialize the environment.
+3. Open the project in Xcode and build.
+
+### Android
+1. Install Android Studio and SDK tools.
+2. Run `setup-android.sh` to initialize the environment.
+3. Open the project in Android Studio and build.
+
+### Troubleshooting
+- Ensure all dependencies are installed.
+- Check `.env` for missing configuration values.
 
 ## 🤝 Contributing
 
