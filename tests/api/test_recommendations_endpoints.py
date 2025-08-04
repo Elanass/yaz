@@ -1,6 +1,6 @@
 import pytest
 from fastapi.testclient import TestClient
-from src.surgify.main import app
+from surgify.main import app
 
 client = TestClient(app)
 

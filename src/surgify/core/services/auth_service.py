@@ -1,7 +1,7 @@
 import bcrypt
 import jwt
 from datetime import datetime, timedelta
-from src.surgify.core.models.user import User
+from ..models.user import User
 
 class AuthService:
     SECRET_KEY = "your_secret_key"
