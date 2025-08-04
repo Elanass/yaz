@@ -4,12 +4,17 @@ Authentication Page Routes
 Clean authentication flow using templates
 """
 
+from pathlib import Path
 from fastapi import APIRouter, Request, Form
 from fastapi.responses import HTMLResponse, RedirectResponse
 from fastapi.templating import Jinja2Templates
 
 router = APIRouter()
-templates = Jinja2Templates(directory="web/templates")
+
+# Get the correct templates directory
+current_dir = Path(__file__).parent.parent
+templates_dir = current_dir / "templates"
+templates = Jinja2Templates(directory=str(templates_dir))
 
 @router.get("/login", response_class=HTMLResponse)
 async def login_page(request: Request):

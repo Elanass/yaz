@@ -9,6 +9,9 @@ from .dashboard import router as dashboard_router
 from .cases import router as cases_router
 from .auth import router as auth_router
 from .proposals import router as proposals_router
+from .search import router as search_router
+from .mobile import router as mobile_router
+from .feedback import router as feedback_router
 
 # Create main router
 router = APIRouter()
@@ -18,6 +21,9 @@ router.include_router(dashboard_router, prefix="/dashboard", tags=["Dashboard"])
 router.include_router(cases_router, prefix="/cases", tags=["Cases"])
 router.include_router(auth_router, prefix="/auth", tags=["Authentication"])
 router.include_router(proposals_router, prefix="/collaboration", tags=["Collaboration"])
+router.include_router(search_router, tags=["Search"])
+router.include_router(mobile_router, tags=["Mobile"])
+router.include_router(feedback_router, tags=["Feedback"])
 
 @router.get("/")
 async def api_root():

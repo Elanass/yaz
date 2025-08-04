@@ -1,0 +1,164 @@
+{% extends "layout.html" %}
+
+{% block content %}
+<!-- Get App Hero Section -->
+<section class="hero-section bg-gradient-to-br from-purple-600 to-indigo-700 text-white px-4 py-12">
+    <div class="max-w-4xl mx-auto text-center">
+        <div class="flex items-center justify-center gap-3 mb-4">
+            <img src="/static/icons/surgify-logo.png" alt="Surgify" class="h-12 w-auto" onerror="this.style.display='none';">
+            <h1 class="text-4xl md:text-5xl font-bold">Get Surgify</h1>
+        </div>
+        <p class="text-xl mb-2 opacity-90">
+            Take surgical precision with you everywhere
+        </p>
+        <p class="text-lg mb-8 opacity-75 italic">
+            Make your way - on any device
+        </p>
+        
+        <!-- App Download Buttons -->
+        <div class="flex flex-col sm:flex-row gap-4 justify-center mb-8">
+            <button onclick="window.surgifyApp?.downloadApp('ios')" class="interactive bg-black text-white px-8 py-3 rounded-lg font-semibold hover:bg-gray-800 transition-colors cursor-pointer flex items-center gap-3">
+                <svg class="w-6 h-6" viewBox="0 0 24 24" fill="currentColor">
+                    <path d="M18.71 19.5c-.83 1.24-1.71 2.45-3.05 2.47-1.34.03-1.77-.79-3.29-.79-1.53 0-2 .77-3.27.82-1.31.05-2.3-1.32-3.14-2.53C4.25 17 2.94 12.45 4.7 9.39c.87-1.52 2.43-2.48 4.12-2.51 1.28-.02 2.5.87 3.29.87.78 0 2.26-1.07 3.81-.91.65.03 2.47.26 3.64 1.98-.09.06-2.17 1.28-2.15 3.81.03 3.02 2.65 4.03 2.68 4.04-.03.07-.42 1.44-1.38 2.83M13 3.5c.73-.83 1.94-1.46 2.94-1.5.13 1.17-.34 2.35-1.04 3.19-.69.85-1.83 1.51-2.95 1.42-.15-1.15.41-2.35 1.05-3.11z"/>
+                </svg>
+                Download for iOS
+            </button>
+            <button onclick="window.surgifyApp?.downloadApp('android')" class="interactive bg-green-600 text-white px-8 py-3 rounded-lg font-semibold hover:bg-green-700 transition-colors cursor-pointer flex items-center gap-3">
+                <svg class="w-6 h-6" viewBox="0 0 24 24" fill="currentColor">
+                    <path d="M17.523 15.3414c-.5511 0-.9993-.4486-.9993-.9997s.4482-.9993.9993-.9993c.5511 0 .9993.4482.9993.9993.0001.5511-.4482.9997-.9993.9997m-11.046 0c-.5511 0-.9993-.4486-.9993-.9997s.4482-.9993.9993-.9993c.5511 0 .9993.4482.9993.9993 0 .5511-.4482.9997-.9993.9997m11.4045-6.02l1.9973-3.4592a.416.416 0 00-.1518-.5735.416.416 0 00-.5735.1518l-2.0223 3.5014c-1.0607-.4775-2.2571-.7446-3.5107-.7446s-2.4499.2671-3.5107.7446L7.1335 5.4519a.4161.4161 0 00-.5735-.1518.4161.4161 0 00-.1518.5735l1.9973 3.4592C6.9107 10.4094 6.3096 11.9619 6.3096 13.7222v.0556h11.3809v-.0556c0-1.7603-.6011-3.3128-2.1062-4.4028z"/>
+                </svg>
+                Download for Android
+            </button>
+        </div>
+        
+        <!-- QR Code Section -->
+        <div class="bg-white bg-opacity-10 rounded-lg p-6 inline-block">
+            <p class="text-sm mb-4">Scan to download</p>
+            <div class="w-32 h-32 bg-white rounded-lg flex items-center justify-center mx-auto">
+                <div class="text-black text-xs text-center">
+                    QR Code<br>
+                    <span class="text-xs">Coming Soon</span>
+                </div>
+            </div>
+        </div>
+    </div>
+</section>
+
+<!-- Features Grid -->
+<section class="px-4 py-12">
+    <div class="max-w-7xl mx-auto">
+        <h2 class="text-3xl font-bold text-center mb-12 text-gray-800">Mobile Features</h2>
+        <div class="grid grid-cols-1 md:grid-cols-3 gap-8">
+            <!-- Offline Capability -->
+            <div class="interactive bg-white rounded-xl shadow-md p-6 hover:shadow-lg transition-shadow cursor-pointer" data-action="offline-feature">
+                <div class="w-12 h-12 bg-blue-100 rounded-lg flex items-center justify-center mb-4">
+                    <svg class="w-6 h-6 text-blue-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 19l9 2-9-18-9 18 9-2zm0 0v-8"></path>
+                    </svg>
+                </div>
+                <h3 class="text-xl font-bold mb-2">Offline Access</h3>
+                <p class="text-gray-600">Access critical patient data and protocols even without internet connection</p>
+            </div>
+
+            <!-- Real-time Sync -->
+            <div class="interactive bg-white rounded-xl shadow-md p-6 hover:shadow-lg transition-shadow cursor-pointer" data-action="sync-feature">
+                <div class="w-12 h-12 bg-green-100 rounded-lg flex items-center justify-center mb-4">
+                    <svg class="w-6 h-6 text-green-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15"></path>
+                    </svg>
+                </div>
+                <h3 class="text-xl font-bold mb-2">Real-time Sync</h3>
+                <p class="text-gray-600">Seamless synchronization across all your devices and team members</p>
+            </div>
+
+            <!-- Voice Commands -->
+            <div class="interactive bg-white rounded-xl shadow-md p-6 hover:shadow-lg transition-shadow cursor-pointer" data-action="voice-feature">
+                <div class="w-12 h-12 bg-purple-100 rounded-lg flex items-center justify-center mb-4">
+                    <svg class="w-6 h-6 text-purple-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 11a7 7 0 01-7 7m0 0a7 7 0 01-7-7m7 7v4m0 0H8m4 0h4m-4-8a3 3 0 01-3-3V5a3 3 0 116 0v6a3 3 0 01-3 3z"></path>
+                    </svg>
+                </div>
+                <h3 class="text-xl font-bold mb-2">Voice Commands</h3>
+                <p class="text-gray-600">Hands-free operation for sterile environments with voice recognition</p>
+            </div>
+        </div>
+    </div>
+</section>
+
+<!-- Device Mockups -->
+<section class="bg-gray-50 px-4 py-12">
+    <div class="max-w-7xl mx-auto text-center">
+        <h2 class="text-3xl font-bold mb-8 text-gray-800">Experience Surgify on Every Device</h2>
+        <div class="grid grid-cols-1 md:grid-cols-2 gap-12 items-center">
+            <!-- iPhone Mockup -->
+            <div class="text-center">
+                <div class="bg-black rounded-3xl p-2 inline-block">
+                    <div class="bg-white rounded-2xl w-64 h-96 flex items-center justify-center">
+                        <div class="text-center">
+                            <div class="w-8 h-8 bg-blue-500 rounded-full mx-auto mb-4"></div>
+                            <h4 class="font-bold text-gray-800">iOS App</h4>
+                            <p class="text-sm text-gray-600 mt-2">Native iOS experience<br>with optimized performance</p>
+                        </div>
+                    </div>
+                </div>
+                <h3 class="text-xl font-bold mt-4">iPhone & iPad</h3>
+            </div>
+
+            <!-- Android Mockup -->
+            <div class="text-center">
+                <div class="bg-gray-800 rounded-3xl p-2 inline-block">
+                    <div class="bg-white rounded-2xl w-64 h-96 flex items-center justify-center">
+                        <div class="text-center">
+                            <div class="w-8 h-8 bg-green-500 rounded-full mx-auto mb-4"></div>
+                            <h4 class="font-bold text-gray-800">Android App</h4>
+                            <p class="text-sm text-gray-600 mt-2">Material Design<br>with seamless integration</p>
+                        </div>
+                    </div>
+                </div>
+                <h3 class="text-xl font-bold mt-4">Android Devices</h3>
+            </div>
+        </div>
+    </div>
+</section>
+
+<!-- Footer Section -->
+<footer class="bg-gray-800 text-white px-4 py-8">
+    <div class="max-w-7xl mx-auto">
+        <div class="grid grid-cols-1 md:grid-cols-3 gap-8">
+            <!-- Partners -->
+            <div class="text-center">
+                <h3 class="text-lg font-bold mb-4">Partners</h3>
+                <div class="space-y-2">
+                    <p class="text-gray-300">Medical Research Institute</p>
+                    <p class="text-gray-300">Global Surgery Alliance</p>
+                    <p class="text-gray-300">Healthcare Innovation Hub</p>
+                </div>
+            </div>
+            
+            <!-- About -->
+            <div class="text-center">
+                <h3 class="text-lg font-bold mb-4">About</h3>
+                <div class="space-y-2">
+                    <button onclick="window.surgifyApp?.showAbout()" class="block mx-auto text-gray-300 hover:text-white transition-colors">Our Mission</button>
+                    <button onclick="window.surgifyApp?.showTeam()" class="block mx-auto text-gray-300 hover:text-white transition-colors">Team</button>
+                    <a href="/" class="block text-gray-300 hover:text-white transition-colors">Home</a>
+                </div>
+            </div>
+            
+            <!-- Feedback -->
+            <div class="text-center">
+                <h3 class="text-lg font-bold mb-4">Feedback</h3>
+                <div class="space-y-2">
+                    <button onclick="window.surgifyApp?.submitFeedback()" class="block mx-auto text-gray-300 hover:text-white transition-colors">Send Feedback</button>
+                    <button onclick="window.surgifyApp?.reportIssue()" class="block mx-auto text-gray-300 hover:text-white transition-colors">Report Issue</button>
+                    <button onclick="window.surgifyApp?.requestFeature()" class="block mx-auto text-gray-300 hover:text-white transition-colors">Request Feature</button>
+                </div>
+            </div>
+        </div>
+        
+        <div class="border-t border-gray-700 mt-8 pt-8 text-center">
+            <p class="text-gray-400">&copy; 2025 Surgify. All rights reserved. Make your way.</p>
+        </div>
+    </div>
+</footer>
+{% endblock %}

@@ -1,0 +1,218 @@
+{% extends "workstation-layout.html" %}
+
+{% block title %}Clinical Workstation - Surgify{% endblock %}
+
+{% block content %}
+<div class="workstation-container h-full">
+    <!-- Workstation Header -->
+    <div class="bg-white border-b border-gray-200 px-6 py-4">
+        <div class="flex items-center justify-between">
+            <div>
+                <h1 class="text-2xl font-bold text-gray-900">Clinical Workstation</h1>
+                <p class="text-gray-600">Case management and surgical decision support</p>
+            </div>
+            <div class="flex items-center gap-4">
+                <button class="bg-blue-600 text-white px-4 py-2 rounded-lg hover:bg-blue-700 transition-colors">
+                    <svg class="w-4 h-4 inline mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16m8-8H4"></path>
+                    </svg>
+                    New Case
+                </button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Workstation Main Content -->
+    <div class="flex-1 grid grid-cols-1 lg:grid-cols-3 gap-6 p-6 overflow-hidden">
+        <!-- Active Cases Panel -->
+        <div class="lg:col-span-2 bg-white rounded-lg shadow-sm border border-gray-200 overflow-hidden">
+            <div class="border-b border-gray-200 px-6 py-4">
+                <h2 class="text-lg font-semibold text-gray-900">Active Cases</h2>
+            </div>
+            <div class="p-6">
+                <div class="space-y-4" id="active-cases">
+                    <!-- Case items will be loaded here -->
+                    <div class="border border-gray-200 rounded-lg p-4 hover:bg-gray-50 cursor-pointer">
+                        <div class="flex items-center justify-between mb-2">
+                            <h3 class="font-semibold text-gray-900">SURG-001</h3>
+                            <span class="bg-yellow-100 text-yellow-800 text-xs font-medium px-2.5 py-0.5 rounded">In Progress</span>
+                        </div>
+                        <p class="text-gray-600 text-sm mb-2">Gastric adenocarcinoma resection</p>
+                        <div class="flex items-center justify-between text-xs text-gray-500">
+                            <span>Patient: Anonymous (65, M)</span>
+                            <span>Started: 2 hours ago</span>
+                        </div>
+                    </div>
+
+                    <div class="border border-gray-200 rounded-lg p-4 hover:bg-gray-50 cursor-pointer">
+                        <div class="flex items-center justify-between mb-2">
+                            <h3 class="font-semibold text-gray-900">SURG-002</h3>
+                            <span class="bg-blue-100 text-blue-800 text-xs font-medium px-2.5 py-0.5 rounded">Planning</span>
+                        </div>
+                        <p class="text-gray-600 text-sm mb-2">Peptic ulcer perforation repair</p>
+                        <div class="flex items-center justify-between text-xs text-gray-500">
+                            <span>Patient: Anonymous (42, F)</span>
+                            <span>Scheduled: Tomorrow 9:00 AM</span>
+                        </div>
+                    </div>
+
+                    <div class="border border-gray-200 rounded-lg p-4 hover:bg-gray-50 cursor-pointer">
+                        <div class="flex items-center justify-between mb-2">
+                            <h3 class="font-semibold text-gray-900">SURG-003</h3>
+                            <span class="bg-green-100 text-green-800 text-xs font-medium px-2.5 py-0.5 rounded">Completed</span>
+                        </div>
+                        <p class="text-gray-600 text-sm mb-2">Laparoscopic gastric sleeve</p>
+                        <div class="flex items-center justify-between text-xs text-gray-500">
+                            <span>Patient: Anonymous (38, M)</span>
+                            <span>Completed: Yesterday</span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Quick Actions & Notifications -->
+        <div class="space-y-6">
+            <!-- Quick Actions -->
+            <div class="bg-white rounded-lg shadow-sm border border-gray-200">
+                <div class="border-b border-gray-200 px-6 py-4">
+                    <h2 class="text-lg font-semibold text-gray-900">Quick Actions</h2>
+                </div>
+                <div class="p-6 space-y-3">
+                    <button class="w-full bg-blue-50 text-blue-700 px-4 py-3 rounded-lg text-left hover:bg-blue-100 transition-colors">
+                        <div class="flex items-center">
+                            <svg class="w-5 h-5 mr-3" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16m8-8H4"></path>
+                            </svg>
+                            Create New Case
+                        </div>
+                    </button>
+                    
+                    <button class="w-full bg-green-50 text-green-700 px-4 py-3 rounded-lg text-left hover:bg-green-100 transition-colors">
+                        <div class="flex items-center">
+                            <svg class="w-5 h-5 mr-3" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"></path>
+                            </svg>
+                            Review Guidelines
+                        </div>
+                    </button>
+                    
+                    <button class="w-full bg-purple-50 text-purple-700 px-4 py-3 rounded-lg text-left hover:bg-purple-100 transition-colors">
+                        <div class="flex items-center">
+                            <svg class="w-5 h-5 mr-3" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 19v-6a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2a2 2 0 002-2zm0 0V9a2 2 0 012-2h2a2 2 0 012 2v10m-6 0a2 2 0 002 2h2a2 2 0 002-2m0 0V5a2 2 0 012-2h2a2 2 0 012 2v14a2 2 0 01-2 2h-2a2 2 0 01-2-2z"></path>
+                            </svg>
+                            View Analytics
+                        </div>
+                    </button>
+                </div>
+            </div>
+
+            <!-- Recent Notifications -->
+            <div class="bg-white rounded-lg shadow-sm border border-gray-200">
+                <div class="border-b border-gray-200 px-6 py-4">
+                    <h2 class="text-lg font-semibold text-gray-900">Recent Notifications</h2>
+                </div>
+                <div class="p-6">
+                    <div class="space-y-3">
+                        <div class="flex items-start space-x-3">
+                            <div class="w-2 h-2 bg-blue-500 rounded-full mt-2 flex-shrink-0"></div>
+                            <div class="text-sm">
+                                <p class="text-gray-900 font-medium">Case SURG-001 updated</p>
+                                <p class="text-gray-500">Pre-operative assessment completed</p>
+                                <p class="text-gray-400 text-xs">5 minutes ago</p>
+                            </div>
+                        </div>
+                        
+                        <div class="flex items-start space-x-3">
+                            <div class="w-2 h-2 bg-green-500 rounded-full mt-2 flex-shrink-0"></div>
+                            <div class="text-sm">
+                                <p class="text-gray-900 font-medium">New protocol available</p>
+                                <p class="text-gray-500">Updated gastric surgery guidelines</p>
+                                <p class="text-gray-400 text-xs">1 hour ago</p>
+                            </div>
+                        </div>
+                        
+                        <div class="flex items-start space-x-3">
+                            <div class="w-2 h-2 bg-yellow-500 rounded-full mt-2 flex-shrink-0"></div>
+                            <div class="text-sm">
+                                <p class="text-gray-900 font-medium">Reminder</p>
+                                <p class="text-gray-500">Team meeting at 3 PM</p>
+                                <p class="text-gray-400 text-xs">2 hours ago</p>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
+
+{% block scripts %}
+<script>
+// Workstation-specific functionality
+document.addEventListener('DOMContentLoaded', function() {
+    console.log('Clinical Workstation Loaded');
+    
+    // Load active cases from API
+    loadActiveCases();
+    
+    // Set up real-time updates
+    setupRealTimeUpdates();
+    
+    // Set up case management
+    setupCaseManagement();
+});
+
+function loadActiveCases() {
+    // Fetch active cases from API
+    fetch('/api/v1/cases/active')
+        .then(response => response.json())
+        .then(data => {
+            console.log('Active cases loaded:', data);
+            // Update UI with real data
+        })
+        .catch(error => {
+            console.log('Using demo data for active cases');
+        });
+}
+
+function setupRealTimeUpdates() {
+    // Set up WebSocket or polling for real-time updates
+    setInterval(() => {
+        checkForUpdates();
+    }, 30000); // Check every 30 seconds
+}
+
+function checkForUpdates() {
+    fetch('/api/v1/cases/updates')
+        .then(response => response.json())
+        .then(data => {
+            if (data.updates && data.updates.length > 0) {
+                console.log('New updates available:', data.updates);
+                // Update notifications or case status
+            }
+        })
+        .catch(error => {
+            console.log('Update check failed');
+        });
+}
+
+function setupCaseManagement() {
+    // Add event listeners for case interactions
+    document.addEventListener('click', function(e) {
+        if (e.target.closest('[data-case-id]')) {
+            const caseId = e.target.closest('[data-case-id]').dataset.caseId;
+            openCase(caseId);
+        }
+    });
+}
+
+function openCase(caseId) {
+    console.log('Opening case:', caseId);
+    // Navigate to case details or open modal
+    window.location.href = `/dashboard/cases/${caseId}`;
+}
+</script>
+{% endblock %}

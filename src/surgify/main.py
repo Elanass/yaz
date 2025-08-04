@@ -28,7 +28,7 @@ from surgify.core.services.registry import get_service_registry
 
 # API imports
 from surgify.api.v1 import router as api_v1_router
-from surgify.web.router import web_router
+from surgify.ui.web.router import web_router
 
 # Setup logging first
 setup_logging()
@@ -154,7 +154,7 @@ def create_app() -> FastAPI:
     app.add_middleware(GZipMiddleware, minimum_size=1000)
     
     # Static files
-    static_dir = Path("web/static")
+    static_dir = Path("src/surgify/ui/web/static")
     if static_dir.exists():
         app.mount("/static", StaticFiles(directory=str(static_dir)), name="static")
     

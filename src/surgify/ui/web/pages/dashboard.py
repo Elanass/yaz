@@ -4,12 +4,17 @@ Dashboard Page Routes
 Clinical workstation and analytics dashboard using templates
 """
 
+from pathlib import Path
 from fastapi import APIRouter, Request
 from fastapi.responses import HTMLResponse
 from fastapi.templating import Jinja2Templates
 
 router = APIRouter()
-templates = Jinja2Templates(directory="web/templates")
+
+# Get the correct templates directory
+current_dir = Path(__file__).parent.parent
+templates_dir = current_dir / "templates"
+templates = Jinja2Templates(directory=str(templates_dir))
 
 @router.get("/", response_class=HTMLResponse)
 async def dashboard_home(request: Request):
