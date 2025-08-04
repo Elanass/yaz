@@ -11,6 +11,14 @@ from typing import Optional, Dict, Any
 
 router = APIRouter()
 
+# Simple in-memory store for testing (in production this would be a database)
+registered_users = set()
+
+class RegisterRequest(BaseModel):
+    username: str
+    email: str
+    password: str
+    full_name: Optional[str] = None
 
 class LoginRequest(BaseModel):
     username: str
@@ -42,6 +50,13 @@ class WebAuthnAuthenticationComplete(BaseModel):
     type: str
 
 
+class RegisterRequest(BaseModel):
+    username: str
+    email: str
+    password: str
+    full_name: Optional[str] = None
+
+
 @router.post("/login", response_model=TokenResponse)
 async def login(request: LoginRequest):
     """User login endpoint"""
@@ -70,6 +85,30 @@ async def get_current_user_info():
 async def logout():
     """User logout endpoint"""
     return {"message": "Successfully logged out"}
+
+
+@router.post("/register")
+async def register(request: RegisterRequest):
+    """User registration endpoint"""
+    # Check for duplicate users
+    user_key = (request.username, request.email)
+    
+    if user_key in registered_users:
+        raise HTTPException(status_code=409, detail="User already exists")
+    
+    # Simple registration for testing
+    if request.username and request.email and request.password:
+        registered_users.add(user_key)
+        return {
+            "message": "User registered successfully",
+            "user": {
+                "username": request.username,
+                "email": request.email,
+                "full_name": request.full_name
+            }
+        }
+    else:
+        raise HTTPException(status_code=400, detail="Missing required fields")
 
 
 # WebAuthn Endpoints

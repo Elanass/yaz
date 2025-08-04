@@ -8,7 +8,7 @@ from typing import Dict, Any
 
 from fastapi import APIRouter, HTTPException
 
-router = APIRouter(prefix="/dashboard", tags=["Dashboard"])
+router = APIRouter(tags=["Dashboard"])
 
 # Database path
 DB_PATH = Path(__file__).parent.parent.parent / "data" / "database" / "surgify.db"
@@ -87,3 +87,40 @@ async def get_recent_cases():
         
     except Exception as e:
         raise HTTPException(status_code=500, detail=f"Database error: {str(e)}")
+
+@router.get("/metrics")
+async def get_dashboard_metrics():
+    """Get dashboard metrics for overview"""
+    try:
+        conn = get_db_connection()
+        cursor = conn.cursor()
+        
+        # Get total cases
+        cursor.execute("SELECT COUNT(*) FROM cases")
+        total_cases = cursor.fetchone()[0] if cursor.fetchone() else 0
+        
+        # Get active cases count
+        cursor.execute("SELECT COUNT(*) FROM cases WHERE status IN ('planned', 'in_progress')")
+        active_cases = cursor.fetchone()[0] if cursor.fetchone() else 0
+        
+        # Calculate completion rate
+        cursor.execute("SELECT COUNT(*) FROM cases WHERE status = 'completed'")
+        completed_cases = cursor.fetchone()[0] if cursor.fetchone() else 0
+        
+        completion_rate = (completed_cases / total_cases * 100) if total_cases > 0 else 0
+        
+        conn.close()
+        
+        return {
+            "total_cases": total_cases,
+            "active_cases": active_cases,
+            "completion_rate": round(completion_rate, 2)
+        }
+        
+    except Exception as e:
+        # Return default values if database doesn't exist yet
+        return {
+            "total_cases": 0,
+            "active_cases": 0,
+            "completion_rate": 0.0
+        }

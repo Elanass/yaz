@@ -34,7 +34,7 @@ web_router.include_router(dashboard.router, prefix="/dashboard", tags=["Dashboar
 web_router.include_router(auth.router, prefix="/auth", tags=["Authentication"])
 
 # Health check for web interface
-@web_router.get("/health", response_class=HTMLResponse)
+@web_router.get("/web-health", response_class=HTMLResponse)
 async def web_health():
     """Web interface health check"""
     return HTMLResponse(

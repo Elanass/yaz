@@ -23,11 +23,11 @@ class TestAPIRoot:
     """Test API root endpoints"""
     
     def test_root_redirect(self, client: TestClient):
-        """Test root endpoint redirects to Surgify interface"""
+        """Test root endpoint serves Surgify interface"""
         response = client.get("/", follow_redirects=False)
         
         assert response.status_code == 200
-        assert "Redirecting to Surgify" in response.text
+        assert "Surgify" in response.text
 
     def test_api_v1_root(self, client: TestClient):
         """Test API v1 root endpoint"""

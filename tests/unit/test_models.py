@@ -2,9 +2,17 @@
 Unit tests for core models
 """
 
+import sys
+import os
+from pathlib import Path
+
+# Add src directory to Python path
+src_path = Path(__file__).parent.parent.parent / "src"
+sys.path.insert(0, str(src_path))
+
 import pytest
 from datetime import datetime
-from src.surgify.core.models.database_models import User, Patient, Case, CaseStatus
+from surgify.core.models.database_models import User, Patient, Case, CaseStatus
 
 class TestUser:
     """Test User model"""
@@ -16,7 +24,8 @@ class TestUser:
             email="surgeon@test.com",
             hashed_password="hashed_password",
             full_name="Test Surgeon",
-            role="surgeon"
+            role="surgeon",
+            is_active=True
         )
         
         assert user.username == "test_surgeon"
@@ -48,14 +57,17 @@ class TestCase:
     def test_case_creation(self):
         """Test case creation with valid data"""
         case = Case(
-            procedure="Laparoscopic Gastrectomy",
+            case_number="CASE001",
+            procedure_type="Laparoscopic Gastrectomy",
             status=CaseStatus.PLANNED,
-            notes="Test surgical case"
+            notes="Test surgical case",
+            patient_id=1
         )
         
-        assert case.procedure == "Laparoscopic Gastrectomy"
+        assert case.procedure_type == "Laparoscopic Gastrectomy"
         assert case.status == CaseStatus.PLANNED
         assert case.notes == "Test surgical case"
+        assert case.case_number == "CASE001"
 
 class TestCaseStatus:
     """Test CaseStatus enum"""

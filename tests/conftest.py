@@ -2,14 +2,22 @@
 Test configuration and fixtures
 """
 
+import sys
+import os
+from pathlib import Path
+
+# Add src directory to Python path
+src_path = Path(__file__).parent.parent / "src"
+sys.path.insert(0, str(src_path))
+
 import pytest
 import asyncio
 from typing import Generator
 from fastapi.testclient import TestClient
 from sqlalchemy import create_engine
 from sqlalchemy.orm import sessionmaker
-from src.surgify.core.database import Base, get_db
-from src.surgify.main import app
+from surgify.core.database import Base, get_db
+from surgify.main import app
 
 # Test database setup
 SQLALCHEMY_DATABASE_URL = "sqlite:///./test_surgify.db"
