@@ -8,8 +8,8 @@ from typing import Generator
 from fastapi.testclient import TestClient
 from sqlalchemy import create_engine
 from sqlalchemy.orm import sessionmaker
-from core.database import Base, get_db
-from main import app
+from src.surgify.core.database import Base, get_db
+from src.surgify.main import app
 
 # Test database setup
 SQLALCHEMY_DATABASE_URL = "sqlite:///./test_surgify.db"

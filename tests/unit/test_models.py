@@ -4,7 +4,7 @@ Unit tests for core models
 
 import pytest
 from datetime import datetime
-from core.models.database_models import User, Patient, Case, CaseStatus
+from src.surgify.core.models.database_models import User, Patient, Case, CaseStatus
 
 class TestUser:
     """Test User model"""

@@ -35,6 +35,10 @@ src/surgify/
 │   │   ├── static/       # CSS, JS, images
 │   │   ├── pages/        # Page controllers
 │   │   └── components/   # Reusable components
+│   ├── desktop/          # Desktop application (Electron)
+│   │   ├── src/main/     # Main process (Node.js)
+│   │   ├── src/renderer/ # Renderer process (Web)
+│   │   └── assets/       # Icons and resources
 │   └── mobile/           # Mobile applications
 │       ├── ios/          # iOS app (Swift/SwiftUI)
 │       └── android/      # Android app (Kotlin)
@@ -52,6 +56,13 @@ src/surgify/
 - **Analytics Dashboard**: Real-time metrics and performance insights
 - **Collaboration Tools**: Team communication and knowledge sharing
 
+### Desktop Application
+- **Native Performance**: Electron-based desktop wrapper for optimal performance
+- **Offline Capability**: Work without internet connectivity
+- **Security**: Enhanced security with certificate validation and sandboxing
+- **Cross-platform**: Support for Windows, macOS, and Linux
+- **Auto-updates**: Seamless application updates and maintenance
+
 ### Mobile Apps (Coming Soon)
 - **iOS App**: Native iPhone & iPad experience
 - **Android App**: Native Android interface
@@ -65,6 +76,7 @@ src/surgify/
 - ✅ Multi-user collaboration
 - ✅ Secure data handling
 - ✅ Responsive web design
+- ✅ Desktop application (Electron wrapper)
 - 🔄 Mobile applications (in development)
 - 🔄 AI-powered insights (expanding)
 
@@ -82,6 +94,13 @@ src/surgify/
 - **Tailwind CSS**: Utility-first CSS framework
 - **Vanilla JavaScript**: Reactive frontend logic
 - **Jinja2**: Template engine
+
+### Desktop
+- **Electron**: Cross-platform desktop application framework
+- **TypeScript**: Type-safe development
+- **React**: Component-based UI library
+- **Webpack**: Module bundling and optimization
+- **Forge**: Application packaging and distribution
 
 ### Mobile (Planned)
 - **iOS**: Swift/SwiftUI
@@ -161,6 +180,29 @@ uvicorn src.surgify.main:app --reload --host 0.0.0.0 --port 8000
 - API Documentation: http://localhost:8000/api/docs
 - Get App Page: http://localhost:8000/get-app
 
+### Desktop Application Setup
+
+1. **Navigate to desktop directory**
+```bash
+cd src/surgify/ui/desktop
+```
+
+2. **Install dependencies**
+```bash
+npm install
+```
+
+3. **Start development mode**
+```bash
+npm run dev
+```
+
+4. **Build for production**
+```bash
+npm run build
+npm run package  # Create distributable package
+```
+
 ### Docker Development
 
 ```bash
@@ -230,7 +272,32 @@ pytest --cov=src/surgify
 pytest tests/api/          # API tests
 pytest tests/ui/           # UI tests
 pytest tests/integration/  # Integration tests
+
+# Test desktop application
+cd src/surgify/ui/desktop
+npm test                   # Desktop app tests
 ```
+
+## 🖥️ Desktop Application
+
+The Surgify Desktop Application provides a native desktop experience using Electron, offering enhanced performance, offline capabilities, and better system integration.
+
+### Features
+- **Native Performance**: Optimized for desktop environments
+- **Offline Mode**: Continue working without internet connectivity
+- **Security**: Enhanced security with certificate validation
+- **Auto-updates**: Automatic application updates
+- **Cross-platform**: Windows, macOS, and Linux support
+
+### Installation
+```bash
+cd src/surgify/ui/desktop
+npm install
+npm run build
+npm run package
+```
+
+For detailed desktop setup instructions, see: [Desktop README](src/surgify/ui/desktop/README.md)
 
 ## 📱 Mobile Development
 
@@ -275,12 +342,14 @@ This project is licensed under the MIT License - see the [LICENSE](LICENSE) file
 - ✅ API infrastructure
 - ✅ Basic case management
 - ✅ User authentication
+- ✅ Desktop application (Electron wrapper)
 
 ### Phase 2 (Q2 2025)
 - 🔄 Mobile app development
 - 🔄 Advanced analytics
 - 🔄 AI-powered recommendations
 - 🔄 Real-time collaboration
+- 🔄 Desktop app store distribution
 
 ### Phase 3 (Q3 2025)
 - 📋 Integration with hospital systems
