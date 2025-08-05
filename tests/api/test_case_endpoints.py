@@ -12,15 +12,14 @@ class TestCaseEndpoints:
             "/api/v1/cases/cases",
             json={
                 "patient_id": "P001",
-                "surgery_type": "Appendectomy",
+                "procedure_type": "Appendectomy",
                 "status": "Planned",
-                "pre_op_notes": "Patient is ready for surgery",
-                "post_op_notes": "",
+                "notes": "Patient is ready for surgery",
             },
         )
         assert response.status_code == 200
         assert response.json()["patient_id"] == "P001"
-        assert response.json()["surgery_type"] == "Appendectomy"
+        assert response.json()["procedure_type"] == "Appendectomy"
 
     def test_list_cases(self):
         """Test case listing endpoint."""
