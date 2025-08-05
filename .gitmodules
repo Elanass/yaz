@@ -1,0 +1,9 @@
+[submodule "src/surgify/network/bitchat"]
+	path = src/surgify/network/bitchat
+	url = https://github.com/permissionlesstech/bitchat.git
+[submodule "bitchat"]
+	path = bitchat
+	url = https://github.com/permissionlesstech/bitchat.git
+[submodule "network/bitchat"]
+	path = network/bitchat
+	url = https://github.com/permissionlesstech/bitchat.git

@@ -184,3 +184,103 @@ class CaseCollaboration(Base):
     notes = Column(Text, nullable=True)
     
     created_at = Column(DateTime, default=datetime.utcnow)
+
+# Enhanced models for modular API endpoints
+
+class Priority(str, Enum):
+    LOW = "low"
+    MEDIUM = "medium"
+    HIGH = "high"
+    URGENT = "urgent"
+
+class CaseModel(Base):
+    """Enhanced Case model with string IDs and better audit trail"""
+    __tablename__ = "enhanced_cases"
+    
+    id = Column(Integer, primary_key=True, index=True)
+    case_number = Column(String(20), unique=True, index=True, nullable=False)
+    patient_id = Column(String(50), nullable=False)  # Allow string patient IDs
+    surgeon_id = Column(String(50), nullable=True)    # Allow string surgeon IDs
+    
+    # Case details
+    procedure_type = Column(String(100), nullable=False)
+    diagnosis = Column(String(200), nullable=True)
+    status = Column(String(20), default="planned")
+    priority = Column(String(20), default="medium")
+    
+    # Scheduling
+    scheduled_date = Column(DateTime, nullable=True)
+    actual_start = Column(DateTime, nullable=True)
+    actual_end = Column(DateTime, nullable=True)
+    
+    # Decision support
+    risk_score = Column(Float, nullable=True)
+    recommendations = Column(Text, nullable=True)
+    notes = Column(Text, nullable=True)
+    
+    # Audit fields
+    created_at = Column(DateTime, default=datetime.utcnow)
+    updated_at = Column(DateTime, default=datetime.utcnow, onupdate=datetime.utcnow)
+    created_by = Column(String(50), nullable=True)
+    updated_by = Column(String(50), nullable=True)
+
+class SyncJobModel(Base):
+    """Model for sync job tracking"""
+    __tablename__ = "sync_jobs"
+    
+    id = Column(String(50), primary_key=True, index=True)
+    resource_type = Column(String(50), nullable=False)
+    resource_id = Column(String(50), nullable=True)
+    target_system = Column(String(100), nullable=False)
+    status = Column(String(20), default="pending")
+    sync_type = Column(String(20), default="full")
+    priority = Column(String(20), default="medium")
+    progress = Column(Integer, default=0)
+    error_message = Column(Text, nullable=True)
+    sync_metadata = Column(Text, nullable=True)  # JSON as text
+    
+    created_at = Column(DateTime, default=datetime.utcnow)
+    updated_at = Column(DateTime, default=datetime.utcnow, onupdate=datetime.utcnow)
+    started_at = Column(DateTime, nullable=True)
+    completed_at = Column(DateTime, nullable=True)
+
+class MessageModel(Base):
+    """Model for message management"""
+    __tablename__ = "messages"
+    
+    id = Column(String(50), primary_key=True, index=True)
+    type = Column(String(50), nullable=False)
+    sender_id = Column(String(50), nullable=True)
+    recipient_id = Column(String(50), nullable=True)
+    title = Column(String(200), nullable=False)
+    content = Column(Text, nullable=False)
+    priority = Column(String(20), default="medium")
+    status = Column(String(20), default="unread")
+    message_metadata = Column(Text, nullable=True)  # JSON as text
+    
+    created_at = Column(DateTime, default=datetime.utcnow)
+    read_at = Column(DateTime, nullable=True)
+    expires_at = Column(DateTime, nullable=True)
+
+class DeliverableModel(Base):
+    """Model for deliverable management"""
+    __tablename__ = "deliverables"
+    
+    id = Column(String(50), primary_key=True, index=True)
+    type = Column(String(50), nullable=False)
+    title = Column(String(200), nullable=False)
+    description = Column(Text, nullable=True)
+    case_id = Column(Integer, nullable=True)
+    format = Column(String(20), nullable=False)
+    status = Column(String(20), default="draft")
+    file_path = Column(String(500), nullable=True)
+    file_size = Column(Integer, nullable=True)
+    deliverable_metadata = Column(Text, nullable=True)  # JSON as text
+    
+    created_at = Column(DateTime, default=datetime.utcnow)
+    updated_at = Column(DateTime, default=datetime.utcnow, onupdate=datetime.utcnow)
+    created_by = Column(String(50), nullable=True)
+    reviewed_by = Column(String(50), nullable=True)
+    approved_at = Column(DateTime, nullable=True)
+    published_at = Column(DateTime, nullable=True)
+    expires_at = Column(DateTime, nullable=True)

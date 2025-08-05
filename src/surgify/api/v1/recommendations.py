@@ -1,5 +1,5 @@
 from fastapi import APIRouter, HTTPException, Query, Depends
-from typing import Optional, Union
+from typing import Optional, Union, Any
 from surgify.core.services.ai_service import AIService
 
 # Universal Research Integration (Optional Enhancement)
@@ -20,7 +20,7 @@ router = APIRouter()
 ai_service = AIService()
 
 # Research enhancement dependencies (optional)
-def get_legacy_bridge() -> Optional[Union[LegacyBridge, None]]:
+def get_legacy_bridge() -> Optional[Any]:
     """Get legacy bridge for research enhancements (optional)"""
     if not RESEARCH_AVAILABLE or LegacyBridge is None:
         return None
@@ -28,7 +28,7 @@ def get_legacy_bridge() -> Optional[Union[LegacyBridge, None]]:
         from sqlalchemy.orm import Session
         db_session = next(get_db())
         surgify_adapter = SurgifyAdapter(db_session)
-        case_service = CaseService()
+        case_service = CaseService(db_session)
         return LegacyBridge(case_service, surgify_adapter)
     except Exception:
         return None

@@ -1,0 +1,19 @@
+name: Canary Deploy GCP
+on:
+  push:
+    branches: [main, canary]
+jobs:
+  build-and-deploy:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - name: Build Docker image
+        run: docker build -t gcr.io/${{ secrets.GCP_PROJECT }}/surgify:canary .
+      - name: Push to GCR
+        run: |
+          echo ${{ secrets.GCP_SA_KEY }} | gcloud auth activate-service-account --key-file=-
+          gcloud auth configure-docker
+          docker push gcr.io/${{ secrets.GCP_PROJECT }}/surgify:canary
+      - name: Deploy canary (10% traffic)
+        run: |
+          gcloud run deploy surgify --image gcr.io/${{ secrets.GCP_PROJECT }}/surgify:canary --region ${{ secrets.GCP_REGION }} --platform managed --set-traffic latest=0.1,previous=0.9

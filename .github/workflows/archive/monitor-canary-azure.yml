@@ -1,0 +1,24 @@
+name: Monitor Canary Azure
+on:
+  workflow_run:
+    workflows: ["Canary Deploy Azure"]
+    types:
+      - completed
+jobs:
+  monitor:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Run smoke tests
+        run: |
+          curl -f https://${{ secrets.CANARY_URL }}/healthz
+      - name: Check metrics
+        run: |
+          # Example: check error rate/latency from Azure Monitor
+          az monitor metrics list --resource ${{ secrets.AZURE_RESOURCE_ID }} --metric errorRate
+      - name: Promote or rollback
+        run: |
+          if [ "$CANARY_OK" = "true" ]; then
+            kubectl argo rollouts promote surgify
+          else
+            kubectl argo rollouts abort surgify
+          fi

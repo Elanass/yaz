@@ -1,0 +1,240 @@
+{
+  "name": "Daily Digest Workflow",
+  "nodes": [
+    {
+      "parameters": {
+        "rule": {
+          "interval": [
+            {
+              "field": "cronExpression",
+              "value": "0 9 * * 1-5"
+            }
+          ]
+        }
+      },
+      "id": "schedule-daily-digest",
+      "name": "Daily Schedule (9 AM Weekdays)",
+      "type": "n8n-nodes-base.cron",
+      "typeVersion": 1,
+      "position": [240, 300]
+    },
+    {
+      "parameters": {
+        "url": "http://localhost:8000/api/v1/dashboard/daily-stats",
+        "authentication": "headerAuth"
+      },
+      "id": "http-get-daily-stats",
+      "name": "Get Daily Statistics",
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 3,
+      "position": [460, 300],
+      "credentials": {
+        "httpHeaderAuth": {
+          "id": "surgify-api-auth",
+          "name": "Surgify API Auth"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "url": "http://localhost:8000/api/v1/cases/recent",
+        "authentication": "headerAuth",
+        "sendQuery": true,
+        "queryParameters": {
+          "parameters": [
+            {
+              "name": "limit",
+              "value": "10"
+            },
+            {
+              "name": "since",
+              "value": "={{ new Date(Date.now() - 24*60*60*1000).toISOString() }}"
+            }
+          ]
+        }
+      },
+      "id": "http-get-recent-cases",
+      "name": "Get Recent Cases",
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 3,
+      "position": [460, 180],
+      "credentials": {
+        "httpHeaderAuth": {
+          "id": "surgify-api-auth",
+          "name": "Surgify API Auth"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "url": "http://localhost:8000/api/v1/deliverables/completed",
+        "authentication": "headerAuth",
+        "sendQuery": true,
+        "queryParameters": {
+          "parameters": [
+            {
+              "name": "since",
+              "value": "={{ new Date(Date.now() - 24*60*60*1000).toISOString() }}"
+            }
+          ]
+        }
+      },
+      "id": "http-get-completed-deliverables",
+      "name": "Get Completed Deliverables",
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 3,
+      "position": [460, 420],
+      "credentials": {
+        "httpHeaderAuth": {
+          "id": "surgify-api-auth",
+          "name": "Surgify API Auth"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "jsCode": "// Aggregate all the data into a digest\nconst dailyStats = $input.all()[0].json;\nconst recentCases = $input.all()[1].json.cases || [];\nconst completedDeliverables = $input.all()[2].json.deliverables || [];\n\nconst today = new Date().toLocaleDateString('en-US', {\n  weekday: 'long',\n  year: 'numeric',\n  month: 'long',\n  day: 'numeric'\n});\n\n// Format the digest\nlet digest = `📊 **Surgify Daily Digest - ${today}**\\n\\n`;\n\n// Daily statistics\ndigest += `📈 **Today's Statistics:**\\n`;\ndigest += `• New Cases: ${dailyStats.new_cases || 0}\\n`;\ndigest += `• Completed Deliverables: ${dailyStats.completed_deliverables || 0}\\n`;\ndigest += `• Active Users: ${dailyStats.active_users || 0}\\n`;\ndigest += `• System Uptime: ${dailyStats.uptime || 'N/A'}\\n\\n`;\n\n// Recent cases\nif (recentCases.length > 0) {\n  digest += `🏥 **Recent Cases (${recentCases.length}):**\\n`;\n  recentCases.slice(0, 5).forEach((case_, index) => {\n    digest += `${index + 1}. ${case_.title} - ${case_.status}\\n`;\n  });\n  digest += '\\n';\n}\n\n// Completed deliverables\nif (completedDeliverables.length > 0) {\n  digest += `✅ **Completed Deliverables (${completedDeliverables.length}):**\\n`;\n  completedDeliverables.slice(0, 5).forEach((deliverable, index) => {\n    digest += `${index + 1}. ${deliverable.title} - ${deliverable.type}\\n`;\n  });\n  digest += '\\n';\n}\n\n// Add footer\ndigest += `🔗 [Open Surgify Dashboard](http://localhost:8000/dashboard)\\n\\n`;\ndigest += `_Generated at ${new Date().toLocaleTimeString()}_`;\n\nreturn { digest, stats: dailyStats, cases_count: recentCases.length, deliverables_count: completedDeliverables.length };"
+      },
+      "id": "code-format-digest",
+      "name": "Format Daily Digest",
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [680, 300]
+    },
+    {
+      "parameters": {
+        "message": "={{ $node[\"Format Daily Digest\"].json[\"digest\"] }}",
+        "channel": "#surgify-daily-digest"
+      },
+      "id": "slack-send-digest",
+      "name": "Send to Slack",
+      "type": "n8n-nodes-base.slack",
+      "typeVersion": 1,
+      "position": [900, 200],
+      "credentials": {
+        "slackApi": {
+          "id": "surgify-slack",
+          "name": "Surgify Slack"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "url": "http://localhost:8000/webhooks/external-digest",
+        "sendBody": true,
+        "bodyParameters": {
+          "parameters": [
+            {
+              "name": "digest",
+              "value": "={{ $node[\"Format Daily Digest\"].json[\"digest\"] }}"
+            },
+            {
+              "name": "stats",
+              "value": "={{ $node[\"Format Daily Digest\"].json[\"stats\"] }}"
+            },
+            {
+              "name": "timestamp",
+              "value": "={{ new Date().toISOString() }}"
+            }
+          ]
+        }
+      },
+      "id": "webhook-external-digest",
+      "name": "Send to External Webhook",
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 3,
+      "position": [900, 400]
+    }
+  ],
+  "connections": {
+    "Daily Schedule (9 AM Weekdays)": {
+      "main": [
+        [
+          {
+            "node": "Get Daily Statistics",
+            "type": "main",
+            "index": 0
+          },
+          {
+            "node": "Get Recent Cases",
+            "type": "main",
+            "index": 0
+          },
+          {
+            "node": "Get Completed Deliverables",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Get Daily Statistics": {
+      "main": [
+        [
+          {
+            "node": "Format Daily Digest",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Get Recent Cases": {
+      "main": [
+        [
+          {
+            "node": "Format Daily Digest",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Get Completed Deliverables": {
+      "main": [
+        [
+          {
+            "node": "Format Daily Digest",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Format Daily Digest": {
+      "main": [
+        [
+          {
+            "node": "Send to Slack",
+            "type": "main",
+            "index": 0
+          },
+          {
+            "node": "Send to External Webhook",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  },
+  "createdAt": "2025-08-05T10:00:00.000Z",
+  "updatedAt": "2025-08-05T10:00:00.000Z",
+  "settings": {
+    "errorWorkflow": {
+      "value": ""
+    },
+    "timezone": "America/New_York"
+  },
+  "active": true,
+  "tags": [
+    {
+      "id": "daily-digest",
+      "name": "Daily Digest"
+    },
+    {
+      "id": "reporting",
+      "name": "Reporting"
+    }
+  ]
+}

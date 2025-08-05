@@ -1,0 +1,24 @@
+name: Monitor Canary GCP
+on:
+  workflow_run:
+    workflows: ["Canary Deploy GCP"]
+    types:
+      - completed
+jobs:
+  monitor:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Run smoke tests
+        run: |
+          curl -f https://${{ secrets.CANARY_URL }}/healthz
+      - name: Check metrics
+        run: |
+          # Example: check error rate/latency from Stackdriver
+          gcloud monitoring time-series list --filter='metric.type="run.googleapis.com/request_count"'
+      - name: Promote or rollback
+        run: |
+          if [ "$CANARY_OK" = "true" ]; then
+            gcloud run services update-traffic surgify --to-latest
+          else
+            gcloud run services update-traffic surgify --to-revisions previous=1
+          fi

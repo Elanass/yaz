@@ -1,0 +1,780 @@
+name: "Yaz & Surgify - Unified CI/CD Pipeline"
+
+on:
+  push:
+    branches: [ main, develop, feature/* ]
+  pull_request:
+    branches: [ main, develop ]
+  release:
+    types: [ published ]
+
+env:
+  PYTHON_VERSION: "3.11"
+  NODE_VERSION: "18"
+  DOCKER_REGISTRY: ghcr.io
+  IMAGE_NAME: yaz-surgify
+
+jobs:
+  # === VALIDATION & TESTING PHASE ===
+  validate-structure:
+    name: "🔍 Code Structure Validation"
+    runs-on: ubuntu-latest
+    outputs:
+      should_deploy: ${{ steps.changes.outputs.should_deploy }}
+      version: ${{ steps.version.outputs.version }}
+      test_status: ${{ steps.test.outputs.status }}
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+
+      - name: Set up Python
+        uses: actions/setup-python@v4
+        with:
+          python-version: ${{ env.PYTHON_VERSION }}
+
+      - name: Install dependencies
+        run: |
+          python -m pip install --upgrade pip
+          pip install -r requirements.txt
+          pip install pytest pytest-cov black flake8 mypy
+
+      - name: Code quality checks
+        run: |
+          echo "🔍 Running code quality checks..."
+          black --check --diff .
+          flake8 --max-line-length=88 --extend-ignore=E203,W503 .
+          mypy src/ --ignore-missing-imports
+
+      - name: Run comprehensive tests
+        id: test
+        run: |
+          echo "🧪 Running comprehensive test suite..."
+          python -m pytest tests/ -v --cov=src/ --cov-report=term-missing --cov-report=xml
+          echo "status=passed" >> $GITHUB_OUTPUT
+
+      - name: Validate project structure
+        run: |
+          echo "📁 Validating project structure..."
+          python scripts/validate_structure.py
+
+      - name: Detect changes
+        id: changes
+        run: |
+          echo "🔍 Detecting changes..."
+          if [[ "${{ github.event_name }}" == "push" && "${{ github.ref }}" == "refs/heads/main" ]]; then
+            echo "should_deploy=true" >> $GITHUB_OUTPUT
+          else
+            echo "should_deploy=false" >> $GITHUB_OUTPUT
+          fi
+
+      - name: Generate version
+        id: version
+        run: |
+          echo "version=$(date +'%Y%m%d-%H%M%S')-$(git rev-parse --short HEAD)" >> $GITHUB_OUTPUT
+
+  # === SECURITY SCANNING ===
+  security-scan:
+    name: "🔒 Security Scanning"
+    runs-on: ubuntu-latest
+    needs: validate-structure
+    if: needs.validate-structure.outputs.test_status == 'passed'
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Security scan with Bandit
+        run: |
+          pip install bandit
+          bandit -r src/ -f json -o security-report.json || true
+
+      - name: Dependency vulnerability scan
+        run: |
+          pip install safety
+          safety check --json --output safety-report.json || true
+
+      - name: Upload security reports
+        uses: actions/upload-artifact@v3
+        with:
+          name: security-reports
+          path: |
+            security-report.json
+            safety-report.json
+
+  # === BUILD PHASE ===
+  build:
+    name: "🏗️ Build Application"
+    runs-on: ubuntu-latest
+    needs: [validate-structure, security-scan]
+    if: needs.validate-structure.outputs.test_status == 'passed'
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Set up Python
+        uses: actions/setup-python@v4
+        with:
+          python-version: ${{ env.PYTHON_VERSION }}
+
+      - name: Build application
+        run: |
+          echo "🏗️ Building Surgify application..."
+          python -m pip install --upgrade pip
+          pip install build
+          python -m build
+
+      - name: Set up Docker Buildx
+        uses: docker/setup-buildx-action@v3
+
+      - name: Login to Container Registry
+        uses: docker/login-action@v3
+        with:
+          registry: ${{ env.DOCKER_REGISTRY }}
+          username: ${{ github.actor }}
+          password: ${{ secrets.GITHUB_TOKEN }}
+
+      - name: Build and push Docker image
+        uses: docker/build-push-action@v5
+        with:
+          context: .
+          push: true
+          tags: |
+            ${{ env.DOCKER_REGISTRY }}/${{ github.repository }}/${{ env.IMAGE_NAME }}:latest
+            ${{ env.DOCKER_REGISTRY }}/${{ github.repository }}/${{ env.IMAGE_NAME }}:${{ needs.validate-structure.outputs.version }}
+          cache-from: type=gha
+          cache-to: type=gha,mode=max
+
+  # === INTEGRATION TESTS ===
+  integration-tests:
+    name: "🧪 Integration Tests"
+    runs-on: ubuntu-latest
+    needs: build
+    services:
+      postgres:
+        image: postgres:15
+        env:
+          POSTGRES_PASSWORD: postgres
+          POSTGRES_DB: surgify_test
+        options: >-
+          --health-cmd pg_isready
+          --health-interval 10s
+          --health-timeout 5s
+          --health-retries 5
+      redis:
+        image: redis:7-alpine
+        options: >-
+          --health-cmd "redis-cli ping"
+          --health-interval 10s
+          --health-timeout 5s
+          --health-retries 5
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Set up Python
+        uses: actions/setup-python@v4
+        with:
+          python-version: ${{ env.PYTHON_VERSION }}
+
+      - name: Install dependencies
+        run: |
+          python -m pip install --upgrade pip
+          pip install -r requirements.txt
+          pip install pytest-asyncio httpx
+
+      - name: Run integration tests
+        env:
+          DATABASE_URL: postgresql://postgres:postgres@localhost:5432/surgify_test
+          REDIS_URL: redis://localhost:6379/1
+          ENVIRONMENT: test
+        run: |
+          echo "🧪 Running integration tests..."
+          python -m pytest tests/integration/ -v --maxfail=5
+
+      - name: Run API tests
+        env:
+          DATABASE_URL: postgresql://postgres:postgres@localhost:5432/surgify_test
+          REDIS_URL: redis://localhost:6379/1
+        run: |
+          echo "🔌 Running API endpoint tests..."
+          python tests/run_comprehensive_tests.py
+
+  # === DEPLOYMENT TO CONTABO STAGING ===
+  deploy-staging:
+    name: "🚀 Deploy to Contabo Staging"
+    runs-on: ubuntu-latest
+    needs: [build, integration-tests]
+    if: needs.validate-structure.outputs.should_deploy == 'true' && github.ref == 'refs/heads/develop'
+    environment: staging
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Deploy to Contabo staging
+        env:
+          CONTABO_SSH_KEY: ${{ secrets.CONTABO_SSH_KEY }}
+          CONTABO_STAGING_HOST: ${{ secrets.CONTABO_STAGING_HOST }}
+          CONTABO_USER: ${{ secrets.CONTABO_USER }}
+        run: |
+          echo "🚀 Deploying to Contabo staging server..."
+          
+          # Setup SSH
+          mkdir -p ~/.ssh
+          echo "$CONTABO_SSH_KEY" > ~/.ssh/id_rsa
+          chmod 600 ~/.ssh/id_rsa
+          ssh-keyscan -H $CONTABO_STAGING_HOST >> ~/.ssh/known_hosts
+          
+          # Deploy using Coolify API
+          curl -X POST "${{ secrets.COOLIFY_STAGING_WEBHOOK }}" \
+            -H "Content-Type: application/json" \
+            -d '{
+              "image": "${{ env.DOCKER_REGISTRY }}/${{ github.repository }}/${{ env.IMAGE_NAME }}:${{ needs.validate-structure.outputs.version }}",
+              "environment": "staging"
+            }'
+
+  # === CANARY DEPLOYMENT TO PRODUCTION ===
+  deploy-canary:
+    name: "🕊️ Canary Deployment"
+    runs-on: ubuntu-latest
+    needs: [build, integration-tests]
+    if: needs.validate-structure.outputs.should_deploy == 'true' && github.ref == 'refs/heads/main'
+    environment: production
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Deploy canary to Contabo production
+        env:
+          CONTABO_SSH_KEY: ${{ secrets.CONTABO_SSH_KEY }}
+          CONTABO_PROD_HOST: ${{ secrets.CONTABO_PROD_HOST }}
+          CONTABO_USER: ${{ secrets.CONTABO_USER }}
+        run: |
+          echo "🕊️ Starting canary deployment..."
+          
+          # Setup SSH
+          mkdir -p ~/.ssh
+          echo "$CONTABO_SSH_KEY" > ~/.ssh/id_rsa
+          chmod 600 ~/.ssh/id_rsa
+          ssh-keyscan -H $CONTABO_PROD_HOST >> ~/.ssh/known_hosts
+          
+          # Deploy 10% traffic to new version via Coolify
+          curl -X POST "${{ secrets.COOLIFY_PROD_WEBHOOK }}" \
+            -H "Content-Type: application/json" \
+            -d '{
+              "image": "${{ env.DOCKER_REGISTRY }}/${{ github.repository }}/${{ env.IMAGE_NAME }}:${{ needs.validate-structure.outputs.version }}",
+              "environment": "production",
+              "strategy": "canary",
+              "traffic_percentage": 10
+            }'
+
+      - name: Wait and monitor canary
+        run: |
+          echo "⏳ Monitoring canary deployment for 5 minutes..."
+          sleep 300
+          
+          # Check health metrics
+          HEALTH_CHECK_URL="${{ secrets.PRODUCTION_URL }}/health"
+          for i in {1..5}; do
+            if curl -f "$HEALTH_CHECK_URL"; then
+              echo "✅ Health check $i passed"
+            else
+              echo "❌ Health check $i failed"
+              exit 1
+            fi
+            sleep 30
+          done
+
+  # === FULL PRODUCTION DEPLOYMENT ===
+  deploy-production:
+    name: "🚀 Full Production Deployment"
+    runs-on: ubuntu-latest
+    needs: deploy-canary
+    if: success()
+    environment: production
+    steps:
+      - name: Promote canary to full production
+        run: |
+          echo "🚀 Promoting canary to full production..."
+          
+          # Promote to 100% traffic via Coolify
+          curl -X POST "${{ secrets.COOLIFY_PROD_WEBHOOK }}" \
+            -H "Content-Type: application/json" \
+            -d '{
+              "image": "${{ env.DOCKER_REGISTRY }}/${{ github.repository }}/${{ env.IMAGE_NAME }}:${{ needs.validate-structure.outputs.version }}",
+              "environment": "production",
+              "strategy": "promote",
+              "traffic_percentage": 100
+            }'
+
+      - name: Post-deployment verification
+        run: |
+          echo "✅ Running post-deployment verification..."
+          
+          # Run smoke tests
+          curl -f "${{ secrets.PRODUCTION_URL }}/health"
+          curl -f "${{ secrets.PRODUCTION_URL }}/api/v1/health"
+          
+          echo "🎉 Deployment completed successfully!"
+
+  # === MONITORING & NOTIFICATIONS ===
+  notify:
+    name: "📢 Deployment Notifications"
+    runs-on: ubuntu-latest
+    needs: [deploy-production]
+    if: always()
+    steps:
+      - name: Notify deployment status
+        env:
+          WEBHOOK_URL: ${{ secrets.SLACK_WEBHOOK_URL }}
+        run: |
+          if [[ "${{ needs.deploy-production.result }}" == "success" ]]; then
+            STATUS="✅ SUCCESS"
+            COLOR="good"
+            MESSAGE="Yaz & Surgify platform deployed successfully to production!"
+          else
+            STATUS="❌ FAILED"
+            COLOR="danger"
+            MESSAGE="Yaz & Surgify platform deployment failed. Check logs for details."
+          fi
+          
+          curl -X POST "$WEBHOOK_URL" \
+            -H "Content-Type: application/json" \
+            -d "{
+              \"attachments\": [{
+                \"color\": \"$COLOR\",
+                \"title\": \"$STATUS - Yaz & Surgify Deployment\",
+                \"text\": \"$MESSAGE\",
+                \"fields\": [
+                  {\"title\": \"Version\", \"value\": \"${{ needs.validate-structure.outputs.version }}\", \"short\": true},
+                  {\"title\": \"Branch\", \"value\": \"${{ github.ref_name }}\", \"short\": true},
+                  {\"title\": \"Commit\", \"value\": \"${{ github.sha }}\", \"short\": true}
+                ]
+              }]
+            }"
+
+  # === CLEANUP ===
+  cleanup:
+    name: "🧹 Cleanup"
+    runs-on: ubuntu-latest
+    needs: [notify]
+    if: always()
+    steps:
+      - name: Cleanup old images
+        run: |
+          echo "🧹 Cleaning up old Docker images..."
+          # This would typically connect to the registry and remove old images
+          echo "Cleanup completed"
+
+      - name: Setup Python
+        uses: actions/setup-python@v4
+        with:
+          python-version: ${{ env.PYTHON_VERSION }}
+
+      - name: Detect changes
+        id: changes
+        run: |
+          if [[ "${{ github.event_name }}" == "release" ]]; then
+            echo "should_deploy=true" >> $GITHUB_OUTPUT
+          elif [[ "${{ github.ref }}" == "refs/heads/main" ]]; then
+            echo "should_deploy=true" >> $GITHUB_OUTPUT
+          else
+            echo "should_deploy=false" >> $GITHUB_OUTPUT
+          fi
+
+      - name: Generate version
+        id: version
+        run: |
+          if [[ "${{ github.event_name }}" == "release" ]]; then
+            echo "version=${{ github.event.release.tag_name }}" >> $GITHUB_OUTPUT
+          else
+            echo "version=dev-$(git rev-parse --short HEAD)" >> $GITHUB_OUTPUT
+          fi
+
+      - name: Validate project structure
+        run: |
+          echo "🔍 Validating project structure..."
+          python -c "
+          import os, sys
+          required_dirs = ['src/surgify', 'tests', 'docs', 'scripts']
+          missing = [d for d in required_dirs if not os.path.exists(d)]
+          if missing:
+              print(f'❌ Missing directories: {missing}')
+              sys.exit(1)
+          print('✅ Project structure valid')
+          "
+
+  unit-tests:
+    name: "🧪 Unit Tests"
+    runs-on: ubuntu-latest
+    needs: validate-structure
+    services:
+      redis:
+        image: redis:alpine
+        ports:
+          - 6379:6379
+        options: >-
+          --health-cmd "redis-cli ping"
+          --health-interval 10s
+          --health-timeout 5s
+          --health-retries 5
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Setup Python
+        uses: actions/setup-python@v4
+        with:
+          python-version: ${{ env.PYTHON_VERSION }}
+          cache: pip
+
+      - name: Install dependencies
+        run: |
+          pip install -r requirements.txt
+          pip install pytest pytest-cov pytest-asyncio
+
+      - name: Run unit tests
+        env:
+          REDIS_URL: redis://localhost:6379/1
+          ENVIRONMENT: test
+        run: |
+          echo "🧪 Running unit tests..."
+          python -m pytest tests/unit/ -v --cov=src/surgify --cov-report=xml --cov-report=term
+
+      - name: Upload coverage
+        uses: codecov/codecov-action@v3
+        with:
+          file: ./coverage.xml
+          fail_ci_if_error: false
+
+  integration-tests:
+    name: "🔗 Integration Tests"
+    runs-on: ubuntu-latest
+    needs: validate-structure
+    services:
+      redis:
+        image: redis:alpine
+        ports:
+          - 6379:6379
+      postgres:
+        image: postgres:15
+        env:
+          POSTGRES_PASSWORD: testpass
+          POSTGRES_DB: testdb
+        ports:
+          - 5432:5432
+        options: >-
+          --health-cmd pg_isready
+          --health-interval 10s
+          --health-timeout 5s
+          --health-retries 5
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Setup Python
+        uses: actions/setup-python@v4
+        with:
+          python-version: ${{ env.PYTHON_VERSION }}
+          cache: pip
+
+      - name: Install dependencies
+        run: |
+          pip install -r requirements.txt
+          pip install pytest pytest-asyncio
+
+      - name: Run integration tests
+        env:
+          DATABASE_URL: postgresql://postgres:testpass@localhost:5432/testdb
+          REDIS_URL: redis://localhost:6379/1
+          ENVIRONMENT: test
+        run: |
+          echo "🔗 Running integration tests..."
+          python -m pytest tests/integration/ -v
+
+  api-tests:
+    name: "🌐 API Endpoint Tests"
+    runs-on: ubuntu-latest
+    needs: validate-structure
+    services:
+      redis:
+        image: redis:alpine
+        ports:
+          - 6379:6379
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Setup Python
+        uses: actions/setup-python@v4
+        with:
+          python-version: ${{ env.PYTHON_VERSION }}
+          cache: pip
+
+      - name: Install dependencies
+        run: |
+          pip install -r requirements.txt
+          pip install pytest pytest-asyncio httpx
+
+      - name: Run comprehensive API tests
+        env:
+          REDIS_URL: redis://localhost:6379/1
+          ENVIRONMENT: test
+        run: |
+          echo "🌐 Running comprehensive API tests..."
+          python tests/run_comprehensive_tests.py
+
+  ui-component-tests:
+    name: "🎨 UI Component Tests"
+    runs-on: ubuntu-latest
+    needs: validate-structure
+    
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: ${{ env.NODE_VERSION }}
+          cache: npm
+
+      - name: Install dependencies
+        run: |
+          npm install -g playwright
+          pip install -r requirements.txt
+
+      - name: Run UI component tests
+        run: |
+          echo "🎨 Running UI component tests..."
+          # Start test server in background
+          python -m uvicorn src.surgify.main:app --host 0.0.0.0 --port 8000 &
+          sleep 10
+          
+          # Run component tests
+          python -c "
+          import requests
+          import time
+          
+          # Test component demo page
+          response = requests.get('http://localhost:8000/demo-components')
+          assert response.status_code == 200
+          print('✅ Component demo page accessible')
+          
+          # Test API endpoints
+          response = requests.get('http://localhost:8000/api/v1/')
+          assert response.status_code == 200
+          print('✅ API endpoints accessible')
+          "
+
+  # === SECURITY & QUALITY PHASE ===
+  security-scan:
+    name: "🔒 Security Scan"
+    runs-on: ubuntu-latest
+    needs: validate-structure
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Setup Python
+        uses: actions/setup-python@v4
+        with:
+          python-version: ${{ env.PYTHON_VERSION }}
+
+      - name: Install security tools
+        run: |
+          pip install bandit safety
+
+      - name: Run security scans
+        run: |
+          echo "🔒 Running security scans..."
+          
+          # Check for known vulnerabilities
+          safety check -r requirements.txt
+          
+          # Static security analysis
+          bandit -r src/ -f json -o bandit-report.json || true
+          
+          echo "✅ Security scan completed"
+
+  code-quality:
+    name: "📊 Code Quality Analysis"
+    runs-on: ubuntu-latest
+    needs: validate-structure
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Setup Python
+        uses: actions/setup-python@v4
+        with:
+          python-version: ${{ env.PYTHON_VERSION }}
+
+      - name: Install quality tools
+        run: |
+          pip install flake8 black isort mypy
+
+      - name: Code quality checks
+        run: |
+          echo "📊 Running code quality checks..."
+          
+          # Format check
+          black --check src/ tests/ || echo "❌ Code formatting issues found"
+          
+          # Import sorting
+          isort --check-only src/ tests/ || echo "❌ Import sorting issues found"
+          
+          # Linting
+          flake8 src/ tests/ --max-line-length=88 --extend-ignore=E203,W503 || echo "❌ Linting issues found"
+          
+          # Type checking
+          mypy src/ --ignore-missing-imports || echo "❌ Type checking issues found"
+          
+          echo "✅ Code quality analysis completed"
+
+  # === BUILD PHASE ===
+  build-docker:
+    name: "🐳 Build Docker Images"
+    runs-on: ubuntu-latest
+    needs: [unit-tests, integration-tests, api-tests]
+    if: needs.validate-structure.outputs.should_deploy == 'true'
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Set up Docker Buildx
+        uses: docker/setup-buildx-action@v3
+
+      - name: Log in to Container Registry
+        uses: docker/login-action@v3
+        with:
+          registry: ${{ env.DOCKER_REGISTRY }}
+          username: ${{ github.actor }}
+          password: ${{ secrets.GITHUB_TOKEN }}
+
+      - name: Build and push Docker image
+        uses: docker/build-push-action@v5
+        with:
+          context: .
+          push: true
+          tags: |
+            ${{ env.DOCKER_REGISTRY }}/${{ github.repository }}/${{ env.IMAGE_NAME }}:${{ needs.validate-structure.outputs.version }}
+            ${{ env.DOCKER_REGISTRY }}/${{ github.repository }}/${{ env.IMAGE_NAME }}:latest
+          cache-from: type=gha
+          cache-to: type=gha,mode=max
+
+  # === CANARY DEPLOYMENT PHASE ===
+  canary-tests:
+    name: "🐦 Canary Deployment Tests"
+    runs-on: ubuntu-latest
+    needs: [build-docker]
+    if: github.ref == 'refs/heads/main' || github.event_name == 'release'
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Setup Python
+        uses: actions/setup-python@v4
+        with:
+          python-version: ${{ env.PYTHON_VERSION }}
+
+      - name: Install dependencies
+        run: |
+          pip install -r requirements.txt
+          pip install pytest pytest-asyncio httpx
+
+      - name: Run canary tests
+        env:
+          CANARY_BASE_URL: ${{ secrets.CANARY_BASE_URL || 'http://localhost:8000' }}
+          PRODUCTION_BASE_URL: ${{ secrets.PRODUCTION_BASE_URL || 'http://localhost:8000' }}
+        run: |
+          echo "🐦 Running canary deployment tests..."
+          python -m pytest tests/canary/ -v --tb=short
+
+  # === DEPLOYMENT PHASE ===
+  deploy-staging:
+    name: "🚀 Deploy to Staging"
+    runs-on: ubuntu-latest
+    needs: [canary-tests]
+    if: github.ref == 'refs/heads/develop'
+    environment: staging
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Deploy to staging
+        run: |
+          echo "🚀 Deploying to staging environment..."
+          echo "Docker image: ${{ env.DOCKER_REGISTRY }}/${{ github.repository }}/${{ env.IMAGE_NAME }}:${{ needs.validate-structure.outputs.version }}"
+          
+          # Here we would integrate with Coolify API for staging deployment
+          # curl -X POST "${{ secrets.COOLIFY_API_URL }}/deploy" \
+          #   -H "Authorization: Bearer ${{ secrets.COOLIFY_API_TOKEN }}" \
+          #   -d '{"environment": "staging", "image": "..."}'
+
+  deploy-production:
+    name: "🌟 Deploy to Production"
+    runs-on: ubuntu-latest
+    needs: [canary-tests]
+    if: github.event_name == 'release'
+    environment: production
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Deploy to production
+        run: |
+          echo "🌟 Deploying to production environment..."
+          echo "Docker image: ${{ env.DOCKER_REGISTRY }}/${{ github.repository }}/${{ env.IMAGE_NAME }}:${{ needs.validate-structure.outputs.version }}"
+          
+          # Here we would integrate with Coolify API for production deployment
+          # curl -X POST "${{ secrets.COOLIFY_API_URL }}/deploy" \
+          #   -H "Authorization: Bearer ${{ secrets.COOLIFY_API_TOKEN }}" \
+          #   -d '{"environment": "production", "image": "..."}'
+
+  # === NOTIFICATION PHASE ===
+  notify-deployment:
+    name: "📢 Deployment Notification"
+    runs-on: ubuntu-latest
+    needs: [deploy-staging, deploy-production]
+    if: always()
+
+    steps:
+      - name: Notify deployment status
+        run: |
+          if [[ "${{ needs.deploy-production.result }}" == "success" ]]; then
+            echo "✅ Production deployment successful!"
+          elif [[ "${{ needs.deploy-staging.result }}" == "success" ]]; then
+            echo "✅ Staging deployment successful!"
+          else
+            echo "❌ Deployment failed or skipped"
+          fi
+          
+          echo "📊 Deployment Summary:"
+          echo "  - Version: ${{ needs.validate-structure.outputs.version }}"
+          echo "  - Branch: ${{ github.ref }}"
+          echo "  - Commit: ${{ github.sha }}"
+          echo "  - Triggered by: ${{ github.event_name }}"
+
+  # === CLEANUP PHASE ===
+  cleanup:
+    name: "🧹 Cleanup"
+    runs-on: ubuntu-latest
+    needs: [deploy-staging, deploy-production]
+    if: always()
+
+    steps:
+      - name: Cleanup old artifacts
+        run: |
+          echo "🧹 Cleaning up old artifacts and cache..."
+          # This would clean up old docker images, test artifacts, etc.
+          echo "✅ Cleanup completed"

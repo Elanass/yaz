@@ -39,7 +39,7 @@ def get_legacy_bridge() -> Optional[Any]:
         from sqlalchemy.orm import Session
         db_session = next(get_db())
         surgify_adapter = SurgifyAdapter(db_session)
-        case_service = CaseService()
+        case_service = CaseService(db_session)
         return LegacyBridge(case_service, surgify_adapter)
     except Exception:
         return None

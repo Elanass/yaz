@@ -1,0 +1,422 @@
+name: Surgify CI/CD Pipeline
+
+on:
+  push:
+    branches: [ main, develop, canary-* ]
+  pull_request:
+    branches: [ main, develop ]
+  workflow_dispatch:
+    inputs:
+      deployment_type:
+        description: 'Deployment type'
+        required: true
+        default: 'canary'
+        type: choice
+        options:
+        - canary
+        - production
+        - rollback
+
+env:
+  PYTHON_VERSION: '3.11'
+  NODE_VERSION: '18'
+  DOCKER_REGISTRY: ghcr.io
+  IMAGE_NAME: ${{ github.repository }}
+
+jobs:
+  # Code Quality and Testing
+  test-and-lint:
+    name: Code Quality & Tests
+    runs-on: ubuntu-latest
+    services:
+      postgres:
+        image: postgres:15
+        env:
+          POSTGRES_PASSWORD: postgres
+          POSTGRES_DB: surgify_test
+        options: >-
+          --health-cmd pg_isready
+          --health-interval 10s
+          --health-timeout 5s
+          --health-retries 5
+        ports:
+          - 5432:5432
+      
+      redis:
+        image: redis:7
+        options: >-
+          --health-cmd "redis-cli ping"
+          --health-interval 10s
+          --health-timeout 5s
+          --health-retries 5
+        ports:
+          - 6379:6379
+
+    steps:
+    - name: Checkout code
+      uses: actions/checkout@v4
+      with:
+        fetch-depth: 0
+
+    - name: Set up Python
+      uses: actions/setup-python@v4
+      with:
+        python-version: ${{ env.PYTHON_VERSION }}
+        cache: 'pip'
+
+    - name: Install dependencies
+      run: |
+        python -m pip install --upgrade pip
+        pip install -e ".[dev]"
+        pip install coverage pytest-cov bandit safety
+
+    - name: Code formatting check
+      run: |
+        black --check --diff src/ tests/
+
+    - name: Linting
+      run: |
+        flake8 src/ tests/ --max-line-length=100 --ignore=E203,W503
+
+    - name: Type checking
+      run: |
+        mypy src/ --ignore-missing-imports
+      continue-on-error: true
+
+    - name: Security scan
+      run: |
+        bandit -r src/ -f json -o bandit-report.json
+        safety check
+      continue-on-error: true
+
+    - name: Unit tests
+      run: |
+        pytest tests/unit/ -v --cov=src --cov-report=xml --cov-report=html
+      env:
+        DATABASE_URL: postgresql://postgres:postgres@localhost:5432/surgify_test
+        REDIS_URL: redis://localhost:6379/0
+
+    - name: Integration tests
+      run: |
+        pytest tests/integration/ -v --maxfail=5
+      env:
+        DATABASE_URL: postgresql://postgres:postgres@localhost:5432/surgify_test
+        REDIS_URL: redis://localhost:6379/0
+
+    - name: Upload coverage reports
+      uses: codecov/codecov-action@v3
+      with:
+        file: ./coverage.xml
+        flags: unittests
+        name: codecov-umbrella
+
+    - name: Upload test results
+      uses: actions/upload-artifact@v3
+      if: always()
+      with:
+        name: test-results
+        path: |
+          htmlcov/
+          bandit-report.json
+          pytest-report.xml
+
+  # Build Docker Image
+  build-image:
+    name: Build Docker Image
+    runs-on: ubuntu-latest
+    needs: test-and-lint
+    outputs:
+      image-tag: ${{ steps.meta.outputs.tags }}
+      image-digest: ${{ steps.build.outputs.digest }}
+
+    steps:
+    - name: Checkout code
+      uses: actions/checkout@v4
+
+    - name: Set up Docker Buildx
+      uses: docker/setup-buildx-action@v3
+
+    - name: Log in to Container Registry
+      uses: docker/login-action@v3
+      with:
+        registry: ${{ env.DOCKER_REGISTRY }}
+        username: ${{ github.actor }}
+        password: ${{ secrets.GITHUB_TOKEN }}
+
+    - name: Extract metadata
+      id: meta
+      uses: docker/metadata-action@v5
+      with:
+        images: ${{ env.DOCKER_REGISTRY }}/${{ env.IMAGE_NAME }}
+        tags: |
+          type=ref,event=branch
+          type=ref,event=pr
+          type=sha,prefix={{branch}}-
+          type=raw,value=latest,enable={{is_default_branch}}
+
+    - name: Build and push Docker image
+      id: build
+      uses: docker/build-push-action@v5
+      with:
+        context: .
+        push: true
+        tags: ${{ steps.meta.outputs.tags }}
+        labels: ${{ steps.meta.outputs.labels }}
+        cache-from: type=gha
+        cache-to: type=gha,mode=max
+        build-args: |
+          BUILD_VERSION=${{ github.sha }}
+          BUILD_DATE=${{ github.event.head_commit.timestamp }}
+
+  # Canary Deployment
+  deploy-canary:
+    name: Deploy to Canary
+    runs-on: ubuntu-latest
+    needs: [test-and-lint, build-image]
+    if: |
+      (github.ref == 'refs/heads/develop' || 
+       startsWith(github.ref, 'refs/heads/canary-') ||
+       github.event.inputs.deployment_type == 'canary') &&
+      github.event_name != 'pull_request'
+    environment:
+      name: canary
+      url: https://canary.surgify.com
+
+    steps:
+    - name: Checkout code
+      uses: actions/checkout@v4
+
+    - name: Setup deployment tools
+      run: |
+        # Install kubectl, helm, or other deployment tools
+        curl -LO "https://dl.k8s.io/release/$(curl -L -s https://dl.k8s.io/release/stable.txt)/bin/linux/amd64/kubectl"
+        chmod +x kubectl
+        sudo mv kubectl /usr/local/bin/
+
+    - name: Configure kubectl
+      run: |
+        echo "${{ secrets.CANARY_KUBECONFIG }}" | base64 -d > kubeconfig
+        export KUBECONFIG=kubeconfig
+
+    - name: Deploy to canary environment
+      run: |
+        # Update Kubernetes deployment
+        kubectl set image deployment/surgify-canary \
+          surgify=${{ needs.build-image.outputs.image-tag }} \
+          --namespace=canary
+        
+        # Wait for rollout
+        kubectl rollout status deployment/surgify-canary --namespace=canary --timeout=300s
+
+    - name: Verify canary deployment
+      run: |
+        # Basic health check
+        sleep 30
+        curl -f https://canary.surgify.com/health || exit 1
+
+    - name: Update deployment status
+      run: |
+        echo "CANARY_DEPLOYMENT_ID=$(date +%Y%m%d-%H%M%S)" >> $GITHUB_ENV
+        echo "CANARY_IMAGE_TAG=${{ needs.build-image.outputs.image-tag }}" >> $GITHUB_ENV
+
+  # Canary Testing and Monitoring
+  monitor-canary:
+    name: Monitor Canary Deployment
+    runs-on: ubuntu-latest
+    needs: [deploy-canary]
+    if: success()
+
+    steps:
+    - name: Checkout code
+      uses: actions/checkout@v4
+
+    - name: Set up Python for canary tests
+      uses: actions/setup-python@v4
+      with:
+        python-version: ${{ env.PYTHON_VERSION }}
+
+    - name: Install test dependencies
+      run: |
+        pip install -e ".[dev]"
+        pip install httpx asyncio
+
+    - name: Run canary tests
+      id: canary-tests
+      run: |
+        python -m pytest tests/canary/ -v --tb=short --maxfail=3
+      env:
+        CANARY_BASE_URL: https://canary.surgify.com
+        PRODUCTION_BASE_URL: https://api.surgify.com
+        TEST_API_TOKEN: ${{ secrets.CANARY_TEST_TOKEN }}
+      continue-on-error: true
+
+    - name: Performance monitoring
+      run: |
+        # Run performance benchmarks
+        python scripts/performance-benchmark.py --target=canary --duration=300
+      continue-on-error: true
+
+    - name: Generate canary report
+      run: |
+        python scripts/generate-canary-report.py \
+          --deployment-id=${{ env.CANARY_DEPLOYMENT_ID }} \
+          --image-tag=${{ env.CANARY_IMAGE_TAG }} \
+          --test-results=${{ steps.canary-tests.outcome }}
+
+    - name: Upload canary report
+      uses: actions/upload-artifact@v3
+      with:
+        name: canary-report-${{ env.CANARY_DEPLOYMENT_ID }}
+        path: canary-report.json
+
+    - name: Send Slack notification
+      uses: 8398a7/action-slack@v3
+      with:
+        status: ${{ job.status }}
+        channel: '#deployments'
+        text: |
+          Canary deployment monitoring completed
+          Deployment ID: ${{ env.CANARY_DEPLOYMENT_ID }}
+          Test Results: ${{ steps.canary-tests.outcome }}
+          Image: ${{ env.CANARY_IMAGE_TAG }}
+      env:
+        SLACK_WEBHOOK_URL: ${{ secrets.SLACK_WEBHOOK_URL }}
+      if: always()
+
+  # Production Deployment (Manual Approval Required)
+  deploy-production:
+    name: Deploy to Production
+    runs-on: ubuntu-latest
+    needs: [monitor-canary]
+    if: |
+      (github.ref == 'refs/heads/main' || 
+       github.event.inputs.deployment_type == 'production') &&
+      success()
+    environment:
+      name: production
+      url: https://api.surgify.com
+
+    steps:
+    - name: Checkout code
+      uses: actions/checkout@v4
+
+    - name: Wait for manual approval
+      uses: trstringer/manual-approval@v1
+      with:
+        secret: ${{ github.TOKEN }}
+        approvers: ${{ secrets.PRODUCTION_APPROVERS }}
+        minimum-approvals: 2
+        issue-title: "Production Deployment Approval"
+        issue-body: |
+          Please review the canary deployment results and approve production deployment.
+          
+          **Canary Results**: ✅ Passed
+          **Image**: ${{ needs.build-image.outputs.image-tag }}
+          **Deployment ID**: ${{ env.CANARY_DEPLOYMENT_ID }}
+          
+          [View Canary Report](https://github.com/${{ github.repository }}/actions/runs/${{ github.run_id }})
+
+    - name: Configure production kubectl
+      run: |
+        echo "${{ secrets.PRODUCTION_KUBECONFIG }}" | base64 -d > kubeconfig
+        export KUBECONFIG=kubeconfig
+
+    - name: Deploy to production
+      run: |
+        # Blue-Green deployment strategy
+        kubectl set image deployment/surgify-production \
+          surgify=${{ needs.build-image.outputs.image-tag }} \
+          --namespace=production
+        
+        # Wait for rollout with longer timeout
+        kubectl rollout status deployment/surgify-production --namespace=production --timeout=600s
+
+    - name: Post-deployment verification
+      run: |
+        # Comprehensive health checks
+        sleep 60
+        curl -f https://api.surgify.com/health || exit 1
+        curl -f https://api.surgify.com/api/v1/ || exit 1
+
+    - name: Update production monitoring
+      run: |
+        # Update monitoring dashboards, alerts, etc.
+        echo "Production deployment completed: ${{ needs.build-image.outputs.image-tag }}"
+
+  # Rollback Capability
+  rollback-deployment:
+    name: Rollback Deployment
+    runs-on: ubuntu-latest
+    if: |
+      github.event.inputs.deployment_type == 'rollback' ||
+      failure()
+    environment:
+      name: rollback
+
+    steps:
+    - name: Checkout code
+      uses: actions/checkout@v4
+
+    - name: Configure kubectl for rollback
+      run: |
+        echo "${{ secrets.PRODUCTION_KUBECONFIG }}" | base64 -d > kubeconfig
+        export KUBECONFIG=kubeconfig
+
+    - name: Rollback production deployment
+      run: |
+        kubectl rollout undo deployment/surgify-production --namespace=production
+        kubectl rollout status deployment/surgify-production --namespace=production --timeout=300s
+
+    - name: Rollback canary deployment
+      run: |
+        echo "${{ secrets.CANARY_KUBECONFIG }}" | base64 -d > kubeconfig-canary
+        export KUBECONFIG=kubeconfig-canary
+        kubectl rollout undo deployment/surgify-canary --namespace=canary
+      continue-on-error: true
+
+    - name: Verify rollback
+      run: |
+        sleep 30
+        curl -f https://api.surgify.com/health || exit 1
+
+    - name: Send rollback notification
+      uses: 8398a7/action-slack@v3
+      with:
+        status: 'warning'
+        channel: '#alerts'
+        text: |
+          🚨 ROLLBACK EXECUTED 🚨
+          Repository: ${{ github.repository }}
+          Branch: ${{ github.ref }}
+          Reason: Deployment failure or manual trigger
+      env:
+        SLACK_WEBHOOK_URL: ${{ secrets.SLACK_WEBHOOK_URL }}
+
+  # Cleanup
+  cleanup:
+    name: Cleanup Resources
+    runs-on: ubuntu-latest
+    needs: [deploy-production, rollback-deployment]
+    if: always()
+
+    steps:
+    - name: Clean up temporary resources
+      run: |
+        # Clean up test databases, temporary files, etc.
+        echo "Cleaning up temporary resources..."
+
+    - name: Archive deployment artifacts
+      uses: actions/upload-artifact@v3
+      with:
+        name: deployment-artifacts-${{ github.run_id }}
+        path: |
+          kubeconfig*
+          *.json
+          *.log
+        retention-days: 30
+      if: always()
+
+    - name: Update deployment history
+      run: |
+        # Update deployment tracking system
+        echo "Deployment completed for run: ${{ github.run_id }}"

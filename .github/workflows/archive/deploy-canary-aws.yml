@@ -1,0 +1,19 @@
+name: Canary Deploy AWS
+on:
+  push:
+    branches: [main, canary]
+jobs:
+  build-and-deploy:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - name: Build Docker image
+        run: docker build -t ${{ secrets.AWS_ECR_REPO }}:canary .
+      - name: Push to ECR
+        run: |
+          aws ecr get-login-password --region ${{ secrets.AWS_REGION }} | docker login --username AWS --password-stdin ${{ secrets.AWS_ECR_REPO }}
+          docker push ${{ secrets.AWS_ECR_REPO }}:canary
+      - name: Deploy canary (10% traffic)
+        run: |
+          aws ecs update-service --cluster ${{ secrets.AWS_ECS_CLUSTER }} --service ${{ secrets.AWS_ECS_SERVICE }} --deployment-controller type=CODE_DEPLOY
+          aws deploy create-deployment --application-name ${{ secrets.AWS_CODEDEPLOY_APP }} --deployment-group-name ${{ secrets.AWS_CODEDEPLOY_DG }} --revision revisionType=AppSpecContent,appSpecContent={content="version: 0.0\nResources:\n  - TargetService:\n      Type: AWS::ECS::Service\n      Properties:\n        TaskDefinition: ${{ secrets.AWS_TASK_DEF }}\n        LoadBalancerInfo:\n          ContainerName: app\n          ContainerPort: 80\n"} --deployment-config-name CodeDeployDefault.ECSCanary10Percent5Minutes

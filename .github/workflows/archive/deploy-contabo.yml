@@ -1,0 +1,34 @@
+name: Deploy to Contabo
+on:
+  push:
+    branches: [main, contabo]
+jobs:
+  deploy:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - name: Build Docker image
+        run: docker build -t surgify:latest .
+      - name: Save Docker image
+        run: docker save surgify:latest | gzip > surgify_latest.tar.gz
+      - name: Copy image to Contabo host
+        uses: appleboy/scp-action@v0.1.7
+        with:
+          host: ${{ secrets.CONTABO_HOST }}
+          username: ${{ secrets.CONTABO_USER }}
+          key: ${{ secrets.CONTABO_SSH_KEY }}
+          port: ${{ secrets.CONTABO_PORT }}
+          source: "surgify_latest.tar.gz"
+          target: "~/surgify_latest.tar.gz"
+      - name: Deploy on Contabo (load image & restart)
+        uses: appleboy/ssh-action@v1.0.3
+        with:
+          host: ${{ secrets.CONTABO_HOST }}
+          username: ${{ secrets.CONTABO_USER }}
+          key: ${{ secrets.CONTABO_SSH_KEY }}
+          port: ${{ secrets.CONTABO_PORT }}
+          script: |
+            docker load < ~/surgify_latest.tar.gz
+            docker stop surgify || true
+            docker rm surgify || true
+            docker run -d --name surgify -p 80:80 surgify:latest

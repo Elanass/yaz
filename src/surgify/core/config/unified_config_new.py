@@ -31,7 +31,7 @@ class SurgifyConfig(BaseModel):
     token_expire_minutes: int = 1440
     
     # Database Settings
-    database_url: str = "sqlite:///data/database/surgify.db"
+    database_url: str = os.getenv('DATABASE_URL', 'cockroachdb://root@localhost:26257/surgify?sslmode=disable')
     
     # CORS Settings
     cors_origins: str = "http://localhost:8000,http://localhost:3000"
@@ -54,7 +54,7 @@ class SurgifyConfig(BaseModel):
             'secret_key': os.getenv('SECRET_KEY', 'surgify_dev_secret_key_2025'),
             'jwt_secret': os.getenv('JWT_SECRET', 'surgify_dev_jwt_secret_2025'),
             'token_expire_minutes': int(os.getenv('TOKEN_EXPIRE_MINUTES', '1440')),
-            'database_url': os.getenv('DATABASE_URL', 'sqlite:///data/database/surgify.db'),
+            'database_url': os.getenv('DATABASE_URL', 'cockroachdb://root@localhost:26257/surgify?sslmode=disable'),
             'cors_origins': os.getenv('CORS_ORIGINS', 'http://localhost:8000,http://localhost:3000'),
             'log_level': os.getenv('LOG_LEVEL', 'INFO'),
             'enable_docs': os.getenv('ENABLE_DOCS', 'true').lower() in ('true', '1', 'yes'),

@@ -1,0 +1,62 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>UI Test</title>
+  <script src="../js/sync_client.js" defer></script>
+  <link href="https://cdn.jsdelivr.net/npm/tailwindcss@2.2.19/dist/tailwind.min.css" rel="stylesheet">
+</head>
+<body class="p-4 space-y-4">
+  <h1 class="text-xl font-bold">UI Test</h1>
+
+  <!-- DomainSelector Component -->
+  <div>
+    <h2 class="text-lg font-semibold">Domain Selector</h2>
+    <div id="domain-selector-container">
+      <select id="domain-selector" class="border rounded p-2 bg-white shadow-md" aria-label="Select domain">
+        <option value="surgery">Surgery</option>
+        <option value="logistics">Logistics</option>
+        <option value="insurance">Insurance</option>
+      </select>
+    </div>
+  </div>
+
+  <!-- CaseList Component -->
+  <div>
+    <h2 class="text-lg font-semibold">Case List</h2>
+    <ul id="case-list" class="list-disc pl-5">
+      <li>Case 1: Surgery</li>
+      <li>Case 2: Logistics</li>
+    </ul>
+  </div>
+
+  <!-- CaseDetail Component -->
+  <div>
+    <h2 class="text-lg font-semibold">Case Detail</h2>
+    <div id="case-detail" class="border rounded p-4 bg-white shadow-md">
+      <h2>Case Detail</h2>
+      <p>Patient: John Doe</p>
+      <p>Procedure: Surgery</p>
+    </div>
+  </div>
+
+  <!-- MessagePane Component -->
+  <div>
+    <h2 class="text-lg font-semibold">Message Pane</h2>
+    <div id="message-pane" class="border rounded p-4 bg-white shadow-md">
+      <h2>Messages</h2>
+      <p>No messages available.</p>
+    </div>
+  </div>
+
+  <!-- SyncStatusBadge Component -->
+  <div>
+    <h2 class="text-lg font-semibold">Sync Status Badge</h2>
+    <div id="sync-status-badge" class="flex items-center space-x-2">
+      <span class="text-sm">Status:</span>
+      <span class="text-green-500">Online</span>
+    </div>
+  </div>
+</body>
+</html>

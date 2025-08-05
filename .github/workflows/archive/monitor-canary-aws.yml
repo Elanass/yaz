@@ -1,0 +1,24 @@
+name: Monitor Canary AWS
+on:
+  workflow_run:
+    workflows: ["Canary Deploy AWS"]
+    types:
+      - completed
+jobs:
+  monitor:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Run smoke tests
+        run: |
+          curl -f https://${{ secrets.CANARY_URL }}/healthz
+      - name: Check metrics
+        run: |
+          # Example: check error rate/latency from CloudWatch
+          aws cloudwatch get-metric-data --metric-name ErrorRate --namespace MyApp --start-time $(date -u -d '5 minutes ago' +%Y-%m-%dT%H:%M:%SZ) --end-time $(date -u +%Y-%m-%dT%H:%M:%SZ)
+      - name: Promote or rollback
+        run: |
+          if [ "$CANARY_OK" = "true" ]; then
+            aws deploy update-deployment-group --application-name ${{ secrets.AWS_CODEDEPLOY_APP }} --current-deployment-group-name ${{ secrets.AWS_CODEDEPLOY_DG }} --deployment-config-name CodeDeployDefault.ECSAllAtOnce
+          else
+            aws deploy stop-deployment --deployment-id ${{ secrets.AWS_DEPLOYMENT_ID }} --auto-rollback-enabled
+          fi

@@ -656,6 +656,33 @@ scripts/bootstrap-aws.sh               # Environment initialization
 
 ---
 
+## Multi-Cloud Canary Deployment
+
+- AWS: See `.github/workflows/deploy-canary-aws.yml` and `monitor-canary-aws.yml`
+- GCP: See `.github/workflows/deploy-canary-gcp.yml` and `monitor-canary-gcp.yml`
+- Azure: See `.github/workflows/deploy-canary-azure.yml` and `monitor-canary-azure.yml`
+
+All canary deploys start at 10% traffic, auto-promote or rollback based on health/metrics.
+
+## Feature Flags
+
+Use the feature flag middleware to toggle features per environment:
+
+```python
+from src.surgify.core.feature_flags import is_feature_enabled
+
+if is_feature_enabled('NEW_UI'):
+    # Serve new UI
+    ...
+else:
+    # Serve legacy UI
+    ...
+```
+
+Set `FEATURE_NEW_UI=true` in your environment to enable.
+
+---
+
 ## 🎯 **Implementation Milestones**
 
 ### Q1 2025 - Foundation Phase
@@ -711,3 +738,10 @@ make publish-all                    # Multi-channel publication
 **Surgify** - *Make your way* through surgical excellence.
 
 Built with ❤️ for healthcare professionals worldwide.
+
+## Contabo Deployment
+
+- Deployment is automated via `.github/workflows/deploy-contabo.yml`.
+- Requires SSH access and Docker on the Contabo VPS.
+- Set the following GitHub secrets: `CONTABO_HOST`, `CONTABO_USER`, `CONTABO_SSH_KEY`, `CONTABO_PORT`.
+- On push to `main` or `contabo` branch, the workflow builds, uploads, and restarts the Docker container on your Contabo host.

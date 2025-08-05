@@ -41,3 +41,9 @@ async def web_health():
         content="<h1>Web Interface OK - Surgify Ready</h1>",
         status_code=200
     )
+
+# Component demo page
+@web_router.get("/demo-components", response_class=HTMLResponse)
+async def demo_components(request: Request):
+    """Component library demonstration page"""
+    return templates.TemplateResponse("demo_components.html", {"request": request})

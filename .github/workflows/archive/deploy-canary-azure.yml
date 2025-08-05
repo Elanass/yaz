@@ -1,0 +1,19 @@
+name: Canary Deploy Azure
+on:
+  push:
+    branches: [main, canary]
+jobs:
+  build-and-deploy:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - name: Build Docker image
+        run: docker build -t ${{ secrets.AZURE_REGISTRY }}/surgify:canary .
+      - name: Push to ACR
+        run: |
+          echo ${{ secrets.AZURE_CREDENTIALS }} | az login --service-principal --username ${{ secrets.AZURE_CLIENT_ID }} --password ${{ secrets.AZURE_CLIENT_SECRET }} --tenant ${{ secrets.AZURE_TENANT_ID }}
+          az acr login --name ${{ secrets.AZURE_REGISTRY }}
+          docker push ${{ secrets.AZURE_REGISTRY }}/surgify:canary
+      - name: Deploy canary (10% traffic)
+        run: |
+          kubectl argo rollouts set canary surgify --set-weight=10

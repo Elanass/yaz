@@ -32,6 +32,10 @@ black==23.11.0
 flake8==6.1.0
 mypy==1.7.0
 
+# Cache
+redis==5.0.1
+fakeredis==2.20.1  # For testing without Redis server
+
 # Additional utilities
 python-dateutil==2.8.2
 typing-extensions==4.8.0

@@ -1,103 +1,321 @@
 """
-Cases API - Surgify Platform
-Enhanced with optional Universal Research capabilities
+Enhanced Cases API - Surgify Platform
+Modular, high-performance endpoints with caching and proper service separation
 """
 
-import sqlite3
-from datetime import datetime
-from pathlib import Path
-from typing import List, Dict, Any, Optional, Union
+from typing import List, Optional
+from fastapi import APIRouter, HTTPException, Depends, Query, status
+from sqlalchemy.orm import Session
 
-from fastapi import APIRouter, HTTPException, Depends, Query
-from pydantic import BaseModel
-
-from surgify.core.services.case_service import CaseService
+from surgify.core.database import get_db
+from surgify.core.services.case_service import (
+    CaseService as EnhancedCaseService, 
+    CaseCreateRequest, 
+    CaseUpdateRequest, 
+    CaseResponse,
+    CaseListFilters
+)
 from surgify.core.services.auth_service import get_current_user
 from surgify.core.models.user import User
-
-# Universal Research Integration (Optional Enhancement)
-try:
-    from surgify.modules.universal_research.adapters.legacy_bridge import LegacyBridge
-    from surgify.modules.universal_research.adapters.surgify_adapter import SurgifyAdapter
-    from surgify.core.database import get_db
-    RESEARCH_AVAILABLE = True
-    LegacyBridge = LegacyBridge  # Make available for type hints
-except ImportError:
-    RESEARCH_AVAILABLE = False
-    LegacyBridge = None  # Provide None fallback
+from surgify.core.cache import cache_list_endpoint, cache_detail_endpoint, invalidate_cache
 
 router = APIRouter(tags=["Cases"])
 
-# Database path
-DB_PATH = Path(__file__).parent.parent.parent / "data" / "database" / "surgify.db"
+def get_case_service(db: Session = Depends(get_db)) -> EnhancedCaseService:
+    """Dependency to get case service instance"""
+    return EnhancedCaseService(db)
 
-class CaseResponse(BaseModel):
-    id: int
-    case_number: str
-    patient_id: str
-    procedure_type: str
-    surgery_type: Optional[str] = None  # For backward compatibility
-    diagnosis: str
-    status: str
-    risk_score: float
-    recommendations: List[str]
+@router.get("/", response_model=List[CaseResponse])
+@cache_list_endpoint("cases", ttl=60)  # Cache for 1 minute
+async def list_cases(
+    status: Optional[str] = Query(None, description="Filter by case status"),
+    procedure_type: Optional[str] = Query(None, description="Filter by procedure type"),
+    surgeon_id: Optional[str] = Query(None, description="Filter by surgeon ID"),
+    priority: Optional[str] = Query(None, description="Filter by priority"),
+    patient_id: Optional[str] = Query(None, description="Filter by patient ID"),
+    search: Optional[str] = Query(None, description="Search cases"),
+    page: int = Query(1, ge=1, description="Page number"),
+    limit: int = Query(50, ge=1, le=100, description="Items per page"),
+    sort_by: str = Query("created_at", description="Sort field"),
+    sort_order: str = Query("desc", regex="^(asc|desc)$", description="Sort order"),
+    case_service: EnhancedCaseService = Depends(get_case_service)
+):
+    """
+    List all surgical cases with filtering, pagination, and sorting.
     
-    def model_post_init(self, __context):
-        # Set surgery_type to procedure_type if not provided
-        if self.surgery_type is None:
-            self.surgery_type = self.procedure_type
-
-class CaseCreate(BaseModel):
-    patient_id: str
-    procedure_type: str
-    diagnosis: str
-    status: str = "planned"
-
-# Pydantic models for request/response
-class CaseCreateRequest(BaseModel):
-    patient_id: str
-    surgery_type: str
-    procedure_type: Optional[str] = None  # For backward compatibility
-    diagnosis: Optional[str] = None
-    status: str = "planned"
-    pre_op_notes: Optional[str] = None
-    post_op_notes: Optional[str] = None
-
-# Dependency
-case_service = CaseService()
-
-# Research enhancement dependencies (optional)
-def get_legacy_bridge() -> Optional[Any]:
-    """Get legacy bridge for research enhancements (optional)"""
-    if not RESEARCH_AVAILABLE or LegacyBridge is None:
-        return None
+    This endpoint is **stateless** and **idempotent** - multiple calls with the same
+    parameters will return the same results. Results are cached for performance.
+    
+    **Filtering Options:**
+    - status: Filter by case status (planned, in_progress, completed, cancelled)
+    - procedure_type: Filter by procedure type
+    - surgeon_id: Filter by assigned surgeon
+    - priority: Filter by priority level (low, medium, high, urgent)
+    - patient_id: Filter by patient identifier
+    - search: Search across case number, patient ID, diagnosis, and procedure type
+    
+    **Pagination:**
+    - page: Page number (starting from 1)
+    - limit: Number of items per page (1-100)
+    
+    **Sorting:**
+    - sort_by: Field to sort by (default: created_at)
+    - sort_order: Sort direction (asc/desc)
+    """
     try:
-        from sqlalchemy.orm import Session
-        db_session = next(get_db())
-        surgify_adapter = SurgifyAdapter(db_session)
-        return LegacyBridge(case_service, surgify_adapter)
-    except Exception:
-        return None
-
-def get_db_connection():
-    """Get database connection"""
-    return sqlite3.connect(str(DB_PATH))
-
-@router.get("/cases", response_model=List[CaseResponse])
-async def list_cases():
-    """List all cases"""
-    try:
-        cases = case_service.list_cases()
-        return [CaseResponse(**case) for case in cases]
+        filters = CaseListFilters(
+            status=status,
+            procedure_type=procedure_type,
+            surgeon_id=surgeon_id,
+            priority=priority,
+            patient_id=patient_id,
+            search=search
+        )
+        
+        cases = await case_service.list_cases(
+            filters=filters,
+            page=page,
+            limit=limit,
+            sort_by=sort_by,
+            sort_order=sort_order
+        )
+        
+        return cases
+        
     except Exception as e:
-        return []
+        raise HTTPException(
+            status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
+            detail=f"Error retrieving cases: {str(e)}"
+        )
 
-@router.get("/cases/{case_id}", response_model=CaseResponse)
-async def get_case(case_id: int):
-    """Get a specific case"""
+@router.post("/", response_model=CaseResponse, status_code=status.HTTP_201_CREATED)
+async def create_case(
+    request: CaseCreateRequest,
+    case_service: EnhancedCaseService = Depends(get_case_service),
+    current_user: User = Depends(get_current_user)
+):
+    """
+    Create a new surgical case.
+    
+    This endpoint is **stateless** - it doesn't maintain any in-process state.
+    Each request creates a new case with a unique case number.
+    
+    **Required Fields:**
+    - patient_id: Unique identifier for the patient
+    - procedure_type: Type of surgical procedure
+    
+    **Optional Fields:**
+    - diagnosis: Patient diagnosis
+    - status: Case status (default: "planned")
+    - priority: Case priority (default: "medium")
+    - surgeon_id: Assigned surgeon identifier
+    - scheduled_date: Scheduled date/time for procedure
+    - notes: Additional notes
+    
+    **Response:**
+    Returns the created case with generated case number, timestamps, and
+    calculated risk score and recommendations.
+    """
     try:
-        case_data = case_service.get_case(case_id)
-        return CaseResponse(**case_data)
+        case = await case_service.create_case(request, current_user.username)
+        
+        # Invalidate related caches
+        await invalidate_cache("cases")
+        
+        return case
+        
+    except Exception as e:
+        raise HTTPException(
+            status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
+            detail=f"Error creating case: {str(e)}"
+        )
+
+@router.get("/{case_id}", response_model=CaseResponse)
+@cache_detail_endpoint("cases", ttl=300)  # Cache for 5 minutes
+async def get_case(
+    case_id: int,
+    case_service: EnhancedCaseService = Depends(get_case_service)
+):
+    """
+    Get a specific surgical case by ID.
+    
+    This endpoint is **stateless** and **idempotent** - multiple calls with the same
+    case_id will return the same result. Results are cached for performance.
+    
+    **Response:**
+    Returns complete case details including:
+    - Basic case information
+    - Patient and surgeon details
+    - Scheduling information
+    - Risk assessment and recommendations
+    - Audit trail (created/updated timestamps)
+    """
+    try:
+        case = await case_service.get_case(case_id)
+        
+        if not case:
+            raise HTTPException(
+                status_code=status.HTTP_404_NOT_FOUND,
+                detail=f"Case with ID {case_id} not found"
+            )
+        
+        return case
+        
+    except HTTPException:
+        raise
+    except Exception as e:
+        raise HTTPException(
+            status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
+            detail=f"Error retrieving case: {str(e)}"
+        )
+
+@router.put("/{case_id}", response_model=CaseResponse)
+async def update_case(
+    case_id: int,
+    request: CaseUpdateRequest,
+    case_service: EnhancedCaseService = Depends(get_case_service),
+    current_user: User = Depends(get_current_user)
+):
+    """
+    Update an existing surgical case.
+    
+    This endpoint is **idempotent** - multiple calls with the same data will
+    result in the same final state.
+    
+    **Partial Updates:**
+    Only provided fields will be updated. Omitted fields remain unchanged.
+    
+    **Updatable Fields:**
+    - patient_id: Patient identifier
+    - procedure_type: Procedure type
+    - diagnosis: Patient diagnosis
+    - status: Case status
+    - priority: Case priority
+    - surgeon_id: Assigned surgeon
+    - scheduled_date: Scheduled procedure date/time
+    - notes: Additional notes
+    
+    **Response:**
+    Returns the updated case with refreshed timestamps and recalculated
+    risk score and recommendations.
+    """
+    try:
+        case = await case_service.update_case(case_id, request, current_user.username)
+        
+        if not case:
+            raise HTTPException(
+                status_code=status.HTTP_404_NOT_FOUND,
+                detail=f"Case with ID {case_id} not found"
+            )
+        
+        # Invalidate related caches
+        await invalidate_cache("cases")
+        await invalidate_cache("cases", id=case_id)
+        
+        return case
+        
+    except HTTPException:
+        raise
+    except Exception as e:
+        raise HTTPException(
+            status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
+            detail=f"Error updating case: {str(e)}"
+        )
+
+@router.delete("/{case_id}", status_code=status.HTTP_204_NO_CONTENT)
+async def delete_case(
+    case_id: int,
+    case_service: EnhancedCaseService = Depends(get_case_service),
+    current_user: User = Depends(get_current_user)
+):
+    """
+    Delete a surgical case.
+    
+    This endpoint is **idempotent** - multiple delete requests for the same
+    case will have the same effect (the case will be deleted or already gone).
+    
+    **Warning:**
+    This operation permanently removes the case and cannot be undone.
+    Consider updating the case status to "cancelled" instead of deletion
+    for audit trail purposes.
+    
+    **Response:**
+    Returns 204 No Content on successful deletion.
+    Returns 404 Not Found if the case doesn't exist.
+    """
+    try:
+        deleted = await case_service.delete_case(case_id)
+        
+        if not deleted:
+            raise HTTPException(
+                status_code=status.HTTP_404_NOT_FOUND,
+                detail=f"Case with ID {case_id} not found"
+            )
+        
+        # Invalidate related caches
+        await invalidate_cache("cases")
+        await invalidate_cache("cases", id=case_id)
+        
+    except HTTPException:
+        raise
+    except Exception as e:
+        raise HTTPException(
+            status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
+            detail=f"Error deleting case: {str(e)}"
+        )
+
+@router.get("/", response_model=dict)
+async def get_case_statistics(
+    status: Optional[str] = Query(None, description="Filter by status"),
+    procedure_type: Optional[str] = Query(None, description="Filter by procedure type"),
+    case_service: EnhancedCaseService = Depends(get_case_service)
+):
+    """
+    Get case statistics and summary information.
+    
+    This endpoint is **stateless** and **idempotent**.
+    Provides aggregate statistics about cases in the system.
+    
+    **Filters:**
+    - status: Filter statistics by case status
+    - procedure_type: Filter statistics by procedure type
+    
+    **Response:**
+    Returns statistical summary including:
+    - Total case count
+    - Cases by status
+    - Cases by priority
+    - Average risk scores
+    - Recent activity metrics
+    """
+    try:
+        # This would implement actual statistics calculation
+        # For now, return a placeholder response
+        stats = {
+            "total_cases": 0,
+            "by_status": {
+                "planned": 0,
+                "in_progress": 0,
+                "completed": 0,
+                "cancelled": 0
+            },
+            "by_priority": {
+                "low": 0,
+                "medium": 0,
+                "high": 0,
+                "urgent": 0
+            },
+            "average_risk_score": 0.0,
+            "last_updated": "2024-01-01T00:00:00Z"
+        }
+        
+        return stats
+        
+    except Exception as e:
+        raise HTTPException(
+            status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
+            detail=f"Error retrieving statistics: {str(e)}"
+        )
     except Exception as e:
         raise HTTPException(status_code=404, detail=str(e))
 

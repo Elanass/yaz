@@ -1,0 +1,205 @@
+{
+  "name": "Case Summarization Workflow",
+  "nodes": [
+    {
+      "parameters": {
+        "httpMethod": "POST",
+        "path": "case-created",
+        "responseMode": "responseNode"
+      },
+      "id": "webhook-case-created",
+      "name": "Case Created Webhook",
+      "type": "n8n-nodes-base.webhook",
+      "typeVersion": 1,
+      "position": [
+        240,
+        300
+      ]
+    },
+    {
+      "parameters": {
+        "url": "={{ $node[\"Case Created Webhook\"].json[\"callback_url\"] || \"http://localhost:8000\" }}/api/v1/ai/summarize",
+        "authentication": "headerAuth",
+        "sendHeaders": true,
+        "headerParameters": {
+          "parameters": [
+            {
+              "name": "Content-Type",
+              "value": "application/json"
+            }
+          ]
+        },
+        "sendBody": true,
+        "bodyParameters": {
+          "parameters": [
+            {
+              "name": "case_id",
+              "value": "={{ $node[\"Case Created Webhook\"].json[\"case_id\"] }}"
+            },
+            {
+              "name": "title",
+              "value": "={{ $node[\"Case Created Webhook\"].json[\"title\"] }}"
+            },
+            {
+              "name": "description",
+              "value": "={{ $node[\"Case Created Webhook\"].json[\"description\"] }}"
+            },
+            {
+              "name": "medical_data",
+              "value": "={{ $node[\"Case Created Webhook\"].json[\"medical_data\"] }}"
+            }
+          ]
+        }
+      },
+      "id": "http-ai-summarize",
+      "name": "Call AI Summarize API",
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 3,
+      "position": [
+        460,
+        300
+      ],
+      "credentials": {
+        "httpHeaderAuth": {
+          "id": "surgify-api-auth",
+          "name": "Surgify API Auth"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "url": "={{ $node[\"Case Created Webhook\"].json[\"callback_url\"] || \"http://localhost:8000\" }}/api/v1/cases/{{ $node[\"Case Created Webhook\"].json[\"case_id\"] }}",
+        "authentication": "headerAuth",
+        "sendHeaders": true,
+        "headerParameters": {
+          "parameters": [
+            {
+              "name": "Content-Type",
+              "value": "application/json"
+            }
+          ]
+        },
+        "sendBody": true,
+        "bodyParameters": {
+          "parameters": [
+            {
+              "name": "ai_summary",
+              "value": "={{ $node[\"Call AI Summarize API\"].json[\"summary\"] }}"
+            },
+            {
+              "name": "summary_generated_at",
+              "value": "={{ new Date().toISOString() }}"
+            }
+          ]
+        },
+        "httpMethod": "PATCH"
+      },
+      "id": "http-update-case",
+      "name": "Update Case with Summary",
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 3,
+      "position": [
+        680,
+        300
+      ],
+      "credentials": {
+        "httpHeaderAuth": {
+          "id": "surgify-api-auth",
+          "name": "Surgify API Auth"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "respondWith": "json",
+        "responseBody": "={{ { \"status\": \"success\", \"message\": \"Case summary generated successfully\", \"case_id\": $node[\"Case Created Webhook\"].json[\"case_id\"], \"summary\": $node[\"Call AI Summarize API\"].json[\"summary\"] } }}"
+      },
+      "id": "webhook-response",
+      "name": "Webhook Response",
+      "type": "n8n-nodes-base.respondToWebhook",
+      "typeVersion": 1,
+      "position": [
+        900,
+        300
+      ]
+    },
+    {
+      "parameters": {
+        "message": "🤖 AI Summary Generated for Case: {{ $node[\"Case Created Webhook\"].json[\"title\"] }}\\n\\n📋 **Case ID**: {{ $node[\"Case Created Webhook\"].json[\"case_id\"] }}\\n\\n📝 **Summary**: {{ $node[\"Call AI Summarize API\"].json[\"summary\"] }}\\n\\n🔗 [View Case]({{ $node[\"Case Created Webhook\"].json[\"callback_url\"] || \"http://localhost:8000\" }}/cases/{{ $node[\"Case Created Webhook\"].json[\"case_id\"] }})"
+      },
+      "id": "slack-notification",
+      "name": "Slack Notification",
+      "type": "n8n-nodes-base.slack",
+      "typeVersion": 1,
+      "position": [
+        680,
+        480
+      ],
+      "credentials": {
+        "slackApi": {
+          "id": "surgify-slack",
+          "name": "Surgify Slack"
+        }
+      }
+    }
+  ],
+  "connections": {
+    "Case Created Webhook": {
+      "main": [
+        [
+          {
+            "node": "Call AI Summarize API",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Call AI Summarize API": {
+      "main": [
+        [
+          {
+            "node": "Update Case with Summary",
+            "type": "main",
+            "index": 0
+          },
+          {
+            "node": "Slack Notification",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Update Case with Summary": {
+      "main": [
+        [
+          {
+            "node": "Webhook Response",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  },
+  "createdAt": "2025-08-05T10:00:00.000Z",
+  "updatedAt": "2025-08-05T10:00:00.000Z",
+  "settings": {
+    "errorWorkflow": {
+      "value": ""
+    },
+    "timezone": "America/New_York"
+  },
+  "active": true,
+  "tags": [
+    {
+      "id": "case-management",
+      "name": "Case Management"
+    },
+    {
+      "id": "ai-automation",
+      "name": "AI Automation"
+    }
+  ]
+}

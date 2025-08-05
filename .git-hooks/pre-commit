@@ -1,0 +1,185 @@
+#!/bin/bash
+# Pre-commit hook for Surgify Platform
+# Ensures code quality and tests pass before commits
+
+set -e
+
+echo "🔍 Running pre-commit checks for Surgify Platform..."
+
+# Colors for output
+RED='\033[0;31m'
+GREEN='\033[0;32m'
+YELLOW='\033[1;33m'
+BLUE='\033[0;34m'
+NC='\033[0m' # No Color
+
+# Function to print colored output
+print_status() {
+    echo -e "${BLUE}[PRE-COMMIT]${NC} $1"
+}
+
+print_success() {
+    echo -e "${GREEN}✅ $1${NC}"
+}
+
+print_warning() {
+    echo -e "${YELLOW}⚠️  $1${NC}"
+}
+
+print_error() {
+    echo -e "${RED}❌ $1${NC}"
+}
+
+# Check if we're in the correct directory
+if [ ! -f "pyproject.toml" ]; then
+    print_error "Not in project root directory"
+    exit 1
+fi
+
+# Initialize error tracking
+ERRORS=0
+
+# 1. Code formatting check
+print_status "Checking code formatting with black..."
+if ! make format-check; then
+    print_error "Code formatting issues found. Run 'make format' to fix."
+    ERRORS=$((ERRORS + 1))
+else
+    print_success "Code formatting looks good"
+fi
+
+# 2. Linting
+print_status "Running linting checks..."
+if ! make lint; then
+    print_error "Linting issues found. Please fix before committing."
+    ERRORS=$((ERRORS + 1))
+else
+    print_success "Linting passed"
+fi
+
+# 3. Type checking
+print_status "Running type checks..."
+if command -v mypy &> /dev/null; then
+    if ! mypy src/ --ignore-missing-imports; then
+        print_warning "Type checking issues found (not blocking)"
+        # Don't increment errors for type checking (non-blocking)
+    else
+        print_success "Type checking passed"
+    fi
+else
+    print_warning "mypy not installed, skipping type checks"
+fi
+
+# 4. Unit tests
+print_status "Running unit tests..."
+if ! make test-unit; then
+    print_error "Unit tests failed"
+    ERRORS=$((ERRORS + 1))
+else
+    print_success "Unit tests passed"
+fi
+
+# 5. Integration tests (quick subset)
+print_status "Running critical integration tests..."
+if ! python -m pytest tests/integration/ -k "critical" --maxfail=5 -q; then
+    print_warning "Some integration tests failed (not blocking commit)"
+    # Don't block commit for integration test failures
+else
+    print_success "Critical integration tests passed"
+fi
+
+# 6. Security checks
+print_status "Running security checks..."
+if command -v bandit &> /dev/null; then
+    if ! bandit -r src/ -f json -o /tmp/bandit-report.json; then
+        print_warning "Security issues detected (review recommended)"
+        # Don't block commit for security warnings
+    else
+        print_success "Security checks passed"
+    fi
+else
+    print_warning "bandit not installed, skipping security checks"
+fi
+
+# 7. Check for sensitive data
+print_status "Checking for sensitive data..."
+SENSITIVE_PATTERNS=(
+    "password"
+    "api_key"
+    "secret"
+    "token"
+    "private_key"
+)
+
+for pattern in "${SENSITIVE_PATTERNS[@]}"; do
+    if git diff --cached --name-only | xargs grep -l -i "$pattern" 2>/dev/null | grep -v ".git-hooks" | grep -v "test" | head -1; then
+        print_warning "Potential sensitive data detected with pattern: $pattern"
+        print_warning "Please review files before committing"
+    fi
+done
+
+# 8. Check commit message format (if available)
+if [ -f ".git/COMMIT_EDITMSG" ]; then
+    print_status "Checking commit message format..."
+    COMMIT_MSG=$(head -n 1 ".git/COMMIT_EDITMSG")
+    
+    # Check for conventional commit format
+    if [[ ! $COMMIT_MSG =~ ^(feat|fix|docs|style|refactor|test|chore|ci)(\(.+\))?:\ .{1,50} ]]; then
+        print_warning "Consider using conventional commit format:"
+        print_warning "  feat: add new feature"
+        print_warning "  fix: bug fix"
+        print_warning "  docs: documentation updates"
+        print_warning "  test: add tests"
+    fi
+fi
+
+# 9. Check for large files
+print_status "Checking for large files..."
+MAX_FILE_SIZE=1048576  # 1MB in bytes
+
+git diff --cached --name-only | while read file; do
+    if [ -f "$file" ]; then
+        size=$(stat -c%s "$file" 2>/dev/null || stat -f%z "$file" 2>/dev/null || echo 0)
+        if [ $size -gt $MAX_FILE_SIZE ]; then
+            print_warning "Large file detected: $file ($(($size / 1024))KB)"
+            print_warning "Consider using Git LFS for large files"
+        fi
+    fi
+done
+
+# 10. Validate n8n workflows if changed
+if git diff --cached --name-only | grep -q "n8n/workflows/.*\.json"; then
+    print_status "Validating n8n workflow files..."
+    for workflow in n8n/workflows/*.json; do
+        if [ -f "$workflow" ]; then
+            if ! python -m json.tool "$workflow" > /dev/null; then
+                print_error "Invalid JSON in workflow: $workflow"
+                ERRORS=$((ERRORS + 1))
+            fi
+        fi
+    done
+    
+    if [ $ERRORS -eq 0 ]; then
+        print_success "n8n workflows validated"
+    fi
+fi
+
+# Summary
+echo ""
+print_status "Pre-commit check summary:"
+
+if [ $ERRORS -eq 0 ]; then
+    print_success "All critical checks passed! ✨"
+    print_status "Commit is ready to proceed"
+    exit 0
+else
+    print_error "$ERRORS critical issues found"
+    print_error "Please fix the issues above before committing"
+    echo ""
+    echo "Quick fixes:"
+    echo "  Code formatting: make format"
+    echo "  Linting: make lint-fix (if available)"
+    echo "  Run tests: make test"
+    echo ""
+    exit 1
+fi

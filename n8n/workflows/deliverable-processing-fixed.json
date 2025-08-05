@@ -1,0 +1,175 @@
+{
+  "name": "Deliverable Processing Workflow",
+  "nodes": [
+    {
+      "parameters": {
+        "httpMethod": "POST",
+        "path": "deliverable-ready",
+        "responseMode": "responseNode"
+      },
+      "id": "webhook-deliverable-ready",
+      "name": "Deliverable Ready Webhook",
+      "type": "n8n-nodes-base.webhook",
+      "typeVersion": 1,
+      "position": [240, 300]
+    },
+    {
+      "parameters": {
+        "url": "={{ $node[\"Deliverable Ready Webhook\"].json[\"callback_url\"] || \"http://localhost:8000\" }}/api/v1/deliverables/{{ $node[\"Deliverable Ready Webhook\"].json[\"deliverable_id\"] }}/pdf",
+        "authentication": "headerAuth",
+        "sendHeaders": true,
+        "headerParameters": {
+          "parameters": [
+            {
+              "name": "Accept",
+              "value": "application/pdf"
+            }
+          ]
+        }
+      },
+      "id": "http-generate-pdf",
+      "name": "Generate PDF Report",
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 3,
+      "position": [460, 300],
+      "credentials": {
+        "httpHeaderAuth": {
+          "id": "surgify-api-auth",
+          "name": "Surgify API Auth"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "fromEmail": "noreply@surgify.com",
+        "toEmail": "={{ $node[\"Deliverable Ready Webhook\"].json[\"recipients\"].join(\",\") }}",
+        "subject": "Deliverable Ready",
+        "text": "A new deliverable is ready for review. Please find the attached PDF report.",
+        "attachments": "data"
+      },
+      "id": "email-send-pdf",
+      "name": "Email PDF to Recipients",
+      "type": "n8n-nodes-base.emailSend",
+      "typeVersion": 2,
+      "position": [680, 300],
+      "credentials": {
+        "smtp": {
+          "id": "surgify-smtp",
+          "name": "Surgify SMTP"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "url": "={{ $node[\"Deliverable Ready Webhook\"].json[\"callback_url\"] || \"http://localhost:8000\" }}/api/v1/deliverables/{{ $node[\"Deliverable Ready Webhook\"].json[\"deliverable_id\"] }}",
+        "authentication": "headerAuth",
+        "sendHeaders": true,
+        "headerParameters": {
+          "parameters": [
+            {
+              "name": "Content-Type",
+              "value": "application/json"
+            }
+          ]
+        },
+        "sendBody": true,
+        "bodyParameters": {
+          "parameters": [
+            {
+              "name": "status",
+              "value": "distributed"
+            },
+            {
+              "name": "distributed_at",
+              "value": "={{ new Date().toISOString() }}"
+            }
+          ]
+        },
+        "httpMethod": "PATCH"
+      },
+      "id": "http-update-deliverable",
+      "name": "Update Deliverable Status",
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 3,
+      "position": [900, 300],
+      "credentials": {
+        "httpHeaderAuth": {
+          "id": "surgify-api-auth",
+          "name": "Surgify API Auth"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "respondWith": "json",
+        "responseBody": "={{ { \"status\": \"success\", \"message\": \"Deliverable processed and distributed\" } }}"
+      },
+      "id": "webhook-response",
+      "name": "Webhook Response",
+      "type": "n8n-nodes-base.respondToWebhook",
+      "typeVersion": 1,
+      "position": [1120, 300]
+    }
+  ],
+  "connections": {
+    "Deliverable Ready Webhook": {
+      "main": [
+        [
+          {
+            "node": "Generate PDF Report",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Generate PDF Report": {
+      "main": [
+        [
+          {
+            "node": "Email PDF to Recipients",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Email PDF to Recipients": {
+      "main": [
+        [
+          {
+            "node": "Update Deliverable Status",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Update Deliverable Status": {
+      "main": [
+        [
+          {
+            "node": "Webhook Response",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  },
+  "createdAt": "2025-08-05T10:00:00.000Z",
+  "updatedAt": "2025-08-05T10:00:00.000Z",
+  "settings": {
+    "errorWorkflow": {
+      "value": ""
+    },
+    "timezone": "America/New_York"
+  },
+  "active": true,
+  "tags": [
+    {
+      "id": "deliverable-management",
+      "name": "Deliverable Management"
+    }
+  ]
+}

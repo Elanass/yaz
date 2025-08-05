@@ -56,54 +56,68 @@
 </head>
 <body class="bg-gray-50 min-h-screen">
     <!-- Sidepanel Menu -->
-    <div id="sidepanel" class="fixed left-0 top-0 h-full w-64 bg-white shadow-lg transform -translate-x-full transition-transform duration-300 ease-in-out z-50">
-        <div class="flex flex-col h-full">
+    <div id="sidepanel" class="fixed left-0 top-0 h-full w-64 bg-white shadow-lg transform -translate-x-full transition-all duration-300 ease-in-out z-50">
+        <div class="flex flex-col h-full relative">
+            <!-- Sidebar Toggle Button -->
+            <div class="sidebar-toggle-btn" onclick="toggleSidebarMode()">
+                <svg fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="3" d="M15 19l-7-7 7-7" />
+                </svg>
+            </div>
+            
             <!-- Sidepanel Header -->
             <div class="flex items-center justify-between p-4 border-b border-gray-200">
-                <h2 class="text-lg font-semibold text-gray-800">Surgify Menu</h2>
+                <div class="flex items-center space-x-3">
+                    <div class="w-8 h-8 bg-gradient-to-r from-blue-500 to-purple-600 rounded-lg flex items-center justify-center shadow-md sidebar-icon">
+                        <i class="fas fa-bars text-white text-lg"></i>
+                    </div>
+                    <div class="sidebar-text">
+                        <h2 class="text-lg font-semibold text-gray-800">Surgify Menu</h2>
+                    </div>
+                </div>
                 <button id="sidepanel-close" class="p-2 hover:bg-gray-100 rounded-lg transition-colors">
-                    <i class="fas fa-times text-gray-600"></i>
+                    <i class="fas fa-times text-gray-600 font-bold"></i>
                 </button>
             </div>
             
             <!-- Navigation Menu -->
             <nav class="flex-1 p-4">
                 <div class="space-y-2">
-                    <a href="/" class="flex items-center space-x-3 px-3 py-2 text-gray-700 hover:bg-blue-50 hover:text-blue-600 rounded-lg transition-colors">
-                        <i class="fas fa-home text-lg"></i>
-                        <span>Dashboard</span>
+                    <a href="/" class="flex items-center space-x-3 px-3 py-2 text-gray-700 hover:bg-blue-50 hover:text-blue-600 rounded-lg transition-colors menu-item">
+                        <i class="fas fa-home text-lg sidebar-icon min-w-[20px]"></i>
+                        <span class="sidebar-text">Dashboard</span>
                     </a>
                     
-                    <a href="/cases" class="flex items-center space-x-3 px-3 py-2 text-gray-700 hover:bg-blue-50 hover:text-blue-600 rounded-lg transition-colors">
-                        <i class="fas fa-file-medical text-lg"></i>
-                        <span>Patient Cases</span>
+                    <a href="/cases" class="flex items-center space-x-3 px-3 py-2 text-gray-700 hover:bg-blue-50 hover:text-blue-600 rounded-lg transition-colors menu-item">
+                        <i class="fas fa-file-medical text-lg sidebar-icon min-w-[20px]"></i>
+                        <span class="sidebar-text">Patient Cases</span>
                     </a>
                     
-                    <a href="/analytics" class="flex items-center space-x-3 px-3 py-2 text-gray-700 hover:bg-blue-50 hover:text-blue-600 rounded-lg transition-colors">
-                        <i class="fas fa-chart-bar text-lg"></i>
-                        <span>Analytics</span>
+                    <a href="/analytics" class="flex items-center space-x-3 px-3 py-2 text-gray-700 hover:bg-blue-50 hover:text-blue-600 rounded-lg transition-colors menu-item">
+                        <i class="fas fa-chart-bar text-lg sidebar-icon min-w-[20px]"></i>
+                        <span class="sidebar-text">Analytics</span>
                     </a>
                     
-                    <a href="/research" class="flex items-center space-x-3 px-3 py-2 text-gray-700 hover:bg-blue-50 hover:text-blue-600 rounded-lg transition-colors">
-                        <i class="fas fa-flask text-lg"></i>
-                        <span>Research Tools</span>
+                    <a href="/research" class="flex items-center space-x-3 px-3 py-2 text-gray-700 hover:bg-blue-50 hover:text-blue-600 rounded-lg transition-colors menu-item">
+                        <i class="fas fa-flask text-lg sidebar-icon min-w-[20px]"></i>
+                        <span class="sidebar-text">Research Tools</span>
                     </a>
                     
-                    <a href="/surgery" class="flex items-center space-x-3 px-3 py-2 text-gray-700 hover:bg-blue-50 hover:text-blue-600 rounded-lg transition-colors">
-                        <i class="fas fa-user-md text-lg"></i>
-                        <span>Surgery Planning</span>
+                    <a href="/surgery" class="flex items-center space-x-3 px-3 py-2 text-gray-700 hover:bg-blue-50 hover:text-blue-600 rounded-lg transition-colors menu-item">
+                        <i class="fas fa-user-md text-lg sidebar-icon min-w-[20px]"></i>
+                        <span class="sidebar-text">Surgery Planning</span>
                     </a>
                     
                     <div class="border-t border-gray-200 my-4"></div>
                     
-                    <a href="/recommendations" class="flex items-center space-x-3 px-3 py-2 text-gray-700 hover:bg-blue-50 hover:text-blue-600 rounded-lg transition-colors">
-                        <i class="fas fa-lightbulb text-lg"></i>
-                        <span>AI Recommendations</span>
+                    <a href="/recommendations" class="flex items-center space-x-3 px-3 py-2 text-gray-700 hover:bg-blue-50 hover:text-blue-600 rounded-lg transition-colors menu-item">
+                        <i class="fas fa-lightbulb text-lg sidebar-icon min-w-[20px]"></i>
+                        <span class="sidebar-text">AI Recommendations</span>
                     </a>
                     
-                    <a href="/downloads" class="flex items-center space-x-3 px-3 py-2 text-gray-700 hover:bg-blue-50 hover:text-blue-600 rounded-lg transition-colors">
-                        <i class="fas fa-download text-lg"></i>
-                        <span>Downloads</span>
+                    <a href="/downloads" class="flex items-center space-x-3 px-3 py-2 text-gray-700 hover:bg-blue-50 hover:text-blue-600 rounded-lg transition-colors menu-item">
+                        <i class="fas fa-download text-lg sidebar-icon min-w-[20px]"></i>
+                        <span class="sidebar-text">Downloads</span>
                     </a>
                     
                     <div class="border-t border-gray-200 my-4"></div>

@@ -14,10 +14,12 @@ help:
 	@echo "  make test-api   - Run API tests only"
 	@echo "  make test-unit  - Run unit tests only" 
 	@echo "  make test-integration - Run integration tests only"
+	@echo "  make test-canary - Run canary tests only"
 	@echo "  make test-compatibility - Run backward compatibility tests"
 	@echo "  make demo-integration - Run integration demonstration"
 	@echo "  make lint       - Run linting"
 	@echo "  make format     - Format code"
+	@echo "  make format-check - Check code formatting"
 	@echo ""
 	@echo "Domain Support (Phase 1.1):"
 	@echo "  make check-domains - Validate all domain adapters"
@@ -25,27 +27,27 @@ help:
 	@echo "  make dev-logistics - Start server in logistics domain mode"
 	@echo "  make dev-insurance - Start server in insurance domain mode"
 	@echo ""
-	@echo "Deployment:"
+	@echo "Deployment & Canary:"
 	@echo "  make build      - Build Docker image"
 	@echo "  make deploy     - Deploy to production"
 	@echo "  make deploy-dev - Deploy development environment"
+	@echo "  make canary-deploy - Deploy to canary environment"
+	@echo "  make canary-status - Check canary deployment status"
+	@echo "  make canary-metrics - Get canary performance metrics"
+	@echo "  make canary-test - Run canary tests"
+	@echo "  make canary-promote - Promote canary to production"
+	@echo "  make canary-rollback - Rollback canary deployment"
+	@echo ""
+	@echo "Quality & Security:"
+	@echo "  make security-scan - Run security analysis"
+	@echo "  make validate-n8n - Validate n8n workflow files"
+	@echo "  make setup-hooks - Install git hooks"
 	@echo ""
 	@echo "Utilities:"
 	@echo "  make clean      - Clean up temporary files"
 	@echo "  make logs       - View application logs"
-	@echo "  test-cov       Run tests with coverage"
-	@echo "  check          Run all code quality checks"
-	@echo ""
-	@echo "Server:"
-	@echo "  dev            Run development server"
-	@echo "  prod           Run production server"
-	@echo ""
-	@echo "Docker:"
-	@echo "  docker-build   Build Docker image"
-	@echo "  docker-run     Run Docker container"
-	@echo ""
-	@echo "Utilities:"
-	@echo "  clean          Clean build artifacts"
+	@echo "  make test-cov   - Run tests with coverage"
+	@echo "  make check      - Run all code quality checks"
 
 # Development setup
 install:
@@ -76,15 +78,6 @@ test:
 
 test-cov:
 	python tasks.py test --coverage
-
-test-api:
-	pytest tests/api/ -v
-
-test-integration:
-	pytest tests/integration/ -v
-
-test-unit:
-	pytest tests/unit/ -v
 
 test-compatibility:
 	cd tests/compatibility && PYTHONPATH=$(PWD)/src python test_backward_compatibility.py
@@ -132,3 +125,88 @@ quick-start: bootstrap dev
 
 # CI/CD workflow
 ci: format lint type-check test-cov
+
+# Canary deployment and management
+canary-deploy:
+	@echo "🚀 Deploying to canary environment..."
+	@if [ -z "$(CANARY_VERSION)" ]; then \
+		echo "Error: CANARY_VERSION must be set"; \
+		exit 1; \
+	fi
+	docker build -t surgify:$(CANARY_VERSION) .
+	kubectl apply -f infra/k8s/canary/
+	kubectl set image deployment/surgify-canary surgify=surgify:$(CANARY_VERSION) -n surgify-canary
+
+canary-status:
+	@echo "📊 Checking canary deployment status..."
+	kubectl get pods -n surgify-canary -l app=surgify
+	kubectl get services -n surgify-canary
+	@echo "Recent deployments:"
+	kubectl rollout history deployment/surgify-canary -n surgify-canary
+
+canary-metrics:
+	@echo "📈 Fetching canary metrics..."
+	@echo "Error rate:"
+	curl -s "http://prometheus:9090/api/v1/query?query=rate(http_requests_total{job=\"surgify-canary\",status=~\"5..\"}[5m])" | jq '.data.result[0].value[1]' || echo "N/A"
+	@echo "Response time (95th percentile):"
+	curl -s "http://prometheus:9090/api/v1/query?query=histogram_quantile(0.95,rate(http_request_duration_seconds_bucket{job=\"surgify-canary\"}[5m]))" | jq '.data.result[0].value[1]' || echo "N/A"
+
+canary-test:
+	@echo "🧪 Running canary tests..."
+	python -m pytest tests/canary/ -v --tb=short
+
+canary-promote:
+	@echo "✅ Promoting canary to production..."
+	@if [ -z "$(CANARY_VERSION)" ]; then \
+		echo "Error: CANARY_VERSION must be set"; \
+		exit 1; \
+	fi
+	kubectl set image deployment/surgify surgify=surgify:$(CANARY_VERSION) -n surgify-prod
+	kubectl rollout status deployment/surgify -n surgify-prod
+
+canary-rollback:
+	@echo "🔄 Rolling back canary deployment..."
+	kubectl rollout undo deployment/surgify-canary -n surgify-canary
+	kubectl rollout status deployment/surgify-canary -n surgify-canary
+
+# Testing targets
+test-canary:
+	@echo "🕯️ Running canary tests..."
+	python -m pytest tests/canary/ -v
+
+test-unit:
+	@echo "🧪 Running unit tests..."
+	python -m pytest tests/unit/ -v
+
+test-integration:
+	@echo "🔗 Running integration tests..."
+	python -m pytest tests/integration/ -v
+
+test-api:
+	@echo "🌐 Running API tests..."
+	python -m pytest tests/api/ -v
+
+# Format checking (for git hooks)
+format-check:
+	@echo "🎨 Checking code formatting..."
+	black --check src/ tests/
+	isort --check-only src/ tests/
+
+# Security scanning
+security-scan:
+	@echo "🔒 Running security scan..."
+	bandit -r src/ -f json -o security-report.json || true
+	safety check --json --output safety-report.json || true
+
+# N8N workflow validation
+validate-n8n:
+	@echo "🔄 Validating n8n workflows..."
+	@for workflow in n8n/workflows/*.json; do \
+		echo "Validating $$workflow..."; \
+		python -m json.tool "$$workflow" > /dev/null && echo "✅ Valid JSON" || echo "❌ Invalid JSON"; \
+	done
+
+# Git hooks setup
+setup-hooks:
+	@echo "🪝 Setting up git hooks..."
+	./scripts/setup-git-hooks.sh

@@ -2,12 +2,12 @@
 Settings module - compatibility layer for unified configuration
 """
 
-from .unified_config import PlatformConfig
+from .unified_config import SurgifyConfig
 
 # Global config instance
-config = PlatformConfig()
+config = SurgifyConfig()
 
-def get_settings() -> PlatformConfig:
+def get_settings() -> SurgifyConfig:
     """Get platform settings"""
     return config
 

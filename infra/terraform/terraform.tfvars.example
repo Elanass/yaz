@@ -1,0 +1,16 @@
+# Environment Configuration
+environment = "dev"
+
+# Contabo Configuration
+# Note: Keep sensitive values in environment variables or use terraform.tfvars.example
+# contabo_username    = "your-contabo-username"
+# contabo_password    = "your-contabo-password"  
+# contabo_customer_id = "your-customer-id"
+
+# VPS Configuration
+contabo_product_id = "400"        # VPS S SSD (1 vCPU, 4GB RAM, 50GB SSD)
+contabo_region     = "EU"         # or "US"
+contabo_image_id   = "100"        # Ubuntu 22.04
+
+# SSH Configuration
+# ssh_public_key = "ssh-rsa AAAAB3... your-ssh-key"

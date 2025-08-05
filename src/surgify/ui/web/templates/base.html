@@ -18,11 +18,15 @@
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/tailwindcss@2.2.19/dist/tailwind.min.css">
     <link rel="stylesheet" href="/static/css/app.css">
     <link rel="stylesheet" href="/static/css/sidepanel.css">
+    <link rel="stylesheet" href="/static/css/components.css">
     
     <!-- Inter font -->
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    
+    <!-- HTMX -->
+    <script src="https://unpkg.com/htmx.org@1.9.6"></script>
     
     {% block extra_head %}{% endblock %}
 </head>
@@ -69,6 +73,13 @@
                             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19.428 15.428a2 2 0 00-1.022-.547l-2.387-.477a6 6 0 00-3.86.517l-.318.158a6 6 0 01-3.86.517L6.05 15.21a2 2 0 00-1.806.547M8 4h8l-1 1v5.172a2 2 0 00.586 1.414l5 5c1.26 1.26.367 3.414-1.415 3.414H4.828c-1.782 0-2.674-2.154-1.414-3.414l5-5A2 2 0 009 10.172V5L8 4z"></path>
                         </svg>
                         <span>Research Tools</span>
+                    </a>
+                    
+                    <a href="/demo-components" class="flex items-center space-x-3 px-3 py-2 text-gray-700 hover:bg-blue-50 hover:text-blue-600 rounded-lg transition-colors">
+                        <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 11H5m14 0a2 2 0 012 2v6a2 2 0 01-2 2H5a2 2 0 01-2-2v-6a2 2 0 012-2m14 0V9a2 2 0 00-2-2M5 11V9a2 2 0 012-2m0 0V5a2 2 0 012-2h6a2 2 0 012 2v2M7 7h10"></path>
+                        </svg>
+                        <span>Component Demo</span>
                     </a>
                     
                     <div class="border-t border-gray-200 my-4"></div>
@@ -145,11 +156,26 @@
     <script src="https://cdn.jsdelivr.net/npm/gun/gun.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/gun/sea.js"></script>
     
+    <!-- Browser Compatibility Layer (load first) -->
+    <script src="/static/js/browser-compat.js"></script>
+    
     <!-- Application scripts -->
     <script src="/static/js/app.js"></script>
-    <script src="/static/js/sidepanel.js"></script>
+    <script src="/static/js/sidebar-menu.js"></script>
     <script src="/static/js/gun-integration.js"></script>
     <script src="/static/js/p2p_connector.js"></script>
+    
+    <!-- Component Library - Main Components Directory -->
+    <script src="/src/surgify/ui/components/DomainSelector.js"></script>
+    <script src="/src/surgify/ui/components/CaseList.js"></script>
+    <script src="/src/surgify/ui/components/CaseDetail.js"></script>
+    <script src="/src/surgify/ui/components/NotificationBadge.js"></script>
+    <script src="/src/surgify/ui/components/ThemeToggle.js"></script>
+    <script src="/src/surgify/ui/components/ResultsIsland.js"></script>
+    <script src="/src/surgify/ui/components/ComparisonIsland.js"></script>
+    <script src="/src/surgify/ui/components/RecommendationIsland.js"></script>
+    <script src="/src/surgify/ui/components/ChatIntegration.js"></script>
+    <script src="/src/surgify/ui/components/index.js"></script>
     
     <!-- Sidepanel functionality -->
     <script>

@@ -33,6 +33,8 @@ dependencies = [
     "python-dotenv==1.0.0",
     "structlog==23.2.0",
     "gunicorn==21.2.0",
+    "redis==5.0.1",  # Cache support
+    "openai==0.28.1",  # AI integration support
 ]
 
 [project.optional-dependencies]

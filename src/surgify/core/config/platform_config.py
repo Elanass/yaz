@@ -42,7 +42,7 @@ class PlatformConfig:
     token_expire_minutes: int = int(os.getenv("TOKEN_EXPIRE_MINUTES", "1440"))  # 24 hours
     
     # Database configuration
-    database_url: str = os.getenv("DATABASE_URL", "sqlite+aiosqlite:///data/database/gastric_adci.db")
+    database_url: str = os.getenv("DATABASE_URL", "cockroachdb://root@localhost:26257/surgify?sslmode=disable")
     electricsql_url: str = os.getenv("ELECTRICSQL_URL", "http://localhost:5133")
     electricsql_token: str = os.getenv("ELECTRICSQL_TOKEN", "dev-token")
     electricsql_secure: bool = os.getenv("ELECTRICSQL_SECURE", "False").lower() in ("true", "1", "yes")
