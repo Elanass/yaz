@@ -1,235 +1,114 @@
 <!DOCTYPE html>
-<html lang="en">
+<html lang="en" data-theme="light">
 <head>
-    <meta charset="utf-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1">
-    <meta name="theme-color" content="#2563eb">
-    <meta name="description" content="Gastric Oncology-Surgery Decision Support Platform">
-    <title>{% block title %}Gastric ADCI Platform{% endblock %}</title>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="description" content="{% block description %}AI-powered surgical decision support platform{% endblock %}">
+    <title>{% block title %}Surgify - Advanced Surgical Platform{% endblock %}</title>
     
-    <!-- PWA manifest -->
-    <link rel="manifest" href="/static/manifest.json">
+    <!-- Essential CSS -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link rel="stylesheet" href="{{ url_for('static', path='/css/main.css') }}">
     
-    <!-- Icons -->
-    <link rel="icon" type="image/x-icon" href="/static/favicon.ico">
-    <link rel="apple-touch-icon" href="/static/icons/apple-touch-icon.png">
-    
-    <!-- CSS -->
-    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/tailwindcss@2.2.19/dist/tailwind.min.css">
-    <link rel="stylesheet" href="/static/css/app.css">
-    <link rel="stylesheet" href="/static/css/sidepanel.css">
-    <link rel="stylesheet" href="/static/css/components.css">
-    
-    <!-- Inter font -->
+    <!-- Fonts -->
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
     
-    <!-- HTMX -->
-    <script src="https://unpkg.com/htmx.org@1.9.6"></script>
+    <!-- Icons -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     
     {% block extra_head %}{% endblock %}
 </head>
 <body class="min-h-screen bg-gray-50 font-inter antialiased">
-    <!-- Sidepanel Menu -->
-    <div id="sidepanel" class="fixed left-0 top-0 h-full w-64 bg-white shadow-lg transform -translate-x-full transition-transform duration-300 ease-in-out z-50">
-        <div class="flex flex-col h-full">
-            <!-- Sidepanel Header -->
-            <div class="flex items-center justify-between p-4 border-b border-gray-200">
-                <h2 class="text-lg font-semibold text-gray-800">Menu</h2>
-                <button id="sidepanel-close" class="p-2 hover:bg-gray-100 rounded-lg transition-colors">
-                    <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"></path>
-                    </svg>
-                </button>
-            </div>
-            
-            <!-- Navigation Menu -->
-            <nav class="flex-1 p-4">
-                <div class="space-y-2">
-                    <a href="/" class="flex items-center space-x-3 px-3 py-2 text-gray-700 hover:bg-blue-50 hover:text-blue-600 rounded-lg transition-colors">
-                        <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 12l2-2m0 0l7-7 7 7M5 10v10a1 1 0 001 1h3m10-11l2 2m-2-2v10a1 1 0 01-1 1h-3m-6 0a1 1 0 001-1v-4a1 1 0 011-1h2a1 1 0 011 1v4a1 1 0 001 1m-6 0h6"></path>
-                        </svg>
-                        <span>Dashboard</span>
-                    </a>
-                    
-                    <a href="/cases" class="flex items-center space-x-3 px-3 py-2 text-gray-700 hover:bg-blue-50 hover:text-blue-600 rounded-lg transition-colors">
-                        <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"></path>
-                        </svg>
-                        <span>Patient Cases</span>
-                    </a>
-                    
-                    <a href="/analytics" class="flex items-center space-x-3 px-3 py-2 text-gray-700 hover:bg-blue-50 hover:text-blue-600 rounded-lg transition-colors">
-                        <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 19v-6a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2a2 2 0 002-2zm0 0V9a2 2 0 012-2h2a2 2 0 012 2v10m-6 0a2 2 0 002 2h2a2 2 0 002-2m0 0V5a2 2 0 012-2h2a2 2 0 012 2v14a2 2 0 01-2 2h-2a2 2 0 01-2-2z"></path>
-                        </svg>
-                        <span>Analytics</span>
-                    </a>
-                    
-                    <a href="/research" class="flex items-center space-x-3 px-3 py-2 text-gray-700 hover:bg-blue-50 hover:text-blue-600 rounded-lg transition-colors">
-                        <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19.428 15.428a2 2 0 00-1.022-.547l-2.387-.477a6 6 0 00-3.86.517l-.318.158a6 6 0 01-3.86.517L6.05 15.21a2 2 0 00-1.806.547M8 4h8l-1 1v5.172a2 2 0 00.586 1.414l5 5c1.26 1.26.367 3.414-1.415 3.414H4.828c-1.782 0-2.674-2.154-1.414-3.414l5-5A2 2 0 009 10.172V5L8 4z"></path>
-                        </svg>
-                        <span>Research Tools</span>
-                    </a>
-                    
-                    <a href="/demo-components" class="flex items-center space-x-3 px-3 py-2 text-gray-700 hover:bg-blue-50 hover:text-blue-600 rounded-lg transition-colors">
-                        <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 11H5m14 0a2 2 0 012 2v6a2 2 0 01-2 2H5a2 2 0 01-2-2v-6a2 2 0 012-2m14 0V9a2 2 0 00-2-2M5 11V9a2 2 0 012-2m0 0V5a2 2 0 012-2h6a2 2 0 012 2v2M7 7h10"></path>
-                        </svg>
-                        <span>Component Demo</span>
-                    </a>
-                    
-                    <div class="border-t border-gray-200 my-4"></div>
-                    
-                    <a href="/settings" class="flex items-center space-x-3 px-3 py-2 text-gray-700 hover:bg-blue-50 hover:text-blue-600 rounded-lg transition-colors">
-                        <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10.325 4.317c.426-1.756 2.924-1.756 3.35 0a1.724 1.724 0 002.573 1.066c1.543-.94 3.31.826 2.37 2.37a1.724 1.724 0 001.065 2.572c1.756.426 1.756 2.924 0 3.35a1.724 1.724 0 00-1.066 2.573c.94 1.543-.826 3.31-2.37 2.37a1.724 1.724 0 00-2.572 1.065c-.426 1.756-2.924 1.756-3.35 0a1.724 1.724 0 00-2.573-1.066c-1.543.94-3.31-.826-2.37-2.37a1.724 1.724 0 00-1.065-2.572c-1.756-.426-1.756-2.924 0-3.35a1.724 1.724 0 001.066-2.573c-.94-1.543.826-3.31 2.37-2.37.996.608 2.296.07 2.572-1.065z"></path>
-                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z"></path>
-                        </svg>
-                        <span>Settings</span>
-                    </a>
-                    
-                    <a href="/help" class="flex items-center space-x-3 px-3 py-2 text-gray-700 hover:bg-blue-50 hover:text-blue-600 rounded-lg transition-colors">
-                        <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8.228 9c.549-1.165 2.03-2 3.772-2 2.21 0 4 1.343 4 3 0 1.4-1.278 2.575-3.006 2.907-.542.104-.994.54-.994 1.093m0 3h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"></path>
-                        </svg>
-                        <span>Help & Support</span>
-                    </a>
+    <!-- Header -->
+    <header class="bg-white shadow-sm border-b">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+            <div class="flex justify-between items-center h-16">
+                <!-- Logo -->
+                <div class="flex items-center space-x-4">
+                    <button id="sidepanel-toggle" class="md:hidden p-2 rounded-md hover:bg-gray-100">
+                        <i class="fas fa-bars"></i>
+                    </button>
+                    <h1 class="text-2xl font-bold logo-text">Surgify</h1>
                 </div>
-            </nav>
-            
-            <!-- User Profile Section -->
-            <div class="border-t border-gray-200 p-4">
-                <div class="flex items-center space-x-3">
-                    <div class="w-8 h-8 bg-blue-600 rounded-full flex items-center justify-center">
-                        <span class="text-white text-sm font-medium">JD</span>
-                    </div>
-                    <div class="flex-1">
-                        <p class="text-sm font-medium text-gray-900">Dr. John Doe</p>
-                        <p class="text-xs text-gray-500">Gastric Surgeon</p>
-                    </div>
+                
+                <!-- Actions -->
+                <div class="flex items-center space-x-4">
+                    {% block header_actions %}
+                    <button id="theme-toggle" class="p-2 rounded-md hover:bg-gray-100">
+                        <i class="fas fa-sun"></i>
+                    </button>
+                    <button id="auth-btn" class="btn btn-primary">
+                        <i class="fas fa-user mr-2"></i>Account
+                    </button>
+                    {% endblock %}
                 </div>
             </div>
         </div>
-    </div>
-    
-    <!-- Sidepanel Overlay -->
-    <div id="sidepanel-overlay" class="fixed inset-0 bg-black bg-opacity-50 z-40 hidden"></div>
-    
-    <!-- Header -->
-    {% include 'partials/header.html' %}
+    </header>
+
+    <!-- Sidepanel -->
+    <div id="sidepanel-overlay" class="sidepanel-overlay hidden"></div>
+    <aside id="sidepanel" class="fixed left-0 top-0 h-full w-64 bg-white shadow-lg z-50">
+        <div class="flex flex-col h-full">
+            <div class="flex items-center justify-between p-4 border-b">
+                <h2 class="text-lg font-semibold">Menu</h2>
+                <button id="sidepanel-close" class="p-2 hover:bg-gray-100 rounded">
+                    <i class="fas fa-times"></i>
+                </button>
+            </div>
+            <nav class="flex-1 p-4">
+                {% block sidebar_nav %}
+                <div class="space-y-2">
+                    <a href="/" class="flex items-center space-x-3 px-3 py-2 rounded hover:bg-blue-50">
+                        <i class="fas fa-home"></i>
+                        <span>Home</span>
+                    </a>
+                    <a href="/dashboard" class="flex items-center space-x-3 px-3 py-2 rounded hover:bg-blue-50">
+                        <i class="fas fa-chart-line"></i>
+                        <span>Dashboard</span>
+                    </a>
+                    <a href="/cases" class="flex items-center space-x-3 px-3 py-2 rounded hover:bg-blue-50">
+                        <i class="fas fa-folder"></i>
+                        <span>Cases</span>
+                    </a>
+                </div>
+                {% endblock %}
+            </nav>
+        </div>
+    </aside>
 
     <!-- Main Content -->
-    <main class="flex-1">
+    <main class="main-content">
         {% block content %}{% endblock %}
     </main>
 
-    <!-- Bottom Navigation -->
-    {% include 'partials/bottom_nav.html' %}
-    <!-- Footer -->
-    <footer class="bg-white border-t border-gray-200 mt-auto">
-        <div class="max-w-7xl mx-auto py-6 px-4 sm:px-6 lg:px-8">
-            <div class="flex items-center justify-between">
-                <div class="text-sm text-gray-500">
-                    © 2025 Gastric ADCI Platform. Healthcare-grade decision support.
-                </div>
-                <div class="flex space-x-6">
-                    <a href="#" class="text-sm text-gray-500 hover:text-gray-600">Privacy</a>
-                    <a href="#" class="text-sm text-gray-500 hover:text-gray-600">Terms</a>
-                    <a href="#" class="text-sm text-gray-500 hover:text-gray-600">Support</a>
-                </div>
+    <!-- Auth Modal -->
+    <div id="auth-modal" class="auth-modal">
+        <div class="bg-white rounded-lg p-8 max-w-md w-full mx-4">
+            <div class="flex justify-between items-center mb-6">
+                <h3 class="text-2xl font-bold">Account Access</h3>
+                <button id="close-auth-modal" class="text-gray-500 hover:text-gray-700">
+                    <i class="fas fa-times"></i>
+                </button>
+            </div>
+            <div class="space-y-4">
+                <button class="w-full btn btn-primary">
+                    <i class="fas fa-sign-in-alt mr-2"></i>Sign In
+                </button>
+                <button class="w-full btn btn-secondary">
+                    <i class="fas fa-user-plus mr-2"></i>Sign Up
+                </button>
             </div>
         </div>
-    </footer>
+    </div>
+
+    <!-- Toast Container -->
+    <div id="toast-container" class="fixed top-4 right-4 z-50 space-y-2"></div>
 
     <!-- Scripts -->
-    <script src="https://unpkg.com/htmx.org@1.9.6/dist/htmx.min.js"></script>
-    <script src="https://unpkg.com/htmx.org@1.9.6/dist/ext/response-targets.js"></script>
-    <script src="https://unpkg.com/htmx.org@1.9.6/dist/ext/loading-states.js"></script>
-    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
-    <script src="https://unpkg.com/alpinejs@3.x.x/dist/cdn.min.js" defer></script>
-    
-    <!-- Gun.js for distributed data -->
-    <script src="https://cdn.jsdelivr.net/npm/gun/gun.js"></script>
-    <script src="https://cdn.jsdelivr.net/npm/gun/sea.js"></script>
-    
-    <!-- Browser Compatibility Layer (load first) -->
-    <script src="/static/js/browser-compat.js"></script>
-    
-    <!-- Application scripts -->
-    <script src="/static/js/app.js"></script>
-    <script src="/static/js/sidebar-menu.js"></script>
-    <script src="/static/js/gun-integration.js"></script>
-    <script src="/static/js/p2p_connector.js"></script>
-    
-    <!-- Component Library - Main Components Directory -->
-    <script src="/src/surgify/ui/components/DomainSelector.js"></script>
-    <script src="/src/surgify/ui/components/CaseList.js"></script>
-    <script src="/src/surgify/ui/components/CaseDetail.js"></script>
-    <script src="/src/surgify/ui/components/NotificationBadge.js"></script>
-    <script src="/src/surgify/ui/components/ThemeToggle.js"></script>
-    <script src="/src/surgify/ui/components/ResultsIsland.js"></script>
-    <script src="/src/surgify/ui/components/ComparisonIsland.js"></script>
-    <script src="/src/surgify/ui/components/RecommendationIsland.js"></script>
-    <script src="/src/surgify/ui/components/ChatIntegration.js"></script>
-    <script src="/src/surgify/ui/components/index.js"></script>
-    
-    <!-- Sidepanel functionality -->
-    <script>
-        document.addEventListener('DOMContentLoaded', function() {
-            const sidepanelToggle = document.getElementById('sidepanel-toggle');
-            const sidepanel = document.getElementById('sidepanel');
-            const sidepanelClose = document.getElementById('sidepanel-close');
-            const sidepanelOverlay = document.getElementById('sidepanel-overlay');
-            
-            function openSidepanel() {
-                sidepanel.classList.remove('-translate-x-full');
-                sidepanel.classList.add('translate-x-0');
-                sidepanelOverlay.classList.remove('hidden');
-                document.body.style.overflow = 'hidden';
-            }
-            
-            function closeSidepanel() {
-                sidepanel.classList.add('-translate-x-full');
-                sidepanel.classList.remove('translate-x-0');
-                sidepanelOverlay.classList.add('hidden');
-                document.body.style.overflow = 'auto';
-            }
-            
-            // Event listeners
-            if (sidepanelToggle) {
-                sidepanelToggle.addEventListener('click', openSidepanel);
-            }
-            
-            if (sidepanelClose) {
-                sidepanelClose.addEventListener('click', closeSidepanel);
-            }
-            
-            if (sidepanelOverlay) {
-                sidepanelOverlay.addEventListener('click', closeSidepanel);
-            }
-            
-            // Close sidepanel on escape key
-            document.addEventListener('keydown', function(e) {
-                if (e.key === 'Escape') {
-                    closeSidepanel();
-                }
-            });
-            
-            // Highlight active menu item
-            const currentPath = window.location.pathname;
-            const menuItems = sidepanel.querySelectorAll('nav a');
-            menuItems.forEach(item => {
-                if (item.getAttribute('href') === currentPath) {
-                    item.classList.add('bg-blue-50', 'text-blue-600', 'border-r-2', 'border-blue-600');
-                }
-            });
-        });
-    </script>
-    
+    <script src="{{ url_for('static', path='/js/app.js') }}"></script>
     {% block extra_scripts %}{% endblock %}
 </body>
 </html>

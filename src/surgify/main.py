@@ -316,8 +316,8 @@ def parse_args():
     parser.add_argument(
         "--port",
         type=int,
-        default=8000,
-        help="Port to bind the server to (default: 8000)",
+        default=6379,
+        help="Port to bind the server to (default: 6379)",
     )
     parser.add_argument(
         "--reload", action="store_true", help="Enable auto-reload for development"

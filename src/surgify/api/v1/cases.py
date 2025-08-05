@@ -34,7 +34,7 @@ def get_case_service(db: Session = Depends(get_db)) -> EnhancedCaseService:
 @router.get("/", response_model=List[CaseResponse])
 @cache_list_endpoint("cases", ttl=60)  # Cache for 1 minute
 async def list_cases(
-    status: Optional[str] = Query(None, description="Filter by case status"),
+    case_status: Optional[str] = Query(None, description="Filter by case status"),
     procedure_type: Optional[str] = Query(None, description="Filter by procedure type"),
     surgeon_id: Optional[str] = Query(None, description="Filter by surgeon ID"),
     priority: Optional[str] = Query(None, description="Filter by priority"),
@@ -43,7 +43,7 @@ async def list_cases(
     page: int = Query(1, ge=1, description="Page number"),
     limit: int = Query(50, ge=1, le=100, description="Items per page"),
     sort_by: str = Query("created_at", description="Sort field"),
-    sort_order: str = Query("desc", regex="^(asc|desc)$", description="Sort order"),
+    sort_order: str = Query("desc", pattern="^(asc|desc)$", description="Sort order"),
     case_service: EnhancedCaseService = Depends(get_case_service),
 ):
     """
