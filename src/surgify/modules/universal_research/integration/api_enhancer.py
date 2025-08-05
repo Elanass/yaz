@@ -4,6 +4,7 @@ Preserves all existing functionality while adding research capabilities
 """
 
 from typing import Dict, List, Any, Optional
+from datetime import datetime
 from fastapi import APIRouter, Depends, HTTPException, Query
 from sqlalchemy.orm import Session
 
@@ -17,6 +18,30 @@ from surgify.modules.universal_research.engines.research_generator import Resear
 from surgify.modules.universal_research.adapters.legacy_bridge import LegacyBridge
 
 
+# Global dependency functions for FastAPI injection
+def get_surgify_adapter(db: Session = Depends(get_db)) -> SurgifyAdapter:
+    return SurgifyAdapter(db)
+
+def get_cohort_analyzer(adapter: SurgifyAdapter = Depends(get_surgify_adapter)) -> CohortAnalyzer:
+    return CohortAnalyzer(adapter)
+
+def get_outcome_predictor(adapter: SurgifyAdapter = Depends(get_surgify_adapter)) -> OutcomePredictor:
+    return OutcomePredictor(adapter)
+
+def get_research_generator(
+    adapter: SurgifyAdapter = Depends(get_surgify_adapter),
+    analyzer: CohortAnalyzer = Depends(get_cohort_analyzer),
+    predictor: OutcomePredictor = Depends(get_outcome_predictor)
+) -> ResearchGenerator:
+    return ResearchGenerator(adapter, analyzer, predictor)
+
+def get_legacy_bridge(adapter: SurgifyAdapter = Depends(get_surgify_adapter)) -> LegacyBridge:
+    # This would need the actual case service
+    from surgify.core.services.case_service import CaseService
+    case_service = CaseService()  # This would be properly injected
+    return LegacyBridge(case_service, adapter)
+
+
 class ResearchAPIEnhancer:
     """
     Enhances existing Surgify FastAPI application with research endpoints
@@ -25,39 +50,7 @@ class ResearchAPIEnhancer:
     
     def __init__(self):
         self.router = APIRouter(prefix="/api/v1/research", tags=["research"])
-        self._setup_research_dependencies()
         self._register_research_endpoints()
-    
-    def _setup_research_dependencies(self):
-        """Setup research service dependencies"""
-        def get_surgify_adapter(db: Session = Depends(get_db)) -> SurgifyAdapter:
-            return SurgifyAdapter(db)
-        
-        def get_cohort_analyzer(adapter: SurgifyAdapter = Depends(get_surgify_adapter)) -> CohortAnalyzer:
-            return CohortAnalyzer(adapter)
-        
-        def get_outcome_predictor(adapter: SurgifyAdapter = Depends(get_surgify_adapter)) -> OutcomePredictor:
-            return OutcomePredictor(adapter)
-        
-        def get_research_generator(
-            adapter: SurgifyAdapter = Depends(get_surgify_adapter),
-            analyzer: CohortAnalyzer = Depends(get_cohort_analyzer),
-            predictor: OutcomePredictor = Depends(get_outcome_predictor)
-        ) -> ResearchGenerator:
-            return ResearchGenerator(adapter, analyzer, predictor)
-        
-        def get_legacy_bridge(adapter: SurgifyAdapter = Depends(get_surgify_adapter)) -> LegacyBridge:
-            # This would need the actual case service
-            from surgify.core.services.case_service import CaseService
-            case_service = CaseService()  # This would be properly injected
-            return LegacyBridge(case_service, adapter)
-        
-        # Store dependencies for use in endpoints
-        self.get_surgify_adapter = get_surgify_adapter
-        self.get_cohort_analyzer = get_cohort_analyzer
-        self.get_outcome_predictor = get_outcome_predictor
-        self.get_research_generator = get_research_generator
-        self.get_legacy_bridge = get_legacy_bridge
     
     def _register_research_endpoints(self):
         """Register all research endpoints"""
