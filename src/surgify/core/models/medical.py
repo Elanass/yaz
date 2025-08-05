@@ -12,6 +12,7 @@ from .base import BaseEntity, ProcessingStatus, ConfidenceLevel
 # Medical/Clinical Specific Enums
 class TumorStage(str, Enum):
     """TNM Tumor classification"""
+
     T1A = "T1a"
     T1B = "T1b"
     T2 = "T2"
@@ -22,29 +23,33 @@ class TumorStage(str, Enum):
 
 class NodalStatus(str, Enum):
     """TNM Nodal status classification"""
+
     N0 = "N0"
-    N1 = "N1" 
+    N1 = "N1"
     N2 = "N2"
     N3 = "N3"
 
 
 class MetastasisStatus(str, Enum):
     """TNM Metastasis status classification"""
+
     M0 = "M0"
     M1 = "M1"
 
 
 class PatientPerformanceStatus(str, Enum):
     """Patient performance status (ECOG scale)"""
-    NORMAL = "normal"          # ECOG 0
+
+    NORMAL = "normal"  # ECOG 0
     RESTRICTED = "restricted"  # ECOG 1
     AMBULATORY = "ambulatory"  # ECOG 2
     SYMPTOMATIC = "symptomatic"  # ECOG 3
-    BEDRIDDEN = "bedridden"    # ECOG 4
+    BEDRIDDEN = "bedridden"  # ECOG 4
 
 
 class ClinicalUserRole(str, Enum):
     """Medical-specific user roles"""
+
     PATIENT = "patient"
     CLINICIAN = "clinician"
     SURGEON = "surgeon"
@@ -56,6 +61,7 @@ class ClinicalUserRole(str, Enum):
 
 class DecisionStatus(str, Enum):
     """Medical decision processing status"""
+
     PENDING = "pending"
     UNDER_REVIEW = "under_review"
     PROCESSING = "processing"
@@ -67,29 +73,32 @@ class DecisionStatus(str, Enum):
 # Medical Models
 class TNMClassification(BaseModel):
     """TNM staging classification"""
+
     tumor_stage: TumorStage
     nodal_status: NodalStatus
     metastasis_status: MetastasisStatus
     overall_stage: Optional[str] = None
-    
+
     class Config:
         from_attributes = True
 
 
 class PatientInfo(BaseEntity):
     """Patient information model"""
+
     patient_id: str
     age: Optional[int] = None
     gender: Optional[str] = None
     performance_status: Optional[PatientPerformanceStatus] = None
     medical_history: Optional[dict] = None
-    
+
     class Config:
         from_attributes = True
 
 
 class ClinicalDecision(BaseEntity):
     """Clinical decision model"""
+
     patient_id: str
     decision_type: str
     status: DecisionStatus = DecisionStatus.PENDING
@@ -97,6 +106,6 @@ class ClinicalDecision(BaseEntity):
     recommendations: Optional[dict] = None
     reasoning: Optional[str] = None
     reviewed_by: Optional[str] = None
-    
+
     class Config:
         from_attributes = True

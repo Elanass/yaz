@@ -7,8 +7,4 @@ from .cohort_analyzer import CohortAnalyzer
 from .outcome_predictor import OutcomePredictor
 from .research_generator import ResearchGenerator
 
-__all__ = [
-    'CohortAnalyzer',
-    'OutcomePredictor', 
-    'ResearchGenerator'
-]
+__all__ = ["CohortAnalyzer", "OutcomePredictor", "ResearchGenerator"]

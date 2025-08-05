@@ -29,18 +29,18 @@ engine_kwargs = {
 }
 
 if DATABASE_URL.startswith("sqlite"):
-    engine_kwargs.update({
-        "poolclass": StaticPool,
-        "connect_args": {
-            "check_same_thread": False,
-            "timeout": 20
+    engine_kwargs.update(
+        {
+            "poolclass": StaticPool,
+            "connect_args": {"check_same_thread": False, "timeout": 20},
         }
-    })
+    )
 
 engine = create_engine(DATABASE_URL, **engine_kwargs)
 
 # Enable WAL mode for SQLite for better concurrency
 if DATABASE_URL.startswith("sqlite"):
+
     @event.listens_for(engine, "connect")
     def set_sqlite_pragma(dbapi_connection, connection_record):
         cursor = dbapi_connection.cursor()
@@ -49,6 +49,7 @@ if DATABASE_URL.startswith("sqlite"):
         cursor.execute("PRAGMA cache_size=1000")
         cursor.execute("PRAGMA temp_store=MEMORY")
         cursor.close()
+
 
 # Session configuration
 SessionLocal = sessionmaker(autocommit=False, autoflush=False, bind=engine)
@@ -59,6 +60,7 @@ Base = declarative_base()
 # Metadata for migrations
 metadata = MetaData()
 
+
 def get_db() -> Generator[Session, None, None]:
     """Database dependency for FastAPI"""
     db = SessionLocal()
@@ -67,13 +69,16 @@ def get_db() -> Generator[Session, None, None]:
     finally:
         db.close()
 
+
 def create_tables():
     """Create all database tables"""
     Base.metadata.create_all(bind=engine)
 
+
 def drop_tables():
     """Drop all database tables"""
     Base.metadata.drop_all(bind=engine)
+
 
 def reset_database():
     """Reset database by dropping and recreating tables"""

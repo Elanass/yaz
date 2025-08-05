@@ -17,6 +17,7 @@ router = APIRouter(prefix="/chat", tags=["chat"])
 # Global chat service instance
 chat_service = ChatIntegrationService()
 
+
 @router.on_event("startup")
 async def initialize_chat_services():
     """Initialize chat services on startup"""
@@ -27,6 +28,7 @@ async def initialize_chat_services():
     except Exception as e:
         logger.error(f"Failed to initialize chat services: {str(e)}")
 
+
 @router.get("/stats")
 async def get_chat_stats():
     """Get current chat platform statistics"""
@@ -35,78 +37,74 @@ async def get_chat_stats():
         return stats
     except Exception as e:
         logger.error(f"Failed to get chat stats: {str(e)}")
-        raise HTTPException(status_code=500, detail="Failed to retrieve chat statistics")
+        raise HTTPException(
+            status_code=500, detail="Failed to retrieve chat statistics"
+        )
+
 
 @router.post("/chatwoot/message")
 async def send_chatwoot_message(
-    conversation_id: int,
-    content: str,
-    message_type: str = "outgoing"
+    conversation_id: int, content: str, message_type: str = "outgoing"
 ):
     """Send a message via Chatwoot"""
     try:
         result = await chat_service.send_chatwoot_message(
-            conversation_id=conversation_id,
-            content=content,
-            message_type=message_type
+            conversation_id=conversation_id, content=content, message_type=message_type
         )
-        
+
         if "error" in result:
             raise HTTPException(status_code=400, detail=result["error"])
-            
+
         return {"success": True, "data": result}
     except Exception as e:
         logger.error(f"Failed to send Chatwoot message: {str(e)}")
         raise HTTPException(status_code=500, detail="Failed to send message")
 
+
 @router.post("/discord/message")
 async def send_discord_message(
     content: str,
     channel_id: Optional[str] = None,
-    embed: Optional[Dict[str, Any]] = None
+    embed: Optional[Dict[str, Any]] = None,
 ):
     """Send a message via Discord"""
     try:
         result = await chat_service.send_discord_message(
-            content=content,
-            channel_id=channel_id,
-            embed=embed
+            content=content, channel_id=channel_id, embed=embed
         )
-        
+
         if "error" in result:
             raise HTTPException(status_code=400, detail=result["error"])
-            
+
         return {"success": True, "data": result}
     except Exception as e:
         logger.error(f"Failed to send Discord message: {str(e)}")
         raise HTTPException(status_code=500, detail="Failed to send message")
 
+
 @router.post("/discord/invite")
-async def create_discord_invite(
-    max_age: int = 86400,
-    max_uses: int = 10
-):
+async def create_discord_invite(max_age: int = 86400, max_uses: int = 10):
     """Create a Discord server invite link"""
     try:
         invite_url = await chat_service.create_discord_invite(
-            max_age=max_age,
-            max_uses=max_uses
+            max_age=max_age, max_uses=max_uses
         )
-        
+
         if not invite_url:
             raise HTTPException(status_code=503, detail="Discord service unavailable")
-            
+
         return {"invite_url": invite_url}
     except Exception as e:
         logger.error(f"Failed to create Discord invite: {str(e)}")
         raise HTTPException(status_code=500, detail="Failed to create invite")
+
 
 @router.post("/notify/case/{case_id}")
 async def notify_case_event(
     case_id: int,
     event_type: str,
     data: Dict[str, Any],
-    background_tasks: BackgroundTasks
+    background_tasks: BackgroundTasks,
 ):
     """Send case event notifications to chat platforms"""
     try:
@@ -114,13 +112,14 @@ async def notify_case_event(
             chat_service.handle_case_notification,
             case_id=case_id,
             event_type=event_type,
-            data=data
+            data=data,
         )
-        
+
         return {"success": True, "message": "Notification sent"}
     except Exception as e:
         logger.error(f"Failed to send case notification: {str(e)}")
         raise HTTPException(status_code=500, detail="Failed to send notification")
+
 
 @router.get("/health")
 async def chat_health_check():
@@ -128,17 +127,16 @@ async def chat_health_check():
     try:
         chatwoot_healthy = await chat_service.initialize_chatwoot()
         discord_healthy = await chat_service.initialize_discord()
-        
+
         return {
-            "status": "healthy" if (chatwoot_healthy or discord_healthy) else "unhealthy",
+            "status": "healthy"
+            if (chatwoot_healthy or discord_healthy)
+            else "unhealthy",
             "services": {
                 "chatwoot": "healthy" if chatwoot_healthy else "unhealthy",
-                "discord": "healthy" if discord_healthy else "unhealthy"
-            }
+                "discord": "healthy" if discord_healthy else "unhealthy",
+            },
         }
     except Exception as e:
         logger.error(f"Chat health check failed: {str(e)}")
-        return {
-            "status": "unhealthy",
-            "error": str(e)
-        }
+        return {"status": "unhealthy", "error": str(e)}

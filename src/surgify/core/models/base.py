@@ -9,23 +9,23 @@ from uuid import UUID, uuid4
 
 from pydantic import BaseModel, Field
 
-T = TypeVar('T')
+T = TypeVar("T")
 
 
 class BaseEntity(BaseModel):
     """Base entity with common fields"""
-    
+
     id: UUID = Field(default_factory=uuid4)
     created_at: datetime = Field(default_factory=datetime.utcnow)
     updated_at: Optional[datetime] = None
-    
+
     class Config:
         from_attributes = True
 
 
 class ApiResponse(BaseModel, Generic[T]):
     """Standard API response wrapper"""
-    
+
     success: bool = True
     message: str = "Success"
     data: Optional[T] = None
@@ -34,9 +34,10 @@ class ApiResponse(BaseModel, Generic[T]):
 
 class PaginationParams(BaseModel):
     """Pagination parameters"""
+
     page: int = Field(default=1, ge=1)
     page_size: int = Field(default=20, ge=1, le=100)
-    
+
     @property
     def offset(self) -> int:
         return (self.page - 1) * self.page_size
@@ -44,6 +45,7 @@ class PaginationParams(BaseModel):
 
 class PaginationMeta(BaseModel):
     """Pagination metadata"""
+
     page: int
     page_size: int
     total_items: int
@@ -54,7 +56,7 @@ class PaginationMeta(BaseModel):
 
 class HealthStatus(BaseModel):
     """Application health status"""
-    
+
     status: str = "healthy"
     version: str = "1.0.0"
     environment: str = "development"
@@ -65,6 +67,7 @@ class HealthStatus(BaseModel):
 # Generic Application Enums
 class ProcessingStatus(str, Enum):
     """Generic processing status for any operation"""
+
     PENDING = "pending"
     PROCESSING = "processing"
     COMPLETED = "completed"
@@ -74,6 +77,7 @@ class ProcessingStatus(str, Enum):
 
 class ConfidenceLevel(str, Enum):
     """Generic confidence level for any analysis"""
+
     VERY_LOW = "very_low"
     LOW = "low"
     MODERATE = "moderate"
@@ -83,6 +87,7 @@ class ConfidenceLevel(str, Enum):
 
 class UserRole(str, Enum):
     """Generic user roles for any application"""
+
     USER = "user"
     ADMIN = "admin"
     MODERATOR = "moderator"
@@ -91,6 +96,7 @@ class UserRole(str, Enum):
 
 class Domain(str, Enum):
     """Application domains/modules"""
+
     AUTH = "auth"
     ANALYSIS = "analysis"
     DECISIONS = "decisions"
@@ -101,6 +107,7 @@ class Domain(str, Enum):
 
 class Scope(str, Enum):
     """Permission scopes"""
+
     READ = "read"
     WRITE = "write"
     DELETE = "delete"

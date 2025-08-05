@@ -7,7 +7,7 @@ Provides functions to generate unique identifiers across the platform.
 import uuid
 
 
-def generate_id(prefix: str = '', length: int = 12) -> str:
+def generate_id(prefix: str = "", length: int = 12) -> str:
     """
     Generate a unique identifier string with an optional prefix.
 

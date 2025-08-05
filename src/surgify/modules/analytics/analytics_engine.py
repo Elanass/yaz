@@ -4,7 +4,7 @@ class AnalyticsEngine:
         metrics = {
             "success_rate": 95.5,
             "complication_rate": 4.5,
-            "average_surgery_time": 120.0
+            "average_surgery_time": 120.0,
         }
         return metrics
 
@@ -13,7 +13,7 @@ class AnalyticsEngine:
         trends = {
             "daily": [90, 92, 95, 96, 94],
             "weekly": [88, 90, 92, 94, 95],
-            "monthly": [85, 87, 90, 92, 95]
+            "monthly": [85, 87, 90, 92, 95],
         }
         return trends
 

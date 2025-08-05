@@ -11,9 +11,9 @@ from .engines.research_generator import ResearchGenerator
 from .integration.api_enhancer import ResearchAPIEnhancer
 
 __all__ = [
-    'SurgifyAdapter',
-    'CohortAnalyzer', 
-    'OutcomePredictor',
-    'ResearchGenerator',
-    'ResearchAPIEnhancer'
+    "SurgifyAdapter",
+    "CohortAnalyzer",
+    "OutcomePredictor",
+    "ResearchGenerator",
+    "ResearchAPIEnhancer",
 ]

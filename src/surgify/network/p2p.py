@@ -3,6 +3,7 @@ libp2p-based peer discovery for auto-mesh across clouds
 """
 import asyncio
 
+
 # Placeholder: In production, use py-libp2p or a subprocess to Go libp2p
 class P2PNode:
     def __init__(self, listen_port=4001):

@@ -1,5 +1,6 @@
 from surgify.modules.surgery.decision_engine import DecisionEngine
 
+
 class AIService:
     def __init__(self):
         self.decision_engine = DecisionEngine()

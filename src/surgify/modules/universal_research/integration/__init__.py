@@ -7,8 +7,4 @@ from .api_enhancer import ResearchAPIEnhancer
 from .database_bridge import DatabaseBridge
 from .auth_integrator import AuthIntegrator
 
-__all__ = [
-    'ResearchAPIEnhancer',
-    'DatabaseBridge',
-    'AuthIntegrator'
-]
+__all__ = ["ResearchAPIEnhancer", "DatabaseBridge", "AuthIntegrator"]

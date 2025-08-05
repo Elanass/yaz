@@ -24,7 +24,9 @@ def weighted_sum(values: Dict[str, float], weights: Dict[str, float]) -> float:
     return total
 
 
-def calculate_confidence(overall_scores: Dict[str, float], threshold: float = 0.2) -> float:
+def calculate_confidence(
+    overall_scores: Dict[str, float], threshold: float = 0.2
+) -> float:
     """
     Calculate confidence based on the margin between top two scores.
 

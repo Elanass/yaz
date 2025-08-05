@@ -33,14 +33,15 @@ web_router.include_router(home.router, prefix="", tags=["Home"])
 web_router.include_router(dashboard.router, prefix="/dashboard", tags=["Dashboard"])
 web_router.include_router(auth.router, prefix="/auth", tags=["Authentication"])
 
+
 # Health check for web interface
 @web_router.get("/web-health", response_class=HTMLResponse)
 async def web_health():
     """Web interface health check"""
     return HTMLResponse(
-        content="<h1>Web Interface OK - Surgify Ready</h1>",
-        status_code=200
+        content="<h1>Web Interface OK - Surgify Ready</h1>", status_code=200
     )
+
 
 # Component demo page
 @web_router.get("/demo-components", response_class=HTMLResponse)

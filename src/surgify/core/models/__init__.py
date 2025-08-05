@@ -13,7 +13,7 @@ from .base import (
     ConfidenceLevel,
     UserRole,
     Domain,
-    Scope
+    Scope,
 )
 
 # Medical models - domain-specific for gastric cancer ADCI
@@ -26,14 +26,14 @@ from .medical import (
     DecisionStatus,
     TNMClassification,
     PatientInfo,
-    ClinicalDecision
+    ClinicalDecision,
 )
 
 __all__ = [
     # Base models
     "BaseEntity",
     "ApiResponse",
-    "PaginationParams", 
+    "PaginationParams",
     "PaginationMeta",
     "HealthStatus",
     "ProcessingStatus",
@@ -41,15 +41,14 @@ __all__ = [
     "UserRole",
     "Domain",
     "Scope",
-    
     # Medical models
     "TumorStage",
-    "NodalStatus", 
+    "NodalStatus",
     "MetastasisStatus",
     "PatientPerformanceStatus",
     "ClinicalUserRole",
     "DecisionStatus",
     "TNMClassification",
     "PatientInfo",
-    "ClinicalDecision"
+    "ClinicalDecision",
 ]

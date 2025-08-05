@@ -6,6 +6,7 @@ from datetime import datetime, timedelta
 from typing import Optional
 from ..models.user import User
 
+
 class AuthService:
     SECRET_KEY = "your_secret_key"
     ALGORITHM = "HS256"
@@ -16,10 +17,12 @@ class AuthService:
         self.security = HTTPBearer()
 
     def hash_password(self, password: str) -> str:
-        return bcrypt.hashpw(password.encode('utf-8'), bcrypt.gensalt()).decode('utf-8')
+        return bcrypt.hashpw(password.encode("utf-8"), bcrypt.gensalt()).decode("utf-8")
 
     def verify_password(self, plain_password: str, hashed_password: str) -> bool:
-        return bcrypt.checkpw(plain_password.encode('utf-8'), hashed_password.encode('utf-8'))
+        return bcrypt.checkpw(
+            plain_password.encode("utf-8"), hashed_password.encode("utf-8")
+        )
 
     def create_access_token(self, data: dict) -> str:
         to_encode = data.copy()
@@ -36,12 +39,14 @@ class AuthService:
     def register_user(self, username: str, email: str, password: str):
         hashed_password = self.hash_password(password)
         # Save user to database (pseudo-code)
-        user = User(username=username, email=email, hashed_password=hashed_password, role="User")
+        user = User(
+            username=username, email=email, hashed_password=hashed_password, role="User"
+        )
         # db_session.add(user)
         # db_session.commit()
         return {
             "access_token": self.create_access_token({"sub": user.email}),
-            "refresh_token": self.create_refresh_token({"sub": user.email})
+            "refresh_token": self.create_refresh_token({"sub": user.email}),
         }
 
     def login_user(self, email: str, password: str):
@@ -50,18 +55,20 @@ class AuthService:
         if user and self.verify_password(password, user.hashed_password):
             return {
                 "access_token": self.create_access_token({"sub": user.email}),
-                "refresh_token": self.create_refresh_token({"sub": user.email})
+                "refresh_token": self.create_refresh_token({"sub": user.email}),
             }
         raise Exception("Invalid credentials")
 
     def refresh_token(self, refresh_token: str):
         try:
-            payload = jwt.decode(refresh_token, self.SECRET_KEY, algorithms=[self.ALGORITHM])
+            payload = jwt.decode(
+                refresh_token, self.SECRET_KEY, algorithms=[self.ALGORITHM]
+            )
             email = payload.get("sub")
             if email:
                 return {
                     "access_token": self.create_access_token({"sub": email}),
-                    "refresh_token": self.create_refresh_token({"sub": email})
+                    "refresh_token": self.create_refresh_token({"sub": email}),
                 }
         except jwt.ExpiredSignatureError:
             raise Exception("Refresh token expired")
@@ -81,11 +88,11 @@ class AuthService:
         payload = self.verify_token(token)
         if payload is None:
             return None
-        
+
         email = payload.get("sub")
         if email is None:
             return None
-        
+
         # In a real implementation, this would query the database
         # For now, return a mock user for testing
         return User(
@@ -94,14 +101,18 @@ class AuthService:
             email=email,
             hashed_password="hashed",
             role="surgeon",
-            is_active=True
+            is_active=True,
         )
+
 
 # Create auth service instance
 auth_service = AuthService()
 
+
 # FastAPI dependency functions
-def get_current_user(credentials: HTTPAuthorizationCredentials = Depends(auth_service.security)) -> User:
+def get_current_user(
+    credentials: HTTPAuthorizationCredentials = Depends(auth_service.security),
+) -> User:
     """
     FastAPI dependency to get current authenticated user
     Used by research endpoints and enhanced existing endpoints
@@ -112,7 +123,7 @@ def get_current_user(credentials: HTTPAuthorizationCredentials = Depends(auth_se
             detail="Authentication credentials required",
             headers={"WWW-Authenticate": "Bearer"},
         )
-    
+
     user = auth_service.get_current_user_from_token(credentials.credentials)
     if user is None:
         raise HTTPException(
@@ -120,8 +131,9 @@ def get_current_user(credentials: HTTPAuthorizationCredentials = Depends(auth_se
             detail="Invalid authentication credentials",
             headers={"WWW-Authenticate": "Bearer"},
         )
-    
+
     return user
+
 
 def verify_token(token: str) -> Optional[dict]:
     """Verify JWT token - wrapper for compatibility"""

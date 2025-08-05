@@ -16,27 +16,31 @@ current_dir = Path(__file__).parent.parent
 templates_dir = current_dir / "templates"
 templates = Jinja2Templates(directory=str(templates_dir))
 
+
 @router.get("/login", response_class=HTMLResponse)
 async def login_page(request: Request):
     """Login page"""
-    return templates.TemplateResponse("auth/login.html", {
-        "request": request,
-        "page_title": "Sign In"
-    })
+    return templates.TemplateResponse(
+        "auth/login.html", {"request": request, "page_title": "Sign In"}
+    )
+
 
 @router.get("/register", response_class=HTMLResponse)
 async def register_page(request: Request):
     """Registration page"""
-    return templates.TemplateResponse("auth/register.html", {
-        "request": request,
-        "page_title": "Create Account"
-    })
+    return templates.TemplateResponse(
+        "auth/register.html", {"request": request, "page_title": "Create Account"}
+    )
+
 
 @router.post("/login")
-async def login_submit(request: Request, username: str = Form(...), password: str = Form(...)):
+async def login_submit(
+    request: Request, username: str = Form(...), password: str = Form(...)
+):
     """Handle login submission"""
     # TODO: Implement authentication logic
     return RedirectResponse(url="/dashboard", status_code=302)
+
 
 @router.get("/logout")
 async def logout(request: Request):

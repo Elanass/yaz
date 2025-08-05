@@ -27,16 +27,23 @@ router = APIRouter()
 router.include_router(dashboard_router, prefix="/dashboard", tags=["Dashboard"])
 router.include_router(cases_router, prefix="/cases", tags=["Cases"])
 router.include_router(sync_router, prefix="/sync", tags=["Sync"])
-router.include_router(deliverables_router, prefix="/deliverables", tags=["Deliverables"])
+router.include_router(
+    deliverables_router, prefix="/deliverables", tags=["Deliverables"]
+)
 router.include_router(auth_router, prefix="/auth", tags=["Authentication"])
 router.include_router(proposals_router, prefix="/collaboration", tags=["Collaboration"])
 router.include_router(search_router, tags=["Search"])
 router.include_router(mobile_router, tags=["Mobile"])
 router.include_router(feedback_router, tags=["Feedback"])
-router.include_router(recommendations_router, prefix="/recommendations", tags=["Recommendations"])
+router.include_router(
+    recommendations_router, prefix="/recommendations", tags=["Recommendations"]
+)
 router.include_router(downloads_router, prefix="/downloads", tags=["Downloads"])
 router.include_router(ai_router, prefix="/ai", tags=["AI Services"])
-router.include_router(chat_router, prefix="/chat", tags=["Chat Integration"])  # Add chat router
+router.include_router(
+    chat_router, prefix="/chat", tags=["Chat Integration"]
+)  # Add chat router
+
 
 @router.get("/")
 async def api_root():
@@ -52,7 +59,7 @@ async def api_root():
             "Document Generation & Deliverables",
             "Analytics Dashboard",
             "Redis Caching for High Performance",
-            "Modular API Architecture"
+            "Modular API Architecture",
         ],
         "endpoints": {
             "dashboard": "/api/v1/dashboard",
@@ -62,17 +69,13 @@ async def api_root():
             "auth": "/api/v1/auth",
             "collaboration": "/api/v1/collaboration",
             "search": "/api/v1/search",
-            "recommendations": "/api/v1/recommendations"
+            "recommendations": "/api/v1/recommendations",
         },
-        "cache": {
-            "enabled": True,
-            "backend": "Redis",
-            "default_ttl": 300
-        },
+        "cache": {"enabled": True, "backend": "Redis", "default_ttl": 300},
         "architecture": {
             "stateless": True,
             "idempotent": True,
             "modular": True,
-            "reproducible": True
-        }
+            "reproducible": True,
+        },
     }

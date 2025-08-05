@@ -8,6 +8,7 @@ from typing import List, Dict, Any
 
 router = APIRouter()
 
+
 @router.get("/")
 async def surgery_module_root():
     """Surgery module root endpoint"""
@@ -19,9 +20,10 @@ async def surgery_module_root():
             "procedures": "/procedures",
             "planning": "/planning",
             "protocols": "/protocols",
-            "equipment": "/equipment"
-        }
+            "equipment": "/equipment",
+        },
     }
+
 
 @router.get("/procedures")
 async def get_procedures():
@@ -33,17 +35,18 @@ async def get_procedures():
                 "name": "Gastric Sleeve Surgery",
                 "type": "bariatric",
                 "duration_minutes": 60,
-                "complexity": "intermediate"
+                "complexity": "intermediate",
             },
             {
-                "id": "gastric_bypass", 
+                "id": "gastric_bypass",
                 "name": "Gastric Bypass Surgery",
                 "type": "bariatric",
                 "duration_minutes": 120,
-                "complexity": "advanced"
-            }
+                "complexity": "advanced",
+            },
         ]
     }
+
 
 @router.get("/planning")
 async def get_surgical_planning():
@@ -51,11 +54,12 @@ async def get_surgical_planning():
     return {
         "planning_tools": [
             "pre_operative_assessment",
-            "risk_stratification", 
+            "risk_stratification",
             "resource_allocation",
-            "timeline_optimization"
+            "timeline_optimization",
         ]
     }
+
 
 @router.get("/protocols")
 async def get_protocols():
@@ -65,10 +69,11 @@ async def get_protocols():
             {
                 "name": "ERAS Protocol",
                 "type": "Enhanced Recovery After Surgery",
-                "applicable_procedures": ["gastric_sleeve", "gastric_bypass"]
+                "applicable_procedures": ["gastric_sleeve", "gastric_bypass"],
             }
         ]
     }
+
 
 @router.get("/equipment")
 async def get_equipment():
@@ -78,9 +83,10 @@ async def get_equipment():
             "laparoscopic_tools",
             "monitoring_devices",
             "safety_equipment",
-            "backup_systems"
+            "backup_systems",
         ]
     }
+
 
 # Add routes from existing surgery.py
 @router.post("/case")
@@ -89,8 +95,9 @@ async def create_surgical_case(case_data: Dict[str, Any]):
     return {
         "message": "Surgical case created successfully",
         "case_id": "SURG_001",
-        "status": "scheduled"
+        "status": "scheduled",
     }
+
 
 @router.get("/cases")
 async def get_surgical_cases():
@@ -102,7 +109,7 @@ async def get_surgical_cases():
                 "patient": "John Doe",
                 "procedure": "Gastric Sleeve",
                 "status": "scheduled",
-                "date": "2025-08-15"
+                "date": "2025-08-15",
             }
         ]
     }

@@ -18,6 +18,7 @@ from surgify.core.services.logger import get_logger
 
 class AlertSeverity(str, Enum):
     """Alert severity levels"""
+
     INFO = "info"
     WARNING = "warning"
     CRITICAL = "critical"
@@ -26,6 +27,7 @@ class AlertSeverity(str, Enum):
 
 class AlertStatus(str, Enum):
     """Alert status states"""
+
     ACTIVE = "active"
     ACKNOWLEDGED = "acknowledged"
     RESOLVED = "resolved"
@@ -34,7 +36,7 @@ class AlertStatus(str, Enum):
 
 class Alert:
     """Alert model for protocol compliance monitoring"""
-    
+
     def __init__(
         self,
         alert_id: str,
@@ -48,7 +50,7 @@ class Alert:
         protocol_id: Optional[str] = None,
         expires_at: Optional[datetime] = None,
         actions: Optional[List[Dict[str, Any]]] = None,
-        metadata: Optional[Dict[str, Any]] = None
+        metadata: Optional[Dict[str, Any]] = None,
     ):
         self.alert_id = alert_id
         self.title = title
@@ -68,55 +70,55 @@ class Alert:
         self.resolved_by = None
         self.actions = actions or []
         self.metadata = metadata or {}
-    
+
     def acknowledge(self, user_id: str) -> bool:
         """
         Acknowledge the alert
-        
+
         Args:
             user_id: ID of the user acknowledging the alert
-            
+
         Returns:
             True if successful, False if already acknowledged
         """
         if self.status != AlertStatus.ACTIVE:
             return False
-            
+
         self.status = AlertStatus.ACKNOWLEDGED
         self.acknowledged_at = datetime.utcnow()
         self.acknowledged_by = user_id
         return True
-    
+
     def resolve(self, user_id: str, resolution_note: Optional[str] = None) -> bool:
         """
         Resolve the alert
-        
+
         Args:
             user_id: ID of the user resolving the alert
             resolution_note: Optional note on how the alert was resolved
-            
+
         Returns:
             True if successful, False if already resolved
         """
         if self.status == AlertStatus.RESOLVED:
             return False
-            
+
         self.status = AlertStatus.RESOLVED
         self.resolved_at = datetime.utcnow()
         self.resolved_by = user_id
-        
+
         if resolution_note:
             self.metadata["resolution_note"] = resolution_note
-            
+
         return True
-    
+
     def is_expired(self) -> bool:
         """Check if the alert is expired"""
         if not self.expires_at:
             return False
-            
+
         return datetime.utcnow() > self.expires_at
-    
+
     def to_dict(self) -> Dict[str, Any]:
         """Convert to dictionary representation"""
         return {
@@ -132,18 +134,20 @@ class Alert:
             "protocol_id": self.protocol_id,
             "created_at": self.created_at.isoformat(),
             "expires_at": self.expires_at.isoformat() if self.expires_at else None,
-            "acknowledged_at": self.acknowledged_at.isoformat() if self.acknowledged_at else None,
+            "acknowledged_at": self.acknowledged_at.isoformat()
+            if self.acknowledged_at
+            else None,
             "resolved_at": self.resolved_at.isoformat() if self.resolved_at else None,
             "acknowledged_by": self.acknowledged_by,
             "resolved_by": self.resolved_by,
             "actions": self.actions,
-            "metadata": self.metadata
+            "metadata": self.metadata,
         }
 
 
 class AlertingService(BaseService):
     """Service for monitoring protocol compliance and generating alerts"""
-    
+
     def __init__(self):
         super().__init__()
         self.settings = get_settings()
@@ -151,19 +155,19 @@ class AlertingService(BaseService):
             "enabled": True,
             "max_alerts_per_hour": 10,
             "email_enabled": False,
-            "severity_threshold": "INFO"
+            "severity_threshold": "INFO",
         }
         self.logger = get_logger(__name__)
         self.active_alerts: Dict[str, Alert] = {}
         self.alert_listeners: List[Callable[[Alert], Awaitable[None]]] = []
         self.expiration_task = None
-    
+
     async def start(self):
         """Start the alerting service"""
         # Start expiration checking task
         self.expiration_task = asyncio.create_task(self._check_expirations())
         self.logger.info("Alerting service started")
-    
+
     async def stop(self):
         """Stop the alerting service"""
         if self.expiration_task:
@@ -173,7 +177,7 @@ class AlertingService(BaseService):
             except asyncio.CancelledError:
                 pass
         self.logger.info("Alerting service stopped")
-    
+
     async def _check_expirations(self):
         """Background task to check for expired alerts"""
         while True:
@@ -181,36 +185,34 @@ class AlertingService(BaseService):
                 # Check all active alerts
                 now = datetime.utcnow()
                 expired_ids = []
-                
+
                 for alert_id, alert in self.active_alerts.items():
                     if alert.status == AlertStatus.ACTIVE and alert.is_expired():
                         alert.status = AlertStatus.EXPIRED
                         expired_ids.append(alert_id)
-                        
+
                         # Notify listeners
                         await self._notify_listeners(alert)
-                
+
                 # Log expired alerts
                 if expired_ids:
                     self.logger.info(
-                        f"Expired {len(expired_ids)} alerts",
-                        alert_ids=expired_ids
+                        f"Expired {len(expired_ids)} alerts", alert_ids=expired_ids
                     )
-                
+
                 # Sleep for the configured interval
-                check_interval = self.config.get("expiration_check_interval_seconds", 60)
+                check_interval = self.config.get(
+                    "expiration_check_interval_seconds", 60
+                )
                 await asyncio.sleep(check_interval)
-                
+
             except asyncio.CancelledError:
                 break
-                
+
             except Exception as e:
-                self.logger.error(
-                    "Error checking alert expirations",
-                    exc_info=e
-                )
+                self.logger.error("Error checking alert expirations", exc_info=e)
                 await asyncio.sleep(5)  # Short delay before retry
-    
+
     async def create_alert(
         self,
         title: str,
@@ -223,11 +225,11 @@ class AlertingService(BaseService):
         protocol_id: Optional[str] = None,
         expires_in: Optional[int] = None,  # Seconds
         actions: Optional[List[Dict[str, Any]]] = None,
-        metadata: Optional[Dict[str, Any]] = None
+        metadata: Optional[Dict[str, Any]] = None,
     ) -> Alert:
         """
         Create a new alert
-        
+
         Args:
             title: Alert title
             message: Alert message
@@ -240,20 +242,20 @@ class AlertingService(BaseService):
             expires_in: Seconds until this alert expires (optional)
             actions: List of possible actions that can be taken
             metadata: Additional context about the alert
-            
+
         Returns:
             The created alert
         """
         import uuid
-        
+
         # Generate alert ID
         alert_id = str(uuid.uuid4())
-        
+
         # Calculate expiration time if provided
         expires_at = None
         if expires_in is not None:
             expires_at = datetime.utcnow() + timedelta(seconds=expires_in)
-        
+
         # Create alert
         alert = Alert(
             alert_id=alert_id,
@@ -267,12 +269,12 @@ class AlertingService(BaseService):
             protocol_id=protocol_id,
             expires_at=expires_at,
             actions=actions,
-            metadata=metadata
+            metadata=metadata,
         )
-        
+
         # Store alert
         self.active_alerts[alert_id] = alert
-        
+
         # Log alert creation
         self.logger.info(
             f"Created {severity.value} alert: {title}",
@@ -282,159 +284,156 @@ class AlertingService(BaseService):
             resource_type=resource_type,
             resource_id=resource_id,
             patient_id=patient_id,
-            protocol_id=protocol_id
+            protocol_id=protocol_id,
         )
-        
+
         # Notify listeners
         await self._notify_listeners(alert)
-        
+
         return alert
-    
+
     async def get_alert(self, alert_id: str) -> Optional[Alert]:
         """
         Get an alert by ID
-        
+
         Args:
             alert_id: The alert ID
-            
+
         Returns:
             The alert, or None if not found
         """
         return self.active_alerts.get(alert_id)
-    
+
     async def list_active_alerts(
         self,
         patient_id: Optional[str] = None,
         protocol_id: Optional[str] = None,
         category: Optional[str] = None,
-        min_severity: Optional[AlertSeverity] = None
+        min_severity: Optional[AlertSeverity] = None,
     ) -> List[Alert]:
         """
         List active alerts with optional filters
-        
+
         Args:
             patient_id: Filter by patient ID
             protocol_id: Filter by protocol ID
             category: Filter by category
             min_severity: Filter by minimum severity
-            
+
         Returns:
             List of matching alerts
         """
         alerts = []
-        
+
         for alert in self.active_alerts.values():
             # Skip non-active alerts
             if alert.status != AlertStatus.ACTIVE:
                 continue
-                
+
             # Apply filters
             if patient_id and alert.patient_id != patient_id:
                 continue
-                
+
             if protocol_id and alert.protocol_id != protocol_id:
                 continue
-                
+
             if category and alert.category != category:
                 continue
-                
+
             if min_severity:
                 # Get severity index
                 severity_order = [s.value for s in AlertSeverity]
                 min_idx = severity_order.index(min_severity.value)
                 alert_idx = severity_order.index(alert.severity.value)
-                
+
                 if alert_idx < min_idx:
                     continue
-            
+
             alerts.append(alert)
-        
+
         return alerts
-    
+
     async def acknowledge_alert(self, alert_id: str, user_id: str) -> bool:
         """
         Acknowledge an alert
-        
+
         Args:
             alert_id: The alert ID
             user_id: ID of the user acknowledging the alert
-            
+
         Returns:
             True if successful, False otherwise
         """
         alert = await self.get_alert(alert_id)
         if not alert:
             return False
-            
+
         result = alert.acknowledge(user_id)
-        
+
         if result:
             self.logger.info(
                 f"Alert {alert_id} acknowledged by user {user_id}",
                 alert_id=alert_id,
-                user_id=user_id
+                user_id=user_id,
             )
-            
+
             # Notify listeners
             await self._notify_listeners(alert)
-            
+
         return result
-    
+
     async def resolve_alert(
-        self,
-        alert_id: str,
-        user_id: str,
-        resolution_note: Optional[str] = None
+        self, alert_id: str, user_id: str, resolution_note: Optional[str] = None
     ) -> bool:
         """
         Resolve an alert
-        
+
         Args:
             alert_id: The alert ID
             user_id: ID of the user resolving the alert
             resolution_note: Optional note on how the alert was resolved
-            
+
         Returns:
             True if successful, False otherwise
         """
         alert = await self.get_alert(alert_id)
         if not alert:
             return False
-            
+
         result = alert.resolve(user_id, resolution_note)
-        
+
         if result:
             self.logger.info(
                 f"Alert {alert_id} resolved by user {user_id}",
                 alert_id=alert_id,
                 user_id=user_id,
-                resolution_note=resolution_note
+                resolution_note=resolution_note,
             )
-            
+
             # Notify listeners
             await self._notify_listeners(alert)
-            
+
         return result
-    
+
     async def add_listener(self, listener: Callable[[Alert], Awaitable[None]]):
         """
         Add a listener for alert events
-        
+
         Args:
             listener: Async callback function that receives alerts
         """
         self.alert_listeners.append(listener)
-    
+
     async def remove_listener(self, listener: Callable[[Alert], Awaitable[None]]):
         """
         Remove a listener
-        
+
         Args:
             listener: The listener to remove
         """
         if listener in self.alert_listeners:
             self.alert_listeners.remove(listener)
-    
+
     async def _notify_listeners(self, alert: Alert):
         """Notify all listeners of an alert event"""
         for listener in self.alert_listeners:
@@ -442,7 +441,5 @@ class AlertingService(BaseService):
                 await listener(alert)
             except Exception as e:
                 self.logger.error(
-                    "Error in alert listener",
-                    exc_info=e,
-                    alert_id=alert.alert_id
+                    "Error in alert listener", exc_info=e, alert_id=alert.alert_id
                 )

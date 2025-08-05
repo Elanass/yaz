@@ -8,6 +8,7 @@ from typing import List, Dict, Any
 
 router = APIRouter()
 
+
 @router.get("/")
 async def analytics_module_root():
     """Analytics module root endpoint"""
@@ -19,9 +20,10 @@ async def analytics_module_root():
             "reports": "/reports",
             "metrics": "/metrics",
             "dashboards": "/dashboards",
-            "insights": "/insights"
-        }
+            "insights": "/insights",
+        },
     }
+
 
 @router.get("/reports")
 async def get_reports():
@@ -32,22 +34,23 @@ async def get_reports():
                 "id": "surgical_outcomes",
                 "name": "Surgical Outcomes Report",
                 "type": "clinical",
-                "frequency": "monthly"
+                "frequency": "monthly",
             },
             {
                 "id": "resource_utilization",
                 "name": "Resource Utilization Report",
                 "type": "operational",
-                "frequency": "weekly"
+                "frequency": "weekly",
             },
             {
                 "id": "quality_metrics",
-                "name": "Quality Metrics Report", 
+                "name": "Quality Metrics Report",
                 "type": "quality",
-                "frequency": "daily"
-            }
+                "frequency": "daily",
+            },
         ]
     }
+
 
 @router.get("/metrics")
 async def get_metrics():
@@ -57,20 +60,17 @@ async def get_metrics():
             "surgical_volume": {
                 "current_month": 45,
                 "previous_month": 38,
-                "trend": "increasing"
+                "trend": "increasing",
             },
-            "patient_satisfaction": {
-                "score": 4.7,
-                "scale": "1-5",
-                "responses": 120
-            },
+            "patient_satisfaction": {"score": 4.7, "scale": "1-5", "responses": 120},
             "operating_room_utilization": {
                 "percentage": 87.5,
                 "target": 85.0,
-                "status": "above_target"
-            }
+                "status": "above_target",
+            },
         }
     }
+
 
 @router.get("/dashboards")
 async def get_dashboards():
@@ -79,18 +79,19 @@ async def get_dashboards():
         "dashboards": [
             {
                 "name": "executive_summary",
-                "widgets": ["kpi_overview", "trends", "alerts"]
+                "widgets": ["kpi_overview", "trends", "alerts"],
             },
             {
                 "name": "clinical_dashboard",
-                "widgets": ["case_pipeline", "outcomes", "protocols"]
+                "widgets": ["case_pipeline", "outcomes", "protocols"],
             },
             {
                 "name": "operational_dashboard",
-                "widgets": ["scheduling", "resources", "efficiency"]
-            }
+                "widgets": ["scheduling", "resources", "efficiency"],
+            },
         ]
     }
+
 
 @router.get("/insights")
 async def get_insights():
@@ -101,16 +102,17 @@ async def get_insights():
                 "type": "prediction",
                 "message": "Operating room utilization expected to increase 15% next month",
                 "confidence": 0.85,
-                "action": "Consider scheduling optimization"
+                "action": "Consider scheduling optimization",
             },
             {
                 "type": "anomaly",
                 "message": "Unusual spike in post-op complications for gastric sleeve procedures",
                 "severity": "medium",
-                "action": "Review protocol adherence"
-            }
+                "action": "Review protocol adherence",
+            },
         ]
     }
+
 
 @router.post("/generate-report")
 async def generate_report(report_request: Dict[str, Any]):
@@ -118,5 +120,5 @@ async def generate_report(report_request: Dict[str, Any]):
     return {
         "message": "Report generation initiated",
         "report_id": "RPT_001",
-        "estimated_completion": "5 minutes"
+        "estimated_completion": "5 minutes",
     }

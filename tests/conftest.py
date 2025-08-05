@@ -26,6 +26,7 @@ test_engine = create_engine(
 )
 TestingSessionLocal = sessionmaker(autocommit=False, autoflush=False, bind=test_engine)
 
+
 @pytest.fixture(scope="session")
 def event_loop():
     """Create an instance of the default event loop for the test session."""
@@ -33,12 +34,14 @@ def event_loop():
     yield loop
     loop.close()
 
+
 @pytest.fixture
 def test_db():
     """Create a test database."""
     Base.metadata.create_all(bind=test_engine)
     yield
     Base.metadata.drop_all(bind=test_engine)
+
 
 def override_get_db():
     """Override database dependency for testing."""
@@ -48,6 +51,7 @@ def override_get_db():
     finally:
         db.close()
 
+
 @pytest.fixture
 def client(test_db) -> Generator:
     """Create a test client."""
@@ -56,6 +60,7 @@ def client(test_db) -> Generator:
         yield c
     app.dependency_overrides.clear()
 
+
 @pytest.fixture
 def sample_user_data():
     """Sample user data for testing."""
@@ -63,8 +68,9 @@ def sample_user_data():
         "username": "test_surgeon",
         "email": "surgeon@test.com",
         "full_name": "Test Surgeon",
-        "password": "testpassword123"
+        "password": "testpassword123",
     }
+
 
 @pytest.fixture
 def sample_patient_data():
@@ -74,8 +80,9 @@ def sample_patient_data():
         "age": 65,
         "gender": "Male",
         "bmi": 28.5,
-        "medical_history": "Hypertension, Diabetes Type 2"
+        "medical_history": "Hypertension, Diabetes Type 2",
     }
+
 
 @pytest.fixture
 def sample_case_data():
@@ -84,5 +91,5 @@ def sample_case_data():
         "procedure": "Laparoscopic Gastrectomy",
         "status": "planned",
         "scheduled_date": "2025-08-15T10:00:00",
-        "notes": "Test case for gastric cancer treatment"
+        "notes": "Test case for gastric cancer treatment",
     }

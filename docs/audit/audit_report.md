@@ -5,6 +5,8 @@
 **Auditor:** Senior Software Architect & DevOps Lead  
 **Platform Version:** Surgify 2.0.0 / Yaz Combined Codebase  
 
+> **Note:** For the latest optimization and cleanup audit, see `/docs/AUDIT_REPORT.md`
+
 ---
 
 ## 🎯 **Executive Summary**
