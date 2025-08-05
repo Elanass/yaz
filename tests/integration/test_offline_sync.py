@@ -2,8 +2,8 @@
 Integration test: Simulate two clients editing the same case and reconciling via CRDT
 """
 import pytest
-from src.surgify.core.sync.crdt_text import RGA
-from src.surgify.core.sync.crdt_json import JSONOT
+from surgify.core.sync.crdt_text import RGA
+from surgify.core.sync.crdt_json import JSONOT
 
 
 @pytest.mark.asyncio

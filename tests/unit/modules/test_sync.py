@@ -8,8 +8,8 @@ from unittest.mock import Mock, patch, AsyncMock
 from datetime import datetime, timedelta
 from typing import List
 
-from src.surgify.api.v1.sync import router
-from src.surgify.core.services.sync_service import (
+from surgify.api.v1.sync import router
+from surgify.core.services.sync_service import (
     SyncService,
     SyncRequest,
     SyncResponse,

@@ -7,7 +7,7 @@ import pytest
 from unittest.mock import Mock, patch, AsyncMock
 from fastapi.testclient import TestClient
 
-from src.surgify.api.v1.ai import (
+from surgify.api.v1.ai import (
     router,
     SummarizeRequest,
     SummarizeResponse,

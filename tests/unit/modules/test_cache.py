@@ -8,7 +8,7 @@ from unittest.mock import Mock, patch, AsyncMock
 import json
 import asyncio
 
-from src.surgify.core.cache import (
+from surgify.core.cache import (
     CacheClient,
     CacheConfig,
     cache_response,

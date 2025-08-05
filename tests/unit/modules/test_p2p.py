@@ -8,7 +8,7 @@ from unittest.mock import Mock, patch, AsyncMock
 import asyncio
 from typing import Set
 
-from src.surgify.network.p2p import P2PNode
+from surgify.network.p2p import P2PNode
 
 
 class TestP2PNode:
