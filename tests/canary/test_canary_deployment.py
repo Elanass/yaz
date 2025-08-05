@@ -3,14 +3,15 @@ Canary Tests for Surgify Platform
 Validates canary deployments and production readiness
 """
 
-import pytest
 import asyncio
-import httpx
 import json
 import time
-from typing import Dict, List, Any
 from datetime import datetime
+from typing import Any, Dict, List
 from unittest.mock import Mock, patch
+
+import httpx
+import pytest
 
 
 class CanaryTestConfig:

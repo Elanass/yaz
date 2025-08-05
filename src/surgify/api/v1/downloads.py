@@ -3,10 +3,11 @@ App Downloads API - Surgify Platform
 Handles mobile and desktop app download requests
 """
 
+import logging
+from pathlib import Path
+
 from fastapi import APIRouter, HTTPException, Request
 from fastapi.responses import FileResponse, RedirectResponse
-from pathlib import Path
-import logging
 
 router = APIRouter(tags=["Downloads"])
 logger = logging.getLogger(__name__)

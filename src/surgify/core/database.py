@@ -4,10 +4,12 @@ Database Configuration and Connection Management
 
 from pathlib import Path
 from typing import Generator
-from sqlalchemy import create_engine, MetaData, event
+
+from sqlalchemy import MetaData, create_engine, event
 from sqlalchemy.ext.declarative import declarative_base
-from sqlalchemy.orm import sessionmaker, Session
+from sqlalchemy.orm import Session, sessionmaker
 from sqlalchemy.pool import StaticPool
+
 from surgify.core.config.unified_config import get_settings
 
 # Get configuration

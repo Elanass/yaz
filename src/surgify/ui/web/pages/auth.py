@@ -5,7 +5,8 @@ Clean authentication flow using templates
 """
 
 from pathlib import Path
-from fastapi import APIRouter, Request, Form
+
+from fastapi import APIRouter, Form, Request
 from fastapi.responses import HTMLResponse, RedirectResponse
 from fastapi.templating import Jinja2Templates
 

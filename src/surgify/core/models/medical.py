@@ -4,9 +4,10 @@ Medical Models - Gastric cancer ADCI specific medical classifications
 
 from enum import Enum
 from typing import Optional
+
 from pydantic import BaseModel, Field
 
-from .base import BaseEntity, ProcessingStatus, ConfidenceLevel
+from .base import BaseEntity, ConfidenceLevel, ProcessingStatus
 
 
 # Medical/Clinical Specific Enums

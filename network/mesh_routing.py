@@ -1,9 +1,9 @@
 """General platform mesh routing wrapper for Bitchat."""
-import sys
 import os
+import sys
 
 # Add the bitchat module to the Python path
-sys.path.insert(0, os.path.join(os.path.dirname(__file__), 'bitchat'))
+sys.path.insert(0, os.path.join(os.path.dirname(__file__), "bitchat"))
 
 try:
     # Try to import from the actual Bitchat library structure
@@ -13,12 +13,12 @@ except ImportError:
     class MultiHopRouter:
         def __init__(self):
             self.messages = []
-        
+
         def send(self, destination, message):
             """Placeholder send - replace with actual Bitchat implementation."""
             print(f"Sending message to {destination}: {message}")
             return True
-        
+
         def receive(self):
             """Placeholder receive - replace with actual Bitchat implementation."""
             return self.messages

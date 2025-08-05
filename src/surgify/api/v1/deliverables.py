@@ -3,29 +3,30 @@ Deliverables API - Surgify Platform
 Handles document generation, reporting, and deliverable management
 """
 
-from typing import List, Optional, BinaryIO
-from fastapi import APIRouter, HTTPException, Depends, Query, status
+import io
+from typing import BinaryIO, List, Optional
+
+from fastapi import APIRouter, Depends, HTTPException, Query, status
 from fastapi.responses import StreamingResponse
 from sqlalchemy.orm import Session
-import io
 
-from surgify.core.database import get_db
-from surgify.core.services.deliverable_service import (
-    DeliverableService,
-    DeliverableRequest,
-    DeliverableUpdateRequest,
-    DeliverableResponse,
-    TemplateResponse,
-    DeliverableType,
-    DeliverableStatus,
-    DeliverableFormat,
-)
-from surgify.core.services.auth_service import get_current_user
-from surgify.core.models.user import User
 from surgify.core.cache import (
-    cache_list_endpoint,
     cache_detail_endpoint,
+    cache_list_endpoint,
     invalidate_cache,
+)
+from surgify.core.database import get_db
+from surgify.core.models.user import User
+from surgify.core.services.auth_service import get_current_user
+from surgify.core.services.deliverable_service import (
+    DeliverableFormat,
+    DeliverableRequest,
+    DeliverableResponse,
+    DeliverableService,
+    DeliverableStatus,
+    DeliverableType,
+    DeliverableUpdateRequest,
+    TemplateResponse,
 )
 
 router = APIRouter(tags=["Deliverables"])

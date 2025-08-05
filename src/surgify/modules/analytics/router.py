@@ -3,8 +3,9 @@ Analytics Module Router
 Handles all analytics and reporting operations
 """
 
+from typing import Any, Dict, List
+
 from fastapi import APIRouter, HTTPException
-from typing import List, Dict, Any
 
 router = APIRouter()
 

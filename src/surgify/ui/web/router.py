@@ -6,13 +6,14 @@ Surgify template integration with backend logic
 
 import os
 from pathlib import Path
+
 from fastapi import APIRouter, Request
 from fastapi.responses import HTMLResponse
 from fastapi.staticfiles import StaticFiles
 from fastapi.templating import Jinja2Templates
 
 # Core page routers
-from .pages import home, dashboard, auth
+from .pages import auth, dashboard, home
 
 # Get the current directory
 current_dir = Path(__file__).parent

@@ -2,8 +2,8 @@
 CRDT for collaborative text editing (RGA - Replicated Growable Array)
 """
 
-from typing import List, Tuple, Optional
 import uuid
+from typing import List, Optional, Tuple
 
 
 class RGAElement:

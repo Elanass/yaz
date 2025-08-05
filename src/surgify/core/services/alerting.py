@@ -9,7 +9,7 @@ import asyncio
 import json
 from datetime import datetime, timedelta
 from enum import Enum
-from typing import Dict, List, Optional, Any, Callable, Awaitable
+from typing import Any, Awaitable, Callable, Dict, List, Optional
 
 from surgify.core.config.unified_config import get_settings
 from surgify.core.services.base import BaseService

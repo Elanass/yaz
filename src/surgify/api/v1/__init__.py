@@ -5,20 +5,21 @@ Enhanced with modular, high-performance endpoints
 
 from fastapi import APIRouter
 
+from .ai import router as ai_router
+from .auth import router as auth_router
+from .cases import router as cases_router
+from .chat import router as chat_router  # Add chat router import
+
 # Import core API routers
 from .dashboard import router as dashboard_router
-from .cases import router as cases_router
-from .sync import router as sync_router
 from .deliverables import router as deliverables_router
-from .auth import router as auth_router
-from .proposals import router as proposals_router
-from .search import router as search_router
-from .mobile import router as mobile_router
-from .feedback import router as feedback_router
-from .recommendations import router as recommendations_router
 from .downloads import router as downloads_router
-from .ai import router as ai_router
-from .chat import router as chat_router  # Add chat router import
+from .feedback import router as feedback_router
+from .mobile import router as mobile_router
+from .proposals import router as proposals_router
+from .recommendations import router as recommendations_router
+from .search import router as search_router
+from .sync import router as sync_router
 
 # Create main router
 router = APIRouter()

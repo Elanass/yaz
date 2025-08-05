@@ -3,11 +3,12 @@ Integration tests for offline CRDT synchronization
 Tests conflict-free replicated data types for offline-first functionality
 """
 
-import pytest
 import asyncio
 from datetime import datetime, timedelta
-from typing import Dict, List, Any
-from unittest.mock import Mock, patch, AsyncMock
+from typing import Any, Dict, List
+from unittest.mock import AsyncMock, Mock, patch
+
+import pytest
 
 
 # Mock CRDT implementation for testing

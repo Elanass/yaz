@@ -4,11 +4,12 @@ Feedback API Endpoints
 Handles user feedback, issues, and feature requests
 """
 
-from fastapi import APIRouter
-from pydantic import BaseModel, EmailStr
-from typing import Optional
 import logging
 from datetime import datetime
+from typing import Optional
+
+from fastapi import APIRouter
+from pydantic import BaseModel, EmailStr
 
 logger = logging.getLogger(__name__)
 

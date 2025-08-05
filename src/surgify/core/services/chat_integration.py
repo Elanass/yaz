@@ -3,13 +3,14 @@ Chat Integration Service for Surgify Platform
 Handles Chatwoot and Discord integrations for chat features
 """
 
-import logging
-import aiohttp
 import asyncio
-from typing import Dict, Any, List, Optional, Union
-from datetime import datetime
 import json
+import logging
 import os
+from datetime import datetime
+from typing import Any, Dict, List, Optional, Union
+
+import aiohttp
 
 from .base import BaseService
 from .logger import get_logger

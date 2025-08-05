@@ -1,7 +1,9 @@
 """Surgify Communication API using Bitchat mesh networking."""
 import logging
-from flask import Flask, request, jsonify
-from src.surgify.network import initialize_surgify_network, get_surgify_handler
+
+from flask import Flask, jsonify, request
+
+from src.surgify.network import get_surgify_handler, initialize_surgify_network
 
 app = Flask(__name__)
 logger = logging.getLogger(__name__)
@@ -79,8 +81,8 @@ def network_status():
     """Get network status and peer information."""
     try:
         # Import here to avoid circular imports
-        import sys
         import os
+        import sys
 
         sys.path.insert(0, os.path.join(os.path.dirname(__file__), "../../../../"))
         from network import get_peers, get_queue_size

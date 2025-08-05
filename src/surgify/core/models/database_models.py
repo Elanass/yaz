@@ -5,17 +5,19 @@ Cleaned and optimized to match actual database schema
 
 from datetime import datetime
 from enum import Enum
+
 from sqlalchemy import (
+    Boolean,
     Column,
-    Integer,
-    String,
     DateTime,
     Float,
-    Boolean,
-    Text,
     ForeignKey,
+    Integer,
+    String,
+    Text,
 )
 from sqlalchemy.orm import relationship
+
 from surgify.core.database import Base
 
 

@@ -3,8 +3,8 @@ Domain Mapper - Maps surgery concepts to universal research concepts
 Enables cross-domain research while preserving surgical specificity
 """
 
-from typing import Dict, List, Any, Optional
 from enum import Enum
+from typing import Any, Dict, List, Optional
 
 
 class ResearchDomain(str, Enum):

@@ -3,16 +3,17 @@ Unified configuration for Surgify - imports from main config
 This file provides backward compatibility and uses its own configuration
 """
 
-from typing import List
-from pathlib import Path
-from dotenv import load_dotenv
 import os
 import secrets
+from pathlib import Path
+from typing import List
+
+from dotenv import load_dotenv
 
 # Try to import BaseSettings from pydantic-settings, fallback to pydantic v1 style
 try:
-    from pydantic_settings import BaseSettings
     from pydantic import Field
+    from pydantic_settings import BaseSettings
 except ImportError:
     from pydantic import BaseSettings, Field
 

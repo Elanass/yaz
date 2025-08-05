@@ -3,20 +3,21 @@ Unit tests for sync module
 Tests data synchronization and messaging functionality
 """
 
-import pytest
-from unittest.mock import Mock, patch, AsyncMock
 from datetime import datetime, timedelta
 from typing import List
+from unittest.mock import AsyncMock, Mock, patch
+
+import pytest
 
 from surgify.api.v1.sync import router
 from surgify.core.services.sync_service import (
-    SyncService,
-    SyncRequest,
-    SyncResponse,
-    SyncStatus,
     MessageRequest,
     MessageResponse,
     MessageType,
+    SyncRequest,
+    SyncResponse,
+    SyncService,
+    SyncStatus,
 )
 
 
@@ -301,8 +302,8 @@ class TestSyncAPI:
 
     def setup_method(self):
         """Setup API test fixtures"""
-        from fastapi.testclient import TestClient
         from fastapi import FastAPI
+        from fastapi.testclient import TestClient
 
         app = FastAPI()
         app.include_router(router)

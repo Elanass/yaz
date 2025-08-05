@@ -3,7 +3,7 @@ OfflineQueue: Stores deltas for offline sync (IndexedDB for web, SQLite for desk
 """
 import os
 import sqlite3
-from typing import List, Dict, Any
+from typing import Any, Dict, List
 
 
 class OfflineQueue:

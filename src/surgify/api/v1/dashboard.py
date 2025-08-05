@@ -5,19 +5,20 @@ Enhanced with optional Universal Research metrics
 
 import sqlite3
 from pathlib import Path
-from typing import Dict, Any, List, Optional, Union
+from typing import Any, Dict, List, Optional, Union
 
-from fastapi import APIRouter, HTTPException, Query, Depends
+from fastapi import APIRouter, Depends, HTTPException, Query
+
 from surgify.modules.analytics.analytics_engine import AnalyticsEngine
 
 # Universal Research Integration (Optional Enhancement)
 try:
+    from surgify.core.database import get_db
+    from surgify.core.services.case_service import CaseService
     from surgify.modules.universal_research.adapters.legacy_bridge import LegacyBridge
     from surgify.modules.universal_research.adapters.surgify_adapter import (
         SurgifyAdapter,
     )
-    from surgify.core.database import get_db
-    from surgify.core.services.case_service import CaseService
 
     RESEARCH_AVAILABLE = True
     LegacyBridge = LegacyBridge  # Make available for type hints

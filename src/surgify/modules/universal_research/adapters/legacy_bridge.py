@@ -3,11 +3,13 @@ Legacy Bridge - Bridges existing APIs with new research APIs
 Ensures backward compatibility while adding research capabilities
 """
 
-from typing import Dict, List, Any, Optional
+from typing import Any, Dict, List, Optional
+
 from fastapi import HTTPException
 
+from surgify.api.v1.cases import get_case, list_cases
 from surgify.core.services.case_service import CaseService
-from surgify.api.v1.cases import list_cases, get_case
+
 from .surgify_adapter import SurgifyAdapter
 
 

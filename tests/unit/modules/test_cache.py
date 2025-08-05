@@ -3,10 +3,11 @@ Unit tests for cache module
 Tests Redis caching functionality and fallback behavior
 """
 
-import pytest
-from unittest.mock import Mock, patch, AsyncMock
-import json
 import asyncio
+import json
+from unittest.mock import AsyncMock, Mock, patch
+
+import pytest
 
 from surgify.core.cache import (
     CacheClient,

@@ -25,9 +25,9 @@ def demonstrate_backward_compatibility():
     print("\n🔍 Testing Existing Core Services...")
 
     try:
-        from surgify.core.services.case_service import CaseService
-        from surgify.core.services.auth_service import AuthService
         from surgify.core.services.ai_service import AIService
+        from surgify.core.services.auth_service import AuthService
+        from surgify.core.services.case_service import CaseService
 
         print("  ✅ CaseService - Available and unchanged")
         print("  ✅ AuthService - Available and unchanged")
@@ -111,11 +111,11 @@ def demonstrate_research_enhancements():
         from surgify.modules.universal_research.integration.api_enhancer import (
             ResearchAPIEnhancer,
         )
-        from surgify.modules.universal_research.integration.database_bridge import (
-            DatabaseBridge,
-        )
         from surgify.modules.universal_research.integration.auth_integrator import (
             AuthIntegrator,
+        )
+        from surgify.modules.universal_research.integration.database_bridge import (
+            DatabaseBridge,
         )
 
         print("  ✅ ResearchAPIEnhancer - Adds research endpoints to existing FastAPI")

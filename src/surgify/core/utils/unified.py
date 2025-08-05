@@ -2,8 +2,8 @@
 Unified utility services for the platform
 """
 import logging
-from typing import Any, Dict, Optional
 from abc import ABC, abstractmethod
+from typing import Any, Dict, Optional
 
 
 class NotificationHandler(ABC):

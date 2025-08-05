@@ -1,16 +1,16 @@
 """Surgify-specific networking implementation using Bitchat."""
 import json
 import logging
-from typing import Dict, Any, List, Optional
-from datetime import datetime
+import os
 
 # Import from the root network module
 import sys
-import os
+from datetime import datetime
+from typing import Any, Dict, List, Optional
 
 sys.path.insert(0, os.path.join(os.path.dirname(__file__), "../../../"))
 
-from network import encrypt, decrypt, send, receive, queue_message, fetch_and_merge
+from network import decrypt, encrypt, fetch_and_merge, queue_message, receive, send
 
 logger = logging.getLogger(__name__)
 

@@ -3,8 +3,9 @@ Surgery Module Router
 Handles all surgery-related operations
 """
 
+from typing import Any, Dict, List
+
 from fastapi import APIRouter, HTTPException
-from typing import List, Dict, Any
 
 router = APIRouter()
 

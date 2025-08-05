@@ -1,13 +1,15 @@
 """
 Authentication API endpoints - Clean implementation
 """
-from fastapi import APIRouter, HTTPException, Depends, Request
-from fastapi.responses import JSONResponse
-from pydantic import BaseModel
-import secrets
 import base64
 import json
-from typing import Optional, Dict, Any
+import secrets
+from typing import Any, Dict, Optional
+
+from fastapi import APIRouter, Depends, HTTPException, Request
+from fastapi.responses import JSONResponse
+from pydantic import BaseModel
+
 from surgify.core.services.auth_service import AuthService
 
 router = APIRouter()

@@ -5,7 +5,7 @@ Simplified Encryption Service for Surgify Platform
 import base64
 import logging
 import os
-from typing import Any, Dict, Union, Optional
+from typing import Any, Dict, Optional, Union
 
 from cryptography.fernet import Fernet, InvalidToken
 from cryptography.hazmat.primitives import hashes

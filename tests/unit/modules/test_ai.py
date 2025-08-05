@@ -3,16 +3,17 @@ Unit tests for AI integration module
 Tests the AI summarization and analysis capabilities
 """
 
+from unittest.mock import AsyncMock, Mock, patch
+
 import pytest
-from unittest.mock import Mock, patch, AsyncMock
 from fastapi.testclient import TestClient
 
 from surgify.api.v1.ai import (
-    router,
     SummarizeRequest,
     SummarizeResponse,
     _build_summarization_prompt,
     _calculate_confidence_score,
+    router,
 )
 
 

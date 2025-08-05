@@ -3,9 +3,9 @@ Service Registry and Dependency Injection Container
 Provides a centralized way to manage application dependencies
 """
 
-from typing import Dict, Any, Type, TypeVar, Optional, Callable
-from abc import ABC, abstractmethod
 import logging
+from abc import ABC, abstractmethod
+from typing import Any, Callable, Dict, Optional, Type, TypeVar
 
 T = TypeVar("T")
 

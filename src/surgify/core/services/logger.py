@@ -7,7 +7,9 @@ import logging.handlers
 import sys
 from pathlib import Path
 from typing import Optional
+
 import structlog
+
 from surgify.core.config.unified_config import get_settings
 
 

@@ -3,13 +3,14 @@ Chat Integration API Endpoints
 Provides REST API for Chatwoot and Discord integrations
 """
 
-from fastapi import APIRouter, HTTPException, Depends, BackgroundTasks
-from typing import Dict, Any, Optional
 import logging
+from typing import Any, Dict, Optional
 
-from ...core.services.chat_integration import ChatIntegrationService
-from ...core.database import get_db
+from fastapi import APIRouter, BackgroundTasks, Depends, HTTPException
 from sqlalchemy.orm import Session
+
+from ...core.database import get_db
+from ...core.services.chat_integration import ChatIntegrationService
 
 logger = logging.getLogger(__name__)
 router = APIRouter(prefix="/chat", tags=["chat"])

@@ -3,14 +3,16 @@ API Enhancer - Adds research endpoints to existing FastAPI application
 Preserves all existing functionality while adding research capabilities
 """
 
-from typing import Dict, List, Any, Optional
 from datetime import datetime
+from typing import Any, Dict, List, Optional
+
 from fastapi import APIRouter, Depends, HTTPException, Query
 from sqlalchemy.orm import Session
 
 from surgify.core.database import get_db
-from surgify.core.services.auth_service import get_current_user
 from surgify.core.models.user import User
+from surgify.core.services.auth_service import get_current_user
+from surgify.modules.universal_research.adapters.legacy_bridge import LegacyBridge
 from surgify.modules.universal_research.adapters.surgify_adapter import SurgifyAdapter
 from surgify.modules.universal_research.engines.cohort_analyzer import CohortAnalyzer
 from surgify.modules.universal_research.engines.outcome_predictor import (
@@ -19,7 +21,6 @@ from surgify.modules.universal_research.engines.outcome_predictor import (
 from surgify.modules.universal_research.engines.research_generator import (
     ResearchGenerator,
 )
-from surgify.modules.universal_research.adapters.legacy_bridge import LegacyBridge
 
 
 # Global dependency functions for FastAPI injection

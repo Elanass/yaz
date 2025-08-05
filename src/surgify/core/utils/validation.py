@@ -5,7 +5,7 @@ This module provides centralized validation functions used throughout the platfo
 to ensure consistent validation logic and DRY principles.
 """
 
-from typing import Dict, Any, List, Optional, Tuple, Union
+from typing import Any, Dict, List, Optional, Tuple, Union
 
 from surgify.core.services.logger import get_logger
 

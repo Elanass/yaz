@@ -9,10 +9,11 @@ The models follow HIPAA/GDPR compliance requirements with proper
 data validation and sanitization.
 """
 
-from pydantic import BaseModel, Field, validator
-from typing import Optional, List, Dict, Any, Union
 from datetime import datetime
 from enum import Enum
+from typing import Any, Dict, List, Optional, Union
+
+from pydantic import BaseModel, Field, validator
 
 
 class SurgeryType(str, Enum):

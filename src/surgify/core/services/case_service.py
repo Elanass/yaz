@@ -5,18 +5,18 @@ Handles all case-related business logic with caching, persistence, and advanced 
 
 import logging
 from datetime import datetime, timedelta
-from typing import Dict, Any, List, Optional, Union
+from typing import Any, Dict, List, Optional, Union
 from uuid import uuid4
+
 import pandas as pd
-
-from sqlalchemy.orm import Session
-from sqlalchemy.ext.asyncio import AsyncSession
-from sqlalchemy import and_, or_, desc, asc, select, func
 from pydantic import BaseModel
+from sqlalchemy import and_, asc, desc, func, or_, select
+from sqlalchemy.ext.asyncio import AsyncSession
+from sqlalchemy.orm import Session
 
+from ..cache import cache_response, invalidate_cache
 from ..database import get_db
 from ..models.database_models import CaseModel, User
-from ..cache import invalidate_cache, cache_response
 from .base import BaseService
 from .logger import get_logger
 

@@ -2,8 +2,8 @@
 CRDT for JSON objects (simple JSON-OT style)
 """
 
-from typing import Any, Dict
 import copy
+from typing import Any, Dict
 
 
 class JSONOT:

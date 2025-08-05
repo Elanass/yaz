@@ -1,8 +1,8 @@
 """
 Simple dependency injection container for the platform
 """
-from typing import Any, Dict, Callable, TypeVar, Type
 import inspect
+from typing import Any, Callable, Dict, Type, TypeVar
 
 T = TypeVar("T")
 

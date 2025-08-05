@@ -5,7 +5,7 @@ Provides unified search across cases, patients, procedures, and protocols
 
 import sqlite3
 from pathlib import Path
-from typing import List, Dict, Any, Optional
+from typing import Any, Dict, List, Optional
 
 from fastapi import APIRouter, HTTPException
 from pydantic import BaseModel

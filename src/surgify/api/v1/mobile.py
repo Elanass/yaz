@@ -7,10 +7,11 @@ Handles mobile app-related requests including:
 - User subscriptions for app updates
 """
 
+import logging
+from typing import Optional
+
 from fastapi import APIRouter, HTTPException
 from pydantic import BaseModel, EmailStr
-from typing import Optional
-import logging
 
 logger = logging.getLogger(__name__)
 

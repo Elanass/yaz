@@ -3,18 +3,18 @@ End-to-end tests for Enhanced Cases API
 Tests both cache-hit and cache-miss scenarios
 """
 
+import fakeredis
 import pytest
 from fastapi.testclient import TestClient
 from sqlalchemy import create_engine
 from sqlalchemy.orm import sessionmaker
 from sqlalchemy.pool import StaticPool
-import fakeredis
 
-from surgify.main import app
-from surgify.core.database import get_db, Base
-from surgify.core.models.database_models import CaseModel
 from surgify.core.cache import cache_client
+from surgify.core.database import Base, get_db
+from surgify.core.models.database_models import CaseModel
 from surgify.core.services.case_service import CaseService
+from surgify.main import app
 
 # Test database setup
 SQLALCHEMY_DATABASE_URL = "sqlite:///:memory:"

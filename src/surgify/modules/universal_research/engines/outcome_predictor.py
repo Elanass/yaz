@@ -3,10 +3,10 @@ Outcome Predictor - Enhances existing decision support with research-based predi
 Integrates with existing recommendation system to provide evidence-based insights
 """
 
-from typing import Dict, List, Any, Optional, Tuple
 import math
-from datetime import datetime
 from collections import defaultdict
+from datetime import datetime
+from typing import Any, Dict, List, Optional, Tuple
 
 from surgify.modules.universal_research.adapters.surgify_adapter import SurgifyAdapter
 

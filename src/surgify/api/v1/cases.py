@@ -4,23 +4,24 @@ Modular, high-performance endpoints with caching and proper service separation
 """
 
 from typing import List, Optional
-from fastapi import APIRouter, HTTPException, Depends, Query, status
+
+from fastapi import APIRouter, Depends, HTTPException, Query, status
 from sqlalchemy.orm import Session
 
-from surgify.core.database import get_db
-from surgify.core.services.case_service import (
-    CaseService as EnhancedCaseService,
-    CaseCreateRequest,
-    CaseUpdateRequest,
-    CaseResponse,
-    CaseListFilters,
-)
-from surgify.core.services.auth_service import get_current_user
-from surgify.core.models.user import User
 from surgify.core.cache import (
-    cache_list_endpoint,
     cache_detail_endpoint,
+    cache_list_endpoint,
     invalidate_cache,
+)
+from surgify.core.database import get_db
+from surgify.core.models.user import User
+from surgify.core.services.auth_service import get_current_user
+from surgify.core.services.case_service import (
+    CaseCreateRequest,
+    CaseListFilters,
+    CaseResponse,
+    CaseService as EnhancedCaseService,
+    CaseUpdateRequest,
 )
 
 router = APIRouter(tags=["Cases"])

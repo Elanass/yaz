@@ -3,12 +3,13 @@ Auth Integrator - Uses existing JWT system for research features
 Seamlessly integrates research permissions with existing authentication
 """
 
-from typing import Dict, List, Any, Optional
-from fastapi import Depends, HTTPException, status
-from fastapi.security import HTTPBearer, HTTPAuthorizationCredentials
+from typing import Any, Dict, List, Optional
 
-from surgify.core.services.auth_service import get_current_user, verify_token
+from fastapi import Depends, HTTPException, status
+from fastapi.security import HTTPAuthorizationCredentials, HTTPBearer
+
 from surgify.core.models.user import User
+from surgify.core.services.auth_service import get_current_user, verify_token
 
 
 class AuthIntegrator:

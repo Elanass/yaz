@@ -3,22 +3,23 @@ End-to-end tests for Deliverables API
 Tests both cache-hit and cache-miss scenarios for deliverable management
 """
 
+from datetime import datetime, timedelta
+
+import fakeredis
 import pytest
 from fastapi.testclient import TestClient
 from sqlalchemy import create_engine
 from sqlalchemy.orm import sessionmaker
 from sqlalchemy.pool import StaticPool
-import fakeredis
-from datetime import datetime, timedelta
 
-from surgify.main import app
-from surgify.core.database import get_db, Base
 from surgify.core.cache import cache_client
+from surgify.core.database import Base, get_db
 from surgify.core.services.deliverable_service import (
-    DeliverableType,
     DeliverableFormat,
     DeliverableStatus,
+    DeliverableType,
 )
+from surgify.main import app
 
 # Test database setup
 SQLALCHEMY_DATABASE_URL = "sqlite:///:memory:"

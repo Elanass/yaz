@@ -6,11 +6,12 @@ Ensures all existing functionality remains intact after research module integrat
 
 import asyncio
 import json
-import requests
-from pathlib import Path
-import sqlite3
 import os
+import sqlite3
 import sys
+from pathlib import Path
+
+import requests
 
 # Add the project root to the Python path
 project_root = Path(__file__).parent.parent.parent
@@ -206,6 +207,7 @@ class BackwardCompatibilityTester:
         # Test that existing error patterns are preserved
         try:
             from fastapi import HTTPException
+
             from surgify.api.v1.cases import get_case
 
             print("    ✓ Error handling imports work")

@@ -1,10 +1,11 @@
 """
 Core dependencies for API endpoints
 """
-from typing import Dict, Any, Optional
 from enum import Enum
+from typing import Any, Dict, Optional
+
 from fastapi import Depends, HTTPException, status
-from fastapi.security import HTTPBearer, HTTPAuthorizationCredentials
+from fastapi.security import HTTPAuthorizationCredentials, HTTPBearer
 
 
 class Domain(Enum):

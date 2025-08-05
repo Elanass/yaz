@@ -1,16 +1,17 @@
-import sys
 import os
-from pathlib import Path
+import sys
 from logging.config import fileConfig
-from sqlalchemy import engine_from_config, pool
+from pathlib import Path
+
 from alembic import context
+from sqlalchemy import engine_from_config, pool
 
 # Add src directory to path
 sys.path.insert(0, str(Path(__file__).parent.parent.parent / "src"))
 
 from surgify.core.database import Base
-from surgify.core.models.user import User
 from surgify.core.models.case import Case
+from surgify.core.models.user import User
 
 # this is the Alembic Config object, which provides access to values within the .ini file.
 config = context.config
@@ -21,6 +22,7 @@ if config.config_file_name is not None:
     fileConfig(config.config_file_name)
 
 target_metadata = Base.metadata
+
 
 def run_migrations_offline():
     """Run migrations in 'offline' mode."""
@@ -35,6 +37,7 @@ def run_migrations_offline():
     with context.begin_transaction():
         context.run_migrations()
 
+
 def run_migrations_online():
     """Run migrations in 'online' mode."""
     connectable = engine_from_config(
@@ -48,6 +51,7 @@ def run_migrations_online():
 
         with context.begin_transaction():
             context.run_migrations()
+
 
 if context.is_offline_mode():
     run_migrations_offline()

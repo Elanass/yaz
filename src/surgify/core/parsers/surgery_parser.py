@@ -5,9 +5,11 @@ Handles parsing of surgical case data, patient information,
 procedures, and surgical outcomes.
 """
 
-from typing import Any, Dict, List
-import pandas as pd
 import logging
+from typing import Any, Dict, List
+
+import pandas as pd
+
 from surgify.core.parsers import BaseParser
 
 logger = logging.getLogger(__name__)

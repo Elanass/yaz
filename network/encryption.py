@@ -1,9 +1,9 @@
 """General platform networking wrapper for Bitchat."""
-import sys
 import os
+import sys
 
 # Add the bitchat module to the Python path
-sys.path.insert(0, os.path.join(os.path.dirname(__file__), 'bitchat'))
+sys.path.insert(0, os.path.join(os.path.dirname(__file__), "bitchat"))
 
 try:
     # Try to import from the actual Bitchat library structure
@@ -15,7 +15,7 @@ except ImportError:
         def encrypt(data, key):
             """Placeholder encryption - replace with actual Bitchat implementation."""
             return f"encrypted_{data}_{key}".encode()
-        
+
         @staticmethod
         def decrypt(data, key):
             """Placeholder decryption - replace with actual Bitchat implementation."""

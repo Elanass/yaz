@@ -2,11 +2,11 @@
 License validation utility for dependency scanning and compliance checking.
 """
 import json
-import subprocess
-from pathlib import Path
-from typing import Dict, List, Tuple, Optional
-from datetime import datetime
 import re
+import subprocess
+from datetime import datetime
+from pathlib import Path
+from typing import Dict, List, Optional, Tuple
 
 from surgify.core.services.logger import get_logger
 

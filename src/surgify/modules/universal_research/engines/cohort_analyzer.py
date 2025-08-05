@@ -3,13 +3,13 @@ Cohort Analyzer - Analyzes surgical cohorts from existing cases
 Leverages existing Surgify data for research cohort analysis
 """
 
-from typing import Dict, List, Any, Optional, Tuple
-from datetime import datetime, timedelta
-from collections import defaultdict
 import statistics
+from collections import defaultdict
+from datetime import datetime, timedelta
+from typing import Any, Dict, List, Optional, Tuple
 
-from surgify.modules.universal_research.adapters.surgify_adapter import SurgifyAdapter
 from surgify.modules.universal_research.adapters.domain_mapper import ConceptMapper
+from surgify.modules.universal_research.adapters.surgify_adapter import SurgifyAdapter
 
 
 class CohortAnalyzer:

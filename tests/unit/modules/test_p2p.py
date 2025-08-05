@@ -3,10 +3,11 @@ Unit tests for P2P networking module
 Tests peer discovery and mesh networking functionality
 """
 
-import pytest
-from unittest.mock import Mock, patch, AsyncMock
 import asyncio
 from typing import Set
+from unittest.mock import AsyncMock, Mock, patch
+
+import pytest
 
 from surgify.network.p2p import P2PNode
 

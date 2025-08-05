@@ -2,11 +2,13 @@
 Surgical Proposals API - Collaborative Surgery Platform
 """
 
-from fastapi import APIRouter, HTTPException, Depends
-from pydantic import BaseModel
-from typing import List, Optional
-from datetime import datetime
 import sqlite3
+from datetime import datetime
+from typing import List, Optional
+
+from fastapi import APIRouter, Depends, HTTPException
+from pydantic import BaseModel
+
 from surgify.core.database import DATABASE_DIR
 
 router = APIRouter()

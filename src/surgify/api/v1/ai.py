@@ -5,14 +5,14 @@ Provides AI-powered summarization and analysis capabilities
 
 import logging
 import os
-from typing import Dict, Any, Optional
+from typing import Any, Dict, Optional
 
-from fastapi import APIRouter, HTTPException, Depends
-from pydantic import BaseModel, Field
 import openai
+from fastapi import APIRouter, Depends, HTTPException
+from pydantic import BaseModel, Field
 
 from ...core.config.unified_config import get_settings
-from ...core.services.logger import log_request, log_error
+from ...core.services.logger import log_error, log_request
 
 # Setup logging and OpenAI
 logger = logging.getLogger(__name__)

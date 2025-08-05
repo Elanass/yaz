@@ -5,16 +5,16 @@ Handles data synchronization, messaging, and inter-service communication
 
 import logging
 from datetime import datetime, timedelta
-from typing import Dict, Any, List, Optional, Union
 from enum import Enum
+from typing import Any, Dict, List, Optional, Union
 from uuid import uuid4
 
-from sqlalchemy.orm import Session
-from sqlalchemy import and_, or_, desc, asc
 from pydantic import BaseModel
+from sqlalchemy import and_, asc, desc, or_
+from sqlalchemy.orm import Session
 
-from ..database import get_db
 from ..cache import invalidate_cache
+from ..database import get_db
 from .base import BaseService
 
 logger = logging.getLogger(__name__)

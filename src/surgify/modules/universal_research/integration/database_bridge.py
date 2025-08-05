@@ -3,9 +3,10 @@ Database Bridge - Connects research engine to existing SQLAlchemy setup
 Ensures seamless integration with existing database architecture
 """
 
-from typing import Dict, List, Any, Optional
+from typing import Any, Dict, List, Optional
+
+from sqlalchemy import func, text
 from sqlalchemy.orm import Session
-from sqlalchemy import text, func
 
 from surgify.core.database import Base, engine, get_db
 from surgify.core.models.database_models import Case, Patient, User

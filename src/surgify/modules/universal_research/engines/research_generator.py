@@ -3,10 +3,10 @@ Research Generator - Generates research from existing Surgify case database
 Automatically creates research deliverables from clinical data
 """
 
-from typing import Dict, List, Any, Optional
-from datetime import datetime, timedelta
-from collections import defaultdict
 import json
+from collections import defaultdict
+from datetime import datetime, timedelta
+from typing import Any, Dict, List, Optional
 
 from surgify.modules.universal_research.adapters.surgify_adapter import SurgifyAdapter
 from surgify.modules.universal_research.engines.cohort_analyzer import CohortAnalyzer

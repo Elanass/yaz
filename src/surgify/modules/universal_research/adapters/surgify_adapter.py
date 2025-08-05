@@ -3,12 +3,13 @@ Surgify Adapter - Maps current case data to universal research engine
 Preserves existing data structure while enabling research capabilities
 """
 
-from typing import Dict, List, Optional, Any
 from datetime import datetime
+from typing import Any, Dict, List, Optional
+
 from sqlalchemy.orm import Session
 
-from surgify.core.models.database_models import Case, Patient, User
 from surgify.core.database import get_db
+from surgify.core.models.database_models import Case, Patient, User
 
 
 class SurgifyAdapter:

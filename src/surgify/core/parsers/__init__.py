@@ -4,6 +4,7 @@ Base parser interface for all domain parsers
 
 from abc import ABC, abstractmethod
 from typing import Any, Dict, List
+
 import pandas as pd
 
 

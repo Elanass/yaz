@@ -18,27 +18,27 @@ import uvicorn
 from fastapi import FastAPI, Request
 from fastapi.middleware.cors import CORSMiddleware
 from fastapi.middleware.gzip import GZipMiddleware
-from fastapi.responses import JSONResponse, HTMLResponse
+from fastapi.responses import HTMLResponse, JSONResponse
 from fastapi.staticfiles import StaticFiles
-
-# Core imports
-from .core.config.unified_config import get_settings
-from .core.services.logger import setup_logging, log_request, log_error
-from .core.database import create_tables, engine
-from .core.models.database_models import Base
-from .core.services.registry import get_service_registry
-
-# Domain adapter imports
-from .core.domain_adapter import domain_registry, Domain
 
 # API imports
 from .api.v1 import router as api_v1_router
-from .ui.web.router import web_router
+
+# Core imports
+from .core.config.unified_config import get_settings
+from .core.database import create_tables, engine
+
+# Domain adapter imports
+from .core.domain_adapter import Domain, domain_registry
+from .core.models.database_models import Base
+from .core.services.logger import log_error, log_request, setup_logging
+from .core.services.registry import get_service_registry
 
 # Universal Research Module imports
 from .modules.universal_research.integration.api_enhancer import ResearchAPIEnhancer
-from .modules.universal_research.integration.database_bridge import DatabaseBridge
 from .modules.universal_research.integration.auth_integrator import AuthIntegrator
+from .modules.universal_research.integration.database_bridge import DatabaseBridge
+from .ui.web.router import web_router
 
 # Setup logging first
 setup_logging()

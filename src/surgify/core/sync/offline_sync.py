@@ -1,8 +1,8 @@
 """
 Offline sync logic: Pull/push deltas over Bitchat, merge via CRDT, resolve conflicts, generate new deltas
 """
-from .crdt_text import RGA
 from .crdt_json import JSONOT
+from .crdt_text import RGA
 from .offline_queue import OfflineQueue
 
 
