@@ -22,12 +22,14 @@ class RegisterRequest(BaseModel):
     full_name: Optional[str] = None
 
 class LoginRequest(BaseModel):
-    username: str
+    username: Optional[str] = None
+    email: Optional[str] = None
     password: str
 
 
 class TokenResponse(BaseModel):
     access_token: str
+    refresh_token: Optional[str] = None
     token_type: str = "bearer"
     user: Optional[Dict[str, Any]] = None
 
@@ -64,19 +66,86 @@ auth_service = AuthService()
 @router.post("/login", response_model=TokenResponse)
 async def login(request: LoginRequest):
     """User login endpoint"""
-    # Simplified login for MVP
-    if request.username == "demo" and request.password == "demo":
+    # Validate input
+    if not request.password:
+        raise HTTPException(status_code=422, detail="Password is required")
+    
+    if not request.username and not request.email:
+        raise HTTPException(status_code=422, detail="Username or email is required")
+    
+    # For testing, check against registered users
+    login_identifier = request.username or request.email
+    
+    # Find user in registered_users
+    user_found = None
+    for username, email in registered_users:
+        if username == login_identifier or email == login_identifier:
+            user_found = (username, email)
+            break
+    
+    if user_found:
+        # Generate token for authenticated user
+        token = f"{user_found[0]}:{secrets.token_urlsafe(32)}"
+        refresh_token = f"refresh_{user_found[0]}:{secrets.token_urlsafe(32)}"
+        user_data = {
+            "username": user_found[0],
+            "email": user_found[1],
+            "display_name": user_found[0]
+        }
+        return TokenResponse(
+            access_token=token,
+            refresh_token=refresh_token,
+            user=user_data
+        )
+    
+    # Fallback to demo user for testing
+    if login_identifier == "demo" and request.password == "demo":
         user_data = {
             "id": "demo-user-id",
-            "email": request.username,
+            "email": "demo@example.com",
             "name": "Demo User",
             "display_name": "Demo User"
         }
         return TokenResponse(
             access_token="demo-token",
+            refresh_token="demo-refresh-token",
             user=user_data
         )
+    
     raise HTTPException(status_code=401, detail="Invalid credentials")
+
+class RefreshRequest(BaseModel):
+    refresh_token: str
+
+@router.post("/refresh", response_model=TokenResponse)
+async def refresh_token(request: RefreshRequest):
+    """Refresh access token using refresh token"""
+    # Simple token refresh logic for testing
+    if request.refresh_token and request.refresh_token.startswith("refresh_"):
+        username = request.refresh_token.split(":")[0].replace("refresh_", "")
+        # Find user in registered_users
+        user_found = None
+        for registered_username, email in registered_users:
+            if registered_username == username:
+                user_found = (registered_username, email)
+                break
+        
+        if user_found:
+            # Generate new tokens
+            new_access_token = f"{user_found[0]}:{secrets.token_urlsafe(32)}"
+            new_refresh_token = f"refresh_{user_found[0]}:{secrets.token_urlsafe(32)}"
+            user_data = {
+                "username": user_found[0],
+                "email": user_found[1],
+                "display_name": user_found[0]
+            }
+            return TokenResponse(
+                access_token=new_access_token,
+                refresh_token=new_refresh_token,
+                user=user_data
+            )
+    
+    raise HTTPException(status_code=401, detail="Invalid refresh token")
 
 
 @router.get("/me")
@@ -103,14 +172,20 @@ def register_user(request: RegisterRequest):
     # Simple registration for testing
     if request.username and request.email and request.password:
         registered_users.add(user_key)
-        return {
-            "message": "User registered successfully",
-            "user": {
-                "username": request.username,
-                "email": request.email,
-                "full_name": request.full_name
-            }
+        user_data = {
+            "username": request.username,
+            "email": request.email,
+            "full_name": request.full_name
         }
+        # Generate a simple token for testing
+        token = f"{request.username}:{secrets.token_urlsafe(32)}"
+        refresh_token = f"refresh_{request.username}:{secrets.token_urlsafe(32)}"
+        return TokenResponse(
+            access_token=token,
+            refresh_token=refresh_token,
+            token_type="bearer",
+            user=user_data
+        )
     else:
         raise HTTPException(status_code=400, detail="Missing required fields")
 

@@ -20,7 +20,7 @@ from surgify.core.database import Base, get_db
 from surgify.main import app
 
 # Test database setup
-SQLALCHEMY_DATABASE_URL = "sqlite:///./test_surgify.db"
+SQLALCHEMY_DATABASE_URL = "sqlite:///./tests/fixtures/test_surgify.db"
 test_engine = create_engine(
     SQLALCHEMY_DATABASE_URL, connect_args={"check_same_thread": False}
 )

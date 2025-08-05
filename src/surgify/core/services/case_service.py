@@ -5,56 +5,68 @@ Handles all case-related operations
 
 from typing import Dict, Any, List, Optional
 from surgify.core.models.case import Case
+import uuid
+import json
 
 class CaseService:
     """
     Case processing service for surgical case management
     """
     def __init__(self):
-        pass
+        # Simple in-memory storage for testing
+        self.cases = {}
+        self.next_id = 1
 
     def create_case(self, request):
-        # Pseudo-code for creating a case
-        case = Case(
-            patient_id=request.patient_id,
-            surgery_type=request.surgery_type,
-            status=request.status,
-            pre_op_notes=request.pre_op_notes,
-            post_op_notes=request.post_op_notes
-        )
-        # db_session.add(case)
-        # db_session.commit()
-        return case
+        # Create a structured case response for testing
+        procedure_type = getattr(request, 'procedure_type', None) or getattr(request, 'surgery_type', 'General Surgery')
+        diagnosis = getattr(request, 'diagnosis', None) or "To be determined"
+        
+        case_data = {
+            "id": self.next_id,
+            "case_number": f"CASE-{uuid.uuid4().hex[:8].upper()}",
+            "patient_id": request.patient_id,
+            "procedure_type": procedure_type,
+            "surgery_type": procedure_type,  # For backward compatibility
+            "diagnosis": diagnosis,
+            "status": request.status,
+            "risk_score": 0.5,  # Default risk score
+            "recommendations": ["Standard pre-operative assessment", "Monitor vital signs"]
+        }
+        self.cases[self.next_id] = case_data
+        self.next_id += 1
+        return case_data
 
     def list_cases(self):
-        # Pseudo-code for listing cases
-        cases = []  # Replace with actual DB query
-        return cases
+        # Return all cases with proper structure
+        return list(self.cases.values())
 
     def get_case(self, case_id):
-        # Pseudo-code for fetching a case by ID
-        case = None  # Replace with actual DB query
-        if not case:
+        # Get a specific case
+        if case_id not in self.cases:
             raise Exception("Case not found")
-        return case
+        return self.cases[case_id]
 
     def update_case(self, case_id, request):
-        # Pseudo-code for updating a case
-        case = None  # Replace with actual DB query
-        if not case:
+        # Update an existing case
+        if case_id not in self.cases:
             raise Exception("Case not found")
-        case.patient_id = request.patient_id
-        case.surgery_type = request.surgery_type
-        case.status = request.status
-        case.pre_op_notes = request.pre_op_notes
-        case.post_op_notes = request.post_op_notes
-        # db_session.commit()
-        return case
+        
+        procedure_type = getattr(request, 'procedure_type', None) or getattr(request, 'surgery_type', 'General Surgery')
+        diagnosis = getattr(request, 'diagnosis', None) or "To be determined"
+        
+        case_data = self.cases[case_id]
+        case_data.update({
+            "patient_id": request.patient_id,
+            "procedure_type": procedure_type,
+            "surgery_type": procedure_type,  # For backward compatibility
+            "diagnosis": diagnosis,
+            "status": request.status,
+        })
+        return case_data
 
     def delete_case(self, case_id):
-        # Pseudo-code for deleting a case
-        case = None  # Replace with actual DB query
-        if not case:
+        # Delete a case
+        if case_id not in self.cases:
             raise Exception("Case not found")
-        # db_session.delete(case)
-        # db_session.commit()
+        del self.cases[case_id]

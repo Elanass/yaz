@@ -2,8 +2,10 @@
 """
 Surgify - Advanced Surgery Analytics Platform
 Decision Precision Engine with Modern Architecture
+Multi-Domain Support: Surgery, Logistics, Insurance
 """
 
+import argparse
 import asyncio
 import logging
 import os
@@ -26,9 +28,17 @@ from .core.database import create_tables, engine
 from .core.models.database_models import Base
 from .core.services.registry import get_service_registry
 
+# Domain adapter imports
+from .core.domain_adapter import domain_registry, Domain
+
 # API imports
 from .api.v1 import router as api_v1_router
 from .ui.web.router import web_router
+
+# Universal Research Module imports
+from .modules.universal_research.integration.api_enhancer import ResearchAPIEnhancer
+from .modules.universal_research.integration.database_bridge import DatabaseBridge
+from .modules.universal_research.integration.auth_integrator import AuthIntegrator
 
 # Setup logging first
 setup_logging()
@@ -76,6 +86,13 @@ async def initialize_services():
     # Service registry is already initialized as singleton
     registry = get_service_registry()
     
+    # Initialize domain adapters
+    logger.info("🎯 Initializing domain adapters...")
+    validation_results = domain_registry.validate_all_domains()
+    for domain, result in validation_results.items():
+        status = "✅" if result.get("status") == "operational" else "⚠️"
+        logger.info(f"  {status} {domain}: {result.get('message', 'Unknown status')}")
+    
     # Register core services here
     # registry.register_singleton(DatabaseService, database_service)
     # registry.register_singleton(AuthService, auth_service)
@@ -97,17 +114,38 @@ async def initialize_modules():
         "analytics": "Data analysis and reporting", 
         "clinical": "Clinical workstation and decision support",
         "auth": "Authentication and user management",
-        "collaboration": "Real-time collaboration features"
+        "collaboration": "Real-time collaboration features",
+        "universal_research": "Universal research and deliverable generation"
     }
     
     for module, description in modules.items():
         logger.info(f"  ✓ {module}: {description}")
     
+    # Initialize research database components
+    try:
+        logger.info("🔬 Initializing Universal Research Module...")
+        db_bridge = DatabaseBridge()
+        db_bridge.create_research_views()
+        db_bridge.create_research_indexes()
+        logger.info("✅ Universal Research Module initialized successfully")
+    except Exception as e:
+        logger.warning(f"⚠️ Research module initialization had issues: {e}")
+        logger.info("🔄 Application will continue with core functionality")
+    
     logger.info("✅ All modules initialized")
 
-def create_app() -> FastAPI:
+def create_app(domain: str = None) -> FastAPI:
     """Create and configure the FastAPI application"""
     settings = get_settings()
+    
+    # Set current domain if provided
+    if domain:
+        try:
+            domain_enum = Domain(domain)
+            domain_registry.set_current_domain(domain_enum)
+            logger.info(f"🎯 Set application domain to: {domain}")
+        except ValueError:
+            logger.warning(f"⚠️ Invalid domain '{domain}', using default behavior")
     
     # Create FastAPI app with enhanced configuration
     app = FastAPI(
@@ -120,6 +158,10 @@ def create_app() -> FastAPI:
         lifespan=lifespan,
         debug=settings.debug
     )
+    
+    # Store domain info in app state
+    app.state.current_domain = domain
+    app.state.domain_registry = domain_registry
     
     # Request logging middleware
     @app.middleware("http")
@@ -161,6 +203,22 @@ def create_app() -> FastAPI:
     # API routes
     app.include_router(api_v1_router, prefix="/api/v1", tags=["API v1"])
     
+    # Universal Research API routes (NEW - PRESERVES EXISTING)
+    try:
+        research_enhancer = ResearchAPIEnhancer()
+        research_router = research_enhancer.get_router()
+        app.include_router(research_router, tags=["Research Analytics"])
+        logger.info("✅ Research API endpoints added successfully")
+        
+        # Initialize research authentication enhancements
+        from surgify.modules.universal_research.integration.auth_integrator import AuthIntegrator
+        auth_integrator = AuthIntegrator()
+        auth_integrator.enhance_existing_auth_middleware(app)
+        
+    except Exception as e:
+        logger.warning(f"⚠️ Research API integration had issues: {e}")
+        logger.info("🔄 Application continues with core functionality")
+    
     # Web routes
     app.include_router(web_router, tags=["Web Interface"])
     
@@ -182,14 +240,17 @@ def create_app() -> FastAPI:
         </html>
         """)
     
-    # Health check
+    # Health check with domain info
     @app.get("/health")
     async def health_check():
-        """Health check endpoint"""
+        """Health check endpoint with domain information"""
+        current_adapter = domain_registry.get_current_adapter()
         return {
             "status": "healthy",
             "service": "Surgify Decision Precision Engine",
             "version": "2.0.0",
+            "current_domain": current_adapter.domain.value if current_adapter else None,
+            "available_domains": domain_registry.list_domains(),
             "timestamp": str(asyncio.get_event_loop().time())
         }
     
@@ -222,19 +283,55 @@ def create_app() -> FastAPI:
 
     return app
 
-# Create the app instance
+# Create the app instance (will be recreated in main() with CLI args)
 app = create_app()
+
+def parse_args():
+    """Parse command line arguments"""
+    parser = argparse.ArgumentParser(description="Surgify - Advanced Surgery Analytics Platform")
+    parser.add_argument(
+        "--domain",
+        choices=["surgery", "logistics", "insurance"],
+        help="Set the primary domain for the application (surgery, logistics, or insurance)"
+    )
+    parser.add_argument(
+        "--host",
+        default="0.0.0.0",
+        help="Host to bind the server to (default: 0.0.0.0)"
+    )
+    parser.add_argument(
+        "--port",
+        type=int,
+        default=8000,
+        help="Port to bind the server to (default: 8000)"
+    )
+    parser.add_argument(
+        "--reload",
+        action="store_true",
+        help="Enable auto-reload for development"
+    )
+    return parser.parse_args()
 
 def main():
     """Run the application"""
+    # Parse command line arguments
+    args = parse_args()
+    
+    # Recreate app with domain configuration
+    global app
+    app = create_app(domain=args.domain)
+    
     settings = get_settings()
     logger.info(f"🏥 Starting {settings.app_name} - Decision Precision Engine")
     
+    if args.domain:
+        logger.info(f"🎯 Running in {args.domain} domain mode")
+    
     uvicorn.run(
         "surgify.main:app",
-        host=settings.host,
-        port=settings.port,
-        reload=settings.is_development,
+        host=args.host,
+        port=args.port,
+        reload=args.reload or settings.is_development,
         log_level=settings.log_level.lower(),
         access_log=True
     )

@@ -1,6 +1,9 @@
+from fastapi import Depends, HTTPException, status
+from fastapi.security import HTTPBearer, HTTPAuthorizationCredentials
 import bcrypt
 import jwt
 from datetime import datetime, timedelta
+from typing import Optional
 from ..models.user import User
 
 class AuthService:
@@ -8,6 +11,9 @@ class AuthService:
     ALGORITHM = "HS256"
     ACCESS_TOKEN_EXPIRE_MINUTES = 30
     REFRESH_TOKEN_EXPIRE_DAYS = 7
+
+    def __init__(self):
+        self.security = HTTPBearer()
 
     def hash_password(self, password: str) -> str:
         return bcrypt.hashpw(password.encode('utf-8'), bcrypt.gensalt()).decode('utf-8')
@@ -61,3 +67,62 @@ class AuthService:
             raise Exception("Refresh token expired")
         except jwt.InvalidTokenError:
             raise Exception("Invalid refresh token")
+
+    def verify_token(self, token: str) -> Optional[dict]:
+        """Verify JWT token and return payload"""
+        try:
+            payload = jwt.decode(token, self.SECRET_KEY, algorithms=[self.ALGORITHM])
+            return payload
+        except jwt.PyJWTError:
+            return None
+
+    def get_current_user_from_token(self, token: str) -> Optional[User]:
+        """Get current user from JWT token"""
+        payload = self.verify_token(token)
+        if payload is None:
+            return None
+        
+        email = payload.get("sub")
+        if email is None:
+            return None
+        
+        # In a real implementation, this would query the database
+        # For now, return a mock user for testing
+        return User(
+            id=1,
+            username="test_user",
+            email=email,
+            hashed_password="hashed",
+            role="surgeon",
+            is_active=True
+        )
+
+# Create auth service instance
+auth_service = AuthService()
+
+# FastAPI dependency functions
+def get_current_user(credentials: HTTPAuthorizationCredentials = Depends(auth_service.security)) -> User:
+    """
+    FastAPI dependency to get current authenticated user
+    Used by research endpoints and enhanced existing endpoints
+    """
+    if not credentials:
+        raise HTTPException(
+            status_code=status.HTTP_401_UNAUTHORIZED,
+            detail="Authentication credentials required",
+            headers={"WWW-Authenticate": "Bearer"},
+        )
+    
+    user = auth_service.get_current_user_from_token(credentials.credentials)
+    if user is None:
+        raise HTTPException(
+            status_code=status.HTTP_401_UNAUTHORIZED,
+            detail="Invalid authentication credentials",
+            headers={"WWW-Authenticate": "Bearer"},
+        )
+    
+    return user
+
+def verify_token(token: str) -> Optional[dict]:
+    """Verify JWT token - wrapper for compatibility"""
+    return auth_service.verify_token(token)

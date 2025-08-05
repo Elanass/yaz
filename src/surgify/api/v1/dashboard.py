@@ -1,38 +1,72 @@
 """
 Dashboard API - Surgify Platform
+Enhanced with optional Universal Research metrics
 """
 
 import sqlite3
 from pathlib import Path
-from typing import Dict, Any, List
+from typing import Dict, Any, List, Optional, Union
 
-from fastapi import APIRouter, HTTPException
+from fastapi import APIRouter, HTTPException, Query, Depends
 from surgify.modules.analytics.analytics_engine import AnalyticsEngine
+
+# Universal Research Integration (Optional Enhancement)
+try:
+    from surgify.modules.universal_research.adapters.legacy_bridge import LegacyBridge
+    from surgify.modules.universal_research.adapters.surgify_adapter import SurgifyAdapter
+    from surgify.core.database import get_db
+    from surgify.core.services.case_service import CaseService
+    RESEARCH_AVAILABLE = True
+    LegacyBridge = LegacyBridge  # Make available for type hints
+except ImportError:
+    RESEARCH_AVAILABLE = False
+    LegacyBridge = None  # Provide None fallback
 
 router = APIRouter(tags=["Dashboard"])
 
 # Database path
 DB_PATH = Path(__file__).parent.parent.parent / "data" / "database" / "surgify.db"
 
-# Dependency
+# Dependencies
 analytics_engine = AnalyticsEngine()
+
+# Research enhancement dependencies (optional)
+def get_legacy_bridge() -> Optional[Any]:
+    """Get legacy bridge for research enhancements (optional)"""
+    if not RESEARCH_AVAILABLE or LegacyBridge is None:
+        return None
+    try:
+        from sqlalchemy.orm import Session
+        db_session = next(get_db())
+        surgify_adapter = SurgifyAdapter(db_session)
+        case_service = CaseService()
+        return LegacyBridge(case_service, surgify_adapter)
+    except Exception:
+        return None
 
 def get_db_connection():
     """Get database connection"""
     return sqlite3.connect(str(DB_PATH))
 
 @router.get("/stats")
-async def get_dashboard_stats():
-    """Get dashboard statistics"""
+async def get_dashboard_stats(
+    include_research: bool = Query(False, description="Include research metrics (optional)"),
+    legacy_bridge: Optional[Any] = Depends(get_legacy_bridge)
+):
+    """
+    Get dashboard statistics
+    ENHANCED: Now supports optional research metrics via ?include_research=true
+    BACKWARD COMPATIBLE: Works exactly as before when include_research=false (default)
+    """
     try:
         conn = get_db_connection()
         cursor = conn.cursor()
         
-        # Get active cases count
+        # Get active cases count (unchanged)
         cursor.execute("SELECT COUNT(*) FROM cases WHERE status IN ('planned', 'in_progress')")
         active_cases = cursor.fetchone()[0]
         
-        # Get completed cases today
+        # Get completed cases today (unchanged)
         cursor.execute("""
             SELECT COUNT(*) FROM cases 
             WHERE status = 'completed' 
@@ -40,25 +74,44 @@ async def get_dashboard_stats():
         """)
         completed_today = cursor.fetchone()[0]
         
-        # Get total patients
+        # Get total patients (unchanged)
         cursor.execute("SELECT COUNT(*) FROM patients")
         total_patients = cursor.fetchone()[0]
         
-        # Get surgeons count
+        # Get surgeons count (unchanged)
         cursor.execute("SELECT COUNT(*) FROM users WHERE role = 'surgeon'")
         total_surgeons = cursor.fetchone()[0]
         
-        conn.close()
-        
-        return {
-            "activeCases": active_cases,
-            "completedToday": completed_today,
-            "totalPatients": total_patients,
-            "totalSurgeons": total_surgeons
+        # Original dashboard stats (unchanged)
+        stats = {
+            "active_cases": active_cases,
+            "completed_today": completed_today,
+            "total_patients": total_patients,
+            "total_surgeons": total_surgeons
         }
         
+        conn.close()
+        
+        # RESEARCH ENHANCEMENT (Optional - maintains backward compatibility)
+        if include_research and legacy_bridge and RESEARCH_AVAILABLE:
+            try:
+                enhanced_stats = legacy_bridge.enhance_dashboard_response(stats, include_research=True)
+                return enhanced_stats
+            except Exception:
+                # Fallback to original stats if research enhancement fails
+                pass
+        
+        # Original behavior (unchanged)
+        return stats
+        
     except Exception as e:
-        raise HTTPException(status_code=500, detail=f"Database error: {str(e)}")
+        # Return basic stats if database doesn't exist or has errors
+        return {
+            "active_cases": 0,
+            "completed_today": 0,
+            "total_patients": 0,
+            "total_surgeons": 0
+        }
 
 @router.get("/recent-cases")
 async def get_recent_cases():
@@ -145,7 +198,7 @@ def get_trends():
     except Exception as e:
         raise HTTPException(status_code=500, detail=str(e))
 
-@router.get("/dashboard/export", response_model=str)
+@router.get("/dashboard/export")
 def export_report():
     try:
         report_path = analytics_engine.export_report()

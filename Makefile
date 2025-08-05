@@ -10,9 +10,20 @@ help:
 	@echo "Development:"
 	@echo "  make install    - Install dependencies and setup development environment"
 	@echo "  make dev        - Start development server"
-	@echo "  make test       - Run tests"
+	@echo "  make test       - Run all tests"
+	@echo "  make test-api   - Run API tests only"
+	@echo "  make test-unit  - Run unit tests only" 
+	@echo "  make test-integration - Run integration tests only"
+	@echo "  make test-compatibility - Run backward compatibility tests"
+	@echo "  make demo-integration - Run integration demonstration"
 	@echo "  make lint       - Run linting"
 	@echo "  make format     - Format code"
+	@echo ""
+	@echo "Domain Support (Phase 1.1):"
+	@echo "  make check-domains - Validate all domain adapters"
+	@echo "  make dev-surgery   - Start server in surgery domain mode"
+	@echo "  make dev-logistics - Start server in logistics domain mode"
+	@echo "  make dev-insurance - Start server in insurance domain mode"
 	@echo ""
 	@echo "Deployment:"
 	@echo "  make build      - Build Docker image"
@@ -59,14 +70,44 @@ lint:
 type-check:
 	python tasks.py type-check
 
+# Testing
 test:
-	python tasks.py test
+	pytest tests/ -v
 
 test-cov:
 	python tasks.py test --coverage
 
-check:
-	python tasks.py check
+test-api:
+	pytest tests/api/ -v
+
+test-integration:
+	pytest tests/integration/ -v
+
+test-unit:
+	pytest tests/unit/ -v
+
+test-compatibility:
+	cd tests/compatibility && PYTHONPATH=$(PWD)/src python test_backward_compatibility.py
+
+demo-integration:
+	cd tests/integration/demos && PYTHONPATH=$(PWD)/src python demonstrate_integration.py
+
+# Domain-specific testing and development (Phase 1.1)
+check-domains:
+	@echo "🧪 Validating all domain adapters..."
+	cd scripts && PYTHONPATH=$(PWD)/src python check_domains.py
+
+dev-surgery:
+	@echo "🏥 Starting Surgify in Surgery domain mode..."
+	PYTHONPATH=src python main.py --domain surgery --reload
+
+dev-logistics:
+	@echo "📦 Starting Surgify in Logistics domain mode..."
+	PYTHONPATH=src python main.py --domain logistics --reload
+
+dev-insurance:
+	@echo "🛡️ Starting Surgify in Insurance domain mode..."
+	PYTHONPATH=src python main.py --domain insurance --reload
 
 # Server management
 dev:

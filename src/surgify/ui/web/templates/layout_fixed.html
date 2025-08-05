@@ -1,0 +1,234 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>{% block title %}Surgify - Make Your Way{% endblock %}</title>
+    
+    <!-- Tailwind CSS -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    
+    <!-- Font Awesome -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    
+    <!-- Custom CSS -->
+    <link rel="stylesheet" href="{{ url_for('static', path='/css/style.css') }}">
+    <link rel="stylesheet" href="{{ url_for('static', path='/css/animations.css') }}">
+    
+    <style>
+        .fade-in {
+            animation: fadeIn 0.6s ease-in;
+        }
+        
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(20px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+        
+        .nav-item.active {
+            color: #3b82f6;
+        }
+        
+        .sidebar {
+            transform: translateX(-100%);
+            transition: transform 0.3s ease-in-out;
+        }
+        
+        .sidebar.open {
+            transform: translateX(0);
+        }
+        
+        .auth-modal {
+            display: none;
+        }
+        
+        .auth-modal.active {
+            display: flex;
+        }
+    </style>
+</head>
+<body class="bg-gray-50 min-h-screen">
+    <!-- Header -->
+    <header class="fixed top-0 left-0 right-0 bg-white shadow-md z-50">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+            <div class="flex justify-between items-center h-16">
+                <!-- Left: Menu Button -->
+                <button id="menu-toggle" class="lg:hidden p-2 rounded-md text-gray-600 hover:text-gray-900 hover:bg-gray-100">
+                    <i class="fas fa-bars text-xl"></i>
+                </button>
+                
+                <!-- Center: Logo/Brand -->
+                <div class="flex items-center">
+                    <h1 class="text-xl font-bold text-gray-900">Surgify</h1>
+                </div>
+                
+                <!-- Right: Auth Icon -->
+                <button id="auth-toggle" class="p-2 rounded-full bg-blue-600 text-white hover:bg-blue-700 transition-colors">
+                    <i class="fas fa-user text-sm"></i>
+                </button>
+            </div>
+        </div>
+    </header>
+    
+    <!-- Sidebar -->
+    <div id="sidebar" class="sidebar fixed top-0 left-0 h-full w-64 bg-white shadow-lg z-40">
+        <div class="p-4">
+            <div class="flex items-center justify-between mb-6">
+                <h2 class="text-lg font-semibold">Menu</h2>
+                <button id="sidebar-close" class="p-2 text-gray-500 hover:text-gray-700">
+                    <i class="fas fa-times"></i>
+                </button>
+            </div>
+            
+            <nav class="space-y-2">
+                <a href="/" class="flex items-center px-4 py-2 text-gray-700 rounded-md hover:bg-gray-100">
+                    <i class="fas fa-home mr-3"></i>
+                    Home
+                </a>
+                <a href="/dashboard" class="flex items-center px-4 py-2 text-gray-700 rounded-md hover:bg-gray-100">
+                    <i class="fas fa-chart-bar mr-3"></i>
+                    Dashboard
+                </a>
+                <a href="/cases" class="flex items-center px-4 py-2 text-gray-700 rounded-md hover:bg-gray-100">
+                    <i class="fas fa-file-medical mr-3"></i>
+                    Cases
+                </a>
+                <a href="/analytics" class="flex items-center px-4 py-2 text-gray-700 rounded-md hover:bg-gray-100">
+                    <i class="fas fa-analytics mr-3"></i>
+                    Analytics
+                </a>
+                
+                <!-- Surgery Status Section -->
+                <div class="mt-6 pt-4 border-t border-gray-200">
+                    <h3 class="text-sm font-medium text-gray-500 uppercase tracking-wide mb-3">Surgery Status</h3>
+                    <div class="space-y-2">
+                        <div class="flex items-center px-4 py-2 text-sm">
+                            <div class="w-3 h-3 bg-green-500 rounded-full mr-3"></div>
+                            Active Cases: <span class="ml-auto font-medium">12</span>
+                        </div>
+                        <div class="flex items-center px-4 py-2 text-sm">
+                            <div class="w-3 h-3 bg-yellow-500 rounded-full mr-3"></div>
+                            Pending: <span class="ml-auto font-medium">5</span>
+                        </div>
+                        <div class="flex items-center px-4 py-2 text-sm">
+                            <div class="w-3 h-3 bg-blue-500 rounded-full mr-3"></div>
+                            Completed: <span class="ml-auto font-medium">87</span>
+                        </div>
+                    </div>
+                </div>
+            </nav>
+        </div>
+    </div>
+    
+    <!-- Auth Modal -->
+    <div id="auth-modal" class="auth-modal fixed inset-0 bg-black bg-opacity-50 z-50 items-center justify-center">
+        <div class="bg-white rounded-lg p-6 w-full max-w-md mx-4">
+            <div class="flex justify-between items-center mb-4">
+                <h3 class="text-lg font-semibold">Authentication</h3>
+                <button id="auth-close" class="text-gray-500 hover:text-gray-700">
+                    <i class="fas fa-times"></i>
+                </button>
+            </div>
+            
+            <div class="space-y-4">
+                <button class="w-full bg-blue-600 text-white py-2 px-4 rounded-md hover:bg-blue-700 transition-colors">
+                    <i class="fas fa-sign-in-alt mr-2"></i>
+                    Sign In
+                </button>
+                <button class="w-full bg-gray-600 text-white py-2 px-4 rounded-md hover:bg-gray-700 transition-colors">
+                    <i class="fas fa-user-plus mr-2"></i>
+                    Sign Up
+                </button>
+            </div>
+        </div>
+    </div>
+    
+    <!-- Sidebar Overlay -->
+    <div id="sidebar-overlay" class="fixed inset-0 bg-black bg-opacity-50 z-30 hidden"></div>
+    
+    <!-- Main Content -->
+    <main class="pt-16 min-h-screen">
+        {% block content %}
+        <div class="p-4">
+            <h1 class="text-2xl font-bold mb-4">Welcome to Surgify</h1>
+            <p>This is the default content. Please extend this template to add your own content.</p>
+        </div>
+        {% endblock %}
+    </main>
+    
+    <!-- Bottom Navigation for Mobile -->
+    <nav class="fixed bottom-0 left-0 right-0 bg-white border-t border-gray-200 md:hidden z-30">
+        <div class="flex items-center justify-around py-2">
+            <a href="/" class="nav-item flex flex-col items-center py-2 px-3 text-gray-600 hover:text-blue-600 transition-colors duration-200 {% if request.url.path == '/' %}active{% endif %}">
+                <i class="fas fa-home text-lg"></i>
+                <span class="text-xs mt-1">Home</span>
+            </a>
+            <a href="/dashboard" class="nav-item flex flex-col items-center py-2 px-3 text-gray-600 hover:text-blue-600 transition-colors duration-200 {% if request.url.path == '/dashboard' %}active{% endif %}">
+                <i class="fas fa-chart-bar text-lg"></i>
+                <span class="text-xs mt-1">Dashboard</span>
+            </a>
+            <a href="/cases" class="nav-item flex flex-col items-center py-2 px-3 text-gray-600 hover:text-blue-600 transition-colors duration-200 {% if request.url.path == '/cases' %}active{% endif %}">
+                <i class="fas fa-file-medical text-lg"></i>
+                <span class="text-xs mt-1">Cases</span>
+            </a>
+            <a href="/analytics" class="nav-item flex flex-col items-center py-2 px-3 text-gray-600 hover:text-blue-600 transition-colors duration-200 {% if request.url.path == '/analytics' %}active{% endif %}">
+                <i class="fas fa-analytics text-lg"></i>
+                <span class="text-xs mt-1">Analytics</span>
+            </a>
+        </div>
+    </nav>
+    
+    <!-- JavaScript -->
+    <script>
+        // Mobile menu toggle
+        const menuToggle = document.getElementById('menu-toggle');
+        const sidebar = document.getElementById('sidebar');
+        const sidebarClose = document.getElementById('sidebar-close');
+        const sidebarOverlay = document.getElementById('sidebar-overlay');
+        
+        function openSidebar() {
+            sidebar.classList.add('open');
+            sidebarOverlay.classList.remove('hidden');
+        }
+        
+        function closeSidebar() {
+            sidebar.classList.remove('open');
+            sidebarOverlay.classList.add('hidden');
+        }
+        
+        menuToggle.addEventListener('click', openSidebar);
+        sidebarClose.addEventListener('click', closeSidebar);
+        sidebarOverlay.addEventListener('click', closeSidebar);
+        
+        // Auth modal toggle
+        const authToggle = document.getElementById('auth-toggle');
+        const authModal = document.getElementById('auth-modal');
+        const authClose = document.getElementById('auth-close');
+        
+        function openAuthModal() {
+            authModal.classList.add('active');
+        }
+        
+        function closeAuthModal() {
+            authModal.classList.remove('active');
+        }
+        
+        authToggle.addEventListener('click', openAuthModal);
+        authClose.addEventListener('click', closeAuthModal);
+        
+        // Close modal when clicking outside
+        authModal.addEventListener('click', function(e) {
+            if (e.target === authModal) {
+                closeAuthModal();
+            }
+        });
+        
+        // Close sidebar on larger screens
+        window.addEventListener('resize', function() {
+            if (window.innerWidth >= 1024) {
+                closeSidebar();
+            }
+        });
+    </script>
+</body>
+</html>
