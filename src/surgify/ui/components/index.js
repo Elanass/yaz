@@ -92,13 +92,6 @@ function initializeComponents() {
             showLabel: element.dataset.showLabel !== 'false',
             autoDetect: element.dataset.autoDetect === 'true',
             htmxEndpoint: element.dataset.htmxEndpoint,
-        const options = {
-            theme: element.dataset.theme || 'light',
-            style: element.dataset.style || 'switch',
-            size: element.dataset.size || 'medium',
-            showLabel: element.dataset.showLabel !== 'false',
-            autoDetect: element.dataset.autoDetect === 'true',
-            htmxEndpoint: element.dataset.htmxEndpoint,
             className: element.dataset.className
         };
         
