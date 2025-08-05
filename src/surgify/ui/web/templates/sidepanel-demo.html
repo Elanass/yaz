@@ -1,0 +1,99 @@
+{% extends "base.html" %}
+
+{% block title %}Sidepanel Demo - Gastric ADCI Platform{% endblock %}
+
+{% block content %}
+<div class="container mx-auto px-4 py-8 mt-16">
+    <div class="max-w-4xl mx-auto">
+        <h1 class="text-3xl font-bold text-gray-900 mb-8">Sidepanel Menu Demo</h1>
+        
+        <div class="bg-white rounded-lg shadow-md p-6 mb-8">
+            <h2 class="text-xl font-semibold text-gray-800 mb-4">Welcome to the Enhanced UI</h2>
+            <p class="text-gray-600 mb-4">
+                This page demonstrates the new sidepanel menu functionality that has been added to the Surgify platform.
+                The sidepanel provides easy access to all major sections of the application.
+            </p>
+            
+            <div class="grid md:grid-cols-2 gap-6 mt-6">
+                <div class="bg-blue-50 p-4 rounded-lg">
+                    <h3 class="font-semibold text-blue-900 mb-2">🎯 Key Features</h3>
+                    <ul class="text-blue-800 text-sm space-y-1">
+                        <li>• Responsive design for all devices</li>
+                        <li>• Smooth animations and transitions</li>
+                        <li>• Keyboard navigation support</li>
+                        <li>• Active page highlighting</li>
+                        <li>• Mobile-friendly overlay</li>
+                    </ul>
+                </div>
+                
+                <div class="bg-green-50 p-4 rounded-lg">
+                    <h3 class="font-semibold text-green-900 mb-2">📱 How to Use</h3>
+                    <ul class="text-green-800 text-sm space-y-1">
+                        <li>• Click the menu icon in the header</li>
+                        <li>• Use Escape key to close</li>
+                        <li>• Click overlay to close on mobile</li>
+                        <li>• Navigate between sections easily</li>
+                        <li>• Auto-closes on mobile after selection</li>
+                    </ul>
+                </div>
+            </div>
+        </div>
+        
+        <div class="bg-white rounded-lg shadow-md p-6">
+            <h2 class="text-xl font-semibold text-gray-800 mb-4">Available Sections</h2>
+            <div class="grid md:grid-cols-3 gap-4">
+                <div class="border border-gray-200 rounded-lg p-4 hover:shadow-md transition-shadow">
+                    <div class="flex items-center space-x-3 mb-2">
+                        <svg class="w-6 h-6 text-blue-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 12l2-2m0 0l7-7 7 7M5 10v10a1 1 0 001 1h3m10-11l2 2m-2-2v10a1 1 0 01-1 1h-3m-6 0a1 1 0 001-1v-4a1 1 0 011-1h2a1 1 0 011 1v4a1 1 0 001 1m-6 0h6"></path>
+                        </svg>
+                        <h3 class="font-semibold text-gray-900">Dashboard</h3>
+                    </div>
+                    <p class="text-gray-600 text-sm">Overview of cases and analytics</p>
+                </div>
+                
+                <div class="border border-gray-200 rounded-lg p-4 hover:shadow-md transition-shadow">
+                    <div class="flex items-center space-x-3 mb-2">
+                        <svg class="w-6 h-6 text-blue-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"></path>
+                        </svg>
+                        <h3 class="font-semibold text-gray-900">Patient Cases</h3>
+                    </div>
+                    <p class="text-gray-600 text-sm">Manage and review patient cases</p>
+                </div>
+                
+                <div class="border border-gray-200 rounded-lg p-4 hover:shadow-md transition-shadow">
+                    <div class="flex items-center space-x-3 mb-2">
+                        <svg class="w-6 h-6 text-blue-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 19v-6a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2a2 2 0 002-2zm0 0V9a2 2 0 012-2h2a2 2 0 012 2v10m-6 0a2 2 0 002 2h2a2 2 0 002-2m0 0V5a2 2 0 012-2h2a2 2 0 012 2v14a2 2 0 01-2 2h-2a2 2 0 01-2-2z"></path>
+                        </svg>
+                        <h3 class="font-semibold text-gray-900">Analytics</h3>
+                    </div>
+                    <p class="text-gray-600 text-sm">Data insights and reports</p>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
+
+{% block extra_scripts %}
+<script>
+    // Demo-specific JavaScript
+    document.addEventListener('DOMContentLoaded', function() {
+        console.log('Sidepanel demo page loaded');
+        
+        // Add some interactive feedback
+        const cards = document.querySelectorAll('.hover\\:shadow-md');
+        cards.forEach(card => {
+            card.addEventListener('mouseenter', function() {
+                this.style.transform = 'translateY(-2px)';
+            });
+            
+            card.addEventListener('mouseleave', function() {
+                this.style.transform = 'translateY(0)';
+            });
+        });
+    });
+</script>
+{% endblock %}
