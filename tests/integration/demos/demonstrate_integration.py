@@ -57,8 +57,7 @@ def demonstrate_backward_compatibility():
     try:
         from surgify.api.v1.cases import router as cases_router
         from surgify.api.v1.dashboard import router as dashboard_router
-        from surgify.api.v1.recommendations import \
-            router as recommendations_router
+        from surgify.api.v1.recommendations import router as recommendations_router
 
         print("  ✅ Cases API - Available with optional research enhancements")
         print("  ✅ Dashboard API - Available with optional research metrics")
@@ -82,14 +81,18 @@ def demonstrate_research_enhancements():
     print("\n🔬 Testing Universal Research Module...")
 
     try:
-        from surgify.modules.universal_research.adapters.surgify_adapter import \
-            SurgifyAdapter
-        from surgify.modules.universal_research.engines.cohort_analyzer import \
-            CohortAnalyzer
-        from surgify.modules.universal_research.engines.outcome_predictor import \
-            OutcomePredictor
-        from surgify.modules.universal_research.engines.research_generator import \
-            ResearchGenerator
+        from surgify.modules.universal_research.adapters.surgify_adapter import (
+            SurgifyAdapter,
+        )
+        from surgify.modules.universal_research.engines.cohort_analyzer import (
+            CohortAnalyzer,
+        )
+        from surgify.modules.universal_research.engines.outcome_predictor import (
+            OutcomePredictor,
+        )
+        from surgify.modules.universal_research.engines.research_generator import (
+            ResearchGenerator,
+        )
 
         print("  ✅ SurgifyAdapter - Maps existing cases to research format")
         print("  ✅ CohortAnalyzer - Analyzes surgical cohorts for research")
@@ -105,12 +108,15 @@ def demonstrate_research_enhancements():
     print("\n🔬 Testing Research API Integration...")
 
     try:
-        from surgify.modules.universal_research.integration.api_enhancer import \
-            ResearchAPIEnhancer
-        from surgify.modules.universal_research.integration.auth_integrator import \
-            AuthIntegrator
-        from surgify.modules.universal_research.integration.database_bridge import \
-            DatabaseBridge
+        from surgify.modules.universal_research.integration.api_enhancer import (
+            ResearchAPIEnhancer,
+        )
+        from surgify.modules.universal_research.integration.auth_integrator import (
+            AuthIntegrator,
+        )
+        from surgify.modules.universal_research.integration.database_bridge import (
+            DatabaseBridge,
+        )
 
         print("  ✅ ResearchAPIEnhancer - Adds research endpoints to existing FastAPI")
         print("  ✅ DatabaseBridge - Connects research to existing SQLAlchemy")

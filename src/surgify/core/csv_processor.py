@@ -16,9 +16,13 @@ from typing import Any, Dict, List, Optional, Tuple, Union
 import numpy as np
 import pandas as pd
 
-from .models.processing_models import (DataSchema, DomainInsights,
-                                       ProcessingResult, QualityReport,
-                                       ValidationError)
+from .models.processing_models import (
+    DataSchema,
+    DomainInsights,
+    ProcessingResult,
+    QualityReport,
+    ValidationError,
+)
 
 
 class DataDomain(Enum):

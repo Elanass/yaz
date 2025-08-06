@@ -49,3 +49,10 @@ async def web_health():
 async def demo_components(request: Request):
     """Component library demonstration page"""
     return templates.TemplateResponse("demo_components.html", {"request": request})
+
+
+# Manual Entry route
+@web_router.get("/manual-entry", response_class=HTMLResponse)
+async def manual_entry(request: Request):
+    """Manual entry page for text, images, video, and audio"""
+    return templates.TemplateResponse("manual_entry.html", {"request": request})

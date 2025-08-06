@@ -1,0 +1,172 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Surgify - Decision Precision in Surgery</title>
+    
+    <!-- PWA Meta Tags -->
+    <link rel="manifest" href="/static/manifest.json">
+    <meta name="theme-color" content="#191410">
+    <meta name="apple-mobile-web-app-capable" content="yes">
+    <meta name="apple-mobile-web-app-status-bar-style" content="default">
+    <meta name="apple-mobile-web-app-title" content="Surgify">
+    <link rel="apple-touch-icon" href="/static/icons/logo192.png">
+    
+    <!-- Icons -->
+    <link rel="icon" type="image/x-icon" href="/static/icons/favicon.ico">
+    <link rel="icon" type="image/png" sizes="192x192" href="/static/icons/logo192.png">
+    <link rel="icon" type="image/png" sizes="512x512" href="/static/icons/logo512.png">
+    
+    <!-- Styles -->
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
+    <script src="https://cdn.tailwindcss.com"></script>
+    
+    <style>
+        .app-container {
+            min-height: 100vh;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+        }
+        .pwa-install-prompt {
+            position: fixed;
+            bottom: 20px;
+            left: 50%;
+            transform: translateX(-50%);
+            background: white;
+            padding: 1rem 2rem;
+            border-radius: 12px;
+            box-shadow: 0 10px 25px rgba(0,0,0,0.1);
+            display: none;
+            z-index: 1000;
+        }
+        .pwa-install-prompt.show {
+            display: block;
+        }
+        .loading {
+            opacity: 0.7;
+            pointer-events: none;
+        }
+    </style>
+</head>
+<body class="app-container">
+    <!-- PWA Install Prompt -->
+    <div class="pwa-install-prompt">
+        <div class="flex items-center space-x-4">
+            <i class="fas fa-download text-blue-600"></i>
+            <div>
+                <p class="font-medium text-gray-900">Install Surgify</p>
+                <p class="text-sm text-gray-600">Add to your home screen for quick access</p>
+            </div>
+            <button id="install-btn" class="bg-blue-600 text-white px-4 py-2 rounded-lg hover:bg-blue-700">
+                Install
+            </button>
+        </div>
+    </div>
+
+    <!-- Header -->
+    <header class="bg-white shadow-sm border-b">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+            <div class="flex justify-between items-center h-16">
+                <div class="flex items-center">
+                    <img src="/static/icons/logo192.png" alt="Surgify" class="h-10 w-10">
+                    <h1 class="ml-3 text-xl font-bold text-gray-900">Surgify</h1>
+                </div>
+                <nav class="flex space-x-8">
+                    <a href="#" class="nav-item text-gray-700 hover:text-blue-600 px-3 py-2 rounded-md text-sm font-medium active">
+                        Dashboard
+                    </a>
+                    <a href="#" class="nav-item text-gray-700 hover:text-blue-600 px-3 py-2 rounded-md text-sm font-medium">
+                        Cases
+                    </a>
+                    <a href="#" class="nav-item text-gray-700 hover:text-blue-600 px-3 py-2 rounded-md text-sm font-medium">
+                        Protocols
+                    </a>
+                </nav>
+                <button id="theme-toggle" class="p-2 rounded-md text-gray-700 hover:text-blue-600">
+                    <i class="fas fa-moon"></i>
+                </button>
+            </div>
+        </div>
+    </header>
+
+    <!-- Main Content -->
+    <main class="max-w-7xl mx-auto py-6 sm:px-6 lg:px-8">
+        <div class="px-4 py-6 sm:px-0">
+            <div class="bg-white rounded-lg shadow p-6">
+                <div class="text-center py-12">
+                    <i class="fas fa-stethoscope text-6xl text-blue-600 mb-6"></i>
+                    <h2 class="text-3xl font-bold text-gray-900 mb-4">
+                        Decision Precision in Surgery
+                    </h2>
+                    <p class="text-xl text-gray-600 mb-8 max-w-2xl mx-auto">
+                        Advanced Surgical Platform with AI-Powered Decision Support for Gastric Surgery
+                    </p>
+                    
+                    <!-- Feature Cards -->
+                    <div class="grid md:grid-cols-3 gap-6 mt-12">
+                        <div class="bg-blue-50 rounded-xl p-6">
+                            <i class="fas fa-brain text-3xl text-blue-600 mb-4"></i>
+                            <h3 class="text-lg font-semibold text-gray-900 mb-2">AI Decision Support</h3>
+                            <p class="text-gray-600">Advanced AI analysis for clinical decision making</p>
+                        </div>
+                        
+                        <div class="bg-green-50 rounded-xl p-6">
+                            <i class="fas fa-chart-line text-3xl text-green-600 mb-4"></i>
+                            <h3 class="text-lg font-semibold text-gray-900 mb-2">Analytics Dashboard</h3>
+                            <p class="text-gray-600">Comprehensive surgical outcome analytics</p>
+                        </div>
+                        
+                        <div class="bg-purple-50 rounded-xl p-6">
+                            <i class="fas fa-shield-alt text-3xl text-purple-600 mb-4"></i>
+                            <h3 class="text-lg font-semibold text-gray-900 mb-2">Secure & Compliant</h3>
+                            <p class="text-gray-600">HIPAA-compliant data handling and storage</p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </main>
+
+    <!-- Status Bar -->
+    <div id="status-bar" class="fixed bottom-0 left-0 right-0 bg-white border-t border-gray-200 px-4 py-2">
+        <div class="flex justify-between items-center text-sm text-gray-600">
+            <div class="flex items-center space-x-4">
+                <span id="connection-status" class="flex items-center">
+                    <span class="w-2 h-2 bg-green-500 rounded-full mr-2"></span>
+                    Connected
+                </span>
+                <span id="sw-status">Service Worker: <span class="font-medium">Loading...</span></span>
+            </div>
+            <div class="flex items-center space-x-4">
+                <span>PWA Ready</span>
+                <span id="cache-status">Cache: <span class="font-medium">Loading...</span></span>
+            </div>
+        </div>
+    </div>
+
+    <!-- Scripts -->
+    <script src="/static/js/app.js"></script>
+    
+    <script>
+        // Initialize the app
+        document.addEventListener('DOMContentLoaded', () => {
+            new SurgifyApp();
+            
+            // Update service worker status
+            if ('serviceWorker' in navigator) {
+                navigator.serviceWorker.ready.then(registration => {
+                    document.getElementById('sw-status').innerHTML = 'Service Worker: <span class="font-medium text-green-600">Active</span>';
+                });
+            }
+            
+            // Check cache status
+            if ('caches' in window) {
+                caches.keys().then(cacheNames => {
+                    const cacheCount = cacheNames.length;
+                    document.getElementById('cache-status').innerHTML = `Cache: <span class="font-medium text-green-600">${cacheCount} stores</span>`;
+                });
+            }
+        });
+    </script>
+</body>
+</html>

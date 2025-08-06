@@ -9,8 +9,13 @@ from unittest.mock import AsyncMock, Mock, patch
 
 import pytest
 
-from surgify.core.cache import (CacheClient, CacheConfig, cache_response,
-                                generate_cache_key, invalidate_cache)
+from surgify.core.cache import (
+    CacheClient,
+    CacheConfig,
+    cache_response,
+    generate_cache_key,
+    invalidate_cache,
+)
 
 
 class TestCacheClient:

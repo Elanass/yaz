@@ -8,12 +8,9 @@ from collections import defaultdict
 from datetime import datetime, timedelta
 from typing import Any, Dict, List, Optional
 
-from ....modules.universal_research.adapters.surgify_adapter import \
-    SurgifyAdapter
-from ....modules.universal_research.engines.cohort_analyzer import \
-    CohortAnalyzer
-from ....modules.universal_research.engines.outcome_predictor import \
-    OutcomePredictor
+from ..adapters.surgify_adapter import SurgifyAdapter
+from .cohort_analyzer import CohortAnalyzer
+from .outcome_predictor import OutcomePredictor
 
 
 class ResearchGenerator:

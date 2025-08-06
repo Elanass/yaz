@@ -35,18 +35,27 @@ try:
     from reportlab.lib import colors
     from reportlab.lib.pagesizes import letter
     from reportlab.lib.styles import ParagraphStyle, getSampleStyleSheet
-    from reportlab.platypus import (Paragraph, SimpleDocTemplate, Spacer,
-                                    Table, TableStyle)
+    from reportlab.platypus import (
+        Paragraph,
+        SimpleDocTemplate,
+        Spacer,
+        Table,
+        TableStyle,
+    )
 
     REPORTLAB_AVAILABLE = True
 except ImportError:
     REPORTLAB_AVAILABLE = False
 
-from ..core.models.processing_models import (AudienceType, Deliverable,
-                                             DeliverableFormat,
-                                             DeliverableMetadata,
-                                             DeliverableRequest,
-                                             InsightPackage, ProcessingResult)
+from ..core.models.processing_models import (
+    AudienceType,
+    Deliverable,
+    DeliverableFormat,
+    DeliverableMetadata,
+    DeliverableRequest,
+    InsightPackage,
+    ProcessingResult,
+)
 
 
 class VisualizationEngine:

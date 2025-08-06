@@ -1,0 +1,574 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Manual Entry - Surgify Platform</title>
+    <link href="https://cdn.jsdelivr.net/npm/tailwindcss@2.2.19/dist/tailwind.min.css" rel="stylesheet">
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
+    <style>
+        .drag-drop-area {
+            transition: all 0.3s ease;
+        }
+        .drag-drop-area.dragover {
+            border-color: #3b82f6;
+            background-color: #eff6ff;
+        }
+        .preview-image {
+            max-width: 200px;
+            max-height: 200px;
+            object-fit: cover;
+        }
+        .media-item {
+            transition: all 0.2s ease;
+        }
+        .media-item:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+        }
+    </style>
+</head>
+<body class="bg-gray-50 min-h-screen">
+    <!-- Navigation -->
+    <nav class="bg-white shadow-sm border-b">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+            <div class="flex justify-between h-16">
+                <div class="flex items-center">
+                    <h1 class="text-2xl font-bold text-gray-900">
+                        <i class="fas fa-edit text-blue-600 mr-2"></i>
+                        Manual Entry
+                    </h1>
+                </div>
+                <div class="flex items-center space-x-4">
+                    <button onclick="showHelp()" class="text-gray-500 hover:text-gray-700">
+                        <i class="fas fa-question-circle text-xl"></i>
+                    </button>
+                    <a href="/dashboard" class="bg-blue-600 text-white px-4 py-2 rounded-lg hover:bg-blue-700">
+                        <i class="fas fa-arrow-left mr-2"></i>
+                        Back to Dashboard
+                    </a>
+                </div>
+            </div>
+        </div>
+    </nav>
+
+    <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
+        <div class="grid grid-cols-1 lg:grid-cols-3 gap-8">
+            <!-- Left Column - Entry Forms -->
+            <div class="lg:col-span-2 space-y-8">
+                <!-- Patient Selection -->
+                <div class="bg-white rounded-lg shadow-sm p-6">
+                    <h2 class="text-lg font-semibold text-gray-900 mb-4">
+                        <i class="fas fa-user text-blue-600 mr-2"></i>
+                        Patient Information
+                    </h2>
+                    <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                        <div>
+                            <label for="patient-id" class="block text-sm font-medium text-gray-700 mb-2">Patient ID</label>
+                            <input type="text" id="patient-id" placeholder="Enter patient ID" 
+                                   class="w-full border border-gray-300 rounded-lg px-3 py-2 focus:ring-2 focus:ring-blue-500 focus:border-transparent">
+                        </div>
+                        <div>
+                            <label for="case-id" class="block text-sm font-medium text-gray-700 mb-2">Case ID (Optional)</label>
+                            <input type="text" id="case-id" placeholder="Enter case ID" 
+                                   class="w-full border border-gray-300 rounded-lg px-3 py-2 focus:ring-2 focus:ring-blue-500 focus:border-transparent">
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Text Entry Tab -->
+                <div class="bg-white rounded-lg shadow-sm">
+                    <!-- Tab Navigation -->
+                    <div class="border-b border-gray-200">
+                        <nav class="flex space-x-8 px-6 py-3">
+                            <button onclick="showTab('text')" id="text-tab" class="tab-button active py-2 px-1 border-b-2 border-blue-600 font-medium text-sm text-blue-600">
+                                <i class="fas fa-file-text mr-2"></i>Text Entry
+                            </button>
+                            <button onclick="showTab('media')" id="media-tab" class="tab-button py-2 px-1 border-b-2 border-transparent font-medium text-sm text-gray-500 hover:text-gray-700 hover:border-gray-300">
+                                <i class="fas fa-photo-video mr-2"></i>Media Upload
+                            </button>
+                        </nav>
+                    </div>
+
+                    <!-- Text Entry Tab Content -->
+                    <div id="text-content" class="tab-content p-6">
+                        <form id="text-entry-form" class="space-y-6">
+                            <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                                <div>
+                                    <label for="entry-type" class="block text-sm font-medium text-gray-700 mb-2">Entry Type</label>
+                                    <select id="entry-type" class="w-full border border-gray-300 rounded-lg px-3 py-2 focus:ring-2 focus:ring-blue-500 focus:border-transparent">
+                                        <option value="note">Clinical Note</option>
+                                        <option value="observation">Observation</option>
+                                        <option value="diagnosis">Diagnosis</option>
+                                        <option value="treatment_plan">Treatment Plan</option>
+                                        <option value="follow_up">Follow-up</option>
+                                    </select>
+                                </div>
+                                <div>
+                                    <label for="entry-title" class="block text-sm font-medium text-gray-700 mb-2">Title</label>
+                                    <input type="text" id="entry-title" placeholder="Entry title" required
+                                           class="w-full border border-gray-300 rounded-lg px-3 py-2 focus:ring-2 focus:ring-blue-500 focus:border-transparent">
+                                </div>
+                            </div>
+
+                            <div>
+                                <label for="entry-content" class="block text-sm font-medium text-gray-700 mb-2">Content</label>
+                                <textarea id="entry-content" rows="8" placeholder="Enter your clinical notes, observations, or other text content..." required
+                                          class="w-full border border-gray-300 rounded-lg px-3 py-2 focus:ring-2 focus:ring-blue-500 focus:border-transparent"></textarea>
+                            </div>
+
+                            <div>
+                                <label for="entry-tags" class="block text-sm font-medium text-gray-700 mb-2">Tags (comma-separated)</label>
+                                <input type="text" id="entry-tags" placeholder="urgent, post-op, follow-up"
+                                       class="w-full border border-gray-300 rounded-lg px-3 py-2 focus:ring-2 focus:ring-blue-500 focus:border-transparent">
+                            </div>
+
+                            <div class="flex justify-end">
+                                <button type="submit" class="bg-blue-600 text-white px-6 py-2 rounded-lg hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-blue-500">
+                                    <i class="fas fa-save mr-2"></i>Save Text Entry
+                                </button>
+                            </div>
+                        </form>
+                    </div>
+
+                    <!-- Media Upload Tab Content -->
+                    <div id="media-content" class="tab-content p-6 hidden">
+                        <form id="media-upload-form" class="space-y-6">
+                            <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                                <div>
+                                    <label for="media-type" class="block text-sm font-medium text-gray-700 mb-2">Media Type</label>
+                                    <select id="media-type" class="w-full border border-gray-300 rounded-lg px-3 py-2 focus:ring-2 focus:ring-blue-500 focus:border-transparent">
+                                        <option value="image">Image</option>
+                                        <option value="video">Video</option>
+                                        <option value="audio">Audio</option>
+                                        <option value="document">Document</option>
+                                    </select>
+                                </div>
+                                <div>
+                                    <label for="media-title" class="block text-sm font-medium text-gray-700 mb-2">Title</label>
+                                    <input type="text" id="media-title" placeholder="Media title" required
+                                           class="w-full border border-gray-300 rounded-lg px-3 py-2 focus:ring-2 focus:ring-blue-500 focus:border-transparent">
+                                </div>
+                            </div>
+
+                            <div>
+                                <label for="media-description" class="block text-sm font-medium text-gray-700 mb-2">Description</label>
+                                <textarea id="media-description" rows="3" placeholder="Describe the media content..."
+                                          class="w-full border border-gray-300 rounded-lg px-3 py-2 focus:ring-2 focus:ring-blue-500 focus:border-transparent"></textarea>
+                            </div>
+
+                            <!-- Drag & Drop Area -->
+                            <div id="drop-zone" class="drag-drop-area border-2 border-dashed border-gray-300 rounded-lg p-8 text-center">
+                                <i class="fas fa-cloud-upload-alt text-4xl text-gray-400 mb-4"></i>
+                                <p class="text-gray-600 mb-2">Drag and drop your files here, or</p>
+                                <button type="button" onclick="document.getElementById('file-input').click()" 
+                                        class="bg-blue-600 text-white px-4 py-2 rounded-lg hover:bg-blue-700">
+                                    Browse Files
+                                </button>
+                                <input type="file" id="file-input" class="hidden" multiple accept="image/*,video/*,audio/*,.pdf,.doc,.docx">
+                                <p class="text-sm text-gray-500 mt-2">Supported: Images, Videos, Audio, Documents</p>
+                            </div>
+
+                            <!-- File Preview Area -->
+                            <div id="file-preview" class="hidden">
+                                <h3 class="text-sm font-medium text-gray-700 mb-3">Selected Files:</h3>
+                                <div id="preview-container" class="space-y-3"></div>
+                            </div>
+
+                            <div>
+                                <label for="media-tags" class="block text-sm font-medium text-gray-700 mb-2">Tags (comma-separated)</label>
+                                <input type="text" id="media-tags" placeholder="x-ray, post-op, ultrasound"
+                                       class="w-full border border-gray-300 rounded-lg px-3 py-2 focus:ring-2 focus:ring-blue-500 focus:border-transparent">
+                            </div>
+
+                            <div class="flex justify-end">
+                                <button type="submit" class="bg-green-600 text-white px-6 py-2 rounded-lg hover:bg-green-700 focus:outline-none focus:ring-2 focus:ring-green-500">
+                                    <i class="fas fa-upload mr-2"></i>Upload Media
+                                </button>
+                            </div>
+                        </form>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Right Column - Recent Entries -->
+            <div class="space-y-8">
+                <!-- Recent Text Entries -->
+                <div class="bg-white rounded-lg shadow-sm p-6">
+                    <h3 class="text-lg font-semibold text-gray-900 mb-4">
+                        <i class="fas fa-history text-green-600 mr-2"></i>
+                        Recent Text Entries
+                    </h3>
+                    <div id="recent-text-entries" class="space-y-3">
+                        <p class="text-gray-500 text-sm">Select a patient to view recent entries</p>
+                    </div>
+                </div>
+
+                <!-- Recent Media Files -->
+                <div class="bg-white rounded-lg shadow-sm p-6">
+                    <h3 class="text-lg font-semibold text-gray-900 mb-4">
+                        <i class="fas fa-images text-purple-600 mr-2"></i>
+                        Recent Media Files
+                    </h3>
+                    <div id="recent-media-files" class="space-y-3">
+                        <p class="text-gray-500 text-sm">Select a patient to view recent media</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Success/Error Messages -->
+    <div id="notification" class="fixed top-4 right-4 p-4 rounded-lg shadow-lg transform translate-x-full transition-transform duration-300 z-50"></div>
+
+    <!-- Help Modal -->
+    <div id="help-modal" class="fixed inset-0 bg-black bg-opacity-50 hidden z-50 flex items-center justify-center">
+        <div class="bg-white rounded-lg p-6 max-w-2xl mx-4">
+            <div class="flex justify-between items-center mb-4">
+                <h3 class="text-lg font-semibold">Manual Entry Help</h3>
+                <button onclick="hideHelp()" class="text-gray-400 hover:text-gray-600">
+                    <i class="fas fa-times"></i>
+                </button>
+            </div>
+            <div class="space-y-4 text-sm text-gray-600">
+                <div>
+                    <h4 class="font-medium text-gray-900">Text Entries</h4>
+                    <p>Add clinical notes, observations, diagnoses, treatment plans, or follow-up notes. All entries are automatically timestamped and associated with the specified patient.</p>
+                </div>
+                <div>
+                    <h4 class="font-medium text-gray-900">Media Uploads</h4>
+                    <p>Upload images, videos, audio files, or documents. Supported formats include JPEG, PNG, MP4, MP3, WAV, PDF, and more.</p>
+                </div>
+                <div>
+                    <h4 class="font-medium text-gray-900">Tags</h4>
+                    <p>Use tags to organize and categorize your entries for easy searching and filtering later.</p>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // Global variables
+        let selectedFiles = [];
+        const API_BASE = '/api/v1/ingestion';
+
+        // Tab switching
+        function showTab(tabName) {
+            // Hide all tab contents
+            document.querySelectorAll('.tab-content').forEach(content => {
+                content.classList.add('hidden');
+            });
+            
+            // Show selected tab content
+            document.getElementById(tabName + '-content').classList.remove('hidden');
+            
+            // Update tab buttons
+            document.querySelectorAll('.tab-button').forEach(button => {
+                button.classList.remove('active', 'border-blue-600', 'text-blue-600');
+                button.classList.add('border-transparent', 'text-gray-500');
+            });
+            
+            const activeTab = document.getElementById(tabName + '-tab');
+            activeTab.classList.add('active', 'border-blue-600', 'text-blue-600');
+            activeTab.classList.remove('border-transparent', 'text-gray-500');
+        }
+
+        // File upload handling
+        const dropZone = document.getElementById('drop-zone');
+        const fileInput = document.getElementById('file-input');
+        
+        // Drag and drop events
+        dropZone.addEventListener('dragover', (e) => {
+            e.preventDefault();
+            dropZone.classList.add('dragover');
+        });
+        
+        dropZone.addEventListener('dragleave', () => {
+            dropZone.classList.remove('dragover');
+        });
+        
+        dropZone.addEventListener('drop', (e) => {
+            e.preventDefault();
+            dropZone.classList.remove('dragover');
+            const files = Array.from(e.dataTransfer.files);
+            handleFiles(files);
+        });
+        
+        fileInput.addEventListener('change', (e) => {
+            const files = Array.from(e.target.files);
+            handleFiles(files);
+        });
+
+        function handleFiles(files) {
+            selectedFiles = files;
+            showFilePreview(files);
+        }
+
+        function showFilePreview(files) {
+            const previewContainer = document.getElementById('preview-container');
+            const filePreview = document.getElementById('file-preview');
+            
+            previewContainer.innerHTML = '';
+            
+            files.forEach((file, index) => {
+                const fileItem = document.createElement('div');
+                fileItem.className = 'flex items-center space-x-3 p-3 bg-gray-50 rounded-lg';
+                
+                let icon = 'fa-file';
+                if (file.type.startsWith('image/')) icon = 'fa-image';
+                else if (file.type.startsWith('video/')) icon = 'fa-video';
+                else if (file.type.startsWith('audio/')) icon = 'fa-music';
+                
+                fileItem.innerHTML = `
+                    <i class="fas ${icon} text-lg text-gray-500"></i>
+                    <div class="flex-1">
+                        <p class="text-sm font-medium text-gray-900">${file.name}</p>
+                        <p class="text-xs text-gray-500">${formatFileSize(file.size)}</p>
+                    </div>
+                    <button type="button" onclick="removeFile(${index})" class="text-red-500 hover:text-red-700">
+                        <i class="fas fa-times"></i>
+                    </button>
+                `;
+                
+                previewContainer.appendChild(fileItem);
+            });
+            
+            filePreview.classList.remove('hidden');
+        }
+
+        function removeFile(index) {
+            selectedFiles.splice(index, 1);
+            if (selectedFiles.length === 0) {
+                document.getElementById('file-preview').classList.add('hidden');
+            } else {
+                showFilePreview(selectedFiles);
+            }
+        }
+
+        function formatFileSize(bytes) {
+            if (bytes === 0) return '0 Bytes';
+            const k = 1024;
+            const sizes = ['Bytes', 'KB', 'MB', 'GB'];
+            const i = Math.floor(Math.log(bytes) / Math.log(k));
+            return parseFloat((bytes / Math.pow(k, i)).toFixed(2)) + ' ' + sizes[i];
+        }
+
+        // Form submissions
+        document.getElementById('text-entry-form').addEventListener('submit', async (e) => {
+            e.preventDefault();
+            await submitTextEntry();
+        });
+
+        document.getElementById('media-upload-form').addEventListener('submit', async (e) => {
+            e.preventDefault();
+            await submitMediaUpload();
+        });
+
+        async function submitTextEntry() {
+            const patientId = document.getElementById('patient-id').value.trim();
+            const caseId = document.getElementById('case-id').value.trim();
+            
+            if (!patientId) {
+                showNotification('Please enter a patient ID', 'error');
+                return;
+            }
+
+            const entryData = {
+                patient_id: patientId,
+                case_id: caseId || null,
+                entry_type: document.getElementById('entry-type').value,
+                title: document.getElementById('entry-title').value.trim(),
+                content: document.getElementById('entry-content').value.trim(),
+                tags: document.getElementById('entry-tags').value.split(',').map(tag => tag.trim()).filter(tag => tag)
+            };
+
+            try {
+                const response = await fetch(`${API_BASE}/manual-entry/text`, {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                    },
+                    body: JSON.stringify(entryData)
+                });
+
+                const result = await response.json();
+
+                if (response.ok && result.success) {
+                    showNotification('Text entry saved successfully!', 'success');
+                    document.getElementById('text-entry-form').reset();
+                    loadRecentEntries(patientId);
+                } else {
+                    showNotification(result.detail || 'Failed to save text entry', 'error');
+                }
+            } catch (error) {
+                console.error('Text entry error:', error);
+                showNotification('Error saving text entry', 'error');
+            }
+        }
+
+        async function submitMediaUpload() {
+            const patientId = document.getElementById('patient-id').value.trim();
+            const caseId = document.getElementById('case-id').value.trim();
+            
+            if (!patientId) {
+                showNotification('Please enter a patient ID', 'error');
+                return;
+            }
+
+            if (selectedFiles.length === 0) {
+                showNotification('Please select files to upload', 'error');
+                return;
+            }
+
+            const mediaType = document.getElementById('media-type').value;
+            const title = document.getElementById('media-title').value.trim();
+            const description = document.getElementById('media-description').value.trim();
+            const tags = document.getElementById('media-tags').value.split(',').map(tag => tag.trim()).filter(tag => tag);
+
+            // Upload each file
+            for (const file of selectedFiles) {
+                const formData = new FormData();
+                formData.append('file', file);
+                formData.append('patient_id', patientId);
+                formData.append('media_type', mediaType);
+                formData.append('title', `${title} - ${file.name}`);
+                if (caseId) formData.append('case_id', caseId);
+                if (description) formData.append('description', description);
+                if (tags.length > 0) formData.append('tags', JSON.stringify(tags));
+
+                try {
+                    const response = await fetch(`${API_BASE}/manual-entry/media`, {
+                        method: 'POST',
+                        body: formData
+                    });
+
+                    const result = await response.json();
+
+                    if (!response.ok || !result.success) {
+                        throw new Error(result.detail || 'Upload failed');
+                    }
+                } catch (error) {
+                    console.error('Media upload error:', error);
+                    showNotification(`Failed to upload ${file.name}: ${error.message}`, 'error');
+                    return;
+                }
+            }
+
+            showNotification(`Successfully uploaded ${selectedFiles.length} file(s)!`, 'success');
+            document.getElementById('media-upload-form').reset();
+            selectedFiles = [];
+            document.getElementById('file-preview').classList.add('hidden');
+            loadRecentMediaFiles(patientId);
+        }
+
+        // Load recent entries
+        async function loadRecentEntries(patientId) {
+            try {
+                const response = await fetch(`${API_BASE}/manual-entry/text/${patientId}?limit=5`);
+                const result = await response.json();
+
+                const container = document.getElementById('recent-text-entries');
+                
+                if (result.success && result.entries.length > 0) {
+                    container.innerHTML = result.entries.map(entry => `
+                        <div class="border-l-4 border-blue-500 pl-4 py-2">
+                            <h4 class="text-sm font-medium text-gray-900">${entry.title}</h4>
+                            <p class="text-xs text-gray-500">${entry.entry_type} • ${new Date(entry.created_at).toLocaleDateString()}</p>
+                            <p class="text-sm text-gray-600 mt-1">${entry.content.substring(0, 100)}${entry.content.length > 100 ? '...' : ''}</p>
+                        </div>
+                    `).join('');
+                } else {
+                    container.innerHTML = '<p class="text-gray-500 text-sm">No recent text entries</p>';
+                }
+            } catch (error) {
+                console.error('Failed to load recent entries:', error);
+            }
+        }
+
+        async function loadRecentMediaFiles(patientId) {
+            try {
+                const response = await fetch(`${API_BASE}/manual-entry/media/${patientId}?limit=5`);
+                const result = await response.json();
+
+                const container = document.getElementById('recent-media-files');
+                
+                if (result.success && result.media_files.length > 0) {
+                    container.innerHTML = result.media_files.map(media => `
+                        <div class="media-item border rounded-lg p-3">
+                            <div class="flex items-center space-x-3">
+                                <i class="fas ${getMediaIcon(media.media_type)} text-lg text-gray-500"></i>
+                                <div class="flex-1">
+                                    <h4 class="text-sm font-medium text-gray-900">${media.title}</h4>
+                                    <p class="text-xs text-gray-500">${media.media_type} • ${formatFileSize(media.file_size)}</p>
+                                    <p class="text-xs text-gray-400">${new Date(media.created_at).toLocaleDateString()}</p>
+                                </div>
+                            </div>
+                        </div>
+                    `).join('');
+                } else {
+                    container.innerHTML = '<p class="text-gray-500 text-sm">No recent media files</p>';
+                }
+            } catch (error) {
+                console.error('Failed to load recent media files:', error);
+            }
+        }
+
+        function getMediaIcon(mediaType) {
+            switch (mediaType) {
+                case 'image': return 'fa-image';
+                case 'video': return 'fa-video';
+                case 'audio': return 'fa-music';
+                case 'document': return 'fa-file-alt';
+                default: return 'fa-file';
+            }
+        }
+
+        // Patient ID change handler
+        document.getElementById('patient-id').addEventListener('blur', (e) => {
+            const patientId = e.target.value.trim();
+            if (patientId) {
+                loadRecentEntries(patientId);
+                loadRecentMediaFiles(patientId);
+            }
+        });
+
+        // Notification system
+        function showNotification(message, type = 'info') {
+            const notification = document.getElementById('notification');
+            const bgColor = type === 'success' ? 'bg-green-500' : type === 'error' ? 'bg-red-500' : 'bg-blue-500';
+            
+            notification.className = `fixed top-4 right-4 p-4 rounded-lg shadow-lg ${bgColor} text-white transform transition-transform duration-300 z-50`;
+            notification.innerHTML = `
+                <div class="flex items-center">
+                    <i class="fas ${type === 'success' ? 'fa-check-circle' : type === 'error' ? 'fa-exclamation-triangle' : 'fa-info-circle'} mr-2"></i>
+                    ${message}
+                </div>
+            `;
+            
+            // Show notification
+            notification.classList.remove('translate-x-full');
+            
+            // Hide after 5 seconds
+            setTimeout(() => {
+                notification.classList.add('translate-x-full');
+            }, 5000);
+        }
+
+        // Help modal
+        function showHelp() {
+            document.getElementById('help-modal').classList.remove('hidden');
+        }
+
+        function hideHelp() {
+            document.getElementById('help-modal').classList.add('hidden');
+        }
+
+        // Close modal when clicking outside
+        document.getElementById('help-modal').addEventListener('click', (e) => {
+            if (e.target === e.currentTarget) {
+                hideHelp();
+            }
+        });
+    </script>
+</body>
+</html>

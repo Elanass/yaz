@@ -4,17 +4,26 @@ Handles CSV uploads, manual entries, and multi-center domain management with int
 """
 
 import asyncio
+import base64
 import csv
 import io
 import json
+import os
 import uuid
 from datetime import datetime
 from pathlib import Path
 from typing import Any, Dict, List, Optional
 
 import pandas as pd
-from fastapi import (APIRouter, BackgroundTasks, Depends, File, Form,
-                     HTTPException, UploadFile)
+from fastapi import (
+    APIRouter,
+    BackgroundTasks,
+    Depends,
+    File,
+    Form,
+    HTTPException,
+    UploadFile,
+)
 from fastapi.responses import JSONResponse
 from pydantic import BaseModel, validator
 from sqlalchemy.orm import Session
@@ -23,7 +32,12 @@ from ...core.analytics.insight_generator import InsightGenerator
 from ...core.csv_processor import CSVProcessor, ProcessingConfig
 from ...core.database import get_db
 from ...core.domain_adapter import get_domain_config
-from ...core.models.database_models import CohortData, IngestionLog
+from ...core.models.database_models import (
+    CohortData,
+    IngestionLog,
+    MediaFile,
+    TextEntry,
+)
 from ...core.models.processing_models import DataDomain, ProcessingResult
 from ...core.services.logger import get_logger
 
@@ -44,6 +58,8 @@ class ManualEntryData(BaseModel):
     histology: Optional[str] = None
     location: Optional[str] = None
     domain: str = "local"
+    notes: Optional[str] = None
+    clinical_findings: Optional[str] = None
 
     @validator("age")
     def validate_age(cls, v):
@@ -59,6 +75,47 @@ class ManualEntryData(BaseModel):
         return v
 
 
+class MediaUploadData(BaseModel):
+    patient_id: str
+    case_id: Optional[str] = None
+    media_type: str  # image, video, audio, document
+    title: str
+    description: Optional[str] = None
+    tags: Optional[List[str]] = None
+    metadata: Optional[Dict[str, Any]] = None
+
+    @validator("media_type")
+    def validate_media_type(cls, v):
+        valid_types = ["image", "video", "audio", "document"]
+        if v not in valid_types:
+            raise ValueError(f"Media type must be one of: {valid_types}")
+        return v
+
+
+class TextEntryData(BaseModel):
+    patient_id: str
+    case_id: Optional[str] = None
+    entry_type: str  # note, observation, diagnosis, treatment_plan
+    title: str
+    content: str
+    timestamp: Optional[datetime] = None
+    tags: Optional[List[str]] = None
+    metadata: Optional[Dict[str, Any]] = None
+
+    @validator("entry_type")
+    def validate_entry_type(cls, v):
+        valid_types = [
+            "note",
+            "observation",
+            "diagnosis",
+            "treatment_plan",
+            "follow_up",
+        ]
+        if v not in valid_types:
+            raise ValueError(f"Entry type must be one of: {valid_types}")
+        return v
+
+
 class IngestionResponse(BaseModel):
     success: bool
     message: str
@@ -71,6 +128,21 @@ class IngestionResponse(BaseModel):
     ] = None  # New field for linking to processing results
     quality_score: Optional[float] = None
     domain_detected: Optional[str] = None
+
+
+class MediaUploadResponse(BaseModel):
+    success: bool
+    message: str
+    media_id: str
+    file_path: str
+    metadata: Dict[str, Any]
+
+
+class TextEntryResponse(BaseModel):
+    success: bool
+    message: str
+    entry_id: str
+    timestamp: datetime
 
 
 class AdvancedIngestionResponse(BaseModel):
@@ -480,186 +552,370 @@ async def delete_upload(upload_id: str, db: Session = Depends(get_db)):
         raise HTTPException(status_code=500, detail="Failed to delete upload")
 
 
-# Background processing functions
-async def store_processed_data(
-    data: List[Dict], domain: str, upload_id: str, db: Session
+# New Manual Entry Endpoints
+
+
+@router.post("/manual-entry/text", response_model=TextEntryResponse)
+async def add_text_entry(
+    entry_data: TextEntryData,
+    db: Session = Depends(get_db),
 ):
     """
-    Background task to store processed data from advanced CSV processing
+    Add a manual text entry (note, observation, diagnosis, etc.)
     """
     try:
-        logger.info(f"Storing processed data for upload_id: {upload_id}")
+        entry_id = str(uuid.uuid4())
+        timestamp = entry_data.timestamp or datetime.utcnow()
 
-        stored_count = 0
-        errors = []
-
-        for record in data:
-            try:
-                # Create cohort data record
-                cohort_record = CohortData(
-                    upload_id=upload_id,
-                    domain=domain,
-                    patient_id=record.get("patient_id", f"auto_{uuid.uuid4().hex[:8]}"),
-                    data=json.dumps(record),
-                    created_at=datetime.utcnow(),
-                )
-
-                db.add(cohort_record)
-                stored_count += 1
-
-            except Exception as e:
-                errors.append(f"Error storing record: {str(e)}")
-                continue
-
-        db.commit()
-        logger.info(f"Stored {stored_count} records for upload_id: {upload_id}")
-
-    except Exception as e:
-        logger.error(f"Error storing processed data for {upload_id}: {str(e)}")
-
-
-async def process_ingestion_data(
-    data: List[Dict], domain: str, upload_id: str, db: Session
-):
-    """
-    Background task to process ingested data
-    """
-    try:
-        logger.info(f"Starting background processing for upload_id: {upload_id}")
-
-        errors = []
-        processed_count = 0
-
-        # Update status to processing
-        update_ingestion_status(db, upload_id, "analyzing", 25)
-
-        for i, record in enumerate(data):
-            try:
-                # Validate and clean record
-                cleaned_record = validate_and_clean_record(record, domain)
-
-                # Create cohort data entry
-                cohort_data = CohortData(
-                    upload_id=upload_id,
-                    patient_id=cleaned_record.get("patient_id"),
-                    age=cleaned_record.get("age"),
-                    stage=cleaned_record.get("stage"),
-                    gender=cleaned_record.get("gender"),
-                    histology=cleaned_record.get("histology"),
-                    location=cleaned_record.get("location"),
-                    domain=domain,
-                    created_at=datetime.utcnow(),
-                )
-
-                db.add(cohort_data)
-                processed_count += 1
-
-                # Update progress
-                progress = int((i + 1) / len(data) * 75) + 25  # 25-100%
-                if i % 10 == 0:  # Update every 10 records
-                    update_ingestion_status(
-                        db, upload_id, "processing", progress, processed_count
-                    )
-
-            except Exception as e:
-                error_msg = f"Record {i + 1}: {str(e)}"
-                errors.append(error_msg)
-                logger.warning(f"Failed to process record {i + 1}: {str(e)}")
-
-        # Commit all changes
-        db.commit()
-
-        # Final status update
-        final_status = "completed" if not errors else "completed_with_errors"
-        update_ingestion_status(
-            db,
-            upload_id,
-            final_status,
-            100,
-            processed_count,
-            errors=errors,
-            completed_at=datetime.utcnow(),
+        # Create text entry in database
+        text_entry = TextEntry(
+            id=entry_id,
+            patient_id=entry_data.patient_id,
+            case_id=entry_data.case_id,
+            entry_type=entry_data.entry_type,
+            title=entry_data.title,
+            content=entry_data.content,
+            tags=json.dumps(entry_data.tags or []),
+            metadata=json.dumps(entry_data.metadata or {}),
+            created_at=timestamp,
         )
+
+        db.add(text_entry)
+        db.commit()
 
         logger.info(
-            f"Completed processing upload_id: {upload_id}, processed: {processed_count}, errors: {len(errors)}"
+            f"Text entry created: {entry_id} for patient {entry_data.patient_id}"
+        )
+
+        return TextEntryResponse(
+            success=True,
+            message="Text entry added successfully",
+            entry_id=entry_id,
+            timestamp=timestamp,
         )
 
     except Exception as e:
-        logger.error(
-            f"Background processing failed for upload_id {upload_id}: {str(e)}"
-        )
-        update_ingestion_status(db, upload_id, "failed", 0, 0, errors=[str(e)])
+        db.rollback()
+        logger.error(f"Text entry failed: {str(e)}")
+        raise HTTPException(status_code=500, detail=f"Text entry failed: {str(e)}")
 
 
-def validate_and_clean_record(record: Dict, domain: str) -> Dict:
-    """
-    Validate and clean a single data record
-    """
-    # Required fields validation
-    required_fields = ["patient_id", "age", "stage"]
-    for field in required_fields:
-        if field not in record or record[field] is None:
-            raise ValueError(f"Missing required field: {field}")
-
-    # Age validation
-    age = int(record["age"])
-    if age < 0 or age > 120:
-        raise ValueError(f"Invalid age: {age}")
-
-    # Stage validation
-    valid_stages = ["IA", "IB", "II", "III", "IV"]
-    stage = str(record["stage"]).upper()
-    if stage not in valid_stages:
-        raise ValueError(f"Invalid stage: {stage}")
-
-    # Clean and return record
-    cleaned = {
-        "patient_id": str(record["patient_id"]).strip(),
-        "age": age,
-        "stage": stage,
-        "gender": record.get("gender", "").strip() if record.get("gender") else None,
-        "histology": record.get("histology", "").strip()
-        if record.get("histology")
-        else None,
-        "location": record.get("location", "").strip()
-        if record.get("location")
-        else None,
-    }
-
-    return cleaned
-
-
-def update_ingestion_status(
-    db: Session,
-    upload_id: str,
-    status: str,
-    progress: int,
-    processed_records: int = 0,
-    errors: List[str] = None,
-    completed_at: datetime = None,
+@router.post("/manual-entry/media", response_model=MediaUploadResponse)
+async def upload_media(
+    file: UploadFile = File(...),
+    patient_id: str = Form(...),
+    media_type: str = Form(...),
+    title: str = Form(...),
+    case_id: Optional[str] = Form(None),
+    description: Optional[str] = Form(None),
+    tags: Optional[str] = Form(None),  # JSON string of tags array
+    db: Session = Depends(get_db),
 ):
     """
-    Update ingestion status in database
+    Upload media files (images, video, audio, documents)
     """
     try:
-        ingestion_log = (
-            db.query(IngestionLog).filter(IngestionLog.upload_id == upload_id).first()
+        # Validate media type
+        valid_types = ["image", "video", "audio", "document"]
+        if media_type not in valid_types:
+            raise HTTPException(
+                status_code=400,
+                detail=f"Invalid media type. Must be one of: {valid_types}",
+            )
+
+        # Validate file type based on media type
+        file_ext = file.filename.lower().split(".")[-1] if file.filename else ""
+
+        type_extensions = {
+            "image": ["jpg", "jpeg", "png", "gif", "bmp", "tiff", "webp"],
+            "video": ["mp4", "avi", "mov", "wmv", "flv", "webm", "mkv"],
+            "audio": ["mp3", "wav", "flac", "aac", "ogg", "m4a", "wma"],
+            "document": ["pdf", "doc", "docx", "txt", "rtf"],
+        }
+
+        if file_ext not in type_extensions.get(media_type, []):
+            raise HTTPException(
+                status_code=400,
+                detail=f"Invalid file type '{file_ext}' for media type '{media_type}'",
+            )
+
+        # Generate unique filename
+        media_id = str(uuid.uuid4())
+        safe_filename = f"{media_id}_{file.filename}"
+
+        # Create upload directory if it doesn't exist
+        upload_dir = Path("data/uploads/media")
+        upload_dir.mkdir(parents=True, exist_ok=True)
+
+        # Save file
+        file_path = upload_dir / safe_filename
+        content = await file.read()
+
+        with open(file_path, "wb") as buffer:
+            buffer.write(content)
+
+        # Parse tags if provided
+        parsed_tags = []
+        if tags:
+            try:
+                parsed_tags = json.loads(tags)
+            except json.JSONDecodeError:
+                parsed_tags = [tag.strip() for tag in tags.split(",")]
+
+        # Extract metadata
+        metadata = {
+            "original_filename": file.filename,
+            "file_size": len(content),
+            "upload_timestamp": datetime.utcnow().isoformat(),
+            "content_type": file.content_type,
+            "file_extension": file_ext,
+        }
+
+        # Additional metadata based on media type
+        if media_type == "image":
+            # TODO: Extract image dimensions, EXIF data, etc.
+            metadata.update(
+                {
+                    "media_type": "image",
+                    "dimensions": "unknown",  # Would extract actual dimensions
+                    "color_space": "unknown",
+                }
+            )
+        elif media_type == "video":
+            # TODO: Extract video duration, resolution, codec, etc.
+            metadata.update(
+                {
+                    "media_type": "video",
+                    "duration": "unknown",
+                    "resolution": "unknown",
+                    "codec": "unknown",
+                }
+            )
+        elif media_type == "audio":
+            # TODO: Extract audio duration, bitrate, format, etc.
+            metadata.update(
+                {
+                    "media_type": "audio",
+                    "duration": "unknown",
+                    "bitrate": "unknown",
+                    "sample_rate": "unknown",
+                }
+            )
+
+        # Store media record in database
+        media_record = MediaFile(
+            id=media_id,
+            patient_id=patient_id,
+            case_id=case_id,
+            media_type=media_type,
+            title=title,
+            description=description,
+            file_path=str(file_path),
+            original_filename=file.filename,
+            file_size=len(content),
+            content_type=file.content_type,
+            tags=json.dumps(parsed_tags),
+            metadata=json.dumps(metadata),
+            created_at=datetime.utcnow(),
         )
 
-        if ingestion_log:
-            ingestion_log.status = status
-            ingestion_log.progress = progress
-            ingestion_log.processed_records = processed_records
+        db.add(media_record)
+        db.commit()
 
-            if errors:
-                ingestion_log.errors = json.dumps(errors)
+        logger.info(
+            f"Media uploaded: {media_id} - {media_type} for patient {patient_id}"
+        )
 
-            if completed_at:
-                ingestion_log.completed_at = completed_at
+        return MediaUploadResponse(
+            success=True,
+            message=f"{media_type.capitalize()} uploaded successfully",
+            media_id=media_id,
+            file_path=str(file_path),
+            metadata=metadata,
+        )
 
-            db.commit()
+    except HTTPException:
+        raise
+    except Exception as e:
+        db.rollback()
+        logger.error(f"Media upload failed: {str(e)}")
+        raise HTTPException(status_code=500, detail=f"Media upload failed: {str(e)}")
+
+
+@router.get("/manual-entry/text/{patient_id}")
+async def get_text_entries(
+    patient_id: str,
+    entry_type: Optional[str] = None,
+    case_id: Optional[str] = None,
+    limit: int = 50,
+    db: Session = Depends(get_db),
+):
+    """
+    Get text entries for a patient
+    """
+    try:
+        # Build query
+        query = db.query(TextEntry).filter(TextEntry.patient_id == patient_id)
+
+        if entry_type:
+            query = query.filter(TextEntry.entry_type == entry_type)
+        if case_id:
+            query = query.filter(TextEntry.case_id == case_id)
+
+        # Get entries with limit
+        entries = query.order_by(TextEntry.created_at.desc()).limit(limit).all()
+
+        # Convert to dict format
+        entries_data = []
+        for entry in entries:
+            entry_dict = {
+                "id": entry.id,
+                "patient_id": entry.patient_id,
+                "case_id": entry.case_id,
+                "entry_type": entry.entry_type,
+                "title": entry.title,
+                "content": entry.content,
+                "tags": json.loads(entry.tags) if entry.tags else [],
+                "metadata": json.loads(entry.metadata) if entry.metadata else {},
+                "created_at": entry.created_at,
+                "updated_at": entry.updated_at,
+            }
+            entries_data.append(entry_dict)
+
+        return {
+            "success": True,
+            "patient_id": patient_id,
+            "entries": entries_data,
+            "total": len(entries_data),
+        }
 
     except Exception as e:
-        logger.error(f"Failed to update ingestion status: {str(e)}")
+        logger.error(f"Failed to get text entries: {str(e)}")
+        raise HTTPException(status_code=500, detail="Failed to retrieve text entries")
+
+
+@router.get("/manual-entry/media/{patient_id}")
+async def get_media_files(
+    patient_id: str,
+    media_type: Optional[str] = None,
+    case_id: Optional[str] = None,
+    limit: int = 50,
+    db: Session = Depends(get_db),
+):
+    """
+    Get media files for a patient
+    """
+    try:
+        # Build query
+        query = db.query(MediaFile).filter(MediaFile.patient_id == patient_id)
+
+        if media_type:
+            query = query.filter(MediaFile.media_type == media_type)
+        if case_id:
+            query = query.filter(MediaFile.case_id == case_id)
+
+        # Get media files with limit
+        media_files = query.order_by(MediaFile.created_at.desc()).limit(limit).all()
+
+        # Convert to dict format
+        media_data = []
+        for media in media_files:
+            media_dict = {
+                "id": media.id,
+                "patient_id": media.patient_id,
+                "case_id": media.case_id,
+                "media_type": media.media_type,
+                "title": media.title,
+                "description": media.description,
+                "file_path": media.file_path,
+                "original_filename": media.original_filename,
+                "file_size": media.file_size,
+                "content_type": media.content_type,
+                "tags": json.loads(media.tags) if media.tags else [],
+                "metadata": json.loads(media.metadata) if media.metadata else {},
+                "created_at": media.created_at,
+                "updated_at": media.updated_at,
+            }
+            media_data.append(media_dict)
+
+        return {
+            "success": True,
+            "patient_id": patient_id,
+            "media_files": media_data,
+            "total": len(media_data),
+        }
+
+    except Exception as e:
+        logger.error(f"Failed to get media files: {str(e)}")
+        raise HTTPException(status_code=500, detail="Failed to retrieve media files")
+
+
+@router.delete("/manual-entry/text/{entry_id}")
+async def delete_text_entry(
+    entry_id: str,
+    db: Session = Depends(get_db),
+):
+    """
+    Delete a text entry
+    """
+    try:
+        # Find and delete text entry
+        text_entry = db.query(TextEntry).filter(TextEntry.id == entry_id).first()
+
+        if not text_entry:
+            raise HTTPException(status_code=404, detail="Text entry not found")
+
+        db.delete(text_entry)
+        db.commit()
+
+        logger.info(f"Text entry deleted: {entry_id}")
+
+        return {"success": True, "message": "Text entry deleted successfully"}
+
+    except HTTPException:
+        raise
+    except Exception as e:
         db.rollback()
+        logger.error(f"Failed to delete text entry: {str(e)}")
+        raise HTTPException(status_code=500, detail="Failed to delete text entry")
+
+
+@router.delete("/manual-entry/media/{media_id}")
+async def delete_media_file(
+    media_id: str,
+    db: Session = Depends(get_db),
+):
+    """
+    Delete a media file
+    """
+    try:
+        # Find media file
+        media_file = db.query(MediaFile).filter(MediaFile.id == media_id).first()
+
+        if not media_file:
+            raise HTTPException(status_code=404, detail="Media file not found")
+
+        # Delete file from filesystem
+        try:
+            if os.path.exists(media_file.file_path):
+                os.remove(media_file.file_path)
+        except Exception as e:
+            logger.warning(f"Failed to delete file {media_file.file_path}: {str(e)}")
+
+        # Delete from database
+        db.delete(media_file)
+        db.commit()
+
+        logger.info(f"Media file deleted: {media_id}")
+
+        return {"success": True, "message": "Media file deleted successfully"}
+
+    except HTTPException:
+        raise
+    except Exception as e:
+        db.rollback()
+        logger.error(f"Failed to delete media file: {str(e)}")
+        raise HTTPException(status_code=500, detail="Failed to delete media file")
+
+
+# Existing endpoints continue below...

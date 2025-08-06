@@ -9,11 +9,12 @@ const OFFLINE_FALLBACK = '/offline.html';
 // Assets to cache immediately
 const STATIC_ASSETS = [
   '/',
-  '/dashboard',
+  '/index.html',
   '/static/manifest.json',
-  '/static/css/app.css',
+  '/static/css/main.css',
   '/static/js/app.js',
-  OFFLINE_FALLBACK,
+  '/static/icons/logo192.png',
+  '/static/icons/logo512.png',
   // Add more static assets as needed
 ];
 
@@ -290,8 +291,8 @@ self.addEventListener('push', event => {
   
   const options = {
     body: 'You have new clinical updates',
-    icon: '/static/icons/icon-192.png',
-    badge: '/static/icons/badge.png',
+    icon: '/static/icons/logo192.png',
+    badge: '/static/icons/logo192.png',
     tag: 'clinical-alert',
     requireInteraction: true,
     actions: [
@@ -344,7 +345,7 @@ async function checkForClinicalUpdates() {
       // Show notification about available updates
       await self.registration.showNotification('Clinical Updates Available', {
         body: `${updates.count} new clinical updates are available`,
-        icon: '/static/icons/icon-192.png',
+        icon: '/static/icons/logo192.png',
         tag: 'clinical-updates'
       });
     }

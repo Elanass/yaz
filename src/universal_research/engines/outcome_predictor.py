@@ -5,11 +5,10 @@ Integrates with existing recommendation system to provide evidence-based insight
 
 import math
 from collections import defaultdict
-from datetime import datetime
+from datetime import datetime, timedelta
 from typing import Any, Dict, List, Optional, Tuple
 
-from ....modules.universal_research.adapters.surgify_adapter import \
-    SurgifyAdapter
+from ..adapters.surgify_adapter import SurgifyAdapter
 
 
 class OutcomePredictor:

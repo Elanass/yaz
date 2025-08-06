@@ -20,7 +20,7 @@ def run_command(cmd: str, description: str = "") -> bool:
             cmd.split(), 
             capture_output=True, 
             text=True, 
-            cwd=Path(__file__).parent
+            cwd=Path(__file__).parent.parent  # Go up to workspace root
         )
         
         if result.returncode == 0:

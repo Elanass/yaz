@@ -11,8 +11,7 @@ from sqlalchemy.orm import Session
 from surgify.core.database import Base, engine, get_db
 from surgify.core.models.database_models import Case, Patient, User
 
-from ....modules.universal_research.adapters.surgify_adapter import \
-    SurgifyAdapter
+from ..adapters.surgify_adapter import SurgifyAdapter
 
 
 class DatabaseBridge:

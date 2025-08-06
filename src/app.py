@@ -20,6 +20,7 @@ from fastapi.responses import JSONResponse
 
 from insure.api.router import router as insurance_router
 from move.api.router import router as logistics_router
+
 # Import domain routers
 from surgify.main import app as surgify_app
 

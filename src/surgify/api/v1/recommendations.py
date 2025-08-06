@@ -138,10 +138,12 @@ def predict_outcome(
                 }
 
                 # Add research-based outcome insights
-                from ....universal_research.adapters.surgify_adapter import \
-                    SurgifyAdapter
-                from ....universal_research.engines.outcome_predictor import \
-                    OutcomePredictor
+                from ....universal_research.adapters.surgify_adapter import (
+                    SurgifyAdapter,
+                )
+                from ....universal_research.engines.outcome_predictor import (
+                    OutcomePredictor,
+                )
 
                 db_session = next(get_db())
                 adapter = SurgifyAdapter(db_session)

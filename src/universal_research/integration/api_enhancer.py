@@ -13,15 +13,11 @@ from surgify.core.database import get_db
 from surgify.core.models.user import User
 from surgify.core.services.auth_service import get_current_user
 
-from ....modules.universal_research.adapters.legacy_bridge import LegacyBridge
-from ....modules.universal_research.adapters.surgify_adapter import \
-    SurgifyAdapter
-from ....modules.universal_research.engines.cohort_analyzer import \
-    CohortAnalyzer
-from ....modules.universal_research.engines.outcome_predictor import \
-    OutcomePredictor
-from ....modules.universal_research.engines.research_generator import \
-    ResearchGenerator
+from ..adapters.legacy_bridge import LegacyBridge
+from ..adapters.surgify_adapter import SurgifyAdapter
+from ..engines.cohort_analyzer import CohortAnalyzer
+from ..engines.outcome_predictor import OutcomePredictor
+from ..engines.research_generator import ResearchGenerator
 
 
 # Global dependency functions for FastAPI injection

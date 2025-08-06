@@ -6,8 +6,16 @@ Cleaned and optimized to match actual database schema
 from datetime import datetime
 from enum import Enum
 
-from sqlalchemy import (Boolean, Column, DateTime, Float, ForeignKey, Integer,
-                        String, Text)
+from sqlalchemy import (
+    Boolean,
+    Column,
+    DateTime,
+    Float,
+    ForeignKey,
+    Integer,
+    String,
+    Text,
+)
 from sqlalchemy.orm import relationship
 
 from ..database import Base
@@ -355,3 +363,39 @@ class IngestionLog(Base):
     started_at = Column(DateTime, default=datetime.utcnow)
     completed_at = Column(DateTime, nullable=True)
     created_by = Column(Integer, ForeignKey("users.id"), nullable=True)
+
+
+class TextEntry(Base):
+    __tablename__ = "text_entries"
+
+    id = Column(String(36), primary_key=True, index=True)  # UUID
+    patient_id = Column(String(20), nullable=False, index=True)
+    case_id = Column(String(36), nullable=True, index=True)
+    entry_type = Column(
+        String(50), nullable=False
+    )  # note, observation, diagnosis, etc.
+    title = Column(String(200), nullable=False)
+    content = Column(Text, nullable=False)
+    tags = Column(Text, nullable=True)  # JSON string of tags
+    meta_data = Column(Text, nullable=True)  # JSON string of metadata
+    created_at = Column(DateTime, default=datetime.utcnow, index=True)
+    updated_at = Column(DateTime, default=datetime.utcnow, onupdate=datetime.utcnow)
+
+
+class MediaFile(Base):
+    __tablename__ = "media_files"
+
+    id = Column(String(36), primary_key=True, index=True)  # UUID
+    patient_id = Column(String(20), nullable=False, index=True)
+    case_id = Column(String(36), nullable=True, index=True)
+    media_type = Column(String(20), nullable=False)  # image, video, audio, document
+    title = Column(String(200), nullable=False)
+    description = Column(Text, nullable=True)
+    file_path = Column(String(500), nullable=False)
+    original_filename = Column(String(255), nullable=False)
+    file_size = Column(Integer, nullable=False)
+    content_type = Column(String(100), nullable=True)
+    tags = Column(Text, nullable=True)  # JSON string of tags
+    meta_data = Column(Text, nullable=True)  # JSON string of metadata
+    created_at = Column(DateTime, default=datetime.utcnow, index=True)
+    updated_at = Column(DateTime, default=datetime.utcnow, onupdate=datetime.utcnow)
