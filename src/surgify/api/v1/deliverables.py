@@ -9,34 +9,30 @@ import uuid
 from datetime import datetime
 from typing import BinaryIO, List, Optional
 
-from fastapi import APIRouter, BackgroundTasks, Depends, HTTPException, Query, status
+from fastapi import (APIRouter, BackgroundTasks, Depends, HTTPException, Query,
+                     status)
 from fastapi.responses import JSONResponse, StreamingResponse
 from pydantic import BaseModel
 from sqlalchemy.orm import Session
 
 from ...core.analytics.insight_generator import InsightGenerator
-from ...core.cache import cache_detail_endpoint, cache_list_endpoint, invalidate_cache
+from ...core.cache import (cache_detail_endpoint, cache_list_endpoint,
+                           invalidate_cache)
 from ...core.database import get_db
 from ...core.deliverable_factory import DeliverableFactory
-from ...core.models.processing_models import (
-    AudienceType,
-    Deliverable,
-    DeliverableFormat,
-    DeliverableMetadata,
-    DeliverableRequest,
-)
+from ...core.models.processing_models import (AudienceType, Deliverable,
+                                              DeliverableFormat,
+                                              DeliverableMetadata,
+                                              DeliverableRequest)
 from ...core.models.user import User
 from ...core.services.auth_service import get_current_user
-
 # Legacy imports for backward compatibility
-from ...core.services.deliverable_service import (
-    DeliverableResponse,
-    DeliverableService,
-    DeliverableStatus,
-    DeliverableType,
-    DeliverableUpdateRequest,
-    TemplateResponse,
-)
+from ...core.services.deliverable_service import (DeliverableResponse,
+                                                  DeliverableService,
+                                                  DeliverableStatus,
+                                                  DeliverableType,
+                                                  DeliverableUpdateRequest,
+                                                  TemplateResponse)
 
 router = APIRouter(tags=["Deliverables"])
 

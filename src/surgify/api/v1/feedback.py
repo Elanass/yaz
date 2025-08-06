@@ -16,11 +16,8 @@ from pydantic import BaseModel, EmailStr, Field, validator
 from sqlalchemy.orm import Session
 
 from ...core.database import get_db
-from ...core.models.processing_models import (
-    AggregatedFeedback,
-    FeedbackData,
-    FeedbackType,
-)
+from ...core.models.processing_models import (AggregatedFeedback, FeedbackData,
+                                              FeedbackType)
 from ...core.services.logger import get_logger
 
 logger = get_logger(__name__)

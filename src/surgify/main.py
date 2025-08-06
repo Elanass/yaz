@@ -9,7 +9,6 @@ import argparse
 import asyncio
 import logging
 import os
-
 # Universal Research Module imports
 import sys
 import uuid
@@ -35,11 +34,9 @@ from universal_research.integration.database_bridge import DatabaseBridge
 
 # API imports
 from .api.v1 import router as api_v1_router
-
 # Core imports
 from .core.config.unified_config import get_settings
 from .core.database import create_tables, engine
-
 # Domain adapter imports
 from .core.domain_adapter import Domain, domain_registry
 from .core.models.database_models import Base
@@ -223,9 +220,8 @@ def create_app(domain: str = None) -> FastAPI:
         logger.info("✅ Research API endpoints added successfully")
 
         # Initialize research authentication enhancements
-        from .modules.universal_research.integration.auth_integrator import (
-            AuthIntegrator,
-        )
+        from .modules.universal_research.integration.auth_integrator import \
+            AuthIntegrator
 
         auth_integrator = AuthIntegrator()
         auth_integrator.enhance_existing_auth_middleware(app)

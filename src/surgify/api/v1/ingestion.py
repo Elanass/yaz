@@ -15,15 +15,8 @@ from pathlib import Path
 from typing import Any, Dict, List, Optional
 
 import pandas as pd
-from fastapi import (
-    APIRouter,
-    BackgroundTasks,
-    Depends,
-    File,
-    Form,
-    HTTPException,
-    UploadFile,
-)
+from fastapi import (APIRouter, BackgroundTasks, Depends, File, Form,
+                     HTTPException, UploadFile)
 from fastapi.responses import JSONResponse
 from pydantic import BaseModel, validator
 from sqlalchemy.orm import Session
@@ -32,12 +25,8 @@ from ...core.analytics.insight_generator import InsightGenerator
 from ...core.csv_processor import CSVProcessor, ProcessingConfig
 from ...core.database import get_db
 from ...core.domain_adapter import get_domain_config
-from ...core.models.database_models import (
-    CohortData,
-    IngestionLog,
-    MediaFile,
-    TextEntry,
-)
+from ...core.models.database_models import (CohortData, IngestionLog,
+                                            MediaFile, TextEntry)
 from ...core.models.processing_models import DataDomain, ProcessingResult
 from ...core.services.logger import get_logger
 

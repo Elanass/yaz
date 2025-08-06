@@ -8,15 +8,13 @@ from typing import List, Optional
 from fastapi import APIRouter, Depends, HTTPException, Query, status
 from sqlalchemy.orm import Session
 
-from ...core.cache import cache_detail_endpoint, cache_list_endpoint, invalidate_cache
+from ...core.cache import (cache_detail_endpoint, cache_list_endpoint,
+                           invalidate_cache)
 from ...core.database import get_db
 from ...core.models.user import User
 from ...core.services.auth_service import get_current_user
-from ...core.services.case_service import (
-    CaseCreateRequest,
-    CaseListFilters,
-    CaseResponse,
-)
+from ...core.services.case_service import (CaseCreateRequest, CaseListFilters,
+                                           CaseResponse)
 from ...core.services.case_service import CaseService as EnhancedCaseService
 from ...core.services.case_service import CaseUpdateRequest
 

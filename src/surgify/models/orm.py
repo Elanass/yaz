@@ -6,40 +6,16 @@ Database schema for gastric oncology decision support platform
 import uuid
 from datetime import datetime
 
-from data.models import (
-    BloodType,
-    ComorbidityType,
-    ConfidenceLevel,
-    DecisionStatus,
-    GenderType,
-    SurgicalProcedure,
-    TreatmentProtocol,
-    TumorHistology,
-    TumorLocation,
-)
-from sqlalchemy import (
-    JSON,
-    UUID,
-    Boolean,
-    Column,
-    DateTime,
-    Enum,
-    Float,
-    ForeignKey,
-    Index,
-    Integer,
-    String,
-    Text,
-    UniqueConstraint,
-)
+from data.models import (BloodType, ComorbidityType, ConfidenceLevel,
+                         DecisionStatus, GenderType, SurgicalProcedure,
+                         TreatmentProtocol, TumorHistology, TumorLocation)
+from sqlalchemy import (JSON, UUID, Boolean, Column, DateTime, Enum, Float,
+                        ForeignKey, Index, Integer, String, Text,
+                        UniqueConstraint)
 from sqlalchemy.orm import relationship
 
-from core.models.medical import (
-    MetastasisStatus,
-    NodalStatus,
-    PatientPerformanceStatus,
-    TumorStage,
-)
+from core.models.medical import (MetastasisStatus, NodalStatus,
+                                 PatientPerformanceStatus, TumorStage)
 from data.database import Base
 
 

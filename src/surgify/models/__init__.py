@@ -12,13 +12,9 @@ from uuid import UUID, uuid4
 from pydantic import BaseModel, ConfigDict, Field, root_validator, validator
 
 from surgify.core.models.base import BaseEntity, ConfidenceLevel
-from surgify.core.models.medical import (
-    DecisionStatus,
-    MetastasisStatus,
-    NodalStatus,
-    PatientPerformanceStatus,
-    TumorStage,
-)
+from surgify.core.models.medical import (DecisionStatus, MetastasisStatus,
+                                         NodalStatus, PatientPerformanceStatus,
+                                         TumorStage)
 
 
 class GenderType(str, Enum):

@@ -8,7 +8,8 @@ from enum import Enum
 from typing import Dict, List, Optional
 from uuid import UUID, uuid4
 
-from pydantic import BaseModel, ConfigDict, EmailStr, Field, root_validator, validator
+from pydantic import (BaseModel, ConfigDict, EmailStr, Field, root_validator,
+                      validator)
 
 
 class UserRole(str, Enum):

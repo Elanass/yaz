@@ -584,7 +584,9 @@ class SyncService(BaseService):
                 result = await self._process_in_batches(data)
             else:
                 # Incremental sync
-                data = await self._fetch_external_data("http://example.com/api/cases?incremental=true")
+                data = await self._fetch_external_data(
+                    "http://example.com/api/cases?incremental=true"
+                )
                 result = await self._process_in_batches(data)
 
             return {
@@ -600,20 +602,15 @@ class SyncService(BaseService):
     async def send_message(self, message_request: MessageRequest) -> MessageResponse:
         """Send a sync message - placeholder for tests to patch"""
         message_id = f"msg-{uuid4().hex[:8]}"
-        
+
         try:
             # Simulate message sending
             await self._send_message(message_request)
-            return MessageResponse(
-                message_id=message_id,
-                status="sent"
-            )
+            return MessageResponse(message_id=message_id, status="sent")
         except Exception as e:
             logger.error(f"Error sending message: {e}")
             return MessageResponse(
-                message_id=message_id,
-                status="failed",
-                error_message=str(e)
+                message_id=message_id, status="failed", error_message=str(e)
             )
 
     async def _send_message(self, message_request: MessageRequest):

@@ -9,7 +9,6 @@ from .ai import router as ai_router
 from .auth import router as auth_router
 from .cases import router as cases_router
 from .chat import router as chat_router
-
 # Import core API routers
 from .dashboard import router as dashboard_router
 from .deliverables import router as deliverables_router

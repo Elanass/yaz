@@ -10,15 +10,8 @@ import uuid
 from datetime import datetime
 from typing import Any, Dict, List, Optional
 
-from fastapi import (
-    APIRouter,
-    BackgroundTasks,
-    Depends,
-    File,
-    Form,
-    HTTPException,
-    UploadFile,
-)
+from fastapi import (APIRouter, BackgroundTasks, Depends, File, Form,
+                     HTTPException, UploadFile)
 from fastapi.responses import JSONResponse, StreamingResponse
 from pydantic import BaseModel, Field
 from sqlalchemy.orm import Session
@@ -27,14 +20,10 @@ from ...core.analytics.insight_generator import InsightGenerator
 from ...core.csv_processor import CSVProcessor, ProcessingConfig
 from ...core.database import get_db
 from ...core.deliverable_factory import DeliverableFactory
-from ...core.models.processing_models import (
-    AudienceType,
-    DataDomain,
-    DeliverableFormat,
-    DeliverableRequest,
-    InsightPackage,
-    ProcessingResult,
-)
+from ...core.models.processing_models import (AudienceType, DataDomain,
+                                              DeliverableFormat,
+                                              DeliverableRequest,
+                                              InsightPackage, ProcessingResult)
 from ...core.services.logger import get_logger
 
 logger = get_logger(__name__)
