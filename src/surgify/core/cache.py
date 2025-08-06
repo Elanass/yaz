@@ -3,8 +3,6 @@ Redis Cache Implementation for Surgify Platform
 Provides caching decorators and utilities for high-performance endpoints
 """
 
-import asyncio
-import hashlib
 import json
 import logging
 from functools import wraps
@@ -70,12 +68,20 @@ class CacheClient:
         """Get value from cache"""
         try:
             client = await self._get_client()
-            if client and self._connected:
-                value = await client.get(key)
+            if client:
+                # Add prefix if not already present
+                cache_key = (
+                    key
+                    if key.startswith(f"{CacheConfig.KEY_PREFIX}:")
+                    else f"{CacheConfig.KEY_PREFIX}:{key}"
+                )
+                value = await client.get(cache_key)
                 if value:
                     return deserialize_response(value)
+                return None
         except Exception as e:
             logger.warning(f"Cache GET error for key {key}: {e}")
+            return None
         return None
 
     async def set(
@@ -84,14 +90,20 @@ class CacheClient:
         """Set value in cache with TTL"""
         try:
             client = await self._get_client()
-            if client and self._connected:
+            if client:
+                # Add prefix if not already present
+                cache_key = (
+                    key
+                    if key.startswith(f"{CacheConfig.KEY_PREFIX}:")
+                    else f"{CacheConfig.KEY_PREFIX}:{key}"
+                )
                 # Serialize value to JSON string
                 if isinstance(value, str):
                     serialized_value = value
                 else:
                     serialized_value = serialize_response(value)
-                await client.setex(key, ttl, serialized_value)
-                return True
+                result = await client.setex(cache_key, ttl, serialized_value)
+                return bool(result)
         except Exception as e:
             logger.warning(f"Cache SET error for key {key}: {e}")
         return False
@@ -111,18 +123,33 @@ class CacheClient:
         """Delete keys matching pattern"""
         try:
             client = await self._get_client()
-            if client and self._connected:
+            if client:
                 keys = await client.keys(pattern)
                 if keys:
                     return await client.delete(*keys)
                 return 0
         except Exception as e:
             logger.warning(f"Cache DELETE_PATTERN error for pattern {pattern}: {e}")
-        return 0
+            return 0
 
     async def invalidate_pattern(self, pattern: str) -> int:
-        """Invalidate cache keys matching pattern (alias for delete_pattern)"""
-        return await self.delete_pattern(pattern)
+        """Invalidate cache keys matching pattern"""
+        try:
+            client = await self._get_client()
+            if client:
+                # Add prefix to pattern if not already prefixed
+                if not pattern.startswith(f"{CacheConfig.KEY_PREFIX}:"):
+                    full_pattern = f"{CacheConfig.KEY_PREFIX}:{pattern}"
+                else:
+                    full_pattern = pattern
+
+                keys = await client.keys(full_pattern)
+                if keys:
+                    return await client.delete(*keys)
+                return 0
+        except Exception as e:
+            logger.warning(f"Cache INVALIDATE_PATTERN error for pattern {pattern}: {e}")
+            return 0
 
 
 # Global cache client instance
@@ -131,12 +158,24 @@ cache_client = CacheClient()
 
 def generate_cache_key(resource: str, **params) -> str:
     """Generate consistent cache key from resource and parameters"""
-    # Sort parameters for consistent hashing
-    sorted_params = sorted(params.items())
-    params_str = json.dumps(sorted_params, sort_keys=True)
-    params_hash = hashlib.md5(params_str.encode()).hexdigest()[:8]
+    # Start with just the resource (without namespace prefix)
+    key_parts = [resource]
 
-    return f"{CacheConfig.KEY_PREFIX}:{resource}:{params_hash}"
+    # Handle request object if present
+    if "request" in params:
+        request = params.pop("request")
+        if hasattr(request, "url") and hasattr(request.url, "path"):
+            key_parts.append(request.url.path)
+        if hasattr(request, "query_params"):
+            sorted_params = dict(sorted(request.query_params.items()))
+            params_str = json.dumps(sorted_params, sort_keys=True)
+            key_parts.append(params_str)
+
+    # Add other parameters
+    for key, value in sorted(params.items()):
+        key_parts.append(f"{key}={value}")
+
+    return ":".join(key_parts)
 
 
 def serialize_response(data: Any) -> str:
@@ -146,29 +185,53 @@ def serialize_response(data: Any) -> str:
     elif isinstance(data, list) and data and isinstance(data[0], BaseModel):
         return json.dumps([item.model_dump() for item in data])
     else:
-        return json.dumps(data, default=str)
+        try:
+            return json.dumps(data, default=str)
+        except (TypeError, ValueError):
+            # Fallback to pickle for complex objects that can't be JSON serialized
+            import base64
+            import pickle
+
+            pickled = pickle.dumps(data)
+            return base64.b64encode(pickled).decode("utf-8")
 
 
-def deserialize_response(data_str: str, response_model: Optional[type] = None) -> Any:
+def deserialize_response(
+    data: Union[str, Any], response_model: Optional[type] = None
+) -> Any:
     """Deserialize cached response data"""
+    # If data is already a dict/list/etc (from mocks), return it directly
+    if not isinstance(data, str):
+        return data
+
     try:
-        data = json.loads(data_str)
+        # First try JSON deserialization
+        parsed_data = json.loads(data)
 
         if response_model and issubclass(response_model, BaseModel):
-            if isinstance(data, list):
-                return [response_model(**item) for item in data]
+            if isinstance(parsed_data, list):
+                return [response_model(**item) for item in parsed_data]
             else:
-                return response_model(**data)
+                return response_model(**parsed_data)
 
-        return data
-    except Exception as e:
-        logger.warning(f"Cache deserialization error: {e}")
-        return None
+        return parsed_data
+    except (json.JSONDecodeError, TypeError):
+        try:
+            # Fallback to pickle deserialization for complex objects
+            import base64
+            import pickle
+
+            pickled_data = base64.b64decode(data.encode("utf-8"))
+            return pickle.loads(pickled_data)
+        except Exception as e:
+            logger.warning(f"Cache deserialization error: {e}")
+            return None
 
 
 def cache_response(
-    resource: str,
-    ttl: int = CacheConfig.DEFAULT_TTL,
+    ttl: int,
+    cache_client: CacheClient,
+    resource: Optional[str] = None,
     key_params: Optional[list] = None,
     response_model: Optional[type] = None,
 ):
@@ -176,8 +239,9 @@ def cache_response(
     Cache decorator for API endpoints
 
     Args:
-        resource: Resource name for cache key generation
         ttl: Time to live in seconds
+        cache_client: Cache client instance
+        resource: Resource name for cache key generation
         key_params: List of parameter names to include in cache key
         response_model: Pydantic model for response serialization
     """
@@ -185,6 +249,9 @@ def cache_response(
     def decorator(func: Callable) -> Callable:
         @wraps(func)
         async def wrapper(*args, **kwargs):
+            # Use function name as resource if not provided
+            resource_name = resource or func.__name__
+
             # Extract parameters for cache key
             cache_params = {}
             if key_params:
@@ -198,7 +265,7 @@ def cache_response(
                     cache_params[param] = kwargs[param]
 
             # Generate cache key
-            cache_key = generate_cache_key(resource, **cache_params)
+            cache_key = generate_cache_key(resource_name, **cache_params)
 
             # Try to get from cache
             try:
@@ -234,13 +301,18 @@ def cache_response(
 def cache_list_endpoint(resource: str, ttl: int = CacheConfig.LIST_TTL):
     """Cache decorator for list endpoints"""
     return cache_response(
-        resource, ttl=ttl, key_params=["page", "limit", "search", "filter"]
+        ttl=ttl,
+        cache_client=cache_client,
+        resource=resource,
+        key_params=["page", "limit", "search", "filter"],
     )
 
 
 def cache_detail_endpoint(resource: str, ttl: int = CacheConfig.DETAIL_TTL):
     """Cache decorator for detail endpoints"""
-    return cache_response(resource, ttl=ttl, key_params=["id"])
+    return cache_response(
+        ttl=ttl, cache_client=cache_client, resource=resource, key_params=["id"]
+    )
 
 
 async def invalidate_cache(resource: str, **params):

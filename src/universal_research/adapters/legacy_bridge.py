@@ -7,9 +7,9 @@ from typing import Any, Dict, List, Optional
 
 from fastapi import HTTPException
 
+from surgify.api.v1.cases import get_case, list_cases
 from surgify.core.services.case_service import CaseService
 
-from surgify.api.v1.cases import get_case, list_cases
 from .surgify_adapter import SurgifyAdapter
 
 
