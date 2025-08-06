@@ -9,9 +9,10 @@ from typing import Any, Dict, List, Optional
 from fastapi import APIRouter, Depends, HTTPException, Query
 from sqlalchemy.orm import Session
 
-from ....core.database import get_db
-from ....core.models.user import User
-from ....core.services.auth_service import get_current_user
+from surgify.core.database import get_db
+from surgify.core.models.user import User
+from surgify.core.services.auth_service import get_current_user
+
 from ....modules.universal_research.adapters.legacy_bridge import LegacyBridge
 from ....modules.universal_research.adapters.surgify_adapter import \
     SurgifyAdapter
@@ -52,7 +53,7 @@ def get_legacy_bridge(
     adapter: SurgifyAdapter = Depends(get_surgify_adapter),
 ) -> LegacyBridge:
     # This would need the actual case service
-    from ....core.services.case_service import CaseService
+    from surgify.core.services.case_service import CaseService
 
     case_service = CaseService()  # This would be properly injected
     return LegacyBridge(case_service, adapter)

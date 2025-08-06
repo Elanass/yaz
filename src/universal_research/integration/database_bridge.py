@@ -8,8 +8,9 @@ from typing import Any, Dict, List, Optional
 from sqlalchemy import func, text
 from sqlalchemy.orm import Session
 
-from ....core.database import Base, engine, get_db
-from ....core.models.database_models import Case, Patient, User
+from surgify.core.database import Base, engine, get_db
+from surgify.core.models.database_models import Case, Patient, User
+
 from ....modules.universal_research.adapters.surgify_adapter import \
     SurgifyAdapter
 

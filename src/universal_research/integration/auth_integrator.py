@@ -8,8 +8,8 @@ from typing import Any, Dict, List, Optional
 from fastapi import Depends, HTTPException, status
 from fastapi.security import HTTPAuthorizationCredentials, HTTPBearer
 
-from ....core.models.user import User
-from ....core.services.auth_service import get_current_user, verify_token
+from surgify.core.models.user import User
+from surgify.core.services.auth_service import get_current_user, verify_token
 
 
 class AuthIntegrator:

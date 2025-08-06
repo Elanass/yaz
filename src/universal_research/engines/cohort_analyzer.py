@@ -8,9 +8,8 @@ from collections import defaultdict
 from datetime import datetime, timedelta
 from typing import Any, Dict, List, Optional, Tuple
 
-from ....modules.universal_research.adapters.domain_mapper import ConceptMapper
-from ....modules.universal_research.adapters.surgify_adapter import \
-    SurgifyAdapter
+from ..adapters.domain_mapper import ConceptMapper
+from ..adapters.surgify_adapter import SurgifyAdapter
 
 
 class CohortAnalyzer:
