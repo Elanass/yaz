@@ -154,7 +154,7 @@ class BackwardCompatibilityTester:
         print("  Testing dashboard functionality preservation...")
 
         try:
-            from surgify.modules.analytics.analytics_engine import AnalyticsEngine
+            from surgify.core.analytics.analytics_engine import AnalyticsEngine
 
             analytics = AnalyticsEngine()
             print("    ✓ AnalyticsEngine imports and initializes")

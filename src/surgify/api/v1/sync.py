@@ -8,23 +8,15 @@ from typing import List, Optional
 from fastapi import APIRouter, Depends, HTTPException, Query, status
 from sqlalchemy.orm import Session
 
-from surgify.core.cache import (
-    cache_detail_endpoint,
-    cache_list_endpoint,
-    invalidate_cache,
-)
-from surgify.core.database import get_db
-from surgify.core.models.user import User
-from surgify.core.services.auth_service import get_current_user
-from surgify.core.services.sync_service import (
-    MessageRequest,
-    MessageResponse,
-    MessageType,
-    SyncRequest,
-    SyncResponse,
-    SyncService,
-    SyncStatus,
-)
+from ...core.cache import (cache_detail_endpoint, cache_list_endpoint,
+                           invalidate_cache)
+from ...core.database import get_db
+from ...core.models.user import User
+from ...core.services.auth_service import get_current_user
+from ...core.services.sync_service import (MessageRequest, MessageResponse,
+                                           MessageType, SyncRequest,
+                                           SyncResponse, SyncService,
+                                           SyncStatus)
 
 router = APIRouter(tags=["Sync"])
 

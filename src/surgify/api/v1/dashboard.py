@@ -9,16 +9,14 @@ from typing import Any, Dict, List, Optional, Union
 
 from fastapi import APIRouter, Depends, HTTPException, Query
 
-from surgify.modules.analytics.analytics_engine import AnalyticsEngine
+from ...core.analytics.analytics_engine import AnalyticsEngine
 
 # Universal Research Integration (Optional Enhancement)
 try:
-    from surgify.core.database import get_db
-    from surgify.core.services.case_service import CaseService
-    from surgify.modules.universal_research.adapters.legacy_bridge import LegacyBridge
-    from surgify.modules.universal_research.adapters.surgify_adapter import (
-        SurgifyAdapter,
-    )
+    from ....universal_research.adapters.legacy_bridge import LegacyBridge
+    from ....universal_research.adapters.surgify_adapter import SurgifyAdapter
+    from ...core.database import get_db
+    from ...core.services.case_service import CaseService
 
     RESEARCH_AVAILABLE = True
     LegacyBridge = LegacyBridge  # Make available for type hints

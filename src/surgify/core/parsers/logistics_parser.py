@@ -10,7 +10,7 @@ from typing import Any, Dict, List
 
 import pandas as pd
 
-from surgify.core.parsers import BaseParser
+from . import BaseParser
 
 logger = logging.getLogger(__name__)
 

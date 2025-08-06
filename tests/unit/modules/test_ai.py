@@ -8,13 +8,9 @@ from unittest.mock import AsyncMock, Mock, patch
 import pytest
 from fastapi.testclient import TestClient
 
-from surgify.api.v1.ai import (
-    SummarizeRequest,
-    SummarizeResponse,
-    _build_summarization_prompt,
-    _calculate_confidence_score,
-    router,
-)
+from surgify.api.v1.ai import (SummarizeRequest, SummarizeResponse,
+                               _build_summarization_prompt,
+                               _calculate_confidence_score, router)
 
 
 class TestAISummarization:

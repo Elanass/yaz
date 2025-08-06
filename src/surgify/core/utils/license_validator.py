@@ -8,7 +8,7 @@ from datetime import datetime
 from pathlib import Path
 from typing import Dict, List, Optional, Tuple
 
-from surgify.core.services.logger import get_logger
+from ...core.services.logger import get_logger
 
 logger = get_logger(__name__)
 

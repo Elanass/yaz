@@ -2,16 +2,14 @@ from typing import Any, Optional, Union
 
 from fastapi import APIRouter, Depends, HTTPException, Query
 
-from surgify.core.services.ai_service import AIService
+from ...core.services.ai_service import AIService
 
 # Universal Research Integration (Optional Enhancement)
 try:
-    from surgify.core.database import get_db
-    from surgify.core.services.case_service import CaseService
-    from surgify.modules.universal_research.adapters.legacy_bridge import LegacyBridge
-    from surgify.modules.universal_research.adapters.surgify_adapter import (
-        SurgifyAdapter,
-    )
+    from ....universal_research.adapters.legacy_bridge import LegacyBridge
+    from ....universal_research.adapters.surgify_adapter import SurgifyAdapter
+    from ...core.database import get_db
+    from ...core.services.case_service import CaseService
 
     RESEARCH_AVAILABLE = True
     LegacyBridge = LegacyBridge  # Make available for type hints
@@ -140,12 +138,10 @@ def predict_outcome(
                 }
 
                 # Add research-based outcome insights
-                from surgify.modules.universal_research.adapters.surgify_adapter import (
-                    SurgifyAdapter,
-                )
-                from surgify.modules.universal_research.engines.outcome_predictor import (
-                    OutcomePredictor,
-                )
+                from ....universal_research.adapters.surgify_adapter import \
+                    SurgifyAdapter
+                from ....universal_research.engines.outcome_predictor import \
+                    OutcomePredictor
 
                 db_session = next(get_db())
                 adapter = SurgifyAdapter(db_session)

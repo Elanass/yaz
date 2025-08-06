@@ -1,6 +1,6 @@
 """
-Enhanced Data Ingestion API - Islandized Workflow Support
-Handles CSV uploads, manual entries, and multi-center domain management
+Enhanced Data Ingestion API - Advanced CSV Processing Integration
+Handles CSV uploads, manual entries, and multi-center domain management with intelligent analytics
 """
 
 import asyncio
@@ -13,26 +13,26 @@ from pathlib import Path
 from typing import Any, Dict, List, Optional
 
 import pandas as pd
-from fastapi import (
-    APIRouter,
-    BackgroundTasks,
-    Depends,
-    File,
-    Form,
-    HTTPException,
-    UploadFile,
-)
+from fastapi import (APIRouter, BackgroundTasks, Depends, File, Form,
+                     HTTPException, UploadFile)
 from fastapi.responses import JSONResponse
 from pydantic import BaseModel, validator
 from sqlalchemy.orm import Session
 
+from ...core.analytics.insight_generator import InsightGenerator
+from ...core.csv_processor import CSVProcessor, ProcessingConfig
 from ...core.database import get_db
 from ...core.domain_adapter import get_domain_config
 from ...core.models.database_models import CohortData, IngestionLog
+from ...core.models.processing_models import DataDomain, ProcessingResult
 from ...core.services.logger import get_logger
 
 logger = get_logger(__name__)
 router = APIRouter()
+
+# Initialize processors
+csv_processor = CSVProcessor()
+insight_generator = InsightGenerator()
 
 
 # Pydantic models
@@ -66,6 +66,25 @@ class IngestionResponse(BaseModel):
     processed_records: int
     errors: List[str] = []
     warnings: List[str] = []
+    processing_result_id: Optional[
+        str
+    ] = None  # New field for linking to processing results
+    quality_score: Optional[float] = None
+    domain_detected: Optional[str] = None
+
+
+class AdvancedIngestionResponse(BaseModel):
+    """Enhanced response with processing insights"""
+
+    success: bool
+    message: str
+    upload_id: str
+    processing_result: Optional[ProcessingResult] = None
+    insights_available: bool = False
+    recommended_actions: List[str] = []
+
+    class Config:
+        arbitrary_types_allowed = True
 
 
 class IngestionStatus(BaseModel):
@@ -77,6 +96,8 @@ class IngestionStatus(BaseModel):
     errors: List[str] = []
     started_at: datetime
     completed_at: Optional[datetime] = None
+    quality_metrics: Optional[Dict[str, float]] = None
+    insights_ready: bool = False
 
 
 @router.post("/ingest", response_model=IngestionResponse)
@@ -132,15 +153,17 @@ async def ingest_data(
         raise HTTPException(status_code=500, detail=f"Ingestion failed: {str(e)}")
 
 
-@router.post("/upload-csv")
-async def upload_csv(
+@router.post("/upload-csv-advanced", response_model=AdvancedIngestionResponse)
+async def upload_csv_advanced(
     background_tasks: BackgroundTasks,
     file: UploadFile = File(...),
-    domain: str = Form("local"),
+    domain: Optional[str] = Form(None),  # Auto-detect if not provided
+    enable_insights: bool = Form(True),
+    stream_processing: bool = Form(False),
     db: Session = Depends(get_db),
 ):
     """
-    Upload and process CSV file for cohort data
+    Advanced CSV upload with intelligent processing, domain detection, and insight generation
     """
     try:
         # Validate file type
@@ -151,56 +174,159 @@ async def upload_csv(
 
         # Generate upload ID
         upload_id = str(uuid.uuid4())
+        logger.info(
+            f"Advanced CSV processing started: {file.filename}, upload_id: {upload_id}"
+        )
 
+        # Read file content
+        content = await file.read()
+
+        # Validate file size
+        max_size = 100 * 1024 * 1024  # 100MB
+        if len(content) > max_size:
+            raise HTTPException(status_code=413, detail="File too large (max 100MB)")
+
+        # Create ingestion log
+        ingestion_log = IngestionLog(
+            upload_id=upload_id,
+            domain=domain or "auto-detect",
+            filename=file.filename,
+            status="processing",
+            started_at=datetime.utcnow(),
+            total_records=0,  # Will be updated during processing
+        )
+        db.add(ingestion_log)
+        db.commit()
+
+        # Configure processing
+        config = ProcessingConfig(
+            max_file_size_mb=100,
+            streaming_threshold_rows=10000 if stream_processing else 50000,
+            auto_detect_types=True,
+            domain=DataDomain(domain) if domain and domain != "auto-detect" else None,
+        )
+
+        # Process CSV with advanced engine
+        processing_result = await csv_processor.analyze_csv(
+            file_content=content, domain=domain
+        )
+
+        # Update ingestion log with results
+        ingestion_log.status = "analyzing"
+        ingestion_log.total_records = (
+            len(processing_result.data) if processing_result.data is not None else 0
+        )
+        ingestion_log.processed_records = processing_result.quality_report.valid_records
+        db.commit()
+
+        # Generate insights if requested
+        insights = None
+        if enable_insights:
+            try:
+                insights = await insight_generator.generate_comprehensive_insights(
+                    processing_result
+                )
+                ingestion_log.status = "completed"
+            except Exception as e:
+                logger.warning(f"Insight generation failed: {str(e)}")
+                ingestion_log.status = "completed_without_insights"
+        else:
+            ingestion_log.status = "completed"
+
+        ingestion_log.completed_at = datetime.utcnow()
+        db.commit()
+
+        # Generate recommendations
+        recommended_actions = []
+        if processing_result.quality_report.overall_score < 0.7:
+            recommended_actions.append("Review data quality - consider data cleaning")
+        if len(processing_result.insights.recommendations) > 0:
+            recommended_actions.extend(processing_result.insights.recommendations[:3])
+
+        return AdvancedIngestionResponse(
+            success=True,
+            message=f"CSV processed successfully. Domain: {processing_result.schema.domain.value}, Quality: {processing_result.quality_report.overall_score:.1%}",
+            upload_id=upload_id,
+            processing_result=processing_result,
+            insights_available=insights is not None,
+            recommended_actions=recommended_actions,
+        )
+
+    except Exception as e:
+        logger.error(f"Advanced CSV processing failed: {str(e)}")
+        # Update ingestion log with error
+        if "ingestion_log" in locals():
+            ingestion_log.status = "failed"
+            ingestion_log.error_message = str(e)
+            db.commit()
+        raise HTTPException(status_code=500, detail=f"Processing failed: {str(e)}")
+
+
+@router.post("/upload-csv")
+async def upload_csv(
+    background_tasks: BackgroundTasks,
+    file: UploadFile = File(...),
+    domain: str = Form("local"),
+    db: Session = Depends(get_db),
+):
+    """
+    Enhanced CSV upload with intelligent processing (backward compatible)
+    """
+    try:
+        # Validate file type
+        if not file.filename.lower().endswith((".csv", ".xlsx", ".xls")):
+            raise HTTPException(
+                status_code=400, detail="Only CSV and Excel files are supported"
+            )
+
+        # Generate upload ID
+        upload_id = str(uuid.uuid4())
         logger.info(f"Processing CSV upload: {file.filename}, upload_id: {upload_id}")
 
         # Read file content
         content = await file.read()
 
-        # Parse based on file type
-        try:
-            if file.filename.lower().endswith(".csv"):
-                df = pd.read_csv(io.StringIO(content.decode("utf-8")))
-            else:
-                df = pd.read_excel(io.BytesIO(content))
-        except Exception as e:
-            raise HTTPException(
-                status_code=400, detail=f"Failed to parse file: {str(e)}"
-            )
+        # Use advanced processor for better results
+        processing_result = await csv_processor.analyze_csv(
+            file_content=content, domain=domain if domain != "local" else None
+        )
 
-        # Convert DataFrame to dict records
-        data = df.to_dict("records")
-
-        # Validate required columns
-        required_columns = ["patient_id", "age", "stage"]
-        missing_columns = [col for col in required_columns if col not in df.columns]
-        if missing_columns:
-            raise HTTPException(
-                status_code=400, detail=f"Missing required columns: {missing_columns}"
-            )
-
-        # Create ingestion log
+        # Create ingestion log with enhanced data
         ingestion_log = IngestionLog(
             upload_id=upload_id,
-            domain=domain,
+            domain=processing_result.schema.domain.value,
             filename=file.filename,
-            status="processing",
+            status="completed",
             started_at=datetime.utcnow(),
-            total_records=len(data),
+            completed_at=datetime.utcnow(),
+            total_records=len(processing_result.data)
+            if processing_result.data is not None
+            else 0,
+            processed_records=processing_result.quality_report.valid_records,
         )
         db.add(ingestion_log)
         db.commit()
 
-        # Process data in background
-        background_tasks.add_task(
-            process_ingestion_data, data=data, domain=domain, upload_id=upload_id, db=db
-        )
+        # Store processed data (simplified for backward compatibility)
+        if processing_result.data is not None and len(processing_result.data) > 0:
+            background_tasks.add_task(
+                store_processed_data,
+                data=processing_result.data.to_dict("records"),
+                domain=processing_result.schema.domain.value,
+                upload_id=upload_id,
+                db=db,
+            )
 
         return IngestionResponse(
             success=True,
-            message=f"CSV file uploaded successfully. Processing {len(data)} records.",
+            message="CSV processed successfully",
             upload_id=upload_id,
-            processed_records=0,
+            processed_records=processing_result.quality_report.valid_records,
+            warnings=[
+                str(error.message) for error in processing_result.quality_report.errors
+            ],
+            quality_score=processing_result.quality_report.overall_score,
+            domain_detected=processing_result.schema.domain.value,
         )
 
     except HTTPException:
@@ -355,6 +481,43 @@ async def delete_upload(upload_id: str, db: Session = Depends(get_db)):
 
 
 # Background processing functions
+async def store_processed_data(
+    data: List[Dict], domain: str, upload_id: str, db: Session
+):
+    """
+    Background task to store processed data from advanced CSV processing
+    """
+    try:
+        logger.info(f"Storing processed data for upload_id: {upload_id}")
+
+        stored_count = 0
+        errors = []
+
+        for record in data:
+            try:
+                # Create cohort data record
+                cohort_record = CohortData(
+                    upload_id=upload_id,
+                    domain=domain,
+                    patient_id=record.get("patient_id", f"auto_{uuid.uuid4().hex[:8]}"),
+                    data=json.dumps(record),
+                    created_at=datetime.utcnow(),
+                )
+
+                db.add(cohort_record)
+                stored_count += 1
+
+            except Exception as e:
+                errors.append(f"Error storing record: {str(e)}")
+                continue
+
+        db.commit()
+        logger.info(f"Stored {stored_count} records for upload_id: {upload_id}")
+
+    except Exception as e:
+        logger.error(f"Error storing processed data for {upload_id}: {str(e)}")
+
+
 async def process_ingestion_data(
     data: List[Dict], domain: str, upload_id: str, db: Session
 ):

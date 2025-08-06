@@ -9,7 +9,7 @@ from typing import List, Optional
 from fastapi import APIRouter, Depends, HTTPException
 from pydantic import BaseModel
 
-from surgify.core.database import DATABASE_DIR
+from ...core.database import DATABASE_DIR
 
 router = APIRouter()
 

@@ -1,6 +1,6 @@
 """
-Surgify API v1 - Clean Surgery Analytics Platform API
-Enhanced with modular, high-performance endpoints
+Surgify API v1 - Enhanced Surgery Analytics Platform API
+Complete CSV-to-Insights Pipeline with Professional Deliverable Generation
 """
 
 from fastapi import APIRouter
@@ -8,14 +8,15 @@ from fastapi import APIRouter
 from .ai import router as ai_router
 from .auth import router as auth_router
 from .cases import router as cases_router
-from .chat import router as chat_router  # Add chat router import
-
+from .chat import router as chat_router
 # Import core API routers
 from .dashboard import router as dashboard_router
 from .deliverables import router as deliverables_router
 from .downloads import router as downloads_router
 from .feedback import router as feedback_router
+from .ingestion import router as ingestion_router
 from .mobile import router as mobile_router
+from .pipeline import router as pipeline_router  # New pipeline router
 from .proposals import router as proposals_router
 from .recommendations import router as recommendations_router
 from .search import router as search_router
@@ -41,9 +42,13 @@ router.include_router(
 )
 router.include_router(downloads_router, prefix="/downloads", tags=["Downloads"])
 router.include_router(ai_router, prefix="/ai", tags=["AI Services"])
+router.include_router(chat_router, prefix="/chat", tags=["Chat Integration"])
+
+# New enhanced endpoints
+router.include_router(ingestion_router, prefix="/ingestion", tags=["Data Ingestion"])
 router.include_router(
-    chat_router, prefix="/chat", tags=["Chat Integration"]
-)  # Add chat router
+    pipeline_router, tags=["CSV-to-Insights Pipeline"]
+)  # Main pipeline endpoint
 
 
 @router.get("/")

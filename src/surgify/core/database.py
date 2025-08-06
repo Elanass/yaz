@@ -10,7 +10,7 @@ from sqlalchemy.ext.declarative import declarative_base
 from sqlalchemy.orm import Session, sessionmaker
 from sqlalchemy.pool import StaticPool
 
-from surgify.core.config.unified_config import get_settings
+from .config.unified_config import get_settings
 
 # Get configuration
 settings = get_settings()

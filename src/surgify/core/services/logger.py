@@ -10,7 +10,7 @@ from typing import Optional
 
 import structlog
 
-from surgify.core.config.unified_config import get_settings
+from ..config.unified_config import get_settings
 
 
 def setup_logging(

@@ -1,4 +1,4 @@
-from surgify.modules.surgery.decision_engine import DecisionEngine
+from ..modules.decision_engine import DecisionEngine
 
 
 class AIService:

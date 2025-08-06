@@ -7,7 +7,7 @@ to ensure consistent validation logic and DRY principles.
 
 from typing import Any, Dict, List, Optional, Tuple, Union
 
-from surgify.core.services.logger import get_logger
+from ...core.services.logger import get_logger
 
 logger = get_logger(__name__)
 

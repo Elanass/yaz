@@ -1,43 +1,359 @@
 """
-Deliverables API - Surgify Platform
-Handles document generation, reporting, and deliverable management
+Enhanced Deliverables API - Advanced CSV-to-Insights Pipeline
+Handles document generation, reporting, and deliverable management with professional templates
 """
 
+import asyncio
 import io
+import uuid
+from datetime import datetime
 from typing import BinaryIO, List, Optional
 
-from fastapi import APIRouter, Depends, HTTPException, Query, status
-from fastapi.responses import StreamingResponse
+from fastapi import (APIRouter, BackgroundTasks, Depends, HTTPException, Query,
+                     status)
+from fastapi.responses import JSONResponse, StreamingResponse
+from pydantic import BaseModel
 from sqlalchemy.orm import Session
 
-from surgify.core.cache import (
-    cache_detail_endpoint,
-    cache_list_endpoint,
-    invalidate_cache,
-)
-from surgify.core.database import get_db
-from surgify.core.models.user import User
-from surgify.core.services.auth_service import get_current_user
-from surgify.core.services.deliverable_service import (
-    DeliverableFormat,
-    DeliverableRequest,
-    DeliverableResponse,
-    DeliverableService,
-    DeliverableStatus,
-    DeliverableType,
-    DeliverableUpdateRequest,
-    TemplateResponse,
-)
+from ...core.analytics.insight_generator import InsightGenerator
+from ...core.cache import (cache_detail_endpoint, cache_list_endpoint,
+                           invalidate_cache)
+from ...core.database import get_db
+from ...core.deliverable_factory import DeliverableFactory
+from ...core.models.processing_models import (AudienceType, Deliverable,
+                                              DeliverableFormat,
+                                              DeliverableMetadata,
+                                              DeliverableRequest)
+from ...core.models.user import User
+from ...core.services.auth_service import get_current_user
+# Legacy imports for backward compatibility
+from ...core.services.deliverable_service import (DeliverableResponse,
+                                                  DeliverableService,
+                                                  DeliverableStatus,
+                                                  DeliverableType,
+                                                  DeliverableUpdateRequest,
+                                                  TemplateResponse)
 
 router = APIRouter(tags=["Deliverables"])
 
+# Initialize our advanced components
+deliverable_factory = DeliverableFactory()
+insight_generator = InsightGenerator()
 
+# In-memory storage for processing results (replace with database in production)
+processing_results_store = {}
+deliverables_store = {}
+
+
+class AdvancedDeliverableRequest(BaseModel):
+    """Enhanced request for advanced deliverable generation"""
+
+    processing_result_id: str
+    audience: AudienceType
+    format: DeliverableFormat
+    title: Optional[str] = None
+    customization: dict = {}
+    include_raw_data: bool = False
+    enable_interactivity: bool = False
+
+    class Config:
+        use_enum_values = True
+
+
+class DeliverableGenerationResponse(BaseModel):
+    """Response for deliverable generation"""
+
+    success: bool
+    deliverable_id: str
+    message: str
+    download_url: Optional[str] = None
+    estimated_completion: Optional[datetime] = None
+    status: str = "generating"
+
+
+@router.post("/generate-advanced", response_model=DeliverableGenerationResponse)
+async def generate_advanced_deliverable(
+    request: AdvancedDeliverableRequest,
+    background_tasks: BackgroundTasks,
+    db: Session = Depends(get_db),
+    current_user: User = Depends(get_current_user),
+):
+    """
+    Generate advanced deliverable from processed CSV data with professional templates
+
+    This endpoint creates publication-ready reports with:
+    - Audience-specific content and formatting
+    - Professional templates and styling
+    - Interactive visualizations (for web formats)
+    - Domain-specific insights and recommendations
+    """
+    try:
+        # Check if processing result exists
+        if request.processing_result_id not in processing_results_store:
+            raise HTTPException(
+                status_code=404,
+                detail=f"Processing result {request.processing_result_id} not found",
+            )
+
+        processing_result = processing_results_store[request.processing_result_id]
+
+        # Generate deliverable ID
+        deliverable_id = str(uuid.uuid4())
+
+        # Create deliverable request
+        deliverable_request = DeliverableRequest(
+            processing_result_id=request.processing_result_id,
+            audience=request.audience,
+            format=request.format,
+            customization=request.customization,
+            include_raw_data=request.include_raw_data,
+        )
+
+        # Generate insights if not already available
+        insights = None
+        try:
+            insights = await insight_generator.generate_comprehensive_insights(
+                processing_result
+            )
+        except Exception as e:
+            logger.warning(f"Failed to generate insights: {str(e)}")
+
+        # Generate deliverable in background
+        background_tasks.add_task(
+            generate_deliverable_async,
+            deliverable_id,
+            processing_result,
+            insights,
+            deliverable_request,
+            current_user.username if hasattr(current_user, "username") else "anonymous",
+        )
+
+        # Create download URL
+        download_url = f"/api/v1/deliverables/download/{deliverable_id}"
+
+        return DeliverableGenerationResponse(
+            success=True,
+            deliverable_id=deliverable_id,
+            message=f"Generating {request.format.value} report for {request.audience.value} audience",
+            download_url=download_url,
+            estimated_completion=datetime.utcnow(),
+            status="generating",
+        )
+
+    except HTTPException:
+        raise
+    except Exception as e:
+        raise HTTPException(
+            status_code=500, detail=f"Failed to generate deliverable: {str(e)}"
+        )
+
+
+@router.get("/download/{deliverable_id}")
+async def download_deliverable(deliverable_id: str, db: Session = Depends(get_db)):
+    """
+    Download a generated deliverable
+    """
+    try:
+        if deliverable_id not in deliverables_store:
+            raise HTTPException(
+                status_code=404, detail="Deliverable not found or not ready"
+            )
+
+        deliverable = deliverables_store[deliverable_id]
+
+        if deliverable.format == DeliverableFormat.PDF and deliverable.content:
+            return StreamingResponse(
+                io.BytesIO(deliverable.content),
+                media_type="application/pdf",
+                headers={
+                    "Content-Disposition": f"attachment; filename={deliverable.metadata.title}.pdf"
+                },
+            )
+
+        elif (
+            deliverable.format == DeliverableFormat.INTERACTIVE
+            and deliverable.html_content
+        ):
+            return StreamingResponse(
+                io.BytesIO(deliverable.html_content.encode()),
+                media_type="text/html",
+                headers={
+                    "Content-Disposition": f"inline; filename={deliverable.metadata.title}.html"
+                },
+            )
+
+        elif deliverable.format == DeliverableFormat.API and deliverable.api_response:
+            return JSONResponse(deliverable.api_response)
+
+        elif (
+            deliverable.format == DeliverableFormat.PRESENTATION
+            and deliverable.html_content
+        ):
+            return StreamingResponse(
+                io.BytesIO(deliverable.html_content.encode()),
+                media_type="text/html",
+                headers={
+                    "Content-Disposition": f"inline; filename={deliverable.metadata.title}_presentation.html"
+                },
+            )
+
+        else:
+            raise HTTPException(
+                status_code=404, detail="Deliverable content not available"
+            )
+
+    except HTTPException:
+        raise
+    except Exception as e:
+        raise HTTPException(
+            status_code=500, detail=f"Failed to download deliverable: {str(e)}"
+        )
+
+
+@router.get("/status/{deliverable_id}")
+async def get_deliverable_status(deliverable_id: str, db: Session = Depends(get_db)):
+    """
+    Get the status of a deliverable generation
+    """
+    try:
+        if deliverable_id in deliverables_store:
+            deliverable = deliverables_store[deliverable_id]
+            return {
+                "deliverable_id": deliverable_id,
+                "status": "completed",
+                "title": deliverable.metadata.title,
+                "format": deliverable.metadata.format.value,
+                "audience": deliverable.metadata.audience.value,
+                "generated_at": deliverable.metadata.generated_at.isoformat(),
+                "file_size_bytes": deliverable.metadata.file_size_bytes,
+                "download_url": f"/api/v1/deliverables/download/{deliverable_id}",
+            }
+        else:
+            return {
+                "deliverable_id": deliverable_id,
+                "status": "generating",
+                "message": "Deliverable is being generated",
+            }
+
+    except Exception as e:
+        raise HTTPException(
+            status_code=500, detail=f"Failed to get deliverable status: {str(e)}"
+        )
+
+
+@router.get("/list-advanced")
+async def list_advanced_deliverables(
+    audience: Optional[AudienceType] = None,
+    format: Optional[DeliverableFormat] = None,
+    limit: int = Query(20, ge=1, le=100),
+    db: Session = Depends(get_db),
+):
+    """
+    List generated advanced deliverables with filtering
+    """
+    try:
+        deliverables = list(deliverables_store.values())
+
+        # Apply filters
+        if audience:
+            deliverables = [d for d in deliverables if d.metadata.audience == audience]
+        if format:
+            deliverables = [d for d in deliverables if d.metadata.format == format]
+
+        # Sort by generation date (newest first)
+        deliverables.sort(key=lambda x: x.metadata.generated_at, reverse=True)
+
+        # Apply limit
+        deliverables = deliverables[:limit]
+
+        return [
+            {
+                "deliverable_id": did,
+                "title": d.metadata.title,
+                "audience": d.metadata.audience.value,
+                "format": d.metadata.format.value,
+                "generated_at": d.metadata.generated_at.isoformat(),
+                "file_size_bytes": d.metadata.file_size_bytes,
+                "download_url": f"/api/v1/deliverables/download/{did}",
+            }
+            for did, d in deliverables_store.items()
+            if (not audience or d.metadata.audience == audience)
+            and (not format or d.metadata.format == format)
+        ][:limit]
+
+    except Exception as e:
+        raise HTTPException(
+            status_code=500, detail=f"Failed to list deliverables: {str(e)}"
+        )
+
+
+@router.delete("/{deliverable_id}")
+async def delete_deliverable(deliverable_id: str, db: Session = Depends(get_db)):
+    """
+    Delete a generated deliverable
+    """
+    try:
+        if deliverable_id not in deliverables_store:
+            raise HTTPException(status_code=404, detail="Deliverable not found")
+
+        del deliverables_store[deliverable_id]
+
+        return {"success": True, "message": "Deliverable deleted successfully"}
+
+    except HTTPException:
+        raise
+    except Exception as e:
+        raise HTTPException(
+            status_code=500, detail=f"Failed to delete deliverable: {str(e)}"
+        )
+
+
+# Background task
+async def generate_deliverable_async(
+    deliverable_id: str,
+    processing_result,
+    insights,
+    deliverable_request: DeliverableRequest,
+    user_id: str,
+):
+    """
+    Background task to generate deliverable
+    """
+    try:
+        # Generate the deliverable
+        deliverable = await deliverable_factory.generate_deliverable(
+            processing_result, insights, deliverable_request
+        )
+
+        # Store the deliverable
+        deliverables_store[deliverable_id] = deliverable
+
+        logger.info(
+            f"Deliverable {deliverable_id} generated successfully for user {user_id}"
+        )
+
+    except Exception as e:
+        logger.error(f"Failed to generate deliverable {deliverable_id}: {str(e)}")
+        # Store error information
+        error_deliverable = Deliverable(
+            metadata=DeliverableMetadata(
+                id=deliverable_id,
+                title="Generation Failed",
+                audience=deliverable_request.audience,
+                format=deliverable_request.format,
+                generated_at=datetime.utcnow(),
+            ),
+            content=None,
+            html_content=f"<html><body><h1>Error</h1><p>Failed to generate deliverable: {str(e)}</p></body></html>",
+            api_response={"error": str(e), "deliverable_id": deliverable_id},
+        )
+        deliverables_store[deliverable_id] = error_deliverable
+
+
+# Legacy endpoints for backward compatibility
 def get_deliverable_service(db: Session = Depends(get_db)) -> DeliverableService:
     """Dependency to get deliverable service instance"""
     return DeliverableService(db)
-
-
-# Deliverable Endpoints
 
 
 @router.post(
@@ -48,6 +364,9 @@ async def create_deliverable(
     deliverable_service: DeliverableService = Depends(get_deliverable_service),
     current_user: User = Depends(get_current_user),
 ):
+    """
+    Create a new deliverable document or report (legacy endpoint).
+    """
     """
     Create a new deliverable document or report.
 

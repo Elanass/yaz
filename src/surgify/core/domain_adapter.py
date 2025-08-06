@@ -174,3 +174,13 @@ domain_registry = DomainRegistry()
 # Initialize all domains by default
 for domain in Domain:
     domain_registry.register_domain(domain)
+
+
+def get_domain_config(domain_name: str) -> Optional[DomainConfig]:
+    """Get domain configuration by domain name"""
+    try:
+        domain = Domain(domain_name.lower())
+        return DomainConfig(domain)
+    except ValueError:
+        logger.error(f"Invalid domain: {domain_name}")
+        return None

@@ -11,7 +11,7 @@ from cryptography.fernet import Fernet, InvalidToken
 from cryptography.hazmat.primitives import hashes
 from cryptography.hazmat.primitives.kdf.pbkdf2 import PBKDF2HMAC
 
-from surgify.core.config.unified_config import get_settings
+from ...core.config.unified_config import get_settings
 
 
 class EncryptionService:

@@ -8,8 +8,8 @@ import logging
 from abc import ABC, abstractmethod
 from typing import Any, Dict, List, Optional, Type, TypeVar
 
-from surgify.core.config.settings import get_settings
-from surgify.core.models.base import ApiResponse, PaginationMeta, PaginationParams
+from ...core.config.settings import get_settings
+from ...core.models.base import ApiResponse, PaginationMeta, PaginationParams
 
 logger = logging.getLogger(__name__)
 

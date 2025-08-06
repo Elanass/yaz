@@ -6,19 +6,11 @@ Cleaned and optimized to match actual database schema
 from datetime import datetime
 from enum import Enum
 
-from sqlalchemy import (
-    Boolean,
-    Column,
-    DateTime,
-    Float,
-    ForeignKey,
-    Integer,
-    String,
-    Text,
-)
+from sqlalchemy import (Boolean, Column, DateTime, Float, ForeignKey, Integer,
+                        String, Text)
 from sqlalchemy.orm import relationship
 
-from surgify.core.database import Base
+from ..database import Base
 
 
 class CaseStatus(str, Enum):
@@ -325,3 +317,41 @@ class DeliverableModel(Base):
     approved_at = Column(DateTime, nullable=True)
     published_at = Column(DateTime, nullable=True)
     expires_at = Column(DateTime, nullable=True)
+
+
+class CohortData(Base):
+    """Model for cohort data from CSV uploads"""
+
+    __tablename__ = "cohort_data"
+
+    id = Column(Integer, primary_key=True, index=True)
+    upload_id = Column(String(50), nullable=False, index=True)
+    patient_id = Column(String(100), nullable=False)
+    age = Column(Integer, nullable=True)
+    stage = Column(String(20), nullable=True)
+    gender = Column(String(10), nullable=True)
+    domain = Column(String(20), default="surgery")
+    raw_data = Column(Text, nullable=True)  # JSON as text
+
+    created_at = Column(DateTime, default=datetime.utcnow)
+    processed_at = Column(DateTime, nullable=True)
+
+
+class IngestionLog(Base):
+    """Model for tracking data ingestion operations"""
+
+    __tablename__ = "ingestion_logs"
+
+    id = Column(Integer, primary_key=True, index=True)
+    upload_id = Column(String(50), unique=True, nullable=False, index=True)
+    domain = Column(String(20), default="surgery")
+    filename = Column(String(255), nullable=True)
+    status = Column(String(20), default="processing")  # processing, completed, failed
+    total_records = Column(Integer, default=0)
+    processed_records = Column(Integer, default=0)
+    failed_records = Column(Integer, default=0)
+    error_message = Column(Text, nullable=True)
+
+    started_at = Column(DateTime, default=datetime.utcnow)
+    completed_at = Column(DateTime, nullable=True)
+    created_by = Column(Integer, ForeignKey("users.id"), nullable=True)

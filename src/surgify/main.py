@@ -9,6 +9,8 @@ import argparse
 import asyncio
 import logging
 import os
+# Universal Research Module imports  
+import sys
 import uuid
 from contextlib import asynccontextmanager
 from pathlib import Path
@@ -21,23 +23,25 @@ from fastapi.middleware.gzip import GZipMiddleware
 from fastapi.responses import HTMLResponse, JSONResponse
 from fastapi.staticfiles import StaticFiles
 
+# Add the parent src directory to the path
+src_path = Path(__file__).parent.parent
+if str(src_path) not in sys.path:
+    sys.path.insert(0, str(src_path))
+
+from universal_research.integration.api_enhancer import ResearchAPIEnhancer
+from universal_research.integration.auth_integrator import AuthIntegrator
+from universal_research.integration.database_bridge import DatabaseBridge
+
 # API imports
 from .api.v1 import router as api_v1_router
-
 # Core imports
 from .core.config.unified_config import get_settings
 from .core.database import create_tables, engine
-
 # Domain adapter imports
 from .core.domain_adapter import Domain, domain_registry
 from .core.models.database_models import Base
 from .core.services.logger import log_error, log_request, setup_logging
 from .core.services.registry import get_service_registry
-
-# Universal Research Module imports
-from .modules.universal_research.integration.api_enhancer import ResearchAPIEnhancer
-from .modules.universal_research.integration.auth_integrator import AuthIntegrator
-from .modules.universal_research.integration.database_bridge import DatabaseBridge
 from .ui.web.router import web_router
 
 # Setup logging first
@@ -216,9 +220,8 @@ def create_app(domain: str = None) -> FastAPI:
         logger.info("✅ Research API endpoints added successfully")
 
         # Initialize research authentication enhancements
-        from surgify.modules.universal_research.integration.auth_integrator import (
-            AuthIntegrator,
-        )
+        from .modules.universal_research.integration.auth_integrator import \
+            AuthIntegrator
 
         auth_integrator = AuthIntegrator()
         auth_integrator.enhance_existing_auth_middleware(app)

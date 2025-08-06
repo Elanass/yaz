@@ -11,9 +11,9 @@ from datetime import datetime, timedelta
 from enum import Enum
 from typing import Any, Awaitable, Callable, Dict, List, Optional
 
-from surgify.core.config.unified_config import get_settings
-from surgify.core.services.base import BaseService
-from surgify.core.services.logger import get_logger
+from ...core.config.unified_config import get_settings
+from ...core.services.base import BaseService
+from ...core.services.logger import get_logger
 
 
 class AlertSeverity(str, Enum):
