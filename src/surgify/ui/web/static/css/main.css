@@ -293,82 +293,123 @@ body {
 .notification-badge .badge:hover { transform: scale(1.1); }
 
 /* Component Loading States */
-.component-loading { position: relative; pointer-events: none; }
+.component-loading { position: relative; opacity: 0.6; pointer-events: none; }
 .component-loading::after {
     content: '';
     position: absolute;
-    top: 0;
-    left: 0;
-    right: 0;
-    bottom: 0;
-    background: rgba(255, 255, 255, 0.8);
-    display: flex;
-    align-items: center;
-    justify-content: center;
+    top: 50%;
+    left: 50%;
+    width: 24px;
+    height: 24px;
+    margin: -12px 0 0 -12px;
+    border: 2px solid #e2e8f0;
+    border-top: 2px solid #2563eb;
+    border-radius: 50%;
+    animation: spin 1s linear infinite;
     z-index: 10;
 }
 
-/* Theme Toggle */
-.theme-toggle { user-select: none; }
-.theme-toggle-switch { 
-    position: relative; 
-    transition: background-color var(--component-transition-duration) ease-in-out; 
+@keyframes spin {
+    0% { transform: rotate(0deg); }
+    100% { transform: rotate(360deg); }
 }
 
-/* PWA Install Prompt */
-.pwa-install-prompt {
-    position: fixed;
-    bottom: 20px;
+/* ===============================
+   Loading States
+   =============================== */
+.component-loading {
+    position: relative;
+    opacity: 0.6;
+    pointer-events: none;
+}
+
+.component-loading::after {
+    content: '';
+    position: absolute;
+    top: 50%;
     left: 50%;
-    transform: translateX(-50%);
-    background: #1f2937;
-    color: white;
-    padding: 1rem 1.5rem;
-    border-radius: 0.5rem;
-    box-shadow: 0 10px 25px rgba(0, 0, 0, 0.2);
+    width: 24px;
+    height: 24px;
+    margin: -12px 0 0 -12px;
+    border: 2px solid #e2e8f0;
+    border-top: 2px solid #2563eb;
+    border-radius: 50%;
+    animation: spin 1s linear infinite;
+    z-index: 10;
+}
+
+@keyframes spin {
+    0% { transform: rotate(0deg); }
+    100% { transform: rotate(360deg); }
+}
+
+/* ===============================
+   Card Components
+   =============================== */
+.case-card, .proposal-card, .collaboration-card, .study-card {
+    transition: all 0.2s ease-in-out;
+}
+
+.case-card:hover, .proposal-card:hover, .collaboration-card:hover, .study-card:hover {
+    transform: translateY(-2px);
+}
+
+/* ===============================
+   Notifications
+   =============================== */
+.notification {
+    position: fixed;
+    top: 20px;
+    right: 20px;
     z-index: 1000;
-    display: flex;
-    align-items: center;
-    gap: 1rem;
-    opacity: 0;
-    visibility: hidden;
-    transition: all 0.3s ease;
+    max-width: 400px;
 }
 
-.pwa-install-prompt.show {
-    opacity: 1;
-    visibility: visible;
-}
-
-.pwa-install-prompt button {
-    background: #3b82f6;
+.notification-success {
+    background-color: #059669;
     color: white;
-    border: none;
-    padding: 0.5rem 1rem;
-    border-radius: 0.25rem;
-    cursor: pointer;
-    transition: background-color 0.2s;
 }
 
-.pwa-install-prompt button:hover {
-    background: #2563eb;
+.notification-error {
+    background-color: #dc2626;
+    color: white;
 }
 
-/* Enhanced Accessibility */
-@media (prefers-reduced-motion: reduce) {
-    *, ::before, ::after {
-        animation-duration: 1ms !important;
-        transition-duration: 0s !important;
+.notification-info {
+    background-color: #2563eb;
+    color: white;
+}
+
+.slide-down {
+    animation: slideDown 0.3s ease-out;
+}
+
+@keyframes slideDown {
+    from {
+        transform: translateY(-100%);
+        opacity: 0;
+    }
+    to {
+        transform: translateY(0);
+        opacity: 1;
     }
 }
 
-/* Component Focus States */
-.case-item:focus,
-.domain-option:focus,
-.tab-btn:focus,
-.theme-option:focus {
-    outline: 2px solid #3b82f6;
-    outline-offset: 2px;
+/* ===============================
+   Dark Mode Support
+   =============================== */
+@media (prefers-color-scheme: dark) {
+    :root {
+        --bg: #0f172a;
+        --text: #e2e8f0;
+        --border: #334155;
+    }
+}
+
+.dark {
+    --bg: #0f172a;
+    --text: #e2e8f0;
+    --border: #334155;
 }
 
 /* ===============================

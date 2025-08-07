@@ -30,6 +30,13 @@ async def home(request: Request):
 @router.get("/surgify", response_class=HTMLResponse)
 async def surgify_app(request: Request):
     """Surgify clinical research interface - Main UI"""
+    # Temporarily use debug template to isolate template issues
+    return templates.TemplateResponse("debug.html", {"request": request})
+
+
+@router.get("/surgify-full", response_class=HTMLResponse)
+async def surgify_app_full(request: Request):
+    """Surgify clinical research interface - Full UI"""
 
     # Sample data for the Surgify template
     context = {

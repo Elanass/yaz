@@ -27,8 +27,15 @@ class FieldType(Enum):
     CATEGORICAL = "categorical"
     DATE = "date"
     TEXT = "text"
+    LONG_TEXT = "long_text"
     MEDICAL_CODE = "medical_code"
     IDENTIFIER = "identifier"
+    IMAGE = "image"
+    PIXEL_DATA = "pixel_data"
+    MEDIA_FILE = "media_file"
+    DOCUMENT = "document"
+    AUDIO = "audio"
+    VIDEO = "video"
 
 
 class ValidationError(BaseModel):

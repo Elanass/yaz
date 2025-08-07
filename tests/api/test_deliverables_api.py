@@ -14,11 +14,9 @@ from sqlalchemy.pool import StaticPool
 
 from surgify.core.cache import cache_client
 from surgify.core.database import Base, get_db
-from surgify.core.services.deliverable_service import (
-    DeliverableFormat,
-    DeliverableStatus,
-    DeliverableType,
-)
+from surgify.core.services.deliverable_service import (DeliverableFormat,
+                                                       DeliverableStatus,
+                                                       DeliverableType)
 from surgify.main import app
 
 # Test database setup

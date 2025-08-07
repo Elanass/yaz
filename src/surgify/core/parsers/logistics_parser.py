@@ -47,6 +47,8 @@ class LogisticsParser(BaseParser):
                 return self._parse_dict(data)
             elif isinstance(data, str):
                 return self._parse_text(data)
+            elif isinstance(data, list):
+                return self._parse_image_list(data)
             else:
                 return {"error": f"Unsupported data type: {type(data)}"}
         except Exception as e:
@@ -112,15 +114,51 @@ class LogisticsParser(BaseParser):
         }
 
     def _parse_text(self, text: str) -> Dict[str, Any]:
-        """Parse logistics text data"""
+        """Parse logistics text data with enhanced supply chain context analysis"""
         logistics_keywords = [
-            "logistics",
-            "supply",
-            "inventory",
-            "shipment",
-            "delivery",
+            "logistics", "supply", "inventory", "shipment", "delivery",
+            "warehouse", "procurement", "supplier", "vendor", "transport",
+            "shipping", "freight", "distribution", "fulfillment", "tracking"
         ]
+        
+        # Enhanced keyword detection
         found_keywords = [kw for kw in logistics_keywords if kw.lower() in text.lower()]
+        
+        # Extract logistics-specific entities
+        import re
+        
+        # Look for tracking numbers
+        tracking_pattern = r'\b(?:tracking|track|shipment)[\s:]*([\w\d-]+)\b'
+        tracking_numbers = re.findall(tracking_pattern, text, re.IGNORECASE)
+        
+        # Look for quantities and measurements
+        quantity_pattern = r'\b\d+\s*(?:units?|pieces?|boxes?|pallets?|tons?|kg|lbs?)\b'
+        quantities = re.findall(quantity_pattern, text, re.IGNORECASE)
+        
+        # Look for monetary values
+        currency_pattern = r'\$[\d,]+\.?\d*|€[\d,]+\.?\d*|£[\d,]+\.?\d*'
+        currency_values = re.findall(currency_pattern, text)
+        
+        # Look for dates and timelines
+        date_pattern = r'\b\d{1,2}[/-]\d{1,2}[/-]\d{2,4}\b|\b\d{4}[-/]\d{1,2}[-/]\d{1,2}\b'
+        dates_found = re.findall(date_pattern, text)
+        
+        # Look for location references
+        location_keywords = ['warehouse', 'depot', 'facility', 'dock', 'terminal', 'port']
+        locations_found = [word for word in location_keywords if word.lower() in text.lower()]
+        
+        # Assess text type
+        text_type = "unknown"
+        if any(word in text.lower() for word in ["purchase", "order", "po"]):
+            text_type = "purchase_order"
+        elif any(word in text.lower() for word in ["delivery", "shipment", "tracking"]):
+            text_type = "delivery_info"
+        elif any(word in text.lower() for word in ["invoice", "payment", "billing"]):
+            text_type = "invoice"
+        elif any(word in text.lower() for word in ["inventory", "stock", "count"]):
+            text_type = "inventory_report"
+        elif any(word in text.lower() for word in ["quality", "inspection", "damage"]):
+            text_type = "quality_report"
 
         return {
             "domain": "logistics",
@@ -129,29 +167,42 @@ class LogisticsParser(BaseParser):
             "logistics_keywords_found": found_keywords,
             "likely_logistics_text": len(found_keywords) > 0,
         }
-
-    def _identify_logistics_columns(self, df: pd.DataFrame) -> Dict[str, str]:
-        """Identify logistics-related columns in the DataFrame"""
-        columns = df.columns.tolist()
-        identified = {}
-
-        # Common logistics column mappings
-        mappings = {
-            "supplier": ["supplier", "vendor", "provider", "company"],
-            "quantity": ["quantity", "qty", "amount", "count", "units"],
-            "cost": ["cost", "price", "amount", "total", "value"],
-            "lead_time": ["lead_time", "delivery_time", "transit_time", "duration"],
-            "product": ["product", "item", "material", "goods"],
-            "tracking": ["tracking", "tracking_number", "shipment_id"],
+    
+    def _parse_image_list(self, images: List[str]) -> Dict[str, Any]:
+        """Parse logistics-related image list"""
+        logistics_image_types = {
+            'product': ['product', 'item', 'goods', 'material'],
+            'shipment': ['shipment', 'package', 'box', 'container', 'cargo'],
+            'warehouse': ['warehouse', 'storage', 'facility', 'dock'],
+            'transportation': ['truck', 'vehicle', 'transport', 'delivery'],
+            'damage': ['damage', 'broken', 'defect', 'problem'],
+            'inspection': ['inspection', 'quality', 'check', 'review'],
+            'documentation': ['label', 'barcode', 'qr', 'receipt', 'invoice']
         }
-
-        for field, patterns in mappings.items():
-            for col in columns:
-                for pattern in patterns:
-                    if pattern.lower() in col.lower():
-                        identified[field] = col
+        
+        categorized_images = {category: [] for category in logistics_image_types.keys()}
+        valid_extensions = {'.jpg', '.jpeg', '.png', '.gif', '.tiff', '.pdf', '.bmp'}
+        valid_images = []
+        
+        for img_path in images:
+            # Check if valid image/document extension
+            if any(img_path.lower().endswith(ext) for ext in valid_extensions):
+                valid_images.append(img_path)
+                
+                # Categorize by content
+                img_lower = img_path.lower()
+                for category, keywords in logistics_image_types.items():
+                    if any(keyword in img_lower for keyword in keywords):
+                        categorized_images[category].append(img_path)
                         break
-                if field in identified:
-                    break
-
-        return identified
+        
+        return {
+            "domain": "logistics",
+            "data_type": "image_list",
+            "total_images": len(images),
+            "valid_image_count": len(valid_images),
+            "valid_images": valid_images,
+            "categorized_images": categorized_images,
+            "image_types_detected": [cat for cat, imgs in categorized_images.items() if imgs],
+            "documentation_ratio": len([img for img in valid_images if any(keyword in img.lower() for keyword in ['pdf', 'doc', 'invoice', 'receipt'])]) / max(len(valid_images), 1)
+        }

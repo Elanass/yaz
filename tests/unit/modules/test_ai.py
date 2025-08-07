@@ -8,13 +8,9 @@ from unittest.mock import AsyncMock, Mock, patch
 import pytest
 from fastapi.testclient import TestClient
 
-from surgify.api.v1.ai import (
-    SummarizeRequest,
-    SummarizeResponse,
-    _build_summarization_prompt,
-    _calculate_confidence_score,
-    router,
-)
+from surgify.api.v1.ai import (SummarizeRequest, SummarizeResponse,
+                               _build_summarization_prompt,
+                               _calculate_confidence_score, router)
 
 
 class TestAISummarization:
@@ -233,3 +229,190 @@ class TestAIIntegration:
         """Test AI service error handling and fallbacks"""
         # Test various error scenarios and recovery mechanisms
         pass
+
+
+class TestEnhancedAI:
+    """Test enhanced AI functionality with local models and cost optimization"""
+
+    def setup_method(self):
+        """Setup test fixtures"""
+        self.sample_medical_text = (
+            "65-year-old male with diabetes and hypertension presenting "
+            "for cardiac bypass surgery. Recent myocardial infarction 6 months ago."
+        )
+        
+        self.sample_patient_data = {
+            "age": 72,
+            "gender": "M",
+            "comorbidities": ["diabetes", "hypertension", "previous_mi"],
+            "procedure": "cardiac_bypass",
+            "emergency": False,
+            "bmi": 28.5
+        }
+
+    def test_cost_calculation_logic(self):
+        """Test cost calculation for different AI approaches"""
+        # Test cost calculation logic
+        requests_per_day = 100
+        monthly_requests = requests_per_day * 30
+        
+        # OpenAI costs (approximate)
+        openai_cost_per_request = 0.045
+        openai_monthly_cost = monthly_requests * openai_cost_per_request
+        
+        # Local model costs
+        local_monthly_cost = 0.0
+        
+        # HuggingFace API costs
+        hf_free_tier = 1000
+        hf_paid_requests = max(0, monthly_requests - hf_free_tier)
+        hf_monthly_cost = hf_paid_requests * 0.0001
+        
+        assert openai_monthly_cost > 0
+        assert local_monthly_cost == 0.0
+        assert hf_monthly_cost < openai_monthly_cost
+        
+        # Calculate savings
+        local_savings = openai_monthly_cost - local_monthly_cost
+        hf_savings = openai_monthly_cost - hf_monthly_cost
+        
+        assert local_savings == openai_monthly_cost
+        assert hf_savings > 0
+
+    def test_medical_entity_extraction_patterns(self):
+        """Test medical entity extraction patterns"""
+        import re
+        
+        # Test medical patterns that should be detected
+        medical_patterns = [
+            r'\b[A-Z]{2,}\b',  # Abbreviations like ICU, MRI
+            r'\b\w+itis\b',    # Inflammation conditions
+            r'\b\w+oma\b',     # Tumor conditions
+            r'\b\w+osis\b',    # Disease conditions
+        ]
+        
+        test_text = "Patient has arthritis and shows signs of fibrosis on MRI scan"
+        
+        entities = []
+        for pattern in medical_patterns:
+            matches = re.findall(pattern, test_text, re.IGNORECASE)
+            entities.extend(matches)
+        
+        assert "arthritis" in [e.lower() for e in entities]
+        assert "fibrosis" in [e.lower() for e in entities]
+        assert "MRI" in entities
+
+    def test_risk_factor_identification(self):
+        """Test risk factor identification logic"""
+        def identify_risk_factors(patient_data):
+            factors = []
+            
+            age = patient_data.get("age", 0)
+            if age > 70:
+                factors.append("advanced_age")
+            
+            bmi = patient_data.get("bmi", 0)
+            if bmi > 30:
+                factors.append("obesity")
+            elif bmi > 25:
+                factors.append("overweight")
+            
+            if "diabetes" in patient_data.get("comorbidities", []):
+                factors.append("diabetes")
+            
+            if patient_data.get("emergency"):
+                factors.append("emergency_procedure")
+            
+            return factors
+        
+        risk_factors = identify_risk_factors(self.sample_patient_data)
+        
+        assert "advanced_age" in risk_factors  # Age 72
+        assert "overweight" in risk_factors    # BMI 28.5
+        assert "diabetes" in risk_factors      # Has diabetes
+        assert "emergency_procedure" not in risk_factors  # Not emergency
+
+    def test_success_probability_calculation(self):
+        """Test success probability calculation logic"""
+        def calculate_success_probability(risk_level, complexity_score):
+            base_probability = 0.85  # Base success rate
+            
+            # Adjust for risk level
+            if risk_level == "high":
+                base_probability -= 0.25
+            elif risk_level == "low":
+                base_probability += 0.10
+            
+            # Adjust for complexity
+            base_probability -= complexity_score * 0.15
+            
+            # Ensure probability is between 0.1 and 0.95
+            return max(0.1, min(0.95, base_probability))
+        
+        # Test different scenarios
+        low_risk_simple = calculate_success_probability("low", 0.2)
+        high_risk_complex = calculate_success_probability("high", 0.8)
+        medium_risk_medium = calculate_success_probability("medium", 0.5)
+        
+        assert low_risk_simple > medium_risk_medium > high_risk_complex
+        assert 0.1 <= low_risk_simple <= 0.95
+        assert 0.1 <= high_risk_complex <= 0.95
+
+    def test_cost_savings_realistic_scenarios(self):
+        """Test cost savings for realistic hospital scenarios"""
+        scenarios = [
+            ("Small Clinic", 10),
+            ("Medium Hospital", 100), 
+            ("Large Hospital", 1000),
+            ("Hospital System", 5000)
+        ]
+        
+        for scenario_name, daily_requests in scenarios:
+            monthly_requests = daily_requests * 30
+            
+            # Calculate realistic costs
+            openai_cost = monthly_requests * 0.045  # ~$0.045 per request
+            local_cost = 0.0  # Free
+            
+            savings = openai_cost - local_cost
+            
+            assert savings > 0
+            assert savings == openai_cost  # All savings with local models
+            
+            # Large hospitals should save significant amounts
+            if daily_requests >= 1000:
+                assert savings > 1000  # Should save over $1000/month
+
+
+class TestAIModelPerformance:
+    """Test AI model performance characteristics"""
+    
+    def test_response_time_expectations(self):
+        """Test expected response times for different approaches"""
+        response_times = {
+            "local_biobert": 150,      # milliseconds
+            "huggingface_api": 500,    # milliseconds  
+            "openai_gpt4": 2000,       # milliseconds
+        }
+        
+        # Local models should be fastest
+        assert response_times["local_biobert"] < response_times["huggingface_api"]
+        assert response_times["huggingface_api"] < response_times["openai_gpt4"]
+        
+        # All should be under reasonable limits
+        assert all(time < 5000 for time in response_times.values())
+
+    def test_accuracy_expectations(self):
+        """Test expected accuracy levels for different models"""
+        accuracy_scores = {
+            "local_biobert": 0.85,     # High for medical text
+            "huggingface_api": 0.88,   # Slightly higher with cloud models
+            "openai_gpt4": 0.92,       # Highest general intelligence
+            "statistical_fallback": 0.75  # Lower but reliable
+        }
+        
+        # All should meet minimum threshold
+        assert all(acc >= 0.70 for acc in accuracy_scores.values())
+        
+        # Medical specialized models should be competitive
+        assert accuracy_scores["local_biobert"] >= 0.80

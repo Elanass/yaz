@@ -250,7 +250,7 @@ class DatabaseBridge:
     def _create_research_case_view(self) -> str:
         """Create view for research case analysis"""
         return """
-        CREATE OR REPLACE VIEW research_case_view AS
+        CREATE VIEW IF NOT EXISTS research_case_view AS
         SELECT 
             c.id as case_id,
             c.case_number,
@@ -271,7 +271,7 @@ class DatabaseBridge:
             u.role as surgeon_role,
             CASE 
                 WHEN c.actual_end IS NOT NULL AND c.actual_start IS NOT NULL 
-                THEN EXTRACT(EPOCH FROM (c.actual_end - c.actual_start))/3600.0 
+                THEN (strftime('%s', c.actual_end) - strftime('%s', c.actual_start)) / 3600.0
                 ELSE NULL 
             END as duration_hours,
             CASE 
@@ -287,7 +287,7 @@ class DatabaseBridge:
     def _create_cohort_summary_view(self) -> str:
         """Create view for cohort summary statistics"""
         return """
-        CREATE OR REPLACE VIEW cohort_summary_view AS
+        CREATE VIEW IF NOT EXISTS cohort_summary_view AS
         SELECT 
             procedure_type,
             COUNT(*) as total_cases,
@@ -295,7 +295,7 @@ class DatabaseBridge:
             AVG(risk_score) as avg_risk_score,
             AVG(CASE 
                 WHEN actual_end IS NOT NULL AND actual_start IS NOT NULL 
-                THEN EXTRACT(EPOCH FROM (actual_end - actual_start))/3600.0 
+                THEN (strftime('%s', actual_end) - strftime('%s', actual_start)) / 3600.0
                 ELSE NULL 
             END) as avg_duration_hours,
             COUNT(DISTINCT surgeon_id) as unique_surgeons,

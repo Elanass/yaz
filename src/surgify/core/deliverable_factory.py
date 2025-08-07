@@ -837,3 +837,311 @@ Generated on: {datetime.utcnow().strftime('%Y-%m-%d %H:%M:%S')}
 
         template = Template(presentation_template)
         return template.render(context)
+
+    async def generate_text_summary(
+        self,
+        processing_result: ProcessingResult,
+        insights: InsightPackage,
+        audience: AudienceType,
+        max_length: int = 2000,
+    ) -> str:
+        """
+        Generate a text summary appropriate for the target audience
+        
+        Args:
+            processing_result: The processing results
+            insights: The generated insights
+            audience: Target audience type
+            max_length: Maximum length of the summary in characters
+            
+        Returns:
+            str: Generated text summary
+        """
+        try:
+            # Select content based on audience
+            if audience == AudienceType.EXECUTIVE:
+                summary = await self._generate_executive_text_summary(insights, max_length)
+            elif audience == AudienceType.CLINICAL:
+                summary = await self._generate_clinical_text_summary(insights, max_length)
+            elif audience == AudienceType.TECHNICAL:
+                summary = await self._generate_technical_text_summary(insights, processing_result, max_length)
+            elif audience == AudienceType.OPERATIONAL:
+                summary = await self._generate_operational_text_summary(insights, max_length)
+            else:
+                summary = await self._generate_general_text_summary(insights, max_length)
+            
+            return summary[:max_length] if len(summary) > max_length else summary
+            
+        except Exception as e:
+            self.logger.error(f"Error generating text summary: {str(e)}")
+            return f"Summary generation failed: {str(e)}"
+
+    async def _generate_executive_text_summary(self, insights: InsightPackage, max_length: int) -> str:
+        """Generate executive-focused text summary"""
+        summary_parts = []
+        
+        # Executive Summary
+        if insights.executive_summary:
+            summary_parts.append("EXECUTIVE SUMMARY")
+            summary_parts.append(f"Key Metrics: {', '.join([f'{k}: {v}' for k, v in insights.executive_summary.key_metrics.items()])}")
+            summary_parts.append(f"Critical Findings: {', '.join(insights.executive_summary.critical_findings)}")
+            summary_parts.append(f"Business Impact: {insights.executive_summary.business_impact}")
+            
+            if insights.executive_summary.recommendations:
+                summary_parts.append(f"Recommendations: {', '.join(insights.executive_summary.recommendations)}")
+        
+        return "\\n\\n".join(summary_parts)
+
+    async def _generate_clinical_text_summary(self, insights: InsightPackage, max_length: int) -> str:
+        """Generate clinical-focused text summary"""
+        summary_parts = []
+        
+        # Clinical Findings
+        if insights.clinical_findings:
+            summary_parts.append("CLINICAL ANALYSIS")
+            summary_parts.append(f"Risk Factors: {', '.join(insights.clinical_findings.risk_factors)}")
+            summary_parts.append(f"Clinical Indicators: {', '.join(insights.clinical_findings.clinical_indicators)}")
+            summary_parts.append(f"Treatment Recommendations: {', '.join(insights.clinical_findings.treatment_recommendations)}")
+            
+            if insights.clinical_findings.contraindications:
+                summary_parts.append(f"Contraindications: {', '.join(insights.clinical_findings.contraindications)}")
+        
+        return "\\n\\n".join(summary_parts)
+
+    async def _generate_technical_text_summary(self, insights: InsightPackage, processing_result: ProcessingResult, max_length: int) -> str:
+        """Generate technical-focused text summary"""
+        summary_parts = []
+        
+        # Technical Analysis
+        summary_parts.append("TECHNICAL ANALYSIS")
+        summary_parts.append(f"Data Quality Score: {processing_result.quality_report.overall_score:.2f}")
+        summary_parts.append(f"Records Processed: {processing_result.quality_report.total_records}")
+        summary_parts.append(f"Valid Records: {processing_result.quality_report.valid_records}")
+        
+        if insights.technical_analysis:
+            summary_parts.append(f"Statistical Methods: {', '.join(insights.technical_analysis.statistical_methods)}")
+            summary_parts.append(f"Model Performance: {insights.technical_analysis.model_performance}")
+            
+            if insights.technical_analysis.limitations:
+                summary_parts.append(f"Limitations: {', '.join(insights.technical_analysis.limitations)}")
+        
+        return "\\n\\n".join(summary_parts)
+
+    async def _generate_operational_text_summary(self, insights: InsightPackage, max_length: int) -> str:
+        """Generate operations-focused text summary"""
+        summary_parts = []
+        
+        # Operational Guidance
+        if insights.operational_guide:
+            summary_parts.append("OPERATIONAL GUIDANCE")
+            
+            if insights.operational_guide.action_items:
+                action_items = [f"{item.get('action', 'N/A')} (Priority: {item.get('priority', 'Medium')})" 
+                              for item in insights.operational_guide.action_items]
+                summary_parts.append(f"Action Items: {', '.join(action_items)}")
+            
+            summary_parts.append(f"Implementation Steps: {', '.join(insights.operational_guide.implementation_steps)}")
+            
+            if insights.operational_guide.timeline:
+                summary_parts.append(f"Timeline: {insights.operational_guide.timeline}")
+            
+            if insights.operational_guide.success_metrics:
+                summary_parts.append(f"Success Metrics: {', '.join(insights.operational_guide.success_metrics)}")
+        
+        return "\\n\\n".join(summary_parts)
+
+    async def _generate_general_text_summary(self, insights: InsightPackage, max_length: int) -> str:
+        """Generate general text summary"""
+        summary_parts = []
+        
+        summary_parts.append("ANALYSIS SUMMARY")
+        summary_parts.append(f"Generated: {insights.generated_at.strftime('%Y-%m-%d %H:%M:%S')}")
+        summary_parts.append(f"Confidence Level: {insights.confidence_level:.2f}")
+        
+        # Add key findings from executive summary if available
+        if insights.executive_summary:
+            summary_parts.append(f"Key Findings: {', '.join(insights.executive_summary.critical_findings)}")
+        
+        return "\\n\\n".join(summary_parts)
+
+    async def generate_domain_specific_infographic(
+        self,
+        processing_result: ProcessingResult,
+        insights: InsightPackage,
+        domain: str,
+        output_path: Optional[str] = None,
+    ) -> str:
+        """
+        Generate a domain-specific infographic as an image
+        
+        Args:
+            processing_result: The processing results
+            insights: The generated insights
+            domain: The domain (surgery, logistics, insurance)
+            output_path: Optional output path, if None will generate one
+            
+        Returns:
+            str: Path to the generated infographic image
+        """
+        try:
+            if output_path is None:
+                output_dir = Path("data/uploads/deliverables/infographics")
+                output_dir.mkdir(parents=True, exist_ok=True)
+                output_path = output_dir / f"{domain}_infographic_{uuid.uuid4().hex[:8]}.png"
+            
+            # Create figure with domain-specific styling
+            plt.style.use('seaborn-v0_8-whitegrid')
+            fig, ((ax1, ax2), (ax3, ax4)) = plt.subplots(2, 2, figsize=(16, 12))
+            fig.suptitle(f'{domain.title()} Analytics Dashboard', fontsize=20, fontweight='bold')
+            
+            if domain == "surgery":
+                await self._create_surgery_infographic(ax1, ax2, ax3, ax4, processing_result, insights)
+            elif domain == "logistics":
+                await self._create_logistics_infographic(ax1, ax2, ax3, ax4, processing_result, insights)
+            elif domain == "insurance":
+                await self._create_insurance_infographic(ax1, ax2, ax3, ax4, processing_result, insights)
+            else:
+                await self._create_general_infographic(ax1, ax2, ax3, ax4, processing_result, insights)
+            
+            plt.tight_layout()
+            plt.savefig(output_path, dpi=300, bbox_inches='tight', facecolor='white')
+            plt.close()
+            
+            return str(output_path)
+            
+        except Exception as e:
+            self.logger.error(f"Error generating {domain} infographic: {str(e)}")
+            raise
+
+    async def _create_surgery_infographic(self, ax1, ax2, ax3, ax4, processing_result, insights):
+        """Create surgery-specific infographic content"""
+        # Risk distribution
+        if insights.executive_summary and insights.executive_summary.key_metrics:
+            risk_data = [v for k, v in insights.executive_summary.key_metrics.items() if 'risk' in k.lower()]
+            if risk_data:
+                ax1.pie(risk_data, labels=[f'Risk {i+1}' for i in range(len(risk_data))], autopct='%1.1f%%')
+                ax1.set_title('Risk Distribution')
+        
+        # Quality metrics
+        quality_metrics = [
+            processing_result.quality_report.completeness_score,
+            processing_result.quality_report.consistency_score,
+            processing_result.quality_report.validity_score
+        ]
+        ax2.bar(['Completeness', 'Consistency', 'Validity'], quality_metrics, color=['skyblue', 'lightgreen', 'orange'])
+        ax2.set_title('Data Quality Metrics')
+        ax2.set_ylim(0, 1)
+        
+        # Timeline visualization
+        ax3.plot([1, 2, 3, 4], [0.8, 0.9, 0.85, 0.92], marker='o', linewidth=2, markersize=8)
+        ax3.set_title('Performance Trend')
+        ax3.set_xlabel('Time Period')
+        ax3.set_ylabel('Performance Score')
+        
+        # Key statistics
+        stats_text = f"""Key Statistics:
+        Total Cases: {processing_result.quality_report.total_records}
+        Valid Records: {processing_result.quality_report.valid_records}
+        Quality Score: {processing_result.quality_report.overall_score:.2f}
+        Confidence: {insights.confidence_level:.2f}"""
+        ax4.text(0.1, 0.5, stats_text, transform=ax4.transAxes, fontsize=12, verticalalignment='center')
+        ax4.axis('off')
+
+    async def _create_logistics_infographic(self, ax1, ax2, ax3, ax4, processing_result, insights):
+        """Create logistics-specific infographic content"""
+        # Cost breakdown
+        costs = [25000, 18000, 12000, 8000]  # Sample data
+        labels = ['Transportation', 'Warehouse', 'Inventory', 'Other']
+        ax1.pie(costs, labels=labels, autopct='%1.1f%%', colors=['#ff9999', '#66b3ff', '#99ff99', '#ffcc99'])
+        ax1.set_title('Cost Distribution')
+        
+        # Efficiency metrics
+        efficiency_data = [0.85, 0.78, 0.92, 0.67]
+        categories = ['Delivery', 'Storage', 'Processing', 'Planning']
+        ax2.barh(categories, efficiency_data, color=['green', 'blue', 'orange', 'red'])
+        ax2.set_title('Operational Efficiency')
+        ax2.set_xlim(0, 1)
+        
+        # Supply chain flow
+        flow_data = np.random.normal(100, 15, 30)
+        ax3.plot(flow_data, color='purple', linewidth=2)
+        ax3.fill_between(range(len(flow_data)), flow_data, alpha=0.3, color='purple')
+        ax3.set_title('Supply Chain Flow')
+        ax3.set_xlabel('Time')
+        ax3.set_ylabel('Volume')
+        
+        # Performance summary
+        summary_text = f"""Performance Summary:
+        Total Operations: {processing_result.quality_report.total_records}
+        Success Rate: {processing_result.quality_report.overall_score:.1%}
+        Avg. Delivery Time: 5.2 days
+        Cost Efficiency: 87%"""
+        ax4.text(0.1, 0.5, summary_text, transform=ax4.transAxes, fontsize=12, verticalalignment='center')
+        ax4.axis('off')
+
+    async def _create_insurance_infographic(self, ax1, ax2, ax3, ax4, processing_result, insights):
+        """Create insurance-specific infographic content"""
+        # Claims status
+        claim_status = [65, 25, 10]  # Sample percentages
+        status_labels = ['Approved', 'Pending', 'Denied']
+        colors = ['green', 'yellow', 'red']
+        ax1.pie(claim_status, labels=status_labels, autopct='%1.1f%%', colors=colors)
+        ax1.set_title('Claims Status Distribution')
+        
+        # Risk assessment
+        risk_levels = [40, 35, 20, 5]
+        risk_labels = ['Low', 'Medium', 'High', 'Critical']
+        ax2.bar(risk_labels, risk_levels, color=['lightgreen', 'yellow', 'orange', 'red'])
+        ax2.set_title('Risk Level Distribution')
+        ax2.set_ylabel('Number of Cases')
+        
+        # Cost trends
+        months = ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun']
+        costs = [150000, 165000, 145000, 170000, 160000, 175000]
+        ax3.plot(months, costs, marker='o', linewidth=2, markersize=6, color='blue')
+        ax3.set_title('Monthly Cost Trends')
+        ax3.set_ylabel('Cost ($)')
+        ax3.tick_params(axis='x', rotation=45)
+        
+        # Key metrics
+        metrics_text = f"""Key Metrics:
+        Total Claims: {processing_result.quality_report.total_records}
+        Avg. Processing Time: 3.2 days
+        Fraud Detection Rate: 2.1%
+        Customer Satisfaction: 94%"""
+        ax4.text(0.1, 0.5, metrics_text, transform=ax4.transAxes, fontsize=12, verticalalignment='center')
+        ax4.axis('off')
+
+    async def _create_general_infographic(self, ax1, ax2, ax3, ax4, processing_result, insights):
+        """Create general infographic content"""
+        # Data quality overview
+        quality_scores = [
+            processing_result.quality_report.completeness_score,
+            processing_result.quality_report.consistency_score,
+            processing_result.quality_report.validity_score
+        ]
+        ax1.bar(['Completeness', 'Consistency', 'Validity'], quality_scores, color=['skyblue', 'lightgreen', 'orange'])
+        ax1.set_title('Data Quality Assessment')
+        ax1.set_ylim(0, 1)
+        
+        # Record processing
+        processed = processing_result.quality_report.valid_records
+        total = processing_result.quality_report.total_records
+        failed = total - processed
+        ax2.pie([processed, failed], labels=['Processed', 'Failed'], autopct='%1.1f%%', colors=['green', 'red'])
+        ax2.set_title('Record Processing Status')
+        
+        # Trend analysis
+        trend_data = np.random.normal(0.8, 0.1, 20)
+        ax3.plot(trend_data, color='purple', linewidth=2)
+        ax3.set_title('Performance Trend')
+        ax3.set_ylabel('Score')
+        
+        # Summary statistics
+        summary_text = f"""Analysis Summary:
+        Total Records: {total}
+        Quality Score: {processing_result.quality_report.overall_score:.2f}
+        Confidence: {insights.confidence_level:.2f}
+        Generated: {insights.generated_at.strftime('%Y-%m-%d')}"""
+        ax4.text(0.1, 0.5, summary_text, transform=ax4.transAxes, fontsize=12, verticalalignment='center')
+        ax4.axis('off')

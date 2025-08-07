@@ -10,15 +10,10 @@ from unittest.mock import AsyncMock, Mock, patch
 import pytest
 
 from surgify.api.v1.sync import router
-from surgify.core.services.sync_service import (
-    MessageRequest,
-    MessageResponse,
-    MessageType,
-    SyncRequest,
-    SyncResponse,
-    SyncService,
-    SyncStatus,
-)
+from surgify.core.services.sync_service import (MessageRequest,
+                                                MessageResponse, MessageType,
+                                                SyncRequest, SyncResponse,
+                                                SyncService, SyncStatus)
 
 
 class TestSyncService:

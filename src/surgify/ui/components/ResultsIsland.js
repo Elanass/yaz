@@ -32,6 +32,8 @@ class ResultsIsland {
                 ${this.options.showCharts ? this.renderCharts() : ''}
                 ${this.renderDataTable()}
                 ${this.options.showExport ? this.renderExportOptions() : ''}
+                ${this.renderTextContent()}
+                ${this.renderImageGallery()}
             </div>
         `;
 
@@ -198,6 +200,228 @@ class ResultsIsland {
                 </div>
             </div>
         `;
+    }
+
+    renderTextContent() {
+        const textData = this.data.textContent || {};
+        if (!textData || Object.keys(textData).length === 0) {
+            return '';
+        }
+
+        return `
+            <div class="text-content-section mb-8">
+                <h3 class="text-xl font-semibold text-gray-900 mb-4">Text Analysis</h3>
+                <div class="text-content-grid grid grid-cols-1 lg:grid-cols-2 gap-6">
+                    ${this.renderTextEntries(textData)}
+                </div>
+            </div>
+        `;
+    }
+
+    renderTextEntries(textData) {
+        let html = '';
+        
+        // Clinical Notes
+        if (textData.clinicalNotes && textData.clinicalNotes.length > 0) {
+            html += `
+                <div class="text-entry-card bg-blue-50 rounded-lg p-4">
+                    <h4 class="font-semibold text-blue-900 mb-2">Clinical Notes</h4>
+                    <div class="text-entries max-h-48 overflow-y-auto">
+                        ${textData.clinicalNotes.map(note => `
+                            <div class="text-entry mb-3 p-3 bg-white rounded border">
+                                <div class="text-entry-header flex justify-between items-start mb-2">
+                                    <span class="text-sm font-medium text-gray-700">${note.title || 'Clinical Note'}</span>
+                                    <span class="text-xs text-gray-500">${note.timestamp || ''}</span>
+                                </div>
+                                <div class="text-entry-content text-sm text-gray-600">
+                                    ${this.truncateText(note.content, 200)}
+                                </div>
+                                ${note.tags && note.tags.length > 0 ? `
+                                    <div class="text-entry-tags mt-2">
+                                        ${note.tags.map(tag => `<span class="inline-block bg-blue-100 text-blue-800 text-xs px-2 py-1 rounded mr-1">${tag}</span>`).join('')}
+                                    </div>
+                                ` : ''}
+                            </div>
+                        `).join('')}
+                    </div>
+                </div>
+            `;
+        }
+
+        // Pathology Reports
+        if (textData.pathologyReports && textData.pathologyReports.length > 0) {
+            html += `
+                <div class="text-entry-card bg-red-50 rounded-lg p-4">
+                    <h4 class="font-semibold text-red-900 mb-2">Pathology Reports</h4>
+                    <div class="text-entries max-h-48 overflow-y-auto">
+                        ${textData.pathologyReports.map(report => `
+                            <div class="text-entry mb-3 p-3 bg-white rounded border">
+                                <div class="text-entry-header flex justify-between items-start mb-2">
+                                    <span class="text-sm font-medium text-gray-700">${report.title || 'Pathology Report'}</span>
+                                    <span class="text-xs text-gray-500">${report.timestamp || ''}</span>
+                                </div>
+                                <div class="text-entry-content text-sm text-gray-600">
+                                    ${this.truncateText(report.content, 200)}
+                                </div>
+                            </div>
+                        `).join('')}
+                    </div>
+                </div>
+            `;
+        }
+
+        // Generated Text Summaries
+        if (textData.generatedSummaries && textData.generatedSummaries.length > 0) {
+            html += `
+                <div class="text-entry-card bg-green-50 rounded-lg p-4">
+                    <h4 class="font-semibold text-green-900 mb-2">AI-Generated Summaries</h4>
+                    <div class="text-entries max-h-48 overflow-y-auto">
+                        ${textData.generatedSummaries.map(summary => `
+                            <div class="text-entry mb-3 p-3 bg-white rounded border">
+                                <div class="text-entry-header flex justify-between items-start mb-2">
+                                    <span class="text-sm font-medium text-gray-700">${summary.type || 'Summary'}</span>
+                                    <span class="text-xs text-gray-500">${summary.audience || 'General'}</span>
+                                </div>
+                                <div class="text-entry-content text-sm text-gray-600">
+                                    ${this.truncateText(summary.content, 300)}
+                                </div>
+                            </div>
+                        `).join('')}
+                    </div>
+                </div>
+            `;
+        }
+
+        return html;
+    }
+
+    renderImageGallery() {
+        const imageData = this.data.imageContent || {};
+        if (!imageData || Object.keys(imageData).length === 0) {
+            return '';
+        }
+
+        return `
+            <div class="image-gallery-section mb-8">
+                <h3 class="text-xl font-semibold text-gray-900 mb-4">Medical Images & Visualizations</h3>
+                <div class="image-gallery-grid">
+                    ${this.renderImageCategories(imageData)}
+                </div>
+            </div>
+        `;
+    }
+
+    renderImageCategories(imageData) {
+        let html = '';
+
+        // Medical Images
+        if (imageData.medicalImages && imageData.medicalImages.length > 0) {
+            html += `
+                <div class="image-category mb-6">
+                    <h4 class="font-semibold text-gray-800 mb-3">Medical Images</h4>
+                    <div class="image-grid grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4">
+                        ${imageData.medicalImages.map(image => this.renderImageCard(image, 'medical')).join('')}
+                    </div>
+                </div>
+            `;
+        }
+
+        // Generated Visualizations
+        if (imageData.generatedVisualizations && imageData.generatedVisualizations.length > 0) {
+            html += `
+                <div class="image-category mb-6">
+                    <h4 class="font-semibold text-gray-800 mb-3">Generated Visualizations</h4>
+                    <div class="image-grid grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4">
+                        ${imageData.generatedVisualizations.map(image => this.renderImageCard(image, 'visualization')).join('')}
+                    </div>
+                </div>
+            `;
+        }
+
+        // Domain-Specific Images
+        if (imageData.domainImages) {
+            Object.keys(imageData.domainImages).forEach(domain => {
+                if (imageData.domainImages[domain] && imageData.domainImages[domain].length > 0) {
+                    html += `
+                        <div class="image-category mb-6">
+                            <h4 class="font-semibold text-gray-800 mb-3">${domain.charAt(0).toUpperCase() + domain.slice(1)} Images</h4>
+                            <div class="image-grid grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4">
+                                ${imageData.domainImages[domain].map(image => this.renderImageCard(image, domain)).join('')}
+                            </div>
+                        </div>
+                    `;
+                }
+            });
+        }
+
+        return html;
+    }
+
+    renderImageCard(image, category) {
+        const categoryColors = {
+            'medical': 'border-blue-200 bg-blue-50',
+            'visualization': 'border-green-200 bg-green-50',
+            'surgery': 'border-red-200 bg-red-50',
+            'logistics': 'border-yellow-200 bg-yellow-50',
+            'insurance': 'border-purple-200 bg-purple-50',
+        };
+
+        const borderClass = categoryColors[category] || 'border-gray-200 bg-gray-50';
+
+        return `
+            <div class="image-card ${borderClass} rounded-lg border overflow-hidden cursor-pointer hover:shadow-md transition-shadow"
+                 data-image-id="${image.id || ''}" onclick="this.showImageModal('${image.id || ''}', '${image.path || ''}', '${image.title || ''}')">
+                <div class="image-container aspect-square relative">
+                    <img src="${image.thumbnail || image.path}" 
+                         alt="${image.title || 'Medical image'}"
+                         class="w-full h-full object-cover"
+                         onerror="this.src='/static/images/placeholder.png'">
+                    <div class="image-overlay absolute inset-0 bg-black bg-opacity-0 hover:bg-opacity-20 transition-all flex items-center justify-center">
+                        <svg class="w-8 h-8 text-white opacity-0 hover:opacity-100 transition-opacity" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0zM10 7v3m0 0v3m0-3h3m-3 0H7"></path>
+                        </svg>
+                    </div>
+                </div>
+                <div class="image-info p-3">
+                    <p class="text-sm font-medium text-gray-800 truncate">${image.title || 'Untitled'}</p>
+                    <p class="text-xs text-gray-600">${image.type || category}</p>
+                    ${image.timestamp ? `<p class="text-xs text-gray-500">${new Date(image.timestamp).toLocaleDateString()}</p>` : ''}
+                </div>
+            </div>
+        `;
+    }
+
+    showImageModal(imageId, imagePath, imageTitle) {
+        const modal = document.createElement('div');
+        modal.className = 'fixed inset-0 bg-black bg-opacity-75 flex items-center justify-center z-50';
+        modal.innerHTML = `
+            <div class="max-w-4xl max-h-full m-4 bg-white rounded-lg overflow-hidden">
+                <div class="flex justify-between items-center p-4 border-b">
+                    <h3 class="text-lg font-semibold">${imageTitle}</h3>
+                    <button class="close-modal text-gray-500 hover:text-gray-700">
+                        <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"></path>
+                        </svg>
+                    </button>
+                </div>
+                <div class="p-4">
+                    <img src="${imagePath}" alt="${imageTitle}" class="max-w-full max-h-[70vh] mx-auto">
+                </div>
+            </div>
+        `;
+
+        // Add event listeners
+        modal.querySelector('.close-modal').addEventListener('click', () => {
+            document.body.removeChild(modal);
+        });
+
+        modal.addEventListener('click', (e) => {
+            if (e.target === modal) {
+                document.body.removeChild(modal);
+            }
+        });
+
+        document.body.appendChild(modal);
     }
 
     attachEventListeners() {

@@ -907,4 +907,388 @@ async def delete_media_file(
         raise HTTPException(status_code=500, detail="Failed to delete media file")
 
 
-# Existing endpoints continue below...
+# Domain-Specific Text and Image Processing Endpoints
+
+@router.post("/domains/{domain}/process-text", response_model=TextEntryResponse)
+async def process_domain_text(
+    domain: str,
+    text_content: str = Form(...),
+    patient_id: str = Form(...),
+    case_id: Optional[str] = Form(None),
+    title: str = Form(...),
+    content_type: str = Form("clinical_note"),
+    metadata: Optional[str] = Form(None),  # JSON string
+    db: Session = Depends(get_db),
+):
+    """
+    Process text data for a specific domain (surgery, logistics, insurance)
+    with domain-appropriate parsing and analysis
+    """
+    try:
+        # Validate domain
+        valid_domains = ["surgery", "logistics", "insurance", "general"]
+        if domain not in valid_domains:
+            raise HTTPException(
+                status_code=400,
+                detail=f"Invalid domain. Must be one of: {valid_domains}"
+            )
+
+        # Parse metadata if provided
+        parsed_metadata = {}
+        if metadata:
+            try:
+                parsed_metadata = json.loads(metadata)
+            except json.JSONDecodeError:
+                logger.warning(f"Invalid metadata JSON, ignoring: {metadata}")
+
+        # Process text with domain-specific parser
+        from ...core.parsers import get_parser_for_domain
+        parser = get_parser_for_domain(domain)
+        parsing_result = parser.parse(text_content)
+
+        # Create enhanced metadata combining input and parsing results
+        enhanced_metadata = {
+            **parsed_metadata,
+            "domain": domain,
+            "parsing_result": parsing_result,
+            "content_type": content_type,
+            "processing_timestamp": datetime.utcnow().isoformat(),
+            "word_count": len(text_content.split()),
+            "character_count": len(text_content),
+        }
+
+        # Generate entry ID and store in database
+        entry_id = str(uuid.uuid4())
+        
+        text_entry = TextEntry(
+            id=entry_id,
+            patient_id=patient_id,
+            case_id=case_id,
+            entry_type=f"{domain}_{content_type}",
+            title=title,
+            content=text_content,
+            tags=json.dumps([domain, content_type]),
+            metadata=json.dumps(enhanced_metadata),
+            created_at=datetime.utcnow(),
+        )
+
+        db.add(text_entry)
+        db.commit()
+
+        logger.info(f"Domain text processed: {entry_id} for {domain} domain, patient {patient_id}")
+
+        return TextEntryResponse(
+            success=True,
+            message=f"Text processed successfully for {domain} domain",
+            entry_id=entry_id,
+            timestamp=datetime.utcnow(),
+        )
+
+    except HTTPException:
+        raise
+    except Exception as e:
+        db.rollback()
+        logger.error(f"Domain text processing failed for {domain}: {str(e)}")
+        raise HTTPException(
+            status_code=500, 
+            detail=f"Text processing failed for {domain}: {str(e)}"
+        )
+
+
+@router.post("/domains/{domain}/process-images", response_model=MediaUploadResponse)
+async def process_domain_images(
+    domain: str,
+    files: List[UploadFile] = File(...),
+    patient_id: str = Form(...),
+    case_id: Optional[str] = Form(None),
+    image_category: str = Form("general"),
+    description: Optional[str] = Form(None),
+    metadata: Optional[str] = Form(None),  # JSON string
+    db: Session = Depends(get_db),
+):
+    """
+    Process multiple image files for a specific domain with domain-appropriate
+    categorization and analysis
+    """
+    try:
+        # Validate domain
+        valid_domains = ["surgery", "logistics", "insurance", "general"]
+        if domain not in valid_domains:
+            raise HTTPException(
+                status_code=400,
+                detail=f"Invalid domain. Must be one of: {valid_domains}"
+            )
+
+        # Validate file types
+        valid_extensions = ['.jpg', '.jpeg', '.png', '.gif', '.bmp', '.tiff', '.pdf', '.dcm']
+        
+        processed_files = []
+        
+        for file in files:
+            file_ext = file.filename.lower().split('.')[-1] if file.filename else ''
+            if f'.{file_ext}' not in valid_extensions:
+                raise HTTPException(
+                    status_code=400,
+                    detail=f"Invalid file type '{file_ext}'. Supported: {valid_extensions}"
+                )
+
+            # Generate unique filename
+            media_id = str(uuid.uuid4())
+            safe_filename = f"{domain}_{media_id}_{file.filename}"
+
+            # Create domain-specific upload directory
+            upload_dir = Path(f"data/uploads/media/{domain}")
+            upload_dir.mkdir(parents=True, exist_ok=True)
+
+            # Save file
+            file_path = upload_dir / safe_filename
+            content = await file.read()
+
+            with open(file_path, "wb") as buffer:
+                buffer.write(content)
+
+            # Parse metadata if provided
+            parsed_metadata = {}
+            if metadata:
+                try:
+                    parsed_metadata = json.loads(metadata)
+                except json.JSONDecodeError:
+                    logger.warning(f"Invalid metadata JSON, ignoring: {metadata}")
+
+            # Process images with domain-specific parser
+            from ...core.parsers import get_parser_for_domain
+            parser = get_parser_for_domain(domain)
+            parsing_result = parser.parse([str(file_path)])  # Pass as list for image parsing
+
+            # Create enhanced metadata
+            enhanced_metadata = {
+                **parsed_metadata,
+                "domain": domain,
+                "image_category": image_category,
+                "parsing_result": parsing_result,
+                "processing_timestamp": datetime.utcnow().isoformat(),
+                "original_filename": file.filename,
+                "file_size": len(content),
+                "content_type": file.content_type,
+                "file_extension": file_ext,
+            }
+
+            # Domain-specific image categorization
+            domain_specific_type = f"{domain}_{image_category}"
+            if domain == "surgery":
+                if "ct" in file.filename.lower() or "scan" in file.filename.lower():
+                    domain_specific_type = "surgery_ct_scan"
+                elif "mri" in file.filename.lower():
+                    domain_specific_type = "surgery_mri"
+                elif "pathology" in file.filename.lower():
+                    domain_specific_type = "surgery_pathology"
+            elif domain == "logistics":
+                if "product" in file.filename.lower():
+                    domain_specific_type = "logistics_product"
+                elif "shipment" in file.filename.lower():
+                    domain_specific_type = "logistics_shipment"
+                elif "damage" in file.filename.lower():
+                    domain_specific_type = "logistics_damage"
+            elif domain == "insurance":
+                if "incident" in file.filename.lower():
+                    domain_specific_type = "insurance_incident"
+                elif "damage" in file.filename.lower():
+                    domain_specific_type = "insurance_damage"
+                elif "medical" in file.filename.lower():
+                    domain_specific_type = "insurance_medical"
+
+            # Store media record in database
+            media_record = MediaFile(
+                id=media_id,
+                patient_id=patient_id,
+                case_id=case_id,
+                media_type=domain_specific_type,
+                title=f"{domain.title()} {image_category} - {file.filename}",
+                description=description or f"Processed image for {domain} domain",
+                file_path=str(file_path),
+                original_filename=file.filename,
+                file_size=len(content),
+                content_type=file.content_type,
+                tags=json.dumps([domain, image_category, domain_specific_type]),
+                metadata=json.dumps(enhanced_metadata),
+                created_at=datetime.utcnow(),
+            )
+
+            db.add(media_record)
+            processed_files.append({
+                "media_id": media_id,
+                "filename": file.filename,
+                "file_path": str(file_path),
+                "type": domain_specific_type,
+                "metadata": enhanced_metadata
+            })
+
+        db.commit()
+
+        logger.info(f"Domain images processed: {len(processed_files)} files for {domain} domain, patient {patient_id}")
+
+        return MediaUploadResponse(
+            success=True,
+            message=f"{len(processed_files)} images processed successfully for {domain} domain",
+            media_id=processed_files[0]["media_id"] if processed_files else "",
+            file_path=processed_files[0]["file_path"] if processed_files else "",
+            metadata={"processed_files": processed_files, "total_count": len(processed_files)},
+        )
+
+    except HTTPException:
+        raise
+    except Exception as e:
+        db.rollback()
+        logger.error(f"Domain image processing failed for {domain}: {str(e)}")
+        raise HTTPException(
+            status_code=500,
+            detail=f"Image processing failed for {domain}: {str(e)}"
+        )
+
+
+@router.get("/domains/{domain}/text/{patient_id}")
+async def get_domain_text_entries(
+    domain: str,
+    patient_id: str,
+    case_id: Optional[str] = None,
+    content_type: Optional[str] = None,
+    limit: int = 50,
+    db: Session = Depends(get_db),
+):
+    """
+    Get text entries for a patient within a specific domain
+    """
+    try:
+        # Validate domain
+        valid_domains = ["surgery", "logistics", "insurance", "general"]
+        if domain not in valid_domains:
+            raise HTTPException(
+                status_code=400,
+                detail=f"Invalid domain. Must be one of: {valid_domains}"
+            )
+
+        # Build query for domain-specific text entries
+        query = db.query(TextEntry).filter(TextEntry.patient_id == patient_id)
+        
+        # Filter by domain in entry_type
+        query = query.filter(TextEntry.entry_type.like(f"{domain}_%"))
+
+        if case_id:
+            query = query.filter(TextEntry.case_id == case_id)
+
+        if content_type:
+            query = query.filter(TextEntry.entry_type.like(f"{domain}_{content_type}%"))
+
+        # Order by creation date and limit
+        entries = query.order_by(TextEntry.created_at.desc()).limit(limit).all()
+
+        # Convert to response format
+        result = []
+        for entry in entries:
+            entry_data = {
+                "id": entry.id,
+                "patient_id": entry.patient_id,
+                "case_id": entry.case_id,
+                "entry_type": entry.entry_type,
+                "title": entry.title,
+                "content": entry.content,
+                "tags": json.loads(entry.tags) if entry.tags else [],
+                "metadata": json.loads(entry.metadata) if entry.metadata else {},
+                "created_at": entry.created_at.isoformat(),
+                "updated_at": entry.updated_at.isoformat(),
+                "domain": domain,
+            }
+            result.append(entry_data)
+
+        return {
+            "success": True,
+            "domain": domain,
+            "patient_id": patient_id,
+            "total_entries": len(result),
+            "entries": result,
+        }
+
+    except HTTPException:
+        raise
+    except Exception as e:
+        logger.error(f"Failed to get domain text entries for {domain}: {str(e)}")
+        raise HTTPException(
+            status_code=500,
+            detail=f"Failed to get text entries for {domain}: {str(e)}"
+        )
+
+
+@router.get("/domains/{domain}/images/{patient_id}")
+async def get_domain_image_entries(
+    domain: str,
+    patient_id: str,
+    case_id: Optional[str] = None,
+    image_category: Optional[str] = None,
+    limit: int = 50,
+    db: Session = Depends(get_db),
+):
+    """
+    Get image entries for a patient within a specific domain
+    """
+    try:
+        # Validate domain
+        valid_domains = ["surgery", "logistics", "insurance", "general"]
+        if domain not in valid_domains:
+            raise HTTPException(
+                status_code=400,
+                detail=f"Invalid domain. Must be one of: {valid_domains}"
+            )
+
+        # Build query for domain-specific image entries
+        query = db.query(MediaFile).filter(MediaFile.patient_id == patient_id)
+        
+        # Filter by domain in media_type
+        query = query.filter(MediaFile.media_type.like(f"{domain}_%"))
+
+        if case_id:
+            query = query.filter(MediaFile.case_id == case_id)
+
+        if image_category:
+            query = query.filter(MediaFile.media_type.like(f"{domain}_{image_category}%"))
+
+        # Order by creation date and limit
+        images = query.order_by(MediaFile.created_at.desc()).limit(limit).all()
+
+        # Convert to response format
+        result = []
+        for image in images:
+            image_data = {
+                "id": image.id,
+                "patient_id": image.patient_id,
+                "case_id": image.case_id,
+                "media_type": image.media_type,
+                "title": image.title,
+                "description": image.description,
+                "file_path": image.file_path,
+                "original_filename": image.original_filename,
+                "file_size": image.file_size,
+                "content_type": image.content_type,
+                "tags": json.loads(image.tags) if image.tags else [],
+                "metadata": json.loads(image.metadata) if image.metadata else {},
+                "created_at": image.created_at.isoformat(),
+                "updated_at": image.updated_at.isoformat(),
+                "domain": domain,
+            }
+            result.append(image_data)
+
+        return {
+            "success": True,
+            "domain": domain,
+            "patient_id": patient_id,
+            "total_images": len(result),
+            "images": result,
+        }
+
+    except HTTPException:
+        raise
+    except Exception as e:
+        logger.error(f"Failed to get domain image entries for {domain}: {str(e)}")
+        raise HTTPException(
+            status_code=500,
+            detail=f"Failed to get image entries for {domain}: {str(e)}"
+        )

@@ -5,7 +5,8 @@ Modular, high-performance endpoints with caching and proper service separation
 
 from typing import List, Optional
 
-from fastapi import APIRouter, Depends, HTTPException, Query, status
+from fastapi import APIRouter, Depends, HTTPException, Query
+from fastapi import status as http_status
 from sqlalchemy.orm import Session
 
 from ...core.cache import (cache_detail_endpoint, cache_list_endpoint,
@@ -65,7 +66,7 @@ async def list_cases(
     """
     try:
         filters = CaseListFilters(
-            status=status,
+            status=case_status,
             procedure_type=procedure_type,
             surgeon_id=surgeon_id,
             priority=priority,
@@ -85,12 +86,12 @@ async def list_cases(
 
     except Exception as e:
         raise HTTPException(
-            status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
+            status_code=http_status.HTTP_500_INTERNAL_SERVER_ERROR,
             detail=f"Error retrieving cases: {str(e)}",
         )
 
 
-@router.post("/", response_model=CaseResponse, status_code=status.HTTP_201_CREATED)
+@router.post("/", response_model=CaseResponse, status_code=http_status.HTTP_201_CREATED)
 async def create_case(
     request: CaseCreateRequest,
     case_service: EnhancedCaseService = Depends(get_case_service),
@@ -128,7 +129,7 @@ async def create_case(
 
     except Exception as e:
         raise HTTPException(
-            status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
+            status_code=http_status.HTTP_500_INTERNAL_SERVER_ERROR,
             detail=f"Error creating case: {str(e)}",
         )
 
@@ -157,7 +158,7 @@ async def get_case(
 
         if not case:
             raise HTTPException(
-                status_code=status.HTTP_404_NOT_FOUND,
+                status_code=http_status.HTTP_404_NOT_FOUND,
                 detail=f"Case with ID {case_id} not found",
             )
 
@@ -167,7 +168,7 @@ async def get_case(
         raise
     except Exception as e:
         raise HTTPException(
-            status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
+            status_code=http_status.HTTP_500_INTERNAL_SERVER_ERROR,
             detail=f"Error retrieving case: {str(e)}",
         )
 
@@ -207,7 +208,7 @@ async def update_case(
 
         if not case:
             raise HTTPException(
-                status_code=status.HTTP_404_NOT_FOUND,
+                status_code=http_status.HTTP_404_NOT_FOUND,
                 detail=f"Case with ID {case_id} not found",
             )
 
@@ -221,12 +222,12 @@ async def update_case(
         raise
     except Exception as e:
         raise HTTPException(
-            status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
+            status_code=http_status.HTTP_500_INTERNAL_SERVER_ERROR,
             detail=f"Error updating case: {str(e)}",
         )
 
 
-@router.delete("/{case_id}", status_code=status.HTTP_204_NO_CONTENT)
+@router.delete("/{case_id}", status_code=http_status.HTTP_204_NO_CONTENT)
 async def delete_case(
     case_id: int,
     case_service: EnhancedCaseService = Depends(get_case_service),
@@ -252,7 +253,7 @@ async def delete_case(
 
         if not deleted:
             raise HTTPException(
-                status_code=status.HTTP_404_NOT_FOUND,
+                status_code=http_status.HTTP_404_NOT_FOUND,
                 detail=f"Case with ID {case_id} not found",
             )
 
@@ -264,7 +265,7 @@ async def delete_case(
         raise
     except Exception as e:
         raise HTTPException(
-            status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
+            status_code=http_status.HTTP_500_INTERNAL_SERVER_ERROR,
             detail=f"Error deleting case: {str(e)}",
         )
 
@@ -313,7 +314,7 @@ async def get_case_statistics(
 
     except Exception as e:
         raise HTTPException(
-            status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
+            status_code=http_status.HTTP_500_INTERNAL_SERVER_ERROR,
             detail=f"Error retrieving statistics: {str(e)}",
         )
     except Exception as e:

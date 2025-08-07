@@ -6,6 +6,7 @@ Complete CSV-to-Insights Pipeline with Professional Deliverable Generation
 from fastapi import APIRouter
 
 from .ai import router as ai_router
+from .ai_enhanced import enhanced_router as ai_enhanced_router  # Enhanced AI with local models
 from .auth import router as auth_router
 from .cases import router as cases_router
 from .chat import router as chat_router
@@ -42,6 +43,7 @@ router.include_router(
 )
 router.include_router(downloads_router, prefix="/downloads", tags=["Downloads"])
 router.include_router(ai_router, prefix="/ai", tags=["AI Services"])
+router.include_router(ai_enhanced_router, prefix="/ai-enhanced", tags=["Enhanced AI Services"])  # Free/low-cost AI
 router.include_router(chat_router, prefix="/chat", tags=["Chat Integration"])
 
 # New enhanced endpoints

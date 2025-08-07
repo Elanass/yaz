@@ -165,6 +165,51 @@ class SurgicalCaseModel(BaseModel):
         None, description="Resection margin status (R0/R1/R2)"
     )
 
+    # Text and Image Data Fields
+    clinical_notes: Optional[str] = Field(
+        None, description="Free-form clinical notes and observations"
+    )
+    pathology_report: Optional[str] = Field(
+        None, description="Detailed pathology report text"
+    )
+    surgery_notes: Optional[str] = Field(
+        None, description="Operative notes and surgical details"
+    )
+    discharge_summary: Optional[str] = Field(
+        None, description="Discharge summary and post-operative care instructions"
+    )
+    
+    # Image and Media References
+    ct_scan_images: Optional[List[str]] = Field(
+        default_factory=list, description="List of CT scan image file paths or IDs"
+    )
+    mri_images: Optional[List[str]] = Field(
+        default_factory=list, description="List of MRI image file paths or IDs"
+    )
+    pathology_images: Optional[List[str]] = Field(
+        default_factory=list, description="List of pathology slide image file paths or IDs"
+    )
+    endoscopy_images: Optional[List[str]] = Field(
+        default_factory=list, description="List of endoscopic image file paths or IDs"
+    )
+    surgical_photos: Optional[List[str]] = Field(
+        default_factory=list, description="List of surgical photography file paths or IDs"
+    )
+    other_images: Optional[List[str]] = Field(
+        default_factory=list, description="List of other medical image file paths or IDs"
+    )
+    
+    # Document References
+    consent_forms: Optional[List[str]] = Field(
+        default_factory=list, description="List of consent form document file paths or IDs"
+    )
+    lab_reports: Optional[List[str]] = Field(
+        default_factory=list, description="List of laboratory report document file paths or IDs"
+    )
+    radiology_reports: Optional[List[str]] = Field(
+        default_factory=list, description="List of radiology report document file paths or IDs"
+    )
+
     # Audit fields
     created_at: datetime = Field(default_factory=datetime.now)
     updated_at: datetime = Field(default_factory=datetime.now)
@@ -208,6 +253,19 @@ class SurgicalCaseModel(BaseModel):
                 "urgency": "elective",
                 "flot_cycles_completed": 4,
                 "asa_score": 3,
+                "clinical_notes": "Patient shows signs of improvement.",
+                "pathology_report": "Invasive adenocarcinoma, moderately differentiated.",
+                "surgery_notes": "Laparoscopic approach, no complications.",
+                "discharge_summary": "Stable, follow-up in 1 week.",
+                "ct_scan_images": ["/path/to/ct_image1.jpg"],
+                "mri_images": ["/path/to/mri_image1.jpg"],
+                "pathology_images": ["/path/to/pathology_image1.jpg"],
+                "endoscopy_images": ["/path/to/endoscopy_image1.jpg"],
+                "surgical_photos": ["/path/to/surgical_photo1.jpg"],
+                "other_images": ["/path/to/other_image1.jpg"],
+                "consent_forms": ["/path/to/consent_form1.pdf"],
+                "lab_reports": ["/path/to/lab_report1.pdf"],
+                "radiology_reports": ["/path/to/radiology_report1.pdf"],
             }
         }
 
@@ -245,6 +303,45 @@ class SurgicalAnalysisResult(BaseModel):
     recommendations: List[str]
     alerts: List[str]
     next_steps: List[str]
+
+    # Text and Image Output Data
+    generated_report: Optional[str] = Field(
+        None, description="Generated comprehensive surgical analysis report"
+    )
+    patient_education_text: Optional[str] = Field(
+        None, description="Generated patient education materials"
+    )
+    clinical_summary: Optional[str] = Field(
+        None, description="Clinical summary for other healthcare providers"
+    )
+    discharge_instructions: Optional[str] = Field(
+        None, description="Generated discharge instructions"
+    )
+    
+    # Generated Images and Visualizations
+    risk_visualization: Optional[str] = Field(
+        None, description="Path to generated risk assessment visualization"
+    )
+    outcome_charts: Optional[List[str]] = Field(
+        default_factory=list, description="List of generated outcome prediction charts"
+    )
+    comparison_images: Optional[List[str]] = Field(
+        default_factory=list, description="List of generated comparison visualization images"
+    )
+    infographic_path: Optional[str] = Field(
+        None, description="Path to generated patient education infographic"
+    )
+    
+    # Generated Documents
+    full_report_pdf: Optional[str] = Field(
+        None, description="Path to generated full analysis report PDF"
+    )
+    patient_handout_pdf: Optional[str] = Field(
+        None, description="Path to generated patient handout PDF"
+    )
+    clinical_decision_doc: Optional[str] = Field(
+        None, description="Path to generated clinical decision support document"
+    )
 
     # Confidence and Validation
     confidence_score: float = Field(
