@@ -1,0 +1,40 @@
+#cloud-config
+users:
+  - name: yaz
+    groups: sudo
+    shell: /bin/bash
+    sudo: ALL=(ALL) NOPASSWD:ALL
+    ssh_authorized_keys:
+      - ssh-ed25519 AAAAC3NzaC1lZDI1NTE5AAAAIA... # Replace with your SSH public key
+
+packages:
+  - curl
+  - wget
+  - git
+  - htop
+  - vim
+  - unzip
+  - build-essential
+
+package_update: true
+package_upgrade: true
+
+timezone: UTC
+
+runcmd:
+  - mkdir -p /opt/yaz
+  - chown yaz:yaz /opt/yaz
+  - echo "YAZ Base User Setup Complete" > /home/yaz/.setup_complete
+
+write_files:
+  - path: /etc/motd
+    content: |
+      
+      ┌─────────────────────────────────────┐
+      │           YAZ Platform              │
+      │         Instance Ready              │
+      └─────────────────────────────────────┘
+      
+    permissions: '0644'
+
+final_message: "YAZ instance setup completed successfully!"

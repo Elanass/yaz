@@ -1,0 +1,77 @@
+#cloud-config
+users:
+  - name: yaz
+    groups: sudo,docker
+    shell: /bin/bash
+    sudo: ALL=(ALL) NOPASSWD:ALL
+    ssh_authorized_keys:
+      - ssh-ed25519 AAAAC3NzaC1lZDI1NTE5AAAAIA... # Replace with your SSH public key
+
+packages:
+  - docker.io
+  - docker-compose
+  - python3
+  - python3-pip
+  - python3-venv
+  - nodejs
+  - npm
+  - postgresql-client
+  - redis-tools
+  - nginx
+
+package_update: true
+package_upgrade: true
+
+timezone: UTC
+
+runcmd:
+  - systemctl enable docker
+  - systemctl start docker
+  - usermod -aG docker yaz
+  - mkdir -p /opt/yaz/surge
+  - chown -R yaz:yaz /opt/yaz
+  - pip3 install fastapi uvicorn sqlalchemy psycopg2-binary redis
+  - npm install -g pm2
+  - echo "YAZ Surge Node Ready" > /home/yaz/.node_ready
+
+write_files:
+  - path: /etc/motd
+    content: |
+      
+      ┌─────────────────────────────────────┐
+      │        YAZ Surge Node               │
+      │      Processing Engine              │
+      └─────────────────────────────────────┘
+      
+    permissions: '0644'
+  
+  - path: /opt/yaz/surge/health-check.sh
+    content: |
+      #!/bin/bash
+      # Basic health check for surge node
+      
+      echo "=== YAZ Surge Node Health Check ==="
+      echo "Timestamp: $(date)"
+      echo
+      
+      # Check Docker
+      echo "Docker Status:"
+      systemctl is-active docker
+      
+      # Check disk space
+      echo "Disk Usage:"
+      df -h /
+      
+      # Check memory
+      echo "Memory Usage:"
+      free -h
+      
+      # Check load
+      echo "System Load:"
+      uptime
+      
+      echo "=== End Health Check ==="
+    permissions: '0755'
+    owner: yaz:yaz
+
+final_message: "YAZ Surge node setup completed successfully!"

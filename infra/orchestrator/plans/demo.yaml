@@ -1,0 +1,116 @@
+# Demo plan for YAZ orchestration system
+instances:
+  yaz-gateway:
+    image: "ubuntu:22.04"
+    type: "container"
+    memory: "1GB"
+    cpus: 2
+    disk: "10GB"
+    metadata:
+      role: "gateway"
+      environment: "demo"
+      version: "1.0"
+    network:
+      type: "bridge"
+      ipv4: "auto"
+    cloud_init: |
+      #cloud-config
+      users:
+        - name: yaz
+          groups: sudo
+          shell: /bin/bash
+          sudo: ALL=(ALL) NOPASSWD:ALL
+          ssh_authorized_keys:
+            - ssh-ed25519 AAAAC3NzaC1lZDI1NTE5AAAAIA... # Add your key
+      packages:
+        - curl
+        - git
+        - htop
+        - nginx
+      runcmd:
+        - systemctl enable nginx
+        - systemctl start nginx
+        - echo "YAZ Gateway Ready" > /var/www/html/index.html
+
+  yaz-worker-1:
+    image: "ubuntu:22.04"
+    type: "container"
+    memory: "2GB"
+    cpus: 2
+    disk: "20GB"
+    metadata:
+      role: "worker"
+      environment: "demo"
+      version: "1.0"
+    network:
+      type: "bridge"
+      ipv4: "auto"
+    cloud_init: |
+      #cloud-config
+      users:
+        - name: yaz
+          groups: sudo,docker
+          shell: /bin/bash
+          sudo: ALL=(ALL) NOPASSWD:ALL
+          ssh_authorized_keys:
+            - ssh-ed25519 AAAACA3NzaC1lZDI1NTE5AAAAIA... # Add your key
+      packages:
+        - docker.io
+        - docker-compose
+        - python3
+        - python3-pip
+      runcmd:
+        - systemctl enable docker
+        - systemctl start docker
+        - pip3 install fastapi uvicorn
+        - echo "YAZ Worker Ready" > /home/yaz/status.txt
+
+  yaz-storage:
+    image: "ubuntu:22.04"
+    type: "container"
+    memory: "1GB"
+    cpus: 1
+    disk: "50GB"
+    metadata:
+      role: "storage"
+      environment: "demo"
+      version: "1.0"
+    network:
+      type: "bridge"
+      ipv4: "auto"
+    cloud_init: |
+      #cloud-config
+      users:
+        - name: yaz
+          groups: sudo
+          shell: /bin/bash
+          sudo: ALL=(ALL) NOPASSWD:ALL
+          ssh_authorized_keys:
+            - ssh-ed25519 AAAAC3NzaC1lZDI1NTE5AAAAIA... # Add your key
+      packages:
+        - postgresql-14
+        - redis-server
+      runcmd:
+        - systemctl enable postgresql
+        - systemctl start postgresql
+        - systemctl enable redis-server
+        - systemctl start redis-server
+        - sudo -u postgres createdb yazdb
+        - echo "YAZ Storage Ready" > /home/yaz/status.txt
+
+profiles:
+  default:
+    description: "Default profile for YAZ instances"
+    config:
+      limits.cpu: "2"
+      limits.memory: "2GB"
+      boot.autostart: "true"
+    devices:
+      root:
+        path: "/"
+        pool: "incus-pool"
+        type: "disk"
+      eth0:
+        name: "eth0"
+        network: "incusbr0"
+        type: "nic"

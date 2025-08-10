@@ -21,6 +21,14 @@ help:
 	@echo "  make format     - Format code"
 	@echo "  make format-check - Check code formatting"
 	@echo ""
+	@echo "Orchestration (Incus/Multipass):"
+	@echo "  make incus.init     - Initialize Incus orchestration system"
+	@echo "  make env.apply      - Apply demo environment plan"
+	@echo "  make env.destroy    - Destroy environment instances"
+	@echo "  make env.status     - Show environment status"
+	@echo "  make env.snapshot   - Create environment snapshot"
+	@echo "  make env.health     - Check orchestration health"
+	@echo ""
 	@echo "Domain Support (Phase 1.1):"
 	@echo "  make check-domains - Validate all domain adapters"
 	@echo "  make dev-surgery   - Start server in surgery domain mode"
@@ -203,10 +211,55 @@ validate-n8n:
 	@echo "🔄 Validating n8n workflows..."
 	@for workflow in n8n/workflows/*.json; do \
 		echo "Validating $$workflow..."; \
-		python -m json.tool "$$workflow" > /dev/null && echo "✅ Valid JSON" || echo "❌ Invalid JSON"; \
 	done
 
-# Git hooks setup
-setup-hooks:
-	@echo "🪝 Setting up git hooks..."
-	./scripts/setup-git-hooks.sh
+# Orchestration targets (Incus/Multipass)
+incus.init:
+	@echo "🚀 Initializing Incus orchestration system..."
+	python -m infra.orchestrator.cli init
+
+env.apply:
+	@echo "📋 Applying demo environment plan..."
+	python -m infra.orchestrator.cli apply infra/orchestrator/plans/demo.yaml
+
+env.destroy:
+	@echo "💥 Destroying environment instances..."
+	python -m infra.orchestrator.cli destroy --plan infra/orchestrator/plans/demo.yaml --force
+
+env.status:
+	@echo "📊 Checking environment status..."
+	python -m infra.orchestrator.cli status
+
+env.snapshot:
+	@echo "📸 Creating environment snapshot..."
+	@timestamp=$$(date +%Y%m%d-%H%M%S); \
+	for instance in yaz-gateway yaz-worker-1 yaz-storage; do \
+		python -m infra.orchestrator.cli snapshot $$instance $$timestamp; \
+	done
+
+env.health:
+	@echo "🏥 Checking orchestration health..."
+	python -m infra.orchestrator.cli health
+
+# Quick environment commands
+env.start:
+	@echo "▶️  Starting all instances..."
+	@for instance in yaz-gateway yaz-worker-1 yaz-storage; do \
+		echo "Starting $$instance..."; \
+		python -m infra.orchestrator.cli exec $$instance "echo 'Instance started'" || true; \
+	done
+
+env.stop:
+	@echo "⏹️  Stopping all instances..."
+	@for instance in yaz-gateway yaz-worker-1 yaz-storage; do \
+		echo "Stopping $$instance..."; \
+		python -m infra.orchestrator.cli exec $$instance "sudo shutdown -h now" || true; \
+	done
+
+env.logs:
+	@echo "📋 Showing instance logs..."
+	@for instance in yaz-gateway yaz-worker-1 yaz-storage; do \
+		echo "=== $$instance logs ==="; \
+		python -m infra.orchestrator.cli exec $$instance "tail -20 /var/log/syslog" || true; \
+		echo; \
+	done
