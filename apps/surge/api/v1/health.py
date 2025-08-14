@@ -13,7 +13,7 @@ from sqlalchemy import text
 from sqlalchemy.orm import Session
 
 from shared.config import get_shared_config
-from src.surge.core.database import get_db
+from apps.surge.core.database import get_db
 
 
 router = APIRouter()

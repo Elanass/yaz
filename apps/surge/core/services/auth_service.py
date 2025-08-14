@@ -5,7 +5,7 @@ import jwt
 from fastapi import Depends
 from fastapi.security import HTTPAuthorizationCredentials, HTTPBearer
 
-from src.surge.core.models.user import User
+from apps.surge.core.models.user import User
 
 
 class AuthService:

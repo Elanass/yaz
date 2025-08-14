@@ -13,7 +13,7 @@ from uuid import uuid4
 from pydantic import BaseModel
 from sqlalchemy.orm import Session
 
-from src.surge.core.database import get_db
+from apps.surge.core.database import get_db
 from surge.core.cache import invalidate_cache
 
 from .base import BaseService

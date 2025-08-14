@@ -17,7 +17,7 @@ from sqlalchemy import (
 )
 from sqlalchemy.orm import relationship
 
-from src.surge.core.database import Base
+from apps.surge.core.database import Base
 
 
 class CaseStatus(str, Enum):

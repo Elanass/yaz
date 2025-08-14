@@ -1,7 +1,7 @@
 from fastapi import APIRouter, Depends
 from sqlalchemy.orm import Session
 
-from src.surge.api.dependencies import get_async_session
+from apps.surge.api.dependencies import get_async_session
 
 
 router = APIRouter(prefix="/studies", tags=["studies"])

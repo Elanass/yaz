@@ -8,7 +8,7 @@ from typing import Any
 
 import pandas as pd
 
-from src.surge.core.models.medical import (
+from apps.surge.core.models.medical import (
     GastricSystem,
     IndependentCellEntity,
     TumorUnit,

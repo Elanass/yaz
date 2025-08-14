@@ -18,7 +18,7 @@ from jose import JWTError, jwt
 from pydantic import BaseModel, EmailStr
 
 # Import AuthService
-from src.surge.core.services.auth_service import AuthService
+from apps.surge.core.services.auth_service import AuthService
 
 
 # Enhanced security scheme

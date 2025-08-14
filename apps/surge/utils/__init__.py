@@ -1,6 +1,6 @@
 """Utility modules for the Surge platform."""
 
-from src.surge.core.cache import cache_response
+from apps.surge.core.cache import cache_response
 
 from .exceptions import (
                          ConfigurationError,

@@ -7,7 +7,7 @@ from typing import Any
 import pandas as pd
 from pydantic import BaseModel, Field
 
-from src.surge.common.pydantic_base import APIModel
+from apps.surge.common.pydantic_base import APIModel
 
 
 class DataDomain(Enum):

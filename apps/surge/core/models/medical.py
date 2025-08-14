@@ -9,7 +9,7 @@ from typing import Any
 
 from pydantic import BaseModel, ConfigDict, Field, field_validator
 
-from src.surge.common.pydantic_base import APIModel
+from apps.surge.common.pydantic_base import APIModel
 
 from .base import BaseEntity, ConfidenceLevel
 

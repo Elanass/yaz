@@ -9,7 +9,7 @@ from datetime import datetime
 from pathlib import Path
 from typing import Any
 
-from src.surge.core.models.medical import CohortAnalysis, SRCCCase
+from apps.surge.core.models.medical import CohortAnalysis, SRCCCase
 
 
 logger = logging.getLogger(__name__)

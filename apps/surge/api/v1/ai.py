@@ -11,8 +11,8 @@ from fastapi import APIRouter, HTTPException
 from pydantic import BaseModel, Field
 
 from shared.config import get_shared_config
-from src.surge.common.pydantic_base import APIModel
-from src.surge.core.services.logger import log_error
+from apps.surge.common.pydantic_base import APIModel
+from apps.surge.core.services.logger import log_error
 
 
 # Setup logging and OpenAI

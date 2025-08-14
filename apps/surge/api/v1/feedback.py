@@ -12,11 +12,11 @@ from pydantic import BaseModel, Field
 from sqlalchemy.ext.asyncio import AsyncSession
 from sqlalchemy.orm import Session
 
-from src.surge.api.dependencies import get_async_session
-from src.surge.core.database import get_db
-from src.surge.core.models.processing_models import FeedbackData, FeedbackType
-from src.surge.core.services.logger import get_logger
-from src.surge.models.orm import FeedbackORM
+from apps.surge.api.dependencies import get_async_session
+from apps.surge.core.database import get_db
+from apps.surge.core.models.processing_models import FeedbackData, FeedbackType
+from apps.surge.core.services.logger import get_logger
+from apps.surge.models.orm import FeedbackORM
 
 
 logger = get_logger(__name__)

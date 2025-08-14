@@ -6,7 +6,7 @@ to ensure consistent validation logic and DRY principles.
 
 from typing import Any
 
-from src.surge.core.services.logger import get_logger
+from apps.surge.core.services.logger import get_logger
 
 
 logger = get_logger(__name__)

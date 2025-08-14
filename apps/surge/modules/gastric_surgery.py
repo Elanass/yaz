@@ -8,7 +8,7 @@ from typing import Any
 
 from pydantic import BaseModel, Field
 
-from src.surge.core.models.medical import (
+from apps.surge.core.models.medical import (
     HistologyType,
     MetastasisStage,
     NodeStage,

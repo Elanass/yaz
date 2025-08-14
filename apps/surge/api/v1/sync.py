@@ -47,10 +47,10 @@ def invalidate_cache(resource, **params) -> None:
     pass
 
 
-from src.surge.core.database import get_db
-from src.surge.core.models.user import User
-from src.surge.core.services.auth_service import get_current_user
-from src.surge.core.services.sync_service import (
+from apps.surge.core.database import get_db
+from apps.surge.core.models.user import User
+from apps.surge.core.services.auth_service import get_current_user
+from apps.surge.core.services.sync_service import (
     MessageRequest,
     MessageResponse,
     MessageType,

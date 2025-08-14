@@ -19,10 +19,10 @@ from fastapi import (
 from pydantic import BaseModel, field_validator
 from sqlalchemy.orm import Session
 
-from src.surge.core.csv_processor import CSVProcessor
-from src.surge.core.database import get_db
-from src.surge.core.models.database_models import IngestionLog
-from src.surge.core.services.logger import get_logger
+from apps.surge.core.csv_processor import CSVProcessor
+from apps.surge.core.database import get_db
+from apps.surge.core.models.database_models import IngestionLog
+from apps.surge.core.services.logger import get_logger
 
 
 logger = get_logger(__name__)

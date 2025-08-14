@@ -22,10 +22,10 @@ from pydantic import BaseModel
 from sqlalchemy import and_, func
 from sqlalchemy.orm import Session
 
-from src.surge.core.database import get_db
-from src.surge.core.models.database_models import CohortData
-from src.surge.core.services.logger import get_logger
-from src.surge.core.websocket_manager import ConnectionManager
+from apps.surge.core.database import get_db
+from apps.surge.core.models.database_models import CohortData
+from apps.surge.core.services.logger import get_logger
+from apps.surge.core.websocket_manager import ConnectionManager
 
 
 logger = get_logger(__name__)

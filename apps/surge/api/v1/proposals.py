@@ -6,7 +6,7 @@ from datetime import datetime
 from fastapi import APIRouter, HTTPException
 from pydantic import BaseModel
 
-from src.surge.core.database import DATABASE_DIR
+from apps.surge.core.database import DATABASE_DIR
 
 
 router = APIRouter()

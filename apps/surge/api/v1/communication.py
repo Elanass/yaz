@@ -4,7 +4,7 @@ import logging
 
 from flask import Flask, jsonify, request
 
-from src.surge.network import get_surgify_handler, initialize_surgify_network
+from apps.surge.network import get_surgify_handler, initialize_surgify_network
 
 
 app = Flask(__name__)

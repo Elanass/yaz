@@ -5,7 +5,7 @@ from pathlib import Path
 
 from fastapi import APIRouter, HTTPException
 
-from src.surge.core.analytics.analytics_engine import AnalyticsEngine
+from apps.surge.core.analytics.analytics_engine import AnalyticsEngine
 
 
 router = APIRouter(tags=["Dashboard"])

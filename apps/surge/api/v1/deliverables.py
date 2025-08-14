@@ -12,7 +12,7 @@ from pydantic import BaseModel
 from sqlalchemy.ext.asyncio import AsyncSession
 from sqlalchemy.orm import Session
 
-from src.surge.core.analytics.insight_generator import InsightGenerator
+from apps.surge.core.analytics.insight_generator import InsightGenerator
 
 
 # from ...core.cache import cache_detail_endpoint, cache_list_endpoint, invalidate_cache
@@ -37,27 +37,27 @@ def invalidate_cache(resource, **params) -> None:
     pass
 
 
-from src.surge.api.dependencies import get_async_session
-from src.surge.core.database import get_db
-from src.surge.core.deliverable_factory import DeliverableFactory
-from src.surge.core.models.processing_models import (
+from apps.surge.api.dependencies import get_async_session
+from apps.surge.core.database import get_db
+from apps.surge.core.deliverable_factory import DeliverableFactory
+from apps.surge.core.models.processing_models import (
     AudienceType,
     Deliverable,
     DeliverableFormat,
     DeliverableMetadata,
     DeliverableRequest,
 )
-from src.surge.core.models.user import User
-from src.surge.core.services.auth_service import get_current_user
-from src.surge.core.services.logger import get_logger
-from src.surge.core.state.store import store
-from src.surge.models.orm import DeliverableORM
+from apps.surge.core.models.user import User
+from apps.surge.core.services.auth_service import get_current_user
+from apps.surge.core.services.logger import get_logger
+from apps.surge.core.state.store import store
+from apps.surge.models.orm import DeliverableORM
 
 
 logger = get_logger(__name__)
 
 # Legacy imports for backward compatibility
-from src.surge.core.services.deliverable_service import (
+from apps.surge.core.services.deliverable_service import (
     DeliverableResponse,
     DeliverableService,
     DeliverableStatus,

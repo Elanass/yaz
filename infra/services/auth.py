@@ -8,10 +8,10 @@ from typing import Any
 import bcrypt
 import jwt
 
-from src.shared.core.config import get_shared_config
-from src.shared.core.exceptions import PermissionError
-from src.shared.core.logger import get_logger
-from src.shared.models import UserRole
+from shared.core.config import get_shared_config
+from shared.core.exceptions import PermissionError
+from shared.core.logger import get_logger
+from shared.models import UserRole
 
 
 class AuthService:

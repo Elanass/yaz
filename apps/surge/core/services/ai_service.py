@@ -1,4 +1,4 @@
-from src.surge.core.modules.decision_engine import DecisionEngine
+from apps.surge.core.modules.decision_engine import DecisionEngine
 
 
 class AIService:

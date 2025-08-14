@@ -2,7 +2,7 @@ from collections.abc import Generator
 
 from sqlalchemy.orm import Session
 
-from src.surge.core.database import SessionLocal
+from apps.surge.core.database import SessionLocal
 
 
 def get_async_session() -> Generator[Session, None, None]:

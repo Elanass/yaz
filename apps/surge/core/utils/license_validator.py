@@ -6,7 +6,7 @@ import subprocess
 from datetime import datetime
 from pathlib import Path
 
-from src.surge.core.services.logger import get_logger
+from apps.surge.core.services.logger import get_logger
 
 
 logger = get_logger(__name__)

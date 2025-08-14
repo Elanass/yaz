@@ -5,8 +5,8 @@ Core analytics processing for surgical data and insights.
 from datetime import datetime
 from typing import Any
 
-from src.surge.core.base_classes import BaseAnalyticsEngine, StandardErrorHandler
-from src.surge.core.utils import calculate_statistics, format_percentage
+from apps.surge.core.base_classes import BaseAnalyticsEngine, StandardErrorHandler
+from apps.surge.core.utils import calculate_statistics, format_percentage
 
 
 class AnalyticsEngine(BaseAnalyticsEngine):

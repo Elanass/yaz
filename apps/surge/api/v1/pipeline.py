@@ -20,18 +20,18 @@ from fastapi.responses import JSONResponse, StreamingResponse
 from pydantic import BaseModel
 from sqlalchemy.orm import Session
 
-from src.surge.core.analytics.insight_generator import InsightGenerator
-from src.surge.core.csv_processor import CSVProcessor, ProcessingConfig
-from src.surge.core.database import get_db
-from src.surge.core.deliverable_factory import DeliverableFactory
-from src.surge.core.models.processing_models import (
+from apps.surge.core.analytics.insight_generator import InsightGenerator
+from apps.surge.core.csv_processor import CSVProcessor, ProcessingConfig
+from apps.surge.core.database import get_db
+from apps.surge.core.deliverable_factory import DeliverableFactory
+from apps.surge.core.models.processing_models import (
     AudienceType,
     DataDomain,
     DeliverableFormat,
     DeliverableRequest,
 )
-from src.surge.core.services.logger import get_logger
-from src.surge.core.state.store import store
+from apps.surge.core.services.logger import get_logger
+from apps.surge.core.state.store import store
 
 
 logger = get_logger(__name__)

@@ -12,8 +12,8 @@ from enum import Enum
 from typing import Any
 
 from shared.config import get_shared_config
-from src.surge.core.services.base import BaseService
-from src.surge.core.services.logger import get_logger
+from apps.surge.core.services.base import BaseService
+from apps.surge.core.services.logger import get_logger
 
 
 class AlertSeverity(str, Enum):

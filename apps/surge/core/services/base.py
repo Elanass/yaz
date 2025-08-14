@@ -7,8 +7,8 @@ import logging
 from abc import ABC, abstractmethod
 from typing import Any, TypeVar
 
-from src.surge.core.config.settings import get_settings
-from src.surge.core.models.base import ApiResponse, PaginationParams
+from apps.surge.core.config.settings import get_settings
+from apps.surge.core.models.base import ApiResponse, PaginationParams
 
 
 logger = logging.getLogger(__name__)

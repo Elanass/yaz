@@ -5,10 +5,10 @@ Generates actionable insights from surgical and healthcare data.
 from datetime import datetime
 from typing import Any
 
-from src.surge.core.base_classes import BaseService, StandardErrorHandler
+from apps.surge.core.base_classes import BaseService, StandardErrorHandler
 
 # NEW: import unified processing/insight models
-from src.surge.core.models.processing_models import (
+from apps.surge.core.models.processing_models import (
     ClinicalFindings,
     DataDomain,
     ExecutiveSummary,
@@ -17,7 +17,7 @@ from src.surge.core.models.processing_models import (
     ProcessingResult,
     TechnicalAnalysis,
 )
-from src.surge.core.utils import format_date, generate_id
+from apps.surge.core.utils import format_date, generate_id
 
 
 class InsightGenerator(BaseService):

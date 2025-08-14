@@ -47,7 +47,7 @@ try:
 except ImportError:
     REPORTLAB_AVAILABLE = False
 
-from src.surge.core.models.processing_models import (
+from apps.surge.core.models.processing_models import (
     AudienceType,
     Deliverable,
     DeliverableFormat,

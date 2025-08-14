@@ -3,18 +3,18 @@ from datetime import datetime
 from fastapi import APIRouter, HTTPException
 from pydantic import BaseModel
 
-from src.surge.core.models.medical import (
+from apps.surge.core.models.medical import (
     GastricSystem,
     IndependentCellEntity,
     TumorUnit,
 )
-from src.surge.core.services.ai_service import AIService
-from src.surge.modules.chemo_flot import FLOTCase, analyze_flot_regimen
-from src.surge.modules.gastric_surgery import (
+from apps.surge.core.services.ai_service import AIService
+from apps.surge.modules.chemo_flot import FLOTCase, analyze_flot_regimen
+from apps.surge.modules.gastric_surgery import (
     GastricSurgeryCase,
     analyze_gastrectomy_case,
 )
-from src.surge.modules.precision_engine import (
+from apps.surge.modules.precision_engine import (
     IntegratedCase,
     create_gastric_oncology_strategy,
 )

@@ -7,7 +7,7 @@ from typing import Any
 
 from fastapi import APIRouter, BackgroundTasks, HTTPException
 
-from src.surge.core.services.chat_integration import ChatIntegrationService
+from apps.surge.core.services.chat_integration import ChatIntegrationService
 
 
 logger = logging.getLogger(__name__)

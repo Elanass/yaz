@@ -749,7 +749,7 @@ class PrecisionDecisionEngine:
         Inputs: case + new entities + lab/biomarker panel
         Outputs: scores + explanations + confidence.
         """
-        from src.surge.core.models.medical import (
+        from apps.surge.core.models.medical import (
             GastricSystem,
             IndependentCellEntity,
             TumorUnit,
