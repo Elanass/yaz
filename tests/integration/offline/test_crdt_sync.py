@@ -5,8 +5,7 @@ Tests conflict-free replicated data types for offline-first functionality
 
 import asyncio
 from datetime import datetime, timedelta
-from typing import Any, Dict, List
-from unittest.mock import AsyncMock, Mock, patch
+from typing import Any
 
 import pytest
 
@@ -64,7 +63,7 @@ class MockCRDT:
 
         return operation
 
-    def merge(self, other_operations: List[Dict]):
+    def merge(self, other_operations: list[dict]):
         """Merge operations from another CRDT node"""
         for op in other_operations:
             if self._should_apply_operation(op):
@@ -79,7 +78,7 @@ class MockCRDT:
                         self.vector_clock.get(node_id, 0), clock
                     )
 
-    def _should_apply_operation(self, operation: Dict) -> bool:
+    def _should_apply_operation(self, operation: dict) -> bool:
         """Determine if an operation should be applied based on vector clocks"""
         op_clock = operation["vector_clock"]
 
@@ -90,7 +89,7 @@ class MockCRDT:
 
         return False
 
-    def get_state(self) -> Dict:
+    def get_state(self) -> dict:
         """Get current CRDT state"""
         return {
             "data": self.data.copy(),
@@ -534,18 +533,15 @@ class TestOfflineSyncIntegration:
         """Test offline sync integration with database persistence"""
         # This would test actual database integration
         # Placeholder for future implementation
-        pass
 
     @pytest.mark.asyncio
     async def test_offline_sync_with_api_endpoints(self):
         """Test offline sync through API endpoints"""
         # This would test the actual API endpoints for sync
         # Placeholder for future implementation
-        pass
 
     @pytest.mark.asyncio
     async def test_offline_sync_with_mobile_clients(self):
         """Test offline sync with mobile client scenarios"""
         # This would test actual mobile client integration
         # Placeholder for future implementation
-        pass

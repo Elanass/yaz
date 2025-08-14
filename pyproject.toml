@@ -3,9 +3,9 @@ requires = ["setuptools>=45", "wheel"]
 build-backend = "setuptools.build_meta"
 
 [project]
-name = "surgify"
+name = "yaz"
 version = "2.0.0"
-description = "Advanced Surgery Analytics Platform with AI-Powered Decision Support"
+description = "Yaz - Targeted care platform"
 authors = [{name = "YAZ Team", email = "team@yaz.com"}]
 license = {text = "MIT"}
 readme = "README.md"

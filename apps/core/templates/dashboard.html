@@ -1,0 +1,857 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>YAZ Healthcare Platform - Dashboard</title>
+    
+    <!-- Progressive Web App Meta Tags -->
+    <meta name="theme-color" content="#2563eb">
+    <meta name="apple-mobile-web-app-capable" content="yes">
+    <meta name="apple-mobile-web-app-status-bar-style" content="default">
+    <meta name="apple-mobile-web-app-title" content="YAZ Healthcare">
+    <link rel="apple-touch-icon" href="/static/assets/icon-192.png">
+    <link rel="manifest" href="/static/manifest.json">
+    
+    <!-- Core Styles -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script src="https://unpkg.com/htmx.org@1.9.6"></script>
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <link rel="stylesheet" href="/static/css/dashboard.css">
+    
+    <!-- YAZ Core Components -->
+    <script src="/static/js/websocket-manager.js"></script>
+    <script src="/static/js/data-manager.js"></script>
+    <script src="/static/js/components.js"></script>
+    
+    <script>
+        tailwind.config = {
+            theme: {
+                extend: {
+                    colors: {
+                        primary: '#2563eb',
+                        secondary: '#64748b'
+                    }
+                }
+            }
+        }
+    </script>
+</head>
+<body class="bg-gray-50" data-theme="light">
+    <!-- Connection Status Bar -->
+    <div id="connection-status" class="hidden bg-yellow-500 text-white text-center py-2 text-sm">
+        <i class="fas fa-wifi"></i> <span id="connection-text">Connecting...</span>
+    </div>
+
+    <!-- Main Header - Mobile Optimized -->
+    <header class="bg-white shadow-lg border-b sticky top-0 z-50">
+        <div class="max-w-7xl mx-auto px-4">
+            <div class="flex justify-between items-center h-16">
+                <div class="flex items-center space-x-4">
+                    <button class="md:hidden p-2 rounded-md text-gray-600 hover:text-gray-900">
+                        <i class="fas fa-bars"></i>
+                    </button>
+                    <h1 class="text-xl font-bold text-gray-900">YAZ Healthcare</h1>
+                </div>
+                <div class="flex items-center space-x-4">
+                    <button id="theme-toggle" class="p-2 rounded-md text-gray-600 hover:text-gray-900">
+                        <i class="fas fa-sun"></i>
+                    </button>
+                    <button class="p-2 rounded-md text-gray-600 hover:text-gray-900 relative">
+                        <i class="fas fa-bell"></i>
+                        <span class="absolute -top-1 -right-1 w-4 h-4 bg-red-500 text-white text-xs rounded-full flex items-center justify-center">3</span>
+                    </button>
+                    <button id="qr-access" class="p-2 rounded-md text-gray-600 hover:text-gray-900">
+                        <i class="fas fa-qrcode"></i>
+                    </button>
+                    <button id="sync-status" class="p-2 rounded-md text-gray-600 hover:text-gray-900">
+                        <i class="fas fa-sync"></i>
+                    </button>
+                </div>
+            </div>
+        </div>
+    </header>
+
+    <!-- Mobile Pull-to-Refresh Indicator -->
+    <div id="pull-refresh" class="hidden fixed top-16 left-0 right-0 bg-blue-500 text-white text-center py-2 z-40">
+        <i class="fas fa-arrow-down"></i> Pull to refresh
+    </div>
+
+    <!-- Main Content Container -->
+    <main class="max-w-7xl mx-auto px-4 py-6 pb-20 md:pb-6">
+        
+        <!-- Real-time Status Strip -->
+        <div class="mb-6 bg-gradient-to-r from-blue-500 to-purple-600 text-white rounded-lg p-4">
+            <div class="flex items-center justify-between">
+                <div class="flex items-center space-x-3">
+                    <div class="w-3 h-3 bg-green-400 rounded-full animate-pulse"></div>
+                    <span class="font-medium">Live Dashboard</span>
+                    <span id="live-users" class="text-blue-100 text-sm">• 1 connected</span>
+                </div>
+                <div class="flex items-center space-x-2">
+                    <span class="text-sm">99.9% uptime</span>
+                </div>
+            </div>
+        </div>
+
+        <!-- Healthcare Apps Grid -->
+        <section class="mb-8">
+            <div class="flex items-center justify-between mb-6">
+                <h2 class="text-2xl font-bold text-gray-900">Healthcare Applications</h2>
+                <button id="refresh-apps" class="text-gray-600 hover:text-gray-900">
+                    <i class="fas fa-refresh"></i>
+                </button>
+            </div>
+            <div class="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-5 gap-4" id="apps-grid">
+                <!-- Apps will be loaded dynamically -->
+            </div>
+        </section>
+
+        <!-- Real-time Metrics Dashboard -->
+        <section class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 mb-8" id="metrics-container">
+            <!-- Metric cards will be injected here -->
+        </section>
+
+        <!-- Interactive Charts Section -->
+        <div class="grid grid-cols-1 lg:grid-cols-2 gap-8 mb-8">
+            <!-- Real-time Activity Chart -->
+            <div class="bg-white rounded-lg shadow-lg p-6">
+                <div class="flex items-center justify-between mb-4">
+                    <h3 class="text-lg font-semibold text-gray-900">Activity Timeline</h3>
+                    <button class="text-gray-400 hover:text-gray-600" onclick="toggleChart('activity')">
+                        <i class="fas fa-expand"></i>
+                    </button>
+                </div>
+                <canvas id="activity-chart" width="400" height="200"></canvas>
+            </div>
+
+            <!-- Performance Metrics -->
+            <div class="bg-white rounded-lg shadow-lg p-6">
+                <div class="flex items-center justify-between mb-4">
+                    <h3 class="text-lg font-semibold text-gray-900">Performance Metrics</h3>
+                    <select id="metric-timeframe" class="text-sm border rounded px-2 py-1">
+                        <option value="1h">Last Hour</option>
+                        <option value="24h" selected>Last 24 Hours</option>
+                        <option value="7d">Last 7 Days</option>
+                    </select>
+                </div>
+                <canvas id="performance-chart" width="400" height="200"></canvas>
+            </div>
+        </div>
+
+        <!-- Real-time Activity Feed -->
+        <div class="grid grid-cols-1 lg:grid-cols-3 gap-8">
+            <!-- Activity Feed -->
+            <div class="lg:col-span-2 bg-white rounded-lg shadow-lg">
+                <div class="p-6 border-b border-gray-200">
+                    <div class="flex items-center justify-between">
+                        <h3 class="text-lg font-semibold text-gray-900">Recent Activity</h3>
+                        <div class="flex items-center space-x-2">
+                            <span class="text-sm text-gray-500" id="activity-count">Loading...</span>
+                            <button class="text-gray-400 hover:text-gray-600" onclick="refreshActivity()">
+                                <i class="fas fa-refresh"></i>
+                            </button>
+                        </div>
+                    </div>
+                </div>
+                <div class="max-h-96 overflow-y-auto" id="activity-feed">
+                    <!-- Activity items will be loaded here -->
+                </div>
+            </div>
+
+            <!-- Quick Actions & System Status -->
+            <div class="space-y-6">
+                <!-- Quick Actions -->
+                <div class="bg-white rounded-lg shadow-lg p-6">
+                    <h3 class="text-lg font-semibold text-gray-900 mb-4">Quick Actions</h3>
+                    <div class="space-y-3">
+                        <button onclick="quickAction('new-patient')" 
+                                class="w-full flex items-center space-x-3 p-3 text-left hover:bg-gray-50 rounded-lg transition-colors">
+                            <i class="fas fa-user-plus text-blue-500"></i>
+                            <span>Add New Patient</span>
+                        </button>
+                        <button onclick="quickAction('schedule-procedure')" 
+                                class="w-full flex items-center space-x-3 p-3 text-left hover:bg-gray-50 rounded-lg transition-colors">
+                            <i class="fas fa-calendar-plus text-green-500"></i>
+                            <span>Schedule Procedure</span>
+                        </button>
+                        <button onclick="quickAction('emergency')" 
+                                class="w-full flex items-center space-x-3 p-3 text-left hover:bg-gray-50 rounded-lg transition-colors">
+                            <i class="fas fa-ambulance text-red-500"></i>
+                            <span>Emergency Protocol</span>
+                        </button>
+                        <button onclick="quickAction('reports')" 
+                                class="w-full flex items-center space-x-3 p-3 text-left hover:bg-gray-50 rounded-lg transition-colors">
+                            <i class="fas fa-chart-bar text-purple-500"></i>
+                            <span>Generate Report</span>
+                        </button>
+                    </div>
+                </div>
+
+                <!-- System Status -->
+                <div class="bg-white rounded-lg shadow-lg p-6">
+                    <h3 class="text-lg font-semibold text-gray-900 mb-4">System Status</h3>
+                    <div class="space-y-3" id="system-status">
+                        <!-- System status items will be loaded here -->
+                    </div>
+                </div>
+            </div>
+        </div>
+    </main>
+
+    <!-- Mobile Bottom Navigation -->
+    <nav class="md:hidden fixed bottom-0 left-0 right-0 bg-white border-t border-gray-200 z-50">
+        <div class="flex justify-around py-2">
+            <button class="flex flex-col items-center py-2 px-3 text-blue-600">
+                <i class="fas fa-chart-bar text-lg mb-1"></i>
+                <span class="text-xs">Dashboard</span>
+            </button>
+            <button class="flex flex-col items-center py-2 px-3 text-gray-400" onclick="location.href='/clinica'">
+                <i class="fas fa-users text-lg mb-1"></i>
+                <span class="text-xs">Patients</span>
+            </button>
+            <button class="flex flex-col items-center py-2 px-3 text-gray-400" onclick="location.href='/surge'">
+                <i class="fas fa-procedures text-lg mb-1"></i>
+                <span class="text-xs">Surgery</span>
+            </button>
+            <button class="flex flex-col items-center py-2 px-3 text-gray-400" onclick="showReports()">
+                <i class="fas fa-chart-line text-lg mb-1"></i>
+                <span class="text-xs">Reports</span>
+            </button>
+            <button class="flex flex-col items-center py-2 px-3 text-gray-400" onclick="showSettings()">
+                <i class="fas fa-cog text-lg mb-1"></i>
+                <span class="text-xs">Settings</span>
+            </button>
+        </div>
+    </nav>
+
+    <!-- Mobile FAB (Floating Action Button) -->
+    <button id="mobile-fab" 
+            class="md:hidden fixed bottom-20 right-4 w-14 h-14 bg-blue-500 text-white rounded-full shadow-lg z-50 flex items-center justify-center hover:bg-blue-600 transition-colors"
+            onclick="showQuickActions()">
+        <i class="fas fa-plus text-xl"></i>
+    </button>
+
+    <!-- PWA Install Prompt -->
+    <div id="pwa-install" class="hidden fixed bottom-4 left-4 right-4 bg-blue-600 text-white p-4 rounded-lg shadow-lg z-50">
+        <div class="flex items-center justify-between">
+            <div>
+                <h4 class="font-semibold">Install YAZ Healthcare</h4>
+                <p class="text-sm opacity-90">Add to your home screen for quick access</p>
+            </div>
+            <div class="flex space-x-2">
+                <button onclick="installPWA()" class="bg-white text-blue-600 px-3 py-1 rounded text-sm font-medium">
+                    Install
+                </button>
+                <button onclick="dismissPWA()" class="text-white opacity-75 hover:opacity-100">
+                    <i class="fas fa-times"></i>
+                </button>
+            </div>
+        </div>
+    </div>
+
+    <!-- QR Code Modal for Mobile Access -->
+    <div id="qr-modal" class="hidden fixed inset-0 bg-black bg-opacity-50 z-50 flex items-center justify-center p-4">
+        <div class="bg-white rounded-lg p-6 max-w-sm w-full">
+            <div class="flex items-center justify-between mb-4">
+                <h3 class="text-lg font-semibold">Mobile Access</h3>
+                <button onclick="closeQRModal()" class="text-gray-400 hover:text-gray-600">
+                    <i class="fas fa-times"></i>
+                </button>
+            </div>
+            <div class="text-center">
+                <div id="qr-code" class="mb-4 flex justify-center">
+                    <div class="w-32 h-32 bg-gray-200 flex items-center justify-center">
+                        <span class="text-gray-500">QR Code</span>
+                    </div>
+                </div>
+                <p class="text-sm text-gray-600">Scan this QR code with your phone to access the dashboard</p>
+            </div>
+        </div>
+    </div>
+
+    <!-- Enhanced JavaScript for Real-time Dashboard -->
+    <script>
+        class YazDashboard {
+            constructor() {
+                this.charts = {};
+                this.refreshInterval = null;
+                this.activityChart = null;
+                this.performanceChart = null;
+                this.isOnline = navigator.onLine;
+                this.deferredPrompt = null;
+                
+                this.apps = [
+                    { id: 'surge', name: 'Surge', description: 'Surgery Analytics', icon: 'fas fa-scalpel', status: 'active', color: 'bg-blue-100 text-blue-600', url: '/surge' },
+                    { id: 'clinica', name: 'Clinica', description: 'Clinical Management', icon: 'fas fa-user-md', status: 'active', color: 'bg-green-100 text-green-600', url: '/clinica' },
+                    { id: 'educa', name: 'Educa', description: 'Medical Education', icon: 'fas fa-graduation-cap', status: 'active', color: 'bg-purple-100 text-purple-600', url: '/educa' },
+                    { id: 'insura', name: 'Insura', description: 'Insurance Management', icon: 'fas fa-shield-alt', status: 'active', color: 'bg-yellow-100 text-yellow-600', url: '/insura' },
+                    { id: 'move', name: 'Move', description: 'Logistics Management', icon: 'fas fa-truck', status: 'active', color: 'bg-red-100 text-red-600', url: '/move' }
+                ];
+                
+                this.init();
+            }
+
+            async init() {
+                this.setupWebSocket();
+                this.setupDataManager();
+                this.setupNetworkHandlers();
+                this.setupPWA();
+                this.setupMobileFeatures();
+                
+                // Load initial data
+                await this.loadDashboardData();
+                this.renderApps();
+                this.initCharts();
+                this.loadRecentActivity();
+                this.loadSystemStatus();
+                
+                // Setup periodic refresh
+                this.setupPeriodicRefresh();
+                
+                console.log('🚀 YAZ Dashboard initialized successfully');
+            }
+
+            setupWebSocket() {
+                if (window.yazWS) {
+                    window.yazWS.on('connected', () => {
+                        this.updateConnectionStatus('connected');
+                    });
+
+                    window.yazWS.on('disconnected', () => {
+                        this.updateConnectionStatus('disconnected');
+                    });
+
+                    window.yazWS.on('client_count_update', (data) => {
+                        const liveUsers = document.getElementById('live-users');
+                        if (liveUsers) {
+                            liveUsers.textContent = `• ${data.count} connected`;
+                        }
+                    });
+
+                    window.yazWS.enableMobileOptimization();
+                    window.yazWS.requestNotificationPermission();
+                }
+            }
+
+            setupDataManager() {
+                if (window.yazData) {
+                    window.yazData.on('online', () => {
+                        this.updateConnectionStatus('online');
+                        this.refreshData();
+                    });
+
+                    window.yazData.on('offline', () => {
+                        this.updateConnectionStatus('offline');
+                    });
+                }
+            }
+
+            updateConnectionStatus(status) {
+                const statusBar = document.getElementById('connection-status');
+                const statusText = document.getElementById('connection-text');
+                const syncButton = document.getElementById('sync-status');
+                
+                if (!statusBar) return;
+                
+                switch (status) {
+                    case 'connected':
+                        statusBar.classList.add('hidden');
+                        if (syncButton) syncButton.innerHTML = '<i class="fas fa-sync text-green-500"></i>';
+                        break;
+                    case 'disconnected':
+                        statusBar.classList.remove('hidden');
+                        statusBar.className = 'bg-red-500 text-white text-center py-2 text-sm';
+                        if (statusText) statusText.innerHTML = '<i class="fas fa-wifi"></i> Connection lost - trying to reconnect...';
+                        if (syncButton) syncButton.innerHTML = '<i class="fas fa-sync fa-spin text-yellow-500"></i>';
+                        break;
+                    case 'offline':
+                        statusBar.classList.remove('hidden');
+                        statusBar.className = 'bg-gray-500 text-white text-center py-2 text-sm';
+                        if (statusText) statusText.innerHTML = '<i class="fas fa-wifi"></i> Offline mode - data will sync when online';
+                        if (syncButton) syncButton.innerHTML = '<i class="fas fa-cloud-download-alt text-gray-500"></i>';
+                        break;
+                    case 'online':
+                        statusBar.classList.add('hidden');
+                        if (syncButton) syncButton.innerHTML = '<i class="fas fa-sync text-green-500"></i>';
+                        break;
+                }
+            }
+
+            renderApps() {
+                const appsGrid = document.getElementById('apps-grid');
+                if (!appsGrid) return;
+                
+                appsGrid.innerHTML = this.apps.map(app => `
+                    <div class="app-card bg-white rounded-lg shadow hover:shadow-lg transition-all duration-200 cursor-pointer p-4 transform hover:scale-105" 
+                         onclick="window.yazDashboard.launchApp('${app.id}')">
+                        <div class="flex items-center justify-between mb-3">
+                            <div class="w-10 h-10 ${app.color} rounded-lg flex items-center justify-center">
+                                <i class="${app.icon} text-lg"></i>
+                            </div>
+                            <div class="w-3 h-3 bg-green-400 rounded-full animate-pulse" title="Active"></div>
+                        </div>
+                        <h3 class="font-semibold text-gray-900 mb-1">${app.name}</h3>
+                        <p class="text-sm text-gray-600">${app.description}</p>
+                    </div>
+                `).join('');
+            }
+
+            async loadDashboardData() {
+                try {
+                    let data;
+                    if (window.yazData) {
+                        data = await window.yazData.getDashboardStats({ cache: true, realTime: true });
+                    } else {
+                        const response = await fetch('/api/v1/dashboard/stats');
+                        data = await response.json();
+                    }
+                    
+                    this.renderMetricCards(data);
+                } catch (error) {
+                    console.error('❌ Failed to load dashboard data:', error);
+                    this.renderMetricCards({
+                        active_patients: 1234,
+                        procedures_today: 45,
+                        success_rate: 95.2,
+                        avg_duration: 2.5
+                    });
+                }
+            }
+
+            renderMetricCards(data) {
+                const metricsContainer = document.getElementById('metrics-container');
+                if (!metricsContainer) return;
+
+                const metrics = [
+                    { 
+                        icon: 'fas fa-heart', 
+                        iconColor: 'text-red-500', 
+                        label: 'Active Patients', 
+                        value: data.active_patients || 0, 
+                        trend: '+12%'
+                    },
+                    { 
+                        icon: 'fas fa-procedures', 
+                        iconColor: 'text-blue-500', 
+                        label: 'Procedures Today', 
+                        value: data.procedures_today || 0, 
+                        trend: '+8%'
+                    },
+                    { 
+                        icon: 'fas fa-chart-line', 
+                        iconColor: 'text-green-500', 
+                        label: 'Success Rate', 
+                        value: (data.success_rate || 95.2) + '%', 
+                        trend: '+2%'
+                    },
+                    { 
+                        icon: 'fas fa-clock', 
+                        iconColor: 'text-purple-500', 
+                        label: 'Avg Duration', 
+                        value: (data.avg_duration || 2.5) + 'h', 
+                        trend: '-5%'
+                    }
+                ];
+
+                metricsContainer.innerHTML = metrics.map(metric => `
+                    <div class="bg-white rounded-lg shadow-lg p-6 hover:shadow-xl transition-shadow">
+                        <div class="flex items-center justify-between">
+                            <div class="flex items-center">
+                                <div class="flex-shrink-0">
+                                    <i class="${metric.icon} ${metric.iconColor} text-2xl"></i>
+                                </div>
+                                <div class="ml-4">
+                                    <p class="text-sm font-medium text-gray-600">${metric.label}</p>
+                                    <p class="text-2xl font-bold text-gray-900">${metric.value}</p>
+                                </div>
+                            </div>
+                            <div class="text-right">
+                                <span class="text-sm font-medium text-green-600">${metric.trend}</span>
+                                <p class="text-xs text-gray-500">vs last week</p>
+                            </div>
+                        </div>
+                        <div class="mt-4">
+                            <div class="w-full bg-gray-200 rounded-full h-2">
+                                <div class="bg-gradient-to-r from-blue-500 to-green-500 h-2 rounded-full" 
+                                     style="width: ${Math.random() * 80 + 20}%"></div>
+                            </div>
+                        </div>
+                    </div>
+                `).join('');
+            }
+
+            async loadRecentActivity() {
+                try {
+                    let data;
+                    if (window.yazData) {
+                        data = await window.yazData.getActivity({ cache: true, realTime: true });
+                    } else {
+                        const response = await fetch('/api/v1/dashboard/activity');
+                        data = await response.json();
+                    }
+                    
+                    this.renderActivity(data);
+                    const activityCount = document.getElementById('activity-count');
+                    if (activityCount) {
+                        activityCount.textContent = `${data.length} recent activities`;
+                    }
+                } catch (error) {
+                    console.error('❌ Failed to load activity:', error);
+                    // Mock data fallback
+                    const mockData = [
+                        { icon: 'fas fa-user-plus', description: 'New patient registered: John Doe', timestamp: '2 minutes ago', app: 'clinica' },
+                        { icon: 'fas fa-calendar-check', description: 'Surgery scheduled for tomorrow', timestamp: '15 minutes ago', app: 'surge' },
+                        { icon: 'fas fa-chart-line', description: 'Monthly report generated', timestamp: '1 hour ago', app: 'educa' }
+                    ];
+                    this.renderActivity(mockData);
+                }
+            }
+
+            renderActivity(activities) {
+                const activityFeed = document.getElementById('activity-feed');
+                if (!activityFeed || !Array.isArray(activities)) return;
+
+                activityFeed.innerHTML = activities.map(activity => `
+                    <div class="p-4 border-b border-gray-100 hover:bg-gray-50 transition-colors">
+                        <div class="flex items-start space-x-3">
+                            <div class="flex-shrink-0 w-8 h-8 bg-blue-100 rounded-full flex items-center justify-center">
+                                <i class="${activity.icon || 'fas fa-info'} text-blue-600 text-sm"></i>
+                            </div>
+                            <div class="flex-1 min-w-0">
+                                <p class="text-sm text-gray-900">${activity.description}</p>
+                                <div class="flex items-center mt-1 space-x-2">
+                                    <span class="text-xs text-gray-500">${activity.timestamp || 'Just now'}</span>
+                                    <span class="text-xs px-2 py-1 bg-gray-100 text-gray-600 rounded-full">${activity.app || 'System'}</span>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                `).join('');
+            }
+
+            loadSystemStatus() {
+                const systemStatus = document.getElementById('system-status');
+                if (!systemStatus) return;
+                
+                const statusItems = [
+                    { name: 'Database', status: 'healthy', icon: 'fas fa-database', color: 'text-green-500' },
+                    { name: 'API Server', status: 'healthy', icon: 'fas fa-server', color: 'text-green-500' },
+                    { name: 'WebSocket', status: window.yazWS?.isConnected ? 'connected' : 'disconnected', icon: 'fas fa-wifi', color: window.yazWS?.isConnected ? 'text-green-500' : 'text-red-500' },
+                    { name: 'Background Sync', status: 'active', icon: 'fas fa-sync', color: 'text-blue-500' }
+                ];
+
+                systemStatus.innerHTML = statusItems.map(item => `
+                    <div class="flex items-center justify-between p-2">
+                        <div class="flex items-center space-x-2">
+                            <i class="${item.icon} ${item.color}"></i>
+                            <span class="text-sm text-gray-700">${item.name}</span>
+                        </div>
+                        <span class="text-xs px-2 py-1 ${item.status === 'healthy' || item.status === 'connected' || item.status === 'active' ? 'bg-green-100 text-green-800' : 'bg-red-100 text-red-800'} rounded-full">${item.status}</span>
+                    </div>
+                `).join('');
+            }
+
+            initCharts() {
+                // Activity Timeline Chart
+                const activityCtx = document.getElementById('activity-chart');
+                if (activityCtx && window.Chart) {
+                    this.activityChart = new Chart(activityCtx, {
+                        type: 'line',
+                        data: {
+                            labels: this.generateTimeLabels(),
+                            datasets: [{
+                                label: 'Activity',
+                                data: this.generateMockData(24),
+                                borderColor: '#3b82f6',
+                                backgroundColor: 'rgba(59, 130, 246, 0.1)',
+                                tension: 0.4,
+                                fill: true
+                            }]
+                        },
+                        options: {
+                            responsive: true,
+                            maintainAspectRatio: false,
+                            plugins: {
+                                legend: { display: false }
+                            },
+                            scales: {
+                                y: { beginAtZero: true }
+                            }
+                        }
+                    });
+                }
+
+                // Performance Metrics Chart
+                const performanceCtx = document.getElementById('performance-chart');
+                if (performanceCtx && window.Chart) {
+                    this.performanceChart = new Chart(performanceCtx, {
+                        type: 'doughnut',
+                        data: {
+                            labels: ['Success', 'Pending', 'Failed'],
+                            datasets: [{
+                                data: [75, 20, 5],
+                                backgroundColor: ['#10b981', '#f59e0b', '#ef4444']
+                            }]
+                        },
+                        options: {
+                            responsive: true,
+                            maintainAspectRatio: false,
+                            plugins: {
+                                legend: { position: 'bottom' }
+                            }
+                        }
+                    });
+                }
+            }
+
+            setupPeriodicRefresh() {
+                this.refreshInterval = setInterval(() => {
+                    if (this.isOnline) {
+                        this.refreshData();
+                    }
+                }, 30000); // Refresh every 30 seconds
+            }
+
+            async refreshData() {
+                try {
+                    await Promise.all([
+                        this.loadDashboardData(),
+                        this.loadRecentActivity()
+                    ]);
+                    this.loadSystemStatus();
+                    console.log('🔄 Data refreshed successfully');
+                } catch (error) {
+                    console.error('❌ Failed to refresh data:', error);
+                }
+            }
+
+            setupNetworkHandlers() {
+                window.addEventListener('online', () => {
+                    this.isOnline = true;
+                    this.updateConnectionStatus('online');
+                    this.refreshData();
+                });
+
+                window.addEventListener('offline', () => {
+                    this.isOnline = false;
+                    this.updateConnectionStatus('offline');
+                });
+            }
+
+            setupPWA() {
+                // Service Worker registration
+                if ('serviceWorker' in navigator) {
+                    navigator.serviceWorker.register('/static/sw.js')
+                        .then(registration => console.log('🔧 Service Worker registered'))
+                        .catch(error => console.error('❌ Service Worker registration failed:', error));
+                }
+
+                // PWA install prompt
+                window.addEventListener('beforeinstallprompt', (e) => {
+                    e.preventDefault();
+                    this.deferredPrompt = e;
+                    const installPrompt = document.getElementById('pwa-install');
+                    if (installPrompt) {
+                        installPrompt.classList.remove('hidden');
+                    }
+                });
+            }
+
+            setupMobileFeatures() {
+                // Pull to refresh for mobile
+                let startY = 0;
+                let isPulling = false;
+
+                document.addEventListener('touchstart', (e) => {
+                    if (window.scrollY === 0) {
+                        startY = e.touches[0].clientY;
+                    }
+                });
+
+                document.addEventListener('touchmove', (e) => {
+                    if (window.scrollY === 0 && e.touches[0].clientY > startY + 50) {
+                        if (!isPulling) {
+                            isPulling = true;
+                            const pullRefresh = document.getElementById('pull-refresh');
+                            if (pullRefresh) {
+                                pullRefresh.classList.remove('hidden');
+                            }
+                        }
+                    }
+                });
+
+                document.addEventListener('touchend', () => {
+                    if (isPulling) {
+                        isPulling = false;
+                        const pullRefresh = document.getElementById('pull-refresh');
+                        if (pullRefresh) {
+                            pullRefresh.classList.add('hidden');
+                        }
+                        this.refreshData();
+                    }
+                });
+            }
+
+            // Utility methods
+            generateTimeLabels() {
+                const labels = [];
+                for (let i = 23; i >= 0; i--) {
+                    const hour = new Date(Date.now() - i * 60 * 60 * 1000).getHours();
+                    labels.push(`${hour}:00`);
+                }
+                return labels;
+            }
+
+            generateMockData(points) {
+                return Array.from({ length: points }, () => Math.floor(Math.random() * 100));
+            }
+
+            // Public methods
+            launchApp(appId) {
+                const app = this.apps.find(a => a.id === appId);
+                if (app) {
+                    if (window.yazUI) {
+                        window.yazUI.notify({
+                            type: 'info',
+                            message: `Launching ${app.name}...`,
+                            duration: 2000
+                        });
+                    }
+                    
+                    setTimeout(() => {
+                        window.open(app.url, '_blank');
+                    }, 500);
+                    
+                    // Track app launch
+                    if (window.yazWS) {
+                        window.yazWS.send({
+                            type: 'app_launched',
+                            app: appId,
+                            timestamp: Date.now()
+                        });
+                    }
+                }
+            }
+        }
+
+        // Global functions for UI interactions
+        function refreshActivity() {
+            if (window.yazDashboard) {
+                window.yazDashboard.loadRecentActivity();
+            }
+        }
+
+        function toggleChart(chartType) {
+            console.log('Toggle chart:', chartType);
+        }
+
+        function quickAction(action) {
+            console.log('Quick action:', action);
+            if (window.yazUI) {
+                window.yazUI.notify({
+                    type: 'info',
+                    message: `Quick action: ${action}`,
+                    duration: 2000
+                });
+            }
+        }
+
+        function showQuickActions() {
+            if (!window.yazUI) return;
+            
+            const actions = [
+                { label: 'New Patient', icon: 'user-plus', action: 'new-patient' },
+                { label: 'Schedule', icon: 'calendar-plus', action: 'schedule' },
+                { label: 'Emergency', icon: 'ambulance', action: 'emergency' }
+            ];
+
+            const modal = window.yazUI.modal({
+                title: 'Quick Actions',
+                content: actions.map(action => `
+                    <button onclick="quickAction('${action.action}'); this.closest('.yaz-modal').remove();" 
+                            class="w-full flex items-center space-x-3 p-3 hover:bg-gray-50 rounded-lg mb-2">
+                        <i class="fas fa-${action.icon} text-blue-500"></i>
+                        <span>${action.label}</span>
+                    </button>
+                `).join('')
+            });
+        }
+
+        function showQRCode() {
+            const modal = document.getElementById('qr-modal');
+            if (modal) {
+                modal.classList.remove('hidden');
+            }
+        }
+
+        function closeQRModal() {
+            const modal = document.getElementById('qr-modal');
+            if (modal) {
+                modal.classList.add('hidden');
+            }
+        }
+
+        function installPWA() {
+            if (window.yazDashboard?.deferredPrompt) {
+                window.yazDashboard.deferredPrompt.prompt();
+                window.yazDashboard.deferredPrompt.userChoice.then((choiceResult) => {
+                    if (choiceResult.outcome === 'accepted') {
+                        console.log('📱 PWA installed');
+                    }
+                    window.yazDashboard.deferredPrompt = null;
+                    dismissPWA();
+                });
+            }
+        }
+
+        function dismissPWA() {
+            const installPrompt = document.getElementById('pwa-install');
+            if (installPrompt) {
+                installPrompt.classList.add('hidden');
+            }
+        }
+
+        function showReports() {
+            if (window.yazUI) {
+                window.yazUI.notify({
+                    type: 'info',
+                    message: 'Reports feature coming soon!',
+                    duration: 2000
+                });
+            }
+        }
+
+        function showSettings() {
+            if (window.yazUI) {
+                window.yazUI.notify({
+                    type: 'info',
+                    message: 'Settings feature coming soon!',
+                    duration: 2000
+                });
+            }
+        }
+
+        // Event listeners
+        document.addEventListener('DOMContentLoaded', () => {
+            window.yazDashboard = new YazDashboard();
+            
+            // Setup event listeners
+            const qrButton = document.getElementById('qr-access');
+            if (qrButton) {
+                qrButton.addEventListener('click', showQRCode);
+            }
+            
+            const syncButton = document.getElementById('sync-status');
+            if (syncButton) {
+                syncButton.addEventListener('click', () => {
+                    if (window.yazDashboard) {
+                        window.yazDashboard.refreshData();
+                    }
+                });
+            }
+        });
+    </script>
+</body>
+</html>

@@ -1,0 +1,106 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>{% block title %}Surge - Surgery Healthcare PWA{% endblock %}</title>
+    
+    <!-- PWA Meta Tags -->
+    <meta name="theme-color" content="#0ea5e9">
+    <meta name="apple-mobile-web-app-capable" content="yes">
+    <meta name="apple-mobile-web-app-status-bar-style" content="default">
+    <meta name="apple-mobile-web-app-title" content="Surge Surgery">
+    <link rel="manifest" href="/static/manifest.json">
+    
+    <!-- HTMX -->
+    <script src="https://unpkg.com/htmx.org@1.9.10" defer></script>
+    <script src="https://unpkg.com/htmx.org/dist/ext/json-enc.js" defer></script>
+    <script src="https://unpkg.com/htmx.org/dist/ext/loading-states.js" defer></script>
+    
+    <!-- Tailwind CSS -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    
+    <!-- React Islands Bootstrap -->
+    <script type="module" src="/static/islands-bootstrap.js" defer></script>
+    
+    {% block head %}{% endblock %}
+</head>
+<body class="bg-gray-50 min-h-screen">
+    <!-- Navigation -->
+    <nav class="bg-white shadow-sm border-b">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+            <div class="flex justify-between h-16">
+                <div class="flex items-center">
+                    <div class="flex-shrink-0">
+                        <h1 class="text-xl font-bold text-blue-600">Surge</h1>
+                    </div>
+                    <div class="hidden md:ml-6 md:flex md:space-x-8">
+                        <a href="/" class="nav-link">Dashboard</a>
+                        <a href="/cases" class="nav-link">Cases</a>
+                        <a href="/schedule" class="nav-link">Schedule</a>
+                        <a href="/or-board" class="nav-link">OR Board</a>
+                    </div>
+                </div>
+                <div class="flex items-center space-x-4">
+                    <button id="offline-indicator" class="hidden px-3 py-1 text-xs bg-yellow-100 text-yellow-800 rounded-full">
+                        Offline
+                    </button>
+                    <div class="relative">
+                        <button class="flex items-center text-sm text-gray-700 hover:text-gray-900">
+                            <span>Dr. User</span>
+                        </button>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </nav>
+
+    <!-- Main Content -->
+    <main class="max-w-7xl mx-auto py-6 px-4 sm:px-6 lg:px-8">
+        {% block content %}{% endblock %}
+    </main>
+
+    <!-- Island Props Scripts -->
+    {% if islands %}
+        {% for island_id, island_config in islands.items() %}
+        <script type="application/json" id="island-props-{{ island_id }}">
+            {{ island_config | tojson }}
+        </script>
+        {% endfor %}
+    {% endif %}
+
+    <!-- Service Worker Registration -->
+    <script>
+        if ('serviceWorker' in navigator) {
+            navigator.serviceWorker.register('/service-worker.js')
+                .then(registration => console.log('SW registered'))
+                .catch(error => console.log('SW registration failed'));
+        }
+    </script>
+
+    <style>
+        .nav-link {
+            @apply text-gray-500 hover:text-gray-900 px-3 py-2 rounded-md text-sm font-medium transition-colors;
+        }
+        .nav-link.active {
+            @apply text-blue-600 bg-blue-50;
+        }
+        .btn-primary {
+            @apply bg-blue-600 hover:bg-blue-700 text-white px-4 py-2 rounded-md text-sm font-medium transition-colors;
+        }
+        .btn-secondary {
+            @apply bg-white hover:bg-gray-50 text-gray-700 border border-gray-300 px-4 py-2 rounded-md text-sm font-medium transition-colors;
+        }
+        .card {
+            @apply bg-white rounded-lg shadow p-6;
+        }
+        .htmx-indicator {
+            opacity: 0;
+            transition: opacity 0.3s ease;
+        }
+        .htmx-request .htmx-indicator {
+            opacity: 1;
+        }
+    </style>
+</body>
+</html>

@@ -1,0 +1,138 @@
+<!-- Coordinated Cases Partial - integrates Dash and Interact data -->
+<div id="coordinated-cases" class="space-y-4" hx-swap-oob="true">
+    <div class="flex items-center justify-between mb-6">
+        <h3 class="text-lg font-medium text-gray-900">
+            Coordinated Cases 
+            <span class="text-sm text-gray-500">(Dash + Interact)</span>
+        </h3>
+        <div class="flex items-center space-x-2">
+            <span class="inline-flex items-center px-2 py-1 rounded-full text-xs font-medium bg-blue-100 text-blue-800">
+                Dash: Active
+            </span>
+            <span class="inline-flex items-center px-2 py-1 rounded-full text-xs font-medium bg-green-100 text-green-800">
+                Interact: Ready
+            </span>
+        </div>
+    </div>
+    
+    {% for case in cases %}
+    <div class="bg-white rounded-lg border border-gray-200 p-4 hover:border-gray-300 transition-colors"
+         data-case-id="{{ case.id }}"
+         data-dash-component="case-card"
+         data-interact-component="patient-card">
+        
+        <div class="flex items-start justify-between">
+            <div class="flex-1">
+                <div class="flex items-center space-x-3 mb-2">
+                    <h4 class="text-sm font-medium text-gray-900">{{ case.patient }}</h4>
+                    <span class="inline-flex items-center px-2 py-1 rounded-full text-xs font-medium 
+                                {% if case.status == 'scheduled' %}bg-blue-100 text-blue-800
+                                {% elif case.status == 'in_progress' %}bg-yellow-100 text-yellow-800
+                                {% elif case.status == 'completed' %}bg-green-100 text-green-800{% endif %}">
+                        {{ case.status|title }}
+                    </span>
+                </div>
+                
+                <p class="text-sm text-gray-600 mb-3">{{ case.procedure }}</p>
+                
+                <!-- Coordinated status from both projects -->
+                <div class="grid grid-cols-2 gap-4 text-xs">
+                    <!-- Dash data -->
+                    <div class="space-y-1">
+                        <div class="font-medium text-gray-700">Dash Status:</div>
+                        <div class="flex items-center space-x-2">
+                            <span class="inline-flex items-center px-1.5 py-0.5 rounded text-xs 
+                                        {% if case.dash_data.priority == 'high' %}bg-red-100 text-red-700
+                                        {% elif case.dash_data.priority == 'urgent' %}bg-orange-100 text-orange-700
+                                        {% else %}bg-gray-100 text-gray-700{% endif %}">
+                                {{ case.dash_data.priority|title }}
+                            </span>
+                            {% if case.dash_data.team_assigned %}
+                            <span class="text-green-600">✓ Team Ready</span>
+                            {% endif %}
+                        </div>
+                    </div>
+                    
+                    <!-- Interact data -->
+                    <div class="space-y-1">
+                        <div class="font-medium text-gray-700">Interact Status:</div>
+                        <div class="space-y-1">
+                            <div class="flex items-center space-x-1">
+                                {% if case.interact_data.consent_status == 'completed' %}
+                                <span class="text-green-600">✓</span>
+                                {% else %}
+                                <span class="text-yellow-600">⚠</span>
+                                {% endif %}
+                                <span>Consent: {{ case.interact_data.consent_status|title }}</span>
+                            </div>
+                            <div class="flex items-center space-x-1">
+                                {% if case.interact_data.forms_ready %}
+                                <span class="text-green-600">✓</span>
+                                {% else %}
+                                <span class="text-red-600">✗</span>
+                                {% endif %}
+                                <span>Forms Ready</span>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            
+            <div class="flex flex-col items-end space-y-2">
+                <span class="text-sm font-medium text-gray-900">{{ case.or_room }}</span>
+                
+                <!-- Coordinated actions -->
+                <div class="flex space-x-1">
+                    <button class="px-2 py-1 text-xs bg-blue-600 text-white rounded hover:bg-blue-700 transition-colors"
+                            hx-post="/api/v1/htmx/coordinate/dash"
+                            hx-vals='{"action": "case_selected", "data": {"case_id": "{{ case.id }}", "source": "template"}}'
+                            hx-target="#dash-response"
+                            hx-swap="innerHTML">
+                        View in Dash
+                    </button>
+                    
+                    <button class="px-2 py-1 text-xs bg-green-600 text-white rounded hover:bg-green-700 transition-colors"
+                            hx-post="/api/v1/htmx/coordinate/interact"
+                            hx-vals='{"action": "patient_selected", "data": {"case_id": "{{ case.id }}", "patient": "{{ case.patient }}"}}'
+                            hx-target="#interact-response" 
+                            hx-swap="innerHTML">
+                        Open in Interact
+                    </button>
+                </div>
+            </div>
+        </div>
+        
+        <!-- Coordination progress bar -->
+        <div class="mt-3 pt-3 border-t border-gray-100">
+            <div class="flex items-center justify-between text-xs text-gray-500 mb-1">
+                <span>Project Coordination</span>
+                <span>
+                    {% set dash_ready = case.dash_data.team_assigned %}
+                    {% set interact_ready = case.interact_data.consent_status == 'completed' and case.interact_data.forms_ready %}
+                    {% if dash_ready and interact_ready %}100%
+                    {% elif dash_ready or interact_ready %}50%
+                    {% else %}0%{% endif %}
+                </span>
+            </div>
+            <div class="w-full bg-gray-200 rounded-full h-1.5">
+                <div class="h-1.5 rounded-full transition-all duration-300
+                           {% if dash_ready and interact_ready %}bg-green-500 w-full
+                           {% elif dash_ready or interact_ready %}bg-yellow-500 w-1/2
+                           {% else %}bg-red-500 w-0{% endif %}"></div>
+            </div>
+        </div>
+    </div>
+    {% endfor %}
+    
+    <!-- Coordination response areas -->
+    <div id="dash-response" class="mt-4"></div>
+    <div id="interact-response" class="mt-4"></div>
+    
+    <!-- Real-time coordination status -->
+    <div class="mt-6 p-4 bg-gray-50 rounded-lg" 
+         hx-get="/api/v1/htmx/partials/project-status"
+         hx-trigger="every 10s"
+         hx-swap="innerHTML">
+        <div class="text-sm text-gray-600">Coordination status loading...</div>
+    </div>
+</div>

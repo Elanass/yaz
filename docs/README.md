@@ -1,158 +1,320 @@
-# Surgify Platform Documentation
+# Yaz - Targeted care platform
 
-> **Version:** 1.0.0  
-> **Last Updated:** August 5, 2025  
-> **Status:** Active Development
+🏥 **Modern Healthcare Technology Platform** - Targeted care for surgery, clinical operations, education, insurance, and logistics
 
-## 📚 Documentation Overview
+[![Python](https://img.shields.io/badge/Python-3.11+-blue.svg)](https://python.org)
+[![FastAPI](https://img.shields.io/badge/FastAPI-0.100+-green.svg)](https://fastapi.tiangolo.com)
+[![License](https://img.shields.io/badge/License-MIT-yellow.svg)](LICENSE)
 
-Welcome to the comprehensive documentation for the Surgify Platform - a gastric oncology-surgery decision support system. This documentation is designed for **reproducibility**, **modularity**, and **maintainability**.
+## 🌟 Overview
 
-## 🏗️ Documentation Structure
+**Yaz** is a comprehensive healthcare technology ecosystem that brings together multiple specialized applications under one unified platform. Our mission is to streamline healthcare operations through cutting-edge technology, intuitive design, and seamless integration across all healthcare domains.
 
-### 📖 Core Documentation
-- **[Getting Started](./guides/getting-started.md)** - Quick setup and first steps
-- **[Architecture Overview](./architecture/README.md)** - System design and patterns
-- **[Installation Guide](./guides/installation.md)** - Complete setup instructions
-- **[Configuration](./guides/configuration.md)** - Environment and settings
+## 🚀 Platform Applications
 
-### 🎨 Component Library
-- **[Component Overview](./components/README.md)** - All UI components
-- **[DomainSelector](./components/domain-selector.md)** - Medical domain selection
-- **[CaseList](./components/case-list.md)** - Case management interface
-- **[CaseDetail](./components/case-detail.md)** - Detailed case view
-- **[NotificationBadge](./components/notification-badge.md)** - Notification system
-- **[ThemeToggle](./components/theme-toggle.md)** - Theme switching
+### 🏥 **Surge** - Surgery Analytics & Decision Support
+- **AI-Powered Analytics**: Advanced surgical outcome prediction and risk assessment
+- **Case Management**: Comprehensive surgical case tracking and management
+- **Decision Support**: Evidence-based clinical recommendations and insights
+- **Real-time Monitoring**: Live surgical metrics and performance tracking
 
-### 🔌 API Documentation
-- **[API Overview](./api/README.md)** - REST API documentation
-- **[Authentication](./api/authentication.md)** - Auth endpoints and flow
-- **[Cases API](./api/cases.md)** - Case management endpoints
-- **[Users API](./api/users.md)** - User management
-- **[Analytics API](./api/analytics.md)** - Data analytics endpoints
+### 🏥 **Clinica** - Clinical Operations Management
+- **Patient Care Coordination**: Streamlined clinical workflows
+- **Resource Management**: Optimized clinical resource allocation
+- **Quality Metrics**: Clinical performance monitoring and improvement
 
-### 🛠️ Development Guides
-- **[Development Setup](./guides/development.md)** - Local development environment
-- **[Component Development](./guides/component-development.md)** - Creating new components
-- **[Testing Guide](./guides/testing.md)** - Testing strategies and tools
-- **[Deployment](./guides/deployment.md)** - Production deployment
-- **[Contributing](./guides/contributing.md)** - Contribution guidelines
+### 📚 **Educa** - Medical Education Platform
+- **Training Programs**: Comprehensive medical education modules
+- **Assessment Tools**: Skill evaluation and competency tracking
+- **Knowledge Base**: Centralized medical learning resources
 
-### 📋 Examples & Tutorials
-- **[Basic Usage](./examples/basic-usage.md)** - Simple implementation examples
-- **[Advanced Integration](./examples/advanced-integration.md)** - Complex scenarios
-- **[HTMX Integration](./examples/htmx-integration.md)** - Dynamic content loading
-- **[Custom Components](./examples/custom-components.md)** - Building extensions
+### 🛡️ **Insura** - Healthcare Insurance Management
+- **Risk Assessment**: Advanced insurance risk modeling
+- **Claims Processing**: Automated claims analysis and processing
+- **Policy Management**: Comprehensive insurance policy administration
 
-## 🎯 Quick Navigation
+### 🚚 **Move** - Healthcare Logistics
+- **Supply Chain Optimization**: Medical supply chain management
+- **Resource Allocation**: Efficient healthcare resource distribution
+- **Inventory Management**: Real-time medical inventory tracking
 
-### For Developers
-1. **New to the project?** → [Getting Started](./guides/getting-started.md)
-2. **Setting up locally?** → [Development Setup](./guides/development.md)
-3. **Building components?** → [Component Development](./guides/component-development.md)
-4. **Need API docs?** → [API Overview](./api/README.md)
+## ✨ Key Features
 
-### For Users
-1. **Using components?** → [Component Overview](./components/README.md)
-2. **Need examples?** → [Basic Usage](./examples/basic-usage.md)
-3. **Customizing themes?** → [ThemeToggle](./components/theme-toggle.md)
-4. **Integration help?** → [HTMX Integration](./examples/htmx-integration.md)
+### � **Unified Platform Architecture**
+- **Modular Design**: Independent applications with shared core services
+- **Single Entry Point**: Unified platform access through main application
+- **Shared Services**: Common authentication, database, and caching infrastructure
+- **Cross-Application Integration**: Seamless data flow between applications
 
-### For Administrators
-1. **Installation?** → [Installation Guide](./guides/installation.md)
-2. **Configuration?** → [Configuration](./guides/configuration.md)
-3. **Deployment?** → [Deployment](./guides/deployment.md)
-4. **Architecture?** → [Architecture Overview](./architecture/README.md)
+### 🔧 **Modern Technology Stack**
+- **Backend**: FastAPI + SQLAlchemy + Alembic for robust API development
+- **Frontend**: Modern web interfaces with responsive design
+- **Database**: SQLite (development) → PostgreSQL (production)
+- **Caching**: Redis-based caching with intelligent fallbacks
+- **Authentication**: JWT-based security with role-based access control
 
-## 🔍 Search & Index
+### 🌐 **Multi-Platform Support**
+- **Web Interface**: Responsive web applications for all platforms
+- **Desktop Apps**: Native desktop applications for enhanced workflows
+- **Mobile Ready**: Mobile-optimized interfaces for on-the-go access
+- **API First**: Comprehensive RESTful APIs for all functionality
 
-### Components Index
-| Component | Description | Size | Dependencies |
-|-----------|-------------|------|--------------|
-| [DomainSelector](./components/domain-selector.md) | Medical domain dropdown | 6.5KB | None |
-| [CaseList](./components/case-list.md) | Case management list | 12KB | None |
-| [CaseDetail](./components/case-detail.md) | Detailed case view | 15KB | None |
-| [NotificationBadge](./components/notification-badge.md) | Notification badges | 8KB | None |
-| [ThemeToggle](./components/theme-toggle.md) | Theme switching | 10KB | None |
+## 🏗️ Architecture
 
-### API Endpoints Index
-| Endpoint | Method | Description | Auth Required |
-|----------|--------|-------------|---------------|
-| `/api/cases` | GET | List cases | Yes |
-| `/api/cases/{id}` | GET | Get case details | Yes |
-| `/api/auth/login` | POST | User authentication | No |
-| `/api/users/profile` | GET | User profile | Yes |
-| `/api/analytics/dashboard` | GET | Dashboard data | Yes |
-
-### File Structure Index
+### Clean Directory Structure
 ```
-surgify/
-├── src/surgify/              # Main application code
-│   ├── ui/                   # User interface components
-│   ├── api/                  # API endpoints
-│   ├── core/                 # Core business logic
-│   └── modules/              # Feature modules
-├── tests/                    # Test suites
-├── docs/                     # This documentation
-├── data/                     # Data management
-└── scripts/                  # Utility scripts
+/workspaces/yaz/
+├── src/                              # Core platform source code
+│   ├── surge/                        # Surgery analytics application
+│   ├── shared/                       # Shared platform services
+│   └── move/                         # Logistics application (minimal)
+├── apps/                             # Modular application implementations
+│   ├── clinica/                      # Clinical operations
+│   ├── educa/                        # Education platform
+│   ├── insura/                       # Insurance management
+│   └── move/                         # Logistics coordination
+├── data/                             # Application data and databases
+├── config/                           # Configuration files
+├── docs/                             # Documentation
+│   └── maintain/                     # Maintenance documentation
+├── scripts/                          # Utility and deployment scripts
+├── tests/                            # Comprehensive testing suite
+└── main.py                           # Unified platform entry point
 ```
 
-## 📊 Documentation Metrics
-
-- **Components Documented**: 5/5 ✅
-- **API Endpoints Documented**: 15+ ✅
-- **Examples Provided**: 20+ ✅
-- **Code Coverage**: 85% ✅
-- **Last Review**: August 5, 2025 ✅
+### Core Services
+- **Shared Configuration**: Unified configuration management across all apps
+- **Database Management**: Centralized database connections and migrations
+- **Authentication Service**: JWT-based authentication with role management
+- **Cache Management**: Redis caching with intelligent fallback mechanisms
+- **Logging Service**: Structured logging across all platform components
 
 ## 🚀 Quick Start
 
+### Prerequisites
+- Python 3.11+
+- Redis (for caching)
+- PostgreSQL (for production) or SQLite (for development)
+
+### Installation
+
+1. **Clone and Setup**
+   ```bash
+   git clone <repository-url>
+   cd yaz
+   pip install -r requirements.txt
+   ```
+
+2. **Environment Configuration**
+   ```bash
+   cp .env.example .env
+   # Edit .env with your configuration
+   ```
+
+3. **Database Setup**
+   ```bash
+   cd data && alembic upgrade head
+   ```
+
+4. **Start the Platform**
+   ```bash
+   # Full platform (all applications)
+   python main.py
+
+   # Specific application
+   python main.py --app surge
+   python main.py --app clinica
+   ```
+
+5. **Access Applications**
+   - **Platform Dashboard**: http://localhost:8000
+   - **Surge (Surgery)**: http://localhost:8000/surge
+   - **Clinica (Clinical)**: http://localhost:8000/clinica
+   - **API Documentation**: http://localhost:8000/docs
+
+## 🔧 Configuration
+
+### Environment Variables
 ```bash
-# Clone the repository
-git clone <repository-url>
-cd surgify
+# Application Settings
+ENVIRONMENT=development
+DEBUG=true
+HOST=0.0.0.0
+PORT=8000
 
-# Install dependencies
-pip install -r requirements.txt
-npm install
+# Database Configuration
+DATABASE_URL=sqlite:///./data/yaz.db
 
-# Start development server
-make dev
+# Redis Configuration
+REDIS_URL=redis://localhost:6379
 
-# View documentation
-cd docs && python -m http.server 8080
+# Security
+SECRET_KEY=your-secret-key
+JWT_SECRET_KEY=your-jwt-secret
 ```
 
-## 🔄 Documentation Maintenance
+### Application-Specific Configuration
+Each application can be configured independently while sharing core platform services:
 
-### Update Schedule
-- **Weekly**: Component documentation review
-- **Monthly**: API documentation sync
-- **Quarterly**: Architecture review
-- **Per Release**: Version updates and new features
+```python
+# Example: Surge application configuration
+from surge.config import get_surge_config
 
-### Contribution Process
-1. **Create/Update** documentation files
-2. **Test** examples and code snippets
-3. **Update** indexes and cross-references
-4. **Submit** pull request with documentation changes
+config = get_surge_config()
+# Surgery-specific settings available
+```
 
-## 📞 Support & Contact
+## 🧪 Testing
 
-- **Issues**: Create GitHub issues for bugs or feature requests
-- **Discussions**: Use GitHub Discussions for questions
-- **Documentation**: Suggest improvements via pull requests
-- **Email**: contact@surgify-platform.com
+### Running Tests
+```bash
+# All tests
+python -m pytest tests/
+
+# Specific test categories
+python -m pytest tests/unit/
+python -m pytest tests/integration/
+python -m pytest tests/api/
+```
+
+### Test Coverage
+- **Unit Tests**: Core component functionality
+- **Integration Tests**: Multi-component interactions
+- **API Tests**: Endpoint validation and security
+- **Compatibility Tests**: Cross-application compatibility
+
+## 📊 Platform Monitoring
+
+### Health Checks
+```bash
+# Platform health
+GET /health
+
+# Application-specific health
+GET /surge/health
+GET /clinica/health
+```
+
+### Metrics and Monitoring
+- **Application Performance**: Request latency, error rates, throughput
+- **Database Health**: Connection pooling, query performance
+- **Cache Performance**: Hit rates, memory usage
+- **Security Metrics**: Authentication success rates, access patterns
+
+## 🔒 Security
+
+### Authentication & Authorization
+- **JWT-based Authentication**: Secure token-based authentication
+- **Role-based Access Control**: Fine-grained permission management
+- **Session Management**: Secure session handling across applications
+- **API Security**: Rate limiting, input validation, CORS protection
+
+### Data Protection
+- **Encryption**: Data encryption at rest and in transit
+- **Input Validation**: Comprehensive input sanitization
+- **Audit Logging**: Complete audit trail for all operations
+- **Privacy Compliance**: HIPAA-compliant data handling
+
+## 🚀 Deployment
+
+### Local Development
+```bash
+# Development server with hot reload
+python main.py --reload
+
+# Individual application development
+python main.py --app surge --reload
+```
+
+### Production Deployment
+```bash
+# Using Docker
+docker-compose up -d
+
+# Direct deployment
+ENVIRONMENT=production python main.py
+```
+
+### Cloud Deployment
+- **Container Support**: Docker containerization ready
+- **Cloud Native**: Kubernetes deployment configurations available
+- **Infrastructure as Code**: Terraform modules for major cloud providers
+- **CI/CD Integration**: GitHub Actions workflows for automated deployment
+
+## 🤝 Contributing
+
+We welcome contributions to the Yaz Platform! Please see our [Contributing Guidelines](CONTRIBUTING.md) for details on:
+
+- **Code Standards**: Python PEP 8, type hints, comprehensive testing
+- **Architecture Principles**: Modular design, shared services, API-first
+- **Testing Requirements**: Maintain comprehensive test coverage
+- **Documentation**: Keep documentation updated with changes
+
+### Development Workflow
+1. Fork the repository
+2. Create a feature branch (`git checkout -b feature/amazing-feature`)
+3. Make your changes with proper tests
+4. Ensure all tests pass (`python -m pytest`)
+5. Submit a pull request
+
+## 🗂️ Platform Evolution
+
+### Recent Cleanup (August 2025)
+- **✅ Codebase Optimization**: Removed duplicate directories and unnecessary files
+- **✅ Architecture Simplification**: Consolidated modular application structure  
+- **✅ Documentation Cleanup**: Organized documentation in maintain directory
+- **✅ Dependency Cleanup**: Removed unused dependencies and bloated code
+- **✅ Performance Optimization**: Streamlined application loading and resource usage
+
+### Removed Components
+- **Duplicate Surge Directories**: Consolidated `apps/surge` into `src/surge`
+- **Unnecessary Platform Directories**: Removed `src/yaz_platform` (renamed directory)
+- **Unrelated Projects**: Removed `network/bitchat` (separate project)
+- **Enhanced/Modified Duplicates**: Removed "enhanced" versions of existing code
+- **Build Artifacts**: Cleaned up cache directories and temporary files
+
+### Future Roadmap
+- **Enhanced Integration**: Deeper cross-application data sharing
+- **Advanced Analytics**: Machine learning integration across all applications
+- **Mobile Applications**: Native mobile apps for key workflows
+- **Real-time Collaboration**: Live collaboration features across applications
+- **International Support**: Multi-language and region-specific features
 
 ## 📄 License
 
-This documentation is part of the Surgify Platform and follows the same license terms.
+This project is licensed under the MIT License - see the [LICENSE](LICENSE) file for details.
+
+## 📞 Support
+
+- **Documentation**: Check the [docs/maintain/](docs/maintain/) directory
+- **Issues**: Report bugs via GitHub Issues
+- **Security**: Report security issues privately via email
+- **Community**: Join our community discussions
 
 ---
 
-**📌 Bookmark this page** - It serves as your central hub for all Surgify Platform documentation.
+**Yaz Platform** - *Unifying Healthcare Technology for Better Outcomes*
 
-**🔍 Need something specific?** Use the search functionality or browse the structured sections above.
+Built with ❤️ for healthcare professionals worldwide.
 
-**💡 Missing something?** Contribute to the documentation by submitting a pull request!
+---
+
+## 📋 Platform Status
+
+**Current Version**: 2.1.0  
+**Last Updated**: August 10, 2025  
+**Status**: ✅ Production Ready  
+
+### Application Status
+- **🏥 Surge**: ✅ Fully Operational - Surgery analytics and decision support
+- **🏥 Clinica**: ✅ Active Development - Clinical operations management
+- **📚 Educa**: ✅ Active Development - Medical education platform
+- **🛡️ Insura**: ✅ Active Development - Insurance management
+- **🚚 Move**: ✅ Active Development - Healthcare logistics
+
+### Core Infrastructure
+- **⚡ Platform Core**: ✅ Stable - Shared services and configuration
+- **🔐 Authentication**: ✅ Secure - JWT-based with role management
+- **💾 Database**: ✅ Reliable - SQLAlchemy with Alembic migrations
+- **🚀 API Layer**: ✅ Robust - FastAPI with comprehensive documentation
+- **🎨 UI Framework**: ✅ Modern - Responsive design with accessibility features

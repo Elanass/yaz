@@ -1,0 +1,185 @@
+{% extends "base.html" %}
+
+{% block content %}
+<div class="px-4 py-6 sm:px-0">
+    <!-- Page Header -->
+    <div class="border-b border-gray-200 pb-4 mb-6">
+        <h1 class="text-3xl font-bold text-gray-900">Surgery Analytics Dashboard</h1>
+        <p class="mt-2 text-gray-600">Real-time insights into surgical operations and outcomes</p>
+    </div>
+
+    <!-- Key Metrics -->
+    <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 mb-8">
+        <div class="stat-card bg-white p-6 rounded-lg card-shadow">
+            <div class="flex items-center">
+                <div class="p-3 rounded-full bg-blue-100 text-blue-600">
+                    <i class="fas fa-procedures text-xl"></i>
+                </div>
+                <div class="ml-4">
+                    <p class="text-2xl font-bold text-gray-900" id="total-cases">156</p>
+                    <p class="text-gray-600">Total Cases</p>
+                </div>
+            </div>
+        </div>
+
+        <div class="stat-card bg-white p-6 rounded-lg card-shadow">
+            <div class="flex items-center">
+                <div class="p-3 rounded-full bg-green-100 text-green-600">
+                    <i class="fas fa-check-circle text-xl"></i>
+                </div>
+                <div class="ml-4">
+                    <p class="text-2xl font-bold text-gray-900" id="success-rate">94.2%</p>
+                    <p class="text-gray-600">Success Rate</p>
+                </div>
+            </div>
+        </div>
+
+        <div class="stat-card bg-white p-6 rounded-lg card-shadow">
+            <div class="flex items-center">
+                <div class="p-3 rounded-full bg-yellow-100 text-yellow-600">
+                    <i class="fas fa-clock text-xl"></i>
+                </div>
+                <div class="ml-4">
+                    <p class="text-2xl font-bold text-gray-900" id="avg-duration">125min</p>
+                    <p class="text-gray-600">Avg Duration</p>
+                </div>
+            </div>
+        </div>
+
+        <div class="stat-card bg-white p-6 rounded-lg card-shadow">
+            <div class="flex items-center">
+                <div class="p-3 rounded-full bg-red-100 text-red-600">
+                    <i class="fas fa-exclamation-triangle text-xl"></i>
+                </div>
+                <div class="ml-4">
+                    <p class="text-2xl font-bold text-gray-900" id="complications">3.1%</p>
+                    <p class="text-gray-600">Complications</p>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Charts Section -->
+    <div class="grid grid-cols-1 lg:grid-cols-2 gap-6 mb-8">
+        <!-- Cases Over Time -->
+        <div class="bg-white p-6 rounded-lg card-shadow">
+            <h3 class="text-lg font-semibold text-gray-900 mb-4">Cases Over Time</h3>
+            <canvas id="casesChart" width="400" height="200"></canvas>
+        </div>
+
+        <!-- Success Rate by Type -->
+        <div class="bg-white p-6 rounded-lg card-shadow">
+            <h3 class="text-lg font-semibold text-gray-900 mb-4">Success Rate by Surgery Type</h3>
+            <canvas id="successChart" width="400" height="200"></canvas>
+        </div>
+    </div>
+
+    <!-- Recent Cases -->
+    <div class="bg-white rounded-lg card-shadow">
+        <div class="px-6 py-4 border-b border-gray-200">
+            <h3 class="text-lg font-semibold text-gray-900">Recent Cases</h3>
+        </div>
+        <div class="p-6">
+            <div class="overflow-x-auto">
+                <table class="min-w-full divide-y divide-gray-200">
+                    <thead class="bg-gray-50">
+                        <tr>
+                            <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Patient</th>
+                            <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Surgery Type</th>
+                            <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Date</th>
+                            <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Status</th>
+                            <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Duration</th>
+                        </tr>
+                    </thead>
+                    <tbody class="bg-white divide-y divide-gray-200" id="recent-cases">
+                        <tr>
+                            <td class="px-6 py-4 whitespace-nowrap text-sm font-medium text-gray-900">John Doe</td>
+                            <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">Gastric Surgery</td>
+                            <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">2025-08-15</td>
+                            <td class="px-6 py-4 whitespace-nowrap">
+                                <span class="px-2 inline-flex text-xs leading-5 font-semibold rounded-full bg-green-100 text-green-800">
+                                    Completed
+                                </span>
+                            </td>
+                            <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">145 min</td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </div>
+</div>
+
+<script>
+// Load dashboard data
+async function loadDashboardData() {
+    try {
+        const response = await fetch('/surge/api/analytics');
+        const data = await response.json();
+        
+        // Update metrics
+        document.getElementById('total-cases').textContent = data.metrics.total_cases;
+        document.getElementById('success-rate').textContent = data.metrics.success_rate + '%';
+        document.getElementById('avg-duration').textContent = data.metrics.avg_duration + 'min';
+        document.getElementById('complications').textContent = data.metrics.complications + '%';
+        
+    } catch (error) {
+        console.error('Error loading dashboard data:', error);
+    }
+}
+
+// Initialize charts
+function initializeCharts() {
+    // Cases over time chart
+    const casesCtx = document.getElementById('casesChart').getContext('2d');
+    new Chart(casesCtx, {
+        type: 'line',
+        data: {
+            labels: ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun'],
+            datasets: [{
+                label: 'Surgical Cases',
+                data: [12, 19, 15, 25, 22, 30],
+                borderColor: 'rgb(99, 102, 241)',
+                backgroundColor: 'rgba(99, 102, 241, 0.1)',
+                tension: 0.1
+            }]
+        },
+        options: {
+            responsive: true,
+            scales: {
+                y: {
+                    beginAtZero: true
+                }
+            }
+        }
+    });
+
+    // Success rate chart
+    const successCtx = document.getElementById('successChart').getContext('2d');
+    new Chart(successCtx, {
+        type: 'doughnut',
+        data: {
+            labels: ['Gastric', 'Cardiac', 'Orthopedic', 'Neuro'],
+            datasets: [{
+                data: [30, 25, 20, 25],
+                backgroundColor: [
+                    'rgb(34, 197, 94)',
+                    'rgb(59, 130, 246)',
+                    'rgb(245, 158, 11)',
+                    'rgb(239, 68, 68)'
+                ]
+            }]
+        },
+        options: {
+            responsive: true
+        }
+    });
+}
+
+// Initialize on page load
+document.addEventListener('DOMContentLoaded', function() {
+    loadDashboardData();
+    initializeCharts();
+});
+</script>
+{% endblock %}

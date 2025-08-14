@@ -1,0 +1,51 @@
+<div class="u-col">
+  <header class="u-stack" style="justify-content: space-between; margin-bottom: var(--s-4);">
+    <div class="u-stack">
+      <button class="u-btn" onclick="history.back()" style="background: rgba(255,255,255,0.1); color: var(--text);">
+        ← Back
+      </button>
+      <h2 style="font:700 var(--fs-20)/1.2 var(--font-ui); color: var(--text);">Case Detail</h2>
+    </div>
+    <div class="u-stack">
+      <button class="u-btn">Edit</button>
+      <button class="u-btn" style="background: rgba(255,255,255,0.1); color: var(--text);">Share</button>
+    </div>
+  </header>
+  
+  <div class="u-card" id="case-detail" style="padding: var(--s-6);">
+    <div class="u-col">
+      <div class="u-stack" style="justify-content: space-between; margin-bottom: var(--s-4);">
+        <h3 style="font:600 var(--fs-16)/1 var(--font-ui); color: var(--text);">Patient Information</h3>
+        <span class="status-badge status-active">Active</span>
+      </div>
+      
+      <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: var(--s-4); margin-bottom: var(--s-6);">
+        <div class="u-card" style="padding: var(--s-4);">
+          <div style="color: var(--muted); font-size: var(--fs-12); text-transform: uppercase; letter-spacing: 0.025em; margin-bottom: var(--s-1);">Patient</div>
+          <div style="color: var(--text); font-size: var(--fs-16); font-weight: 600;">John Doe</div>
+        </div>
+        
+        <div class="u-card" style="padding: var(--s-4);">
+          <div style="color: var(--muted); font-size: var(--fs-12); text-transform: uppercase; letter-spacing: 0.025em; margin-bottom: var(--s-1);">Procedure</div>
+          <div style="color: var(--text); font-size: var(--fs-16); font-weight: 600;">Cardiac Surgery</div>
+        </div>
+        
+        <div class="u-card" style="padding: var(--s-4);">
+          <div style="color: var(--muted); font-size: var(--fs-12); text-transform: uppercase; letter-spacing: 0.025em; margin-bottom: var(--s-1);">Date</div>
+          <div style="color: var(--text); font-size: var(--fs-16); font-weight: 600;">2025-08-10</div>
+        </div>
+        
+        <div class="u-card" style="padding: var(--s-4);">
+          <div style="color: var(--muted); font-size: var(--fs-12); text-transform: uppercase; letter-spacing: 0.025em; margin-bottom: var(--s-1);">Status</div>
+          <div style="color: var(--ok); font-size: var(--fs-16); font-weight: 600;">In Progress</div>
+        </div>
+      </div>
+      
+      <div class="u-stack" style="gap: var(--s-3);">
+        <button class="u-btn">View Reports</button>
+        <button class="u-btn" style="background: rgba(255,255,255,0.1); color: var(--text);">Add Notes</button>
+        <button class="u-btn" style="background: rgba(255,255,255,0.1); color: var(--text);">Schedule Follow-up</button>
+      </div>
+    </div>
+  </div>
+</div>

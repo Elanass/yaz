@@ -8,12 +8,13 @@ from .health import get_provider, health_check, switch_provider
 from .providers.base import BaseProvider, Instance, InstanceStatus
 from .providers.incus import IncusProvider
 from .providers.multipass import MultipassProvider
-from .utils import ProviderError, InstanceNotFoundError, ProviderUnavailableError
+from .utils import (InstanceNotFoundError, ProviderError,
+                    ProviderUnavailableError)
 
 __version__ = "1.0.0"
 __all__ = [
     "get_provider",
-    "health_check", 
+    "health_check",
     "switch_provider",
     "BaseProvider",
     "Instance",
@@ -22,5 +23,5 @@ __all__ = [
     "MultipassProvider",
     "ProviderError",
     "InstanceNotFoundError",
-    "ProviderUnavailableError"
+    "ProviderUnavailableError",
 ]

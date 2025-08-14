@@ -1,0 +1,19 @@
+{
+  "file": "data/test_samples/sample_gastric_cohort.csv",
+  "cases": 50,
+  "domain": "surgery",
+  "statistics": {
+    "summary": {
+      "total_cases": 50,
+      "data_completeness": 100.0,
+      "date_range": null
+    },
+    "staging_stats": {},
+    "treatment_effectiveness": {},
+    "survival_metrics": {}
+  },
+  "insights": [
+    "Dataset contains 50 surgical cases with 8 data fields",
+    "Excellent data completeness: 100.0%"
+  ]
+}

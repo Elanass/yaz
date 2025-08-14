@@ -1,7 +1,7 @@
-import pytest
 from fastapi.testclient import TestClient
 
-from surgify.main import app
+from apps.surge.main import app
+
 
 client = TestClient(app)
 

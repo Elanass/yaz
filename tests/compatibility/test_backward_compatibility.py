@@ -4,14 +4,12 @@ Backward Compatibility Test Suite for Universal Research Integration
 Ensures all existing functionality remains intact after research module integration
 """
 
-import asyncio
-import json
-import os
 import sqlite3
 import sys
 from pathlib import Path
 
 import requests
+
 
 # Add the project root to the Python path
 project_root = Path(__file__).parent.parent.parent
@@ -51,7 +49,7 @@ class BackwardCompatibilityTester:
                 print(f"✅ PASSED: {test.__name__}")
                 self.test_results.append((test.__name__, "PASSED", None))
             except Exception as e:
-                print(f"❌ FAILED: {test.__name__} - {str(e)}")
+                print(f"❌ FAILED: {test.__name__} - {e!s}")
                 self.test_results.append((test.__name__, "FAILED", str(e)))
 
         self.print_test_summary()
@@ -76,7 +74,7 @@ class BackwardCompatibilityTester:
             except requests.exceptions.ConnectionError:
                 print(f"    ⚠️ {endpoint} - Server not running (expected in CI)")
             except Exception as e:
-                raise AssertionError(f"Endpoint {endpoint} failed: {str(e)}")
+                raise AssertionError(f"Endpoint {endpoint} failed: {e!s}")
 
     def test_existing_database_structure(self):
         """Test that existing database structure is preserved"""
@@ -110,7 +108,7 @@ class BackwardCompatibilityTester:
             conn.close()
 
         except Exception as e:
-            raise AssertionError(f"Database structure test failed: {str(e)}")
+            raise AssertionError(f"Database structure test failed: {e!s}")
 
     def test_existing_authentication(self):
         """Test that existing authentication system works unchanged"""
@@ -119,61 +117,61 @@ class BackwardCompatibilityTester:
         # This would test JWT tokens, user roles, permissions
         # For now, we'll check that the auth module can be imported
         try:
-            from surgify.core.services.auth_service import get_current_user
+            from apps.surge.core.services.auth_service import get_current_user
 
             print("    ✓ Auth service imports successfully")
 
             # Test that existing auth decorators work
-            from surgify.api.v1.auth import router as auth_router
+            from apps.surge.api.v1.auth import router as auth_router
 
             print("    ✓ Auth router accessible")
 
         except ImportError as e:
-            raise AssertionError(f"Authentication system compromised: {str(e)}")
+            raise AssertionError(f"Authentication system compromised: {e!s}")
 
     def test_existing_case_management(self):
         """Test that existing case management functionality works"""
         print("  Testing case management preservation...")
 
         try:
-            from surgify.core.services.case_service import CaseService
+            from apps.surge.core.services.case_service import CaseService
 
             case_service = CaseService()
             print("    ✓ CaseService imports and initializes")
 
             # Test that existing case models work
-            from surgify.core.models.database_models import Case, Patient, User
+            from apps.surge.core.models.database_models import Case, Patient, User
 
             print("    ✓ Database models accessible")
 
         except ImportError as e:
-            raise AssertionError(f"Case management system compromised: {str(e)}")
+            raise AssertionError(f"Case management system compromised: {e!s}")
 
     def test_existing_dashboard_functionality(self):
         """Test that existing dashboard works unchanged"""
         print("  Testing dashboard functionality preservation...")
 
         try:
-            from surgify.core.analytics.analytics_engine import AnalyticsEngine
+            from apps.surge.core.analytics.analytics_engine import AnalyticsEngine
 
             analytics = AnalyticsEngine()
             print("    ✓ AnalyticsEngine imports and initializes")
 
         except ImportError as e:
-            raise AssertionError(f"Dashboard functionality compromised: {str(e)}")
+            raise AssertionError(f"Dashboard functionality compromised: {e!s}")
 
     def test_existing_recommendations(self):
         """Test that existing recommendation system works"""
         print("  Testing recommendation system preservation...")
 
         try:
-            from surgify.core.services.ai_service import AIService
+            from apps.surge.core.services.ai_service import AIService
 
             ai_service = AIService()
             print("    ✓ AIService imports and initializes")
 
         except ImportError as e:
-            raise AssertionError(f"Recommendation system compromised: {str(e)}")
+            raise AssertionError(f"Recommendation system compromised: {e!s}")
 
     def test_research_enhancements_optional(self):
         """Test that research enhancements are truly optional"""
@@ -189,16 +187,14 @@ class BackwardCompatibilityTester:
 
             # Test that research modules can be imported but are optional
             try:
-                from surgify.modules.universal_research import SurgifyAdapter
+                from apps.surge.modules.universal_research import SurgifyAdapter
 
                 print("    ✓ Research modules available")
             except ImportError:
                 print("    ⚠️ Research modules not available (graceful degradation)")
 
         except Exception as e:
-            raise AssertionError(
-                f"Research enhancements not properly optional: {str(e)}"
-            )
+            raise AssertionError(f"Research enhancements not properly optional: {e!s}")
 
     def test_error_handling_preserved(self):
         """Test that existing error handling works unchanged"""
@@ -208,12 +204,12 @@ class BackwardCompatibilityTester:
         try:
             from fastapi import HTTPException
 
-            from surgify.api.v1.cases import get_case
+            from apps.surge.api.v1.cases import get_case
 
             print("    ✓ Error handling imports work")
 
         except ImportError as e:
-            raise AssertionError(f"Error handling compromised: {str(e)}")
+            raise AssertionError(f"Error handling compromised: {e!s}")
 
     def print_test_summary(self):
         """Print test results summary"""

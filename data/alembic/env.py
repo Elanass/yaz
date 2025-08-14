@@ -9,9 +9,8 @@ from sqlalchemy import engine_from_config, pool
 # Add src directory to path
 sys.path.insert(0, str(Path(__file__).parent.parent.parent / "src"))
 
-from surgify.core.database import Base
-from surgify.core.models.case import Case
-from surgify.core.models.user import User
+from surge.core.database import Base
+from surge.core.models.medical import *
 
 # this is the Alembic Config object, which provides access to values within the .ini file.
 config = context.config

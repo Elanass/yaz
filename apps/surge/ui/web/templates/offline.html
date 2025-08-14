@@ -1,0 +1,99 @@
+{% extends "shell.html" %}
+
+{% block title %}Offline - Surgify{% endblock %}
+
+{% block content %}
+<div class="offline-fallback min-h-screen flex items-center justify-center bg-gradient-to-br from-blue-50 to-indigo-100">
+    <div class="max-w-md mx-auto text-center p-8">
+        <!-- Animated Offline Icon -->
+        <div class="mb-8 relative">
+            <div class="w-24 h-24 mx-auto bg-gradient-to-br from-blue-500 to-indigo-600 rounded-full flex items-center justify-center animate-pulse">
+                <i class="fas fa-wifi-slash text-white text-3xl"></i>
+            </div>
+            <div class="absolute -top-2 -right-2 w-8 h-8 bg-amber-500 rounded-full flex items-center justify-center animate-bounce">
+                <i class="fas fa-exclamation text-white text-sm"></i>
+            </div>
+        </div>
+
+        <!-- Status Message -->
+        <h1 class="text-2xl font-bold text-gray-900 mb-4">You're Offline</h1>
+        <p class="text-gray-600 mb-8 leading-relaxed">
+            No internet connection detected. Don't worry - you can still access your recently viewed cases and work offline.
+        </p>
+
+        <!-- Quick Actions -->
+        <div class="space-y-4 mb-8">
+            <button onclick="window.location.reload()" 
+                    class="w-full bg-blue-600 text-white py-3 px-6 rounded-lg font-medium hover:bg-blue-700 transition-all duration-200 transform hover:scale-105 active:scale-95">
+                <i class="fas fa-sync-alt mr-2"></i>Try Again
+            </button>
+            
+            <button onclick="showCachedContent()" 
+                    class="w-full bg-gray-100 text-gray-700 py-3 px-6 rounded-lg font-medium hover:bg-gray-200 transition-all duration-200">
+                <i class="fas fa-archive mr-2"></i>View Cached Content
+            </button>
+        </div>
+
+        <!-- Offline Features -->
+        <div class="bg-white rounded-xl shadow-lg p-6 border border-gray-200">
+            <h3 class="font-semibold text-gray-900 mb-4 flex items-center">
+                <i class="fas fa-star text-amber-500 mr-2"></i>
+                Available Offline
+            </h3>
+            <div class="space-y-3 text-sm text-gray-600">
+                <div class="flex items-center">
+                    <i class="fas fa-check-circle text-green-500 mr-2"></i>
+                    Recently viewed cases
+                </div>
+                <div class="flex items-center">
+                    <i class="fas fa-check-circle text-green-500 mr-2"></i>
+                    Draft notes and forms
+                </div>
+                <div class="flex items-center">
+                    <i class="fas fa-check-circle text-green-500 mr-2"></i>
+                    Quick reference guides
+                </div>
+                <div class="flex items-center">
+                    <i class="fas fa-clock text-amber-500 mr-2"></i>
+                    Data will sync when online
+                </div>
+            </div>
+        </div>
+
+        <!-- Network Status -->
+        <div class="mt-6 p-4 bg-blue-50 rounded-lg border border-blue-200">
+            <div class="flex items-center justify-between">
+                <span class="text-sm text-blue-700">Connection Status:</span>
+                <span id="connection-status" class="text-sm font-medium text-blue-900">Checking...</span>
+            </div>
+        </div>
+    </div>
+</div>
+
+<script>
+function showCachedContent() {
+    // Show cached content drawer
+    window.location.href = '/';
+}
+
+// Network status monitoring
+function updateConnectionStatus() {
+    const status = document.getElementById('connection-status');
+    if (navigator.onLine) {
+        status.textContent = 'Online';
+        status.className = 'text-sm font-medium text-green-900';
+        setTimeout(() => window.location.reload(), 1000);
+    } else {
+        status.textContent = 'Offline';
+        status.className = 'text-sm font-medium text-red-900';
+    }
+}
+
+// Listen for online/offline events
+window.addEventListener('online', updateConnectionStatus);
+window.addEventListener('offline', updateConnectionStatus);
+
+// Initial status check
+updateConnectionStatus();
+</script>
+{% endblock %}

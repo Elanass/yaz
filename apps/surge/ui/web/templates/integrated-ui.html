@@ -1,0 +1,439 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>SURGE - Surgery Platform with Dash & Interact</title>
+    
+    <!-- Tailwind CSS -->
+    <link rel="stylesheet" href="https://cdn.tailwindcss.com/3.3.0/tailwind.min.css">
+    
+    <!-- HTMX -->
+    <script src="https://unpkg.com/htmx.org@1.9.10"></script>
+    
+    <!-- React & ReactDOM -->
+    <script crossorigin src="https://unpkg.com/react@18/umd/react.production.min.js"></script>
+    <script crossorigin src="https://unpkg.com/react-dom@18/umd/react-dom.production.min.js"></script>
+    
+    <style>
+        .fade-in { animation: fadeIn 0.5s ease-in; }
+        @keyframes fadeIn { from { opacity: 0; } to { opacity: 1; } }
+        .island-container { min-height: 400px; }
+    </style>
+</head>
+<body class="bg-gray-50">
+    <!-- Navigation -->
+    <nav class="bg-white shadow-sm border-b">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+            <div class="flex justify-between h-16">
+                <div class="flex items-center">
+                    <h1 class="text-xl font-bold text-gray-900">SURGE Platform</h1>
+                    <div class="ml-6 flex space-x-8">
+                        <button class="nav-tab px-3 py-2 text-sm font-medium text-gray-700 hover:text-blue-600 active" 
+                                onclick="showTab('dashboard')">Dashboard</button>
+                        <button class="nav-tab px-3 py-2 text-sm font-medium text-gray-700 hover:text-blue-600" 
+                                onclick="showTab('dash')">Dash</button>
+                        <button class="nav-tab px-3 py-2 text-sm font-medium text-gray-700 hover:text-blue-600" 
+                                onclick="showTab('interact')">Interact</button>
+                        <button class="nav-tab px-3 py-2 text-sm font-medium text-gray-700 hover:text-blue-600" 
+                                onclick="showTab('cases')">Cases</button>
+                    </div>
+                </div>
+                <div class="flex items-center space-x-4">
+                    <div class="flex items-center space-x-2 text-sm">
+                        <span class="inline-flex items-center px-2 py-1 rounded-full text-xs bg-green-100 text-green-800">
+                            <span class="w-2 h-2 bg-green-400 rounded-full mr-1"></span>
+                            All Systems Online
+                        </span>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </nav>
+
+    <!-- Main Content -->
+    <main class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-6">
+        
+        <!-- Dashboard Tab -->
+        <div id="dashboard-tab" class="tab-content">
+            <div class="grid grid-cols-1 lg:grid-cols-3 gap-6 mb-8">
+                <!-- Quick Stats -->
+                <div class="bg-white rounded-lg shadow p-6">
+                    <h3 class="text-lg font-medium text-gray-900 mb-4">Surgery Stats</h3>
+                    <div class="space-y-3">
+                        <div class="flex justify-between">
+                            <span class="text-sm text-gray-600">Active Cases</span>
+                            <span class="font-medium">12</span>
+                        </div>
+                        <div class="flex justify-between">
+                            <span class="text-sm text-gray-600">Completed Today</span>
+                            <span class="font-medium">8</span>
+                        </div>
+                        <div class="flex justify-between">
+                            <span class="text-sm text-gray-600">OR Utilization</span>
+                            <span class="font-medium">92%</span>
+                        </div>
+                    </div>
+                </div>
+                
+                <!-- OR Status -->
+                <div class="bg-white rounded-lg shadow p-6">
+                    <h3 class="text-lg font-medium text-gray-900 mb-4">OR Status</h3>
+                    <div class="space-y-2">
+                        <div class="flex items-center justify-between">
+                            <span class="text-sm">OR-1</span>
+                            <span class="inline-flex items-center px-2 py-1 rounded-full text-xs bg-red-100 text-red-800">In Use</span>
+                        </div>
+                        <div class="flex items-center justify-between">
+                            <span class="text-sm">OR-2</span>
+                            <span class="inline-flex items-center px-2 py-1 rounded-full text-xs bg-yellow-100 text-yellow-800">Prep</span>
+                        </div>
+                        <div class="flex items-center justify-between">
+                            <span class="text-sm">OR-3</span>
+                            <span class="inline-flex items-center px-2 py-1 rounded-full text-xs bg-green-100 text-green-800">Available</span>
+                        </div>
+                    </div>
+                </div>
+                
+                <!-- Quick Actions -->
+                <div class="bg-white rounded-lg shadow p-6">
+                    <h3 class="text-lg font-medium text-gray-900 mb-4">Quick Actions</h3>
+                    <div class="space-y-2">
+                        <button class="w-full px-4 py-2 text-sm bg-blue-600 text-white rounded hover:bg-blue-700 transition-colors">
+                            New Case
+                        </button>
+                        <button class="w-full px-4 py-2 text-sm bg-green-600 text-white rounded hover:bg-green-700 transition-colors">
+                            Schedule Surgery
+                        </button>
+                        <button class="w-full px-4 py-2 text-sm bg-purple-600 text-white rounded hover:bg-purple-700 transition-colors">
+                            Patient Check-in
+                        </button>
+                    </div>
+                </div>
+            </div>
+            
+            <!-- Calendar Island -->
+            <div class="bg-white rounded-lg shadow p-6 mb-6">
+                <h3 class="text-lg font-medium text-gray-900 mb-4">Surgery Schedule</h3>
+                <div id="calendar-island" class="island-container border-2 border-dashed border-gray-300 rounded-lg flex items-center justify-center">
+                    <div class="text-center">
+                        <div class="text-gray-500 mb-2">Calendar Component</div>
+                        <button class="px-4 py-2 bg-indigo-600 text-white rounded hover:bg-indigo-700 transition-colors"
+                                onclick="loadCalendarIsland()">
+                            Load Calendar
+                        </button>
+                    </div>
+                </div>
+            </div>
+        </div>
+        
+        <!-- Dash Tab -->
+        <div id="dash-tab" class="tab-content hidden">
+            <div class="bg-white rounded-lg shadow p-6">
+                <div class="flex items-center justify-between mb-6">
+                    <h2 class="text-xl font-semibold text-gray-900">Dash - Operational Surgery Platform</h2>
+                    <span class="inline-flex items-center px-3 py-1 rounded-full text-sm bg-blue-100 text-blue-800">
+                        React Component
+                    </span>
+                </div>
+                
+                <div id="dash-island" class="island-container border-2 border-dashed border-blue-300 rounded-lg">
+                    <div class="flex items-center justify-center h-full">
+                        <div class="text-center">
+                            <div class="text-gray-500 mb-4">Dash Application Component</div>
+                            <button class="px-6 py-3 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors"
+                                    onclick="loadDashIsland()">
+                                Load Dash App
+                            </button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+        
+        <!-- Interact Tab -->
+        <div id="interact-tab" class="tab-content hidden">
+            <div class="bg-white rounded-lg shadow p-6">
+                <div class="flex items-center justify-between mb-6">
+                    <h2 class="text-xl font-semibold text-gray-900">Interact - Patient Communication Platform</h2>
+                    <span class="inline-flex items-center px-3 py-1 rounded-full text-sm bg-green-100 text-green-800">
+                        React Component
+                    </span>
+                </div>
+                
+                <div id="interact-island" class="island-container border-2 border-dashed border-green-300 rounded-lg">
+                    <div class="flex items-center justify-center h-full">
+                        <div class="text-center">
+                            <div class="text-gray-500 mb-4">Interact Application Component</div>
+                            <button class="px-6 py-3 bg-green-600 text-white rounded-lg hover:bg-green-700 transition-colors"
+                                    onclick="loadInteractIsland()">
+                                Load Interact App
+                            </button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+        
+        <!-- Cases Tab -->
+        <div id="cases-tab" class="tab-content hidden">
+            <div class="bg-white rounded-lg shadow p-6">
+                <h2 class="text-xl font-semibold text-gray-900 mb-6">Case Management</h2>
+                
+                <div id="cases-list" 
+                     hx-get="/api/v1/htmx/cases"
+                     hx-trigger="load"
+                     hx-swap="innerHTML">
+                    <div class="text-center py-8 text-gray-500">Loading cases...</div>
+                </div>
+            </div>
+        </div>
+        
+    </main>
+
+    <script>
+        // Tab management
+        function showTab(tabName) {
+            // Hide all tabs
+            document.querySelectorAll('.tab-content').forEach(tab => {
+                tab.classList.add('hidden');
+            });
+            
+            // Remove active class from all nav buttons
+            document.querySelectorAll('.nav-tab').forEach(btn => {
+                btn.classList.remove('active', 'text-blue-600', 'border-b-2', 'border-blue-600');
+                btn.classList.add('text-gray-700');
+            });
+            
+            // Show selected tab
+            const selectedTab = document.getElementById(tabName + '-tab');
+            if (selectedTab) {
+                selectedTab.classList.remove('hidden');
+                selectedTab.classList.add('fade-in');
+            }
+            
+            // Activate selected nav button
+            event.target.classList.add('active', 'text-blue-600', 'border-b-2', 'border-blue-600');
+            event.target.classList.remove('text-gray-700');
+        }
+
+        // Island loading functions
+        async function loadDashIsland() {
+            const container = document.getElementById('dash-island');
+            container.innerHTML = '<div class="flex items-center justify-center h-full"><div class="text-blue-600">Loading Dash Application...</div></div>';
+            
+            try {
+                // Simulate loading Dash React component
+                await new Promise(resolve => setTimeout(resolve, 1000));
+                
+                container.innerHTML = `
+                    <div class="p-6">
+                        <h3 class="text-lg font-semibold mb-4">Dash - Operational Surgery Platform</h3>
+                        <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
+                            <div class="bg-blue-50 border border-blue-200 rounded-lg p-4">
+                                <h4 class="font-medium text-blue-900 mb-2">Case Analytics</h4>
+                                <p class="text-sm text-blue-700">Real-time surgical case monitoring and analytics dashboard</p>
+                                <div class="mt-3">
+                                    <div class="text-xs text-blue-600">Active Cases: 12</div>
+                                    <div class="text-xs text-blue-600">Success Rate: 98.5%</div>
+                                </div>
+                            </div>
+                            <div class="bg-blue-50 border border-blue-200 rounded-lg p-4">
+                                <h4 class="font-medium text-blue-900 mb-2">OR Management</h4>
+                                <p class="text-sm text-blue-700">Operating room scheduling and resource allocation</p>
+                                <div class="mt-3">
+                                    <div class="text-xs text-blue-600">Utilization: 92%</div>
+                                    <div class="text-xs text-blue-600">Next Available: OR-3</div>
+                                </div>
+                            </div>
+                            <div class="bg-blue-50 border border-blue-200 rounded-lg p-4">
+                                <h4 class="font-medium text-blue-900 mb-2">Team Coordination</h4>
+                                <p class="text-sm text-blue-700">Surgical team management and communication</p>
+                                <div class="mt-3">
+                                    <div class="text-xs text-blue-600">Teams Active: 8</div>
+                                    <div class="text-xs text-blue-600">On-Call: 15</div>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="mt-6 flex space-x-3">
+                            <button class="px-4 py-2 bg-blue-600 text-white rounded hover:bg-blue-700 transition-colors">
+                                View Full Dashboard
+                            </button>
+                            <button class="px-4 py-2 border border-blue-600 text-blue-600 rounded hover:bg-blue-50 transition-colors">
+                                Configure Settings
+                            </button>
+                        </div>
+                    </div>
+                `;
+                
+                console.log('Dash island loaded successfully');
+                
+            } catch (error) {
+                container.innerHTML = `<div class="text-red-600 p-6">Failed to load Dash application: ${error.message}</div>`;
+            }
+        }
+
+        async function loadInteractIsland() {
+            const container = document.getElementById('interact-island');
+            container.innerHTML = '<div class="flex items-center justify-center h-full"><div class="text-green-600">Loading Interact Application...</div></div>';
+            
+            try {
+                // Simulate loading Interact React component
+                await new Promise(resolve => setTimeout(resolve, 1000));
+                
+                container.innerHTML = `
+                    <div class="p-6">
+                        <h3 class="text-lg font-semibold mb-4">Interact - Patient Communication Platform</h3>
+                        <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+                            <div class="space-y-4">
+                                <div class="bg-green-50 border border-green-200 rounded-lg p-4">
+                                    <h4 class="font-medium text-green-900 mb-2">Patient Forms</h4>
+                                    <p class="text-sm text-green-700 mb-3">Digital consent and pre-operative forms</p>
+                                    <div class="space-y-2">
+                                        <div class="flex items-center justify-between text-xs">
+                                            <span>Consent Forms</span>
+                                            <span class="text-green-600">✓ 8/10 Complete</span>
+                                        </div>
+                                        <div class="flex items-center justify-between text-xs">
+                                            <span>Medical History</span>
+                                            <span class="text-green-600">✓ 10/10 Complete</span>
+                                        </div>
+                                        <div class="flex items-center justify-between text-xs">
+                                            <span>Insurance Verification</span>
+                                            <span class="text-yellow-600">⚠ 7/10 Pending</span>
+                                        </div>
+                                    </div>
+                                </div>
+                                
+                                <div class="bg-green-50 border border-green-200 rounded-lg p-4">
+                                    <h4 class="font-medium text-green-900 mb-2">Communication Hub</h4>
+                                    <p class="text-sm text-green-700 mb-3">Patient-provider messaging system</p>
+                                    <div class="space-y-2">
+                                        <div class="text-xs text-green-600">Active Conversations: 24</div>
+                                        <div class="text-xs text-green-600">Unread Messages: 3</div>
+                                        <div class="text-xs text-green-600">Response Time: < 2 hours</div>
+                                    </div>
+                                </div>
+                            </div>
+                            
+                            <div class="space-y-4">
+                                <div class="bg-green-50 border border-green-200 rounded-lg p-4">
+                                    <h4 class="font-medium text-green-900 mb-2">Recent Interactions</h4>
+                                    <div class="space-y-3">
+                                        <div class="text-sm">
+                                            <div class="font-medium">John Doe</div>
+                                            <div class="text-xs text-gray-600">Pre-op questionnaire completed</div>
+                                            <div class="text-xs text-gray-500">2 minutes ago</div>
+                                        </div>
+                                        <div class="text-sm">
+                                            <div class="font-medium">Jane Smith</div>
+                                            <div class="text-xs text-gray-600">Consent form signed</div>
+                                            <div class="text-xs text-gray-500">15 minutes ago</div>
+                                        </div>
+                                        <div class="text-sm">
+                                            <div class="font-medium">Mike Johnson</div>
+                                            <div class="text-xs text-gray-600">Message sent to care team</div>
+                                            <div class="text-xs text-gray-500">1 hour ago</div>
+                                        </div>
+                                    </div>
+                                </div>
+                                
+                                <button class="w-full px-4 py-2 bg-green-600 text-white rounded hover:bg-green-700 transition-colors">
+                                    Open Full Interface
+                                </button>
+                            </div>
+                        </div>
+                    </div>
+                `;
+                
+                console.log('Interact island loaded successfully');
+                
+            } catch (error) {
+                container.innerHTML = `<div class="text-red-600 p-6">Failed to load Interact application: ${error.message}</div>`;
+            }
+        }
+
+        async function loadCalendarIsland() {
+            const container = document.getElementById('calendar-island');
+            container.innerHTML = '<div class="flex items-center justify-center h-full"><div class="text-indigo-600">Loading Calendar...</div></div>';
+            
+            try {
+                await new Promise(resolve => setTimeout(resolve, 800));
+                
+                container.innerHTML = `
+                    <div class="p-4">
+                        <div class="grid grid-cols-7 gap-2 mb-4">
+                            <div class="text-center text-sm font-medium text-gray-500 py-2">Mon</div>
+                            <div class="text-center text-sm font-medium text-gray-500 py-2">Tue</div>
+                            <div class="text-center text-sm font-medium text-gray-500 py-2">Wed</div>
+                            <div class="text-center text-sm font-medium text-gray-500 py-2">Thu</div>
+                            <div class="text-center text-sm font-medium text-gray-500 py-2">Fri</div>
+                            <div class="text-center text-sm font-medium text-gray-500 py-2">Sat</div>
+                            <div class="text-center text-sm font-medium text-gray-500 py-2">Sun</div>
+                        </div>
+                        <div class="grid grid-cols-7 gap-2">
+                            ${generateCalendarDays()}
+                        </div>
+                        <div class="mt-4 text-sm text-gray-600">
+                            <div class="flex items-center space-x-4">
+                                <div class="flex items-center space-x-1">
+                                    <div class="w-3 h-3 bg-blue-500 rounded"></div>
+                                    <span>Scheduled Surgery</span>
+                                </div>
+                                <div class="flex items-center space-x-1">
+                                    <div class="w-3 h-3 bg-green-500 rounded"></div>
+                                    <span>Available Slot</span>
+                                </div>
+                                <div class="flex items-center space-x-1">
+                                    <div class="w-3 h-3 bg-red-500 rounded"></div>
+                                    <span>Emergency Block</span>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                `;
+                
+            } catch (error) {
+                container.innerHTML = `<div class="text-red-600 p-4">Failed to load calendar: ${error.message}</div>`;
+            }
+        }
+
+        function generateCalendarDays() {
+            const days = [];
+            const today = new Date().getDate();
+            
+            for (let i = 1; i <= 30; i++) {
+                const isToday = i === today;
+                const hasEvent = [5, 12, 18, 22, 28].includes(i);
+                const isEmergency = [15, 29].includes(i);
+                
+                let classes = 'p-2 text-center text-sm border rounded hover:bg-gray-50 cursor-pointer';
+                
+                if (isToday) {
+                    classes += ' bg-blue-100 border-blue-300';
+                } else if (isEmergency) {
+                    classes += ' bg-red-100 border-red-300';
+                } else if (hasEvent) {
+                    classes += ' bg-green-100 border-green-300';
+                } else {
+                    classes += ' border-gray-200';
+                }
+                
+                days.push(`<div class="${classes}">${i}</div>`);
+            }
+            
+            return days.join('');
+        }
+
+        // Initialize on load
+        document.addEventListener('DOMContentLoaded', function() {
+            console.log('SURGE Platform with Dash & Interact loaded');
+            
+            // Auto-load calendar on dashboard
+            setTimeout(() => {
+                loadCalendarIsland();
+            }, 500);
+        });
+    </script>
+</body>
+</html>

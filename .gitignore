@@ -210,3 +210,20 @@ coverage.xml
 # Runtime data directories
 src/data/
 
+# Cleanup and optimization markers
+.cleanup_done
+.consolidated
+
+# Redundancy prevention
+**/duplicate_*
+**/*_backup
+**/*_old
+**/*_deprecated
+
+# Empty directories indicator
+.keep
+
+# Build optimization
+dist_backup/
+build_backup/
+

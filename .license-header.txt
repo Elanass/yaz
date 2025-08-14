@@ -1,0 +1,2 @@
+# Copyright (c) 2024 YAZ Healthcare Platform
+# Licensed under the MIT License

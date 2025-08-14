@@ -2,19 +2,16 @@
 Unit tests for core models
 """
 
-import os
 import sys
 from pathlib import Path
+
 
 # Add src directory to Python path
 src_path = Path(__file__).parent.parent.parent / "src"
 sys.path.insert(0, str(src_path))
 
-from datetime import datetime
 
-import pytest
-
-from surgify.core.models.database_models import Case, CaseStatus, Patient, User
+from apps.surge.core.models.database_models import Case, CaseStatus, Patient, User
 
 
 class TestUser:

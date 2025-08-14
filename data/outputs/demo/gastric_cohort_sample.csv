@@ -1,0 +1,51 @@
+patient_id,age,gender,tumor_stage,histology,flot_cycles,surgical_outcome,survival_months
+P001,45,M,T1,Adenocarcinoma,4,Partial,12
+P002,46,F,T2,Signet Ring,5,Complete,13
+P003,47,M,T3,Signet Ring,6,Complete,14
+P004,48,F,T4,Adenocarcinoma,7,Partial,15
+P005,49,M,T1,Signet Ring,4,Complete,16
+P006,50,F,T2,Signet Ring,5,Complete,17
+P007,51,M,T3,Adenocarcinoma,6,Partial,18
+P008,52,F,T4,Signet Ring,7,Complete,19
+P009,53,M,T1,Signet Ring,4,Complete,20
+P010,54,F,T2,Adenocarcinoma,5,Partial,21
+P011,55,M,T3,Signet Ring,6,Complete,22
+P012,56,F,T4,Signet Ring,7,Complete,23
+P013,57,M,T1,Adenocarcinoma,4,Partial,24
+P014,58,F,T2,Signet Ring,5,Complete,25
+P015,59,M,T3,Signet Ring,6,Complete,26
+P016,60,F,T4,Adenocarcinoma,7,Partial,27
+P017,61,M,T1,Signet Ring,4,Complete,28
+P018,62,F,T2,Signet Ring,5,Complete,29
+P019,63,M,T3,Adenocarcinoma,6,Partial,30
+P020,64,F,T4,Signet Ring,7,Complete,31
+P021,65,M,T1,Signet Ring,4,Complete,32
+P022,66,F,T2,Adenocarcinoma,5,Partial,33
+P023,67,M,T3,Signet Ring,6,Complete,34
+P024,68,F,T4,Signet Ring,7,Complete,35
+P025,69,M,T1,Adenocarcinoma,4,Partial,36
+P026,70,F,T2,Signet Ring,5,Complete,37
+P027,71,M,T3,Signet Ring,6,Complete,38
+P028,72,F,T4,Adenocarcinoma,7,Partial,39
+P029,73,M,T1,Signet Ring,4,Complete,40
+P030,74,F,T2,Signet Ring,5,Complete,41
+P031,45,M,T3,Adenocarcinoma,6,Partial,42
+P032,46,F,T4,Signet Ring,7,Complete,43
+P033,47,M,T1,Signet Ring,4,Complete,44
+P034,48,F,T2,Adenocarcinoma,5,Partial,45
+P035,49,M,T3,Signet Ring,6,Complete,46
+P036,50,F,T4,Signet Ring,7,Complete,47
+P037,51,M,T1,Adenocarcinoma,4,Partial,12
+P038,52,F,T2,Signet Ring,5,Complete,13
+P039,53,M,T3,Signet Ring,6,Complete,14
+P040,54,F,T4,Adenocarcinoma,7,Partial,15
+P041,55,M,T1,Signet Ring,4,Complete,16
+P042,56,F,T2,Signet Ring,5,Complete,17
+P043,57,M,T3,Adenocarcinoma,6,Partial,18
+P044,58,F,T4,Signet Ring,7,Complete,19
+P045,59,M,T1,Signet Ring,4,Complete,20
+P046,60,F,T2,Adenocarcinoma,5,Partial,21
+P047,61,M,T3,Signet Ring,6,Complete,22
+P048,62,F,T4,Signet Ring,7,Complete,23
+P049,63,M,T1,Adenocarcinoma,4,Partial,24
+P050,64,F,T2,Signet Ring,5,Complete,25

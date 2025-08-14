@@ -1,0 +1,123 @@
+<!DOCTYPE html>
+<html lang="en" class="h-full">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>YAZ Surge Islands</title>
+    <link href="https://cdn.jsdelivr.net/npm/tailwindcss@2.2.19/dist/tailwind.min.css" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@phosphor-icons/web@2.1.1/regular/style.css">
+    <style>
+        .gradient-bg {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+        }
+        .card-hover {
+            transition: all 0.3s ease;
+        }
+        .card-hover:hover {
+            transform: translateY(-4px);
+            box-shadow: 0 20px 25px -5px rgba(0, 0, 0, 0.1), 0 10px 10px -5px rgba(0, 0, 0, 0.04);
+        }
+    </style>
+</head>
+<body class="h-full bg-gray-50">
+    <div class="min-h-full">
+        <!-- Header -->
+        <header class="gradient-bg shadow-lg">
+            <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+                <div class="flex justify-between items-center py-6">
+                    <div class="flex items-center">
+                        <h1 class="text-3xl font-bold text-white">YAZ Surge Platform</h1>
+                        <span class="ml-3 px-2 py-1 bg-white bg-opacity-20 text-white text-sm rounded-full">Islands</span>
+                    </div>
+                    <div class="text-white text-sm">
+                        Surgical Analytics & Clinical Collaboration
+                    </div>
+                </div>
+            </div>
+        </header>
+
+        <!-- Main Content -->
+        <main class="max-w-7xl mx-auto py-12 px-4 sm:px-6 lg:px-8">
+            <div class="text-center mb-12">
+                <h2 class="text-4xl font-extrabold text-gray-900 mb-4">
+                    Choose Your Application
+                </h2>
+                <p class="text-xl text-gray-600 max-w-3xl mx-auto">
+                    Select from our specialized surgical and clinical applications designed for different aspects of medical care.
+                </p>
+            </div>
+
+            <!-- Application Cards -->
+            <div class="grid md:grid-cols-2 gap-8 max-w-4xl mx-auto">
+                {% for app in apps %}
+                <div class="bg-white rounded-2xl shadow-lg overflow-hidden card-hover">
+                    <div class="p-8">
+                        <div class="flex items-center mb-6">
+                            <div class="w-12 h-12 bg-{% if app.variant == 'dashboard' %}blue{% else %}green{% endif %}-100 rounded-lg flex items-center justify-center">
+                                <i class="ph ph-{{ app.icon }} text-2xl text-{% if app.variant == 'dashboard' %}blue{% else %}green{% endif %}-600"></i>
+                            </div>
+                            <div class="ml-4">
+                                <h3 class="text-2xl font-bold text-gray-900">{{ app.name }}</h3>
+                                <span class="text-sm text-gray-500 uppercase tracking-wide">{{ app.variant }}</span>
+                            </div>
+                        </div>
+                        
+                        <p class="text-gray-600 mb-8 text-lg leading-relaxed">
+                            {{ app.description }}
+                        </p>
+                        
+                        <a href="{{ app.url }}" 
+                           class="w-full bg-{% if app.variant == 'dashboard' %}blue{% else %}green{% endif %}-600 hover:bg-{% if app.variant == 'dashboard' %}blue{% else %}green{% endif %}-700 text-white font-semibold py-3 px-6 rounded-lg transition duration-200 inline-flex items-center justify-center">
+                            <span>Launch {{ app.name }}</span>
+                            <i class="ph ph-arrow-right ml-2"></i>
+                        </a>
+                    </div>
+                    
+                    <div class="h-2 bg-{% if app.variant == 'dashboard' %}blue{% else %}green{% endif %}-500"></div>
+                </div>
+                {% endfor %}
+            </div>
+
+            <!-- Features Overview -->
+            <div class="mt-20">
+                <h3 class="text-2xl font-bold text-gray-900 text-center mb-8">Platform Features</h3>
+                <div class="grid md:grid-cols-3 gap-6">
+                    <div class="text-center">
+                        <div class="w-16 h-16 bg-purple-100 rounded-full flex items-center justify-center mx-auto mb-4">
+                            <i class="ph ph-database text-2xl text-purple-600"></i>
+                        </div>
+                        <h4 class="text-lg font-semibold text-gray-900 mb-2">Unified Data</h4>
+                        <p class="text-gray-600">Seamless integration across all surgical and clinical workflows</p>
+                    </div>
+                    
+                    <div class="text-center">
+                        <div class="w-16 h-16 bg-indigo-100 rounded-full flex items-center justify-center mx-auto mb-4">
+                            <i class="ph ph-shield-check text-2xl text-indigo-600"></i>
+                        </div>
+                        <h4 class="text-lg font-semibold text-gray-900 mb-2">Secure & Compliant</h4>
+                        <p class="text-gray-600">HIPAA compliant with enterprise-grade security</p>
+                    </div>
+                    
+                    <div class="text-center">
+                        <div class="w-16 h-16 bg-pink-100 rounded-full flex items-center justify-center mx-auto mb-4">
+                            <i class="ph ph-users text-2xl text-pink-600"></i>
+                        </div>
+                        <h4 class="text-lg font-semibold text-gray-900 mb-2">Collaborative</h4>
+                        <p class="text-gray-600">Real-time collaboration between surgical teams</p>
+                    </div>
+                </div>
+            </div>
+        </main>
+
+        <!-- Footer -->
+        <footer class="bg-white border-t border-gray-200 mt-20">
+            <div class="max-w-7xl mx-auto py-8 px-4 sm:px-6 lg:px-8">
+                <div class="text-center text-gray-500">
+                    <p>&copy; 2025 YAZ Surge Platform. All rights reserved.</p>
+                    <p class="mt-2">Advanced Surgical Analytics & Clinical Collaboration</p>
+                </div>
+            </div>
+        </footer>
+    </div>
+</body>
+</html>

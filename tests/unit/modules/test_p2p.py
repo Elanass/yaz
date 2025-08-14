@@ -4,12 +4,11 @@ Tests peer discovery and mesh networking functionality
 """
 
 import asyncio
-from typing import Set
-from unittest.mock import AsyncMock, Mock, patch
+from unittest.mock import patch
 
 import pytest
 
-from surgify.network.p2p import P2PNode
+from apps.surge.network.p2p import P2PNode
 
 
 class TestP2PNode:

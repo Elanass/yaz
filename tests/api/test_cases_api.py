@@ -10,11 +10,10 @@ from sqlalchemy import create_engine
 from sqlalchemy.orm import sessionmaker
 from sqlalchemy.pool import StaticPool
 
-from surgify.core.cache import cache_client
-from surgify.core.database import Base, get_db
-from surgify.core.models.database_models import CaseModel
-from surgify.core.services.case_service import CaseService
-from surgify.main import app
+from apps.surge.core.cache import cache_client
+from apps.surge.core.database import Base, get_db
+from apps.surge.main import app
+
 
 # Test database setup
 SQLALCHEMY_DATABASE_URL = "sqlite:///:memory:"
@@ -294,7 +293,7 @@ class TestCasesAPI:
         assert len(data) > 0
 
         # Search by diagnosis
-        response = client.get(f"/api/v1/cases/?search=Coronary")
+        response = client.get("/api/v1/cases/?search=Coronary")
         assert response.status_code == 200
         data = response.json()
         assert len(data) > 0

@@ -1,0 +1,40 @@
+# Case Management Dashboard Screenshot
+
+This would be a screenshot showing:
+
+## Dashboard Layout
+```
+┌─────────────────────────────────────────────────────────────────┐
+│ 🏥 Yaz Medical Intelligence Platform                           │
+├─────────────────────────────────────────────────────────────────┤
+│ [Surgery] [Logistics] [Insurance] [All Domains]                │
+├─────────────────────────────────────────────────────────────────┤
+│ Search: [____________________] 🔍 Filter: [Active Cases ▼]     │
+├─────────────────────────────────────────────────────────────────┤
+│ Case ID    | Patient | Domain  | Status     | Last Update      │
+│ GS-001     | P001    | Surgery | Active     | 2h ago          │
+│ GS-002     | P002    | Surgery | Complete   | 1d ago          │
+│ LG-001     | P003    | Logistics| Pending   | 30m ago         │
+│ IN-001     | P004    | Insurance| Review    | 4h ago          │
+├─────────────────────────────────────────────────────────────────┤
+│ 📊 Quick Stats:                                                │
+│ • Total Cases: 42                                              │
+│ • Active: 18    • Complete: 20    • Pending: 4               │
+│ • Avg Processing Time: 3.2 days                               │
+└─────────────────────────────────────────────────────────────────┘
+```
+
+## Key Features Shown
+- Real-time case status tracking
+- Multi-domain filtering (Surgery/Logistics/Insurance)
+- Live collaboration indicators
+- Quick action buttons
+- Status color coding
+
+## Interactive Elements
+- Click cases to open detailed view
+- Drag-and-drop status updates
+- Real-time notifications for changes
+- Collaborative editing with conflict resolution
+
+*Real-time case status tracking with surgical domain filters*

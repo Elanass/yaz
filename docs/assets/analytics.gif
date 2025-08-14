@@ -1,0 +1,78 @@
+# Analytics Dashboard Animation
+
+This would be an animated GIF showing:
+
+## Survival Curve Animation Sequence
+
+### Frame 1: Loading Data
+```
+📊 Analytics Dashboard
+Loading gastric surgery cohort data...
+[████████████████████████████████████] 100%
+```
+
+### Frame 2: Initial Curve
+```
+Kaplan-Meier Survival Curve
+ 
+Survival  ↑
+Rate     1.0 ┤●─●─●─●─●─●─●─●─●─●─●
+         0.8 ┤              ●─●─●─●─●
+         0.6 ┤                    ●─●─●
+         0.4 ┤                        ●
+         0.2 ┤
+         0.0 └─────────────────────────────────→
+             0   200  400  600  800  1000  Days
+```
+
+### Frame 3: Adding Confidence Intervals
+```
+Kaplan-Meier Survival Curve (with 95% CI)
+ 
+Survival  ↑
+Rate     1.0 ┤●═●═●═●═●═●═●═●═●═●═●
+         0.8 ┤ ░░░░░░░░░░░░░░●═●═●═●═●
+         0.6 ┤ ▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓●═●═●
+         0.4 ┤ ▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓●
+         0.2 ┤
+         0.0 └─────────────────────────────────→
+             0   200  400  600  800  1000  Days
+```
+
+### Frame 4: Group Comparison
+```
+Survival by TNM Stage
+ 
+Survival  ↑
+Rate     1.0 ┤●─●─●─●─●─●─●─●─●─●─● Early Stage (T1-T2)
+         0.8 ┤              ●─●─●─●─●
+         0.6 ┤●─●─●─●─●─●─●─●─●─●─● Advanced Stage (T3-T4)
+         0.4 ┤                    ●─●
+         0.2 ┤
+         0.0 └─────────────────────────────────→
+             0   200  400  600  800  1000  Days
+             
+Log-rank test: p = 0.045
+```
+
+### Frame 5: Interactive Features
+```
+📊 Interactive Controls:
+[Group by: TNM Stage ▼] [Time Units: Days ▼]
+[Export PNG] [Export PDF] [Share Link]
+
+Statistics Panel:
+• Median Survival: 845 days
+• 1-year Rate: 82%
+• 2-year Rate: 67%
+• At Risk: T1-T2 (4), T3-T4 (6)
+```
+
+## Animation Features
+- Smooth curve drawing with data points appearing sequentially
+- Interactive hover tooltips showing exact values
+- Real-time statistics updates
+- Color-coded survival groups
+- Confidence interval shading animation
+
+*Interactive survival curves and protocol comparison*

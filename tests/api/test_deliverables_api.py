@@ -3,8 +3,6 @@ End-to-end tests for Deliverables API
 Tests both cache-hit and cache-miss scenarios for deliverable management
 """
 
-from datetime import datetime, timedelta
-
 import fakeredis
 import pytest
 from fastapi.testclient import TestClient
@@ -12,12 +10,11 @@ from sqlalchemy import create_engine
 from sqlalchemy.orm import sessionmaker
 from sqlalchemy.pool import StaticPool
 
-from surgify.core.cache import cache_client
-from surgify.core.database import Base, get_db
-from surgify.core.services.deliverable_service import (DeliverableFormat,
-                                                       DeliverableStatus,
-                                                       DeliverableType)
-from surgify.main import app
+from apps.surge.core.cache import cache_client
+from apps.surge.core.database import Base, get_db
+from apps.surge.core.services.deliverable_service import DeliverableStatus
+from apps.surge.main import app
+
 
 # Test database setup
 SQLALCHEMY_DATABASE_URL = "sqlite:///:memory:"
@@ -107,7 +104,7 @@ class TestDeliverablesAPI:
         """Test deliverable creation with missing required fields"""
         incomplete_data = {
             "type": "case_report",
-            "title": "Test Report"
+            "title": "Test Report",
             # Missing format
         }
 

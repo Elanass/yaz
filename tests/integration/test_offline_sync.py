@@ -1,10 +1,11 @@
 """
 Integration test: Simulate two clients editing the same case and reconciling via CRDT
 """
+
 import pytest
 
-from surgify.core.sync.crdt_json import JSONOT
-from surgify.core.sync.crdt_text import RGA
+from apps.surge.core.sync.crdt_json import JSONOT
+from apps.surge.core.sync.crdt_text import RGA
 
 
 @pytest.mark.asyncio

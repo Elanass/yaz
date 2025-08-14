@@ -1,0 +1,53 @@
+{% extends "shell.html" %}
+
+{% block title %}Loading - Surgify{% endblock %}
+
+{% block content %}
+<div class="flex items-center justify-center h-screen bg-gray-50">
+    <div class="text-center">
+        <!-- Snake-like scalpel animation -->
+        <div class="snake-icon w-16 h-16 mx-auto mb-4">
+            <i class="fas fa-scalpel text-4xl text-blue-600"></i>
+        </div>
+        
+        <!-- Loading message -->
+        <div class="text-lg font-medium text-gray-700 mb-2">Processing...</div>
+        <div class="text-sm text-gray-500 mb-4">Analyzing surgical data</div>
+        
+        <!-- Progress indicator -->
+        <div class="w-64 bg-gray-200 rounded-full h-2 mx-auto">
+            <div class="bg-blue-600 h-2 rounded-full animate-pulse" style="width: 65%"></div>
+        </div>
+        
+        <!-- Additional context -->
+        <div class="mt-6 text-xs text-gray-400 max-w-sm mx-auto">
+            <div id="loading-status">Initializing AI analysis engine...</div>
+        </div>
+    </div>
+</div>
+
+<script>
+// Simulate loading progress
+const loadingSteps = [
+    "Initializing AI analysis engine...",
+    "Processing medical data...",
+    "Running diagnostic algorithms...",
+    "Preparing results...",
+    "Almost ready..."
+];
+
+let stepIndex = 0;
+const statusElement = document.getElementById('loading-status');
+
+const updateStatus = () => {
+    if (stepIndex < loadingSteps.length) {
+        statusElement.textContent = loadingSteps[stepIndex];
+        stepIndex++;
+        setTimeout(updateStatus, 1500);
+    }
+};
+
+// Start the status updates
+updateStatus();
+</script>
+{% endblock %}

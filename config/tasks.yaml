@@ -1,0 +1,68 @@
+version: '1.0'
+description: 'Surge Pipeline Tasks Configuration'
+
+tasks:
+  load_csv:
+    description: 'Load and validate CSV medical data'
+    type: 'load_csv'
+    domain: 'surgery'
+    enabled: true
+    outputs:
+      - 'data_summary'
+      - 'validation_report'
+
+  analyze:
+    description: 'Generate comprehensive statistical analysis'
+    type: 'analyze'
+    domain: 'surgery'
+    depends_on:
+      - 'load_csv'
+    enabled: true
+    outputs:
+      - 'statistics'
+      - 'insights'
+
+  km_curve:
+    description: 'Generate Kaplan-Meier survival curves with confidence intervals'
+    type: 'analysis'
+    domain: 'surgery'
+    depends_on:
+      - 'load_csv'
+    enabled: true
+    parameters:
+      confidence_interval: 0.95
+
+  deliver_practitioner:
+    description: 'Create clinical practitioner report with actionable insights'
+    type: 'deliverable'
+    domain: 'surgery'
+    audience: 'practitioner'
+    depends_on:
+      - 'analyze'
+    enabled: true
+    outputs:
+      - 'pdf_report'
+
+  deliver_researcher:
+    description: 'Create research-focused report with statistical methodology'
+    type: 'deliverable'
+    domain: 'surgery'
+    audience: 'researcher'
+    depends_on:
+      - 'analyze'
+    enabled: true
+    outputs:
+      - 'pdf_report'
+      - 'methodology_notes'
+
+  deliver_community:
+    description: 'Create patient-friendly community education report'
+    type: 'deliverable'
+    domain: 'surgery'
+    audience: 'community'
+    depends_on:
+      - 'analyze'
+    enabled: true
+    outputs:
+      - 'pdf_report'
+      - 'education_materials'

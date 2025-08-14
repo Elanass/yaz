@@ -1,0 +1,13 @@
+{
+  "total_cases": 10,
+  "avg_survival": 32.6,
+  "stage_distribution": {
+    "T2N0M0": 2,
+    "T3N1M0": 2,
+    "T1N0M0": 2,
+    "T4N2M1": 1,
+    "T2N1M0": 1,
+    "T3N0M0": 1,
+    "T2N2M0": 1
+  }
+}

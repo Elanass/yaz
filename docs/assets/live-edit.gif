@@ -1,0 +1,99 @@
+# Live Collaboration Animation
+
+This would be an animated GIF showing:
+
+## Multi-User Editing Sequence
+
+### Frame 1: Dr. Smith Joins (Practitioner)
+```
+🤝 Collaboration Session: Case GS-001
+┌─────────────────────────────────────────┐
+│ 👨‍⚕️ Dr. Smith (Practitioner) - Online     │
+│ ┌─────────────────────────────────────┐ │
+│ │ Patient: GS-001                     │ │
+│ │ TNM Stage: [T2N1M0]                │ │
+│ │ Procedure: [Total Gastrectomy]      │ │
+│ │ Notes: [Editing...▋]                │ │
+│ └─────────────────────────────────────┘ │
+└─────────────────────────────────────────┘
+```
+
+### Frame 2: Dr. Johnson Joins (Researcher)
+```
+🤝 Collaboration Session: Case GS-001
+┌─────────────────────────────────────────┐
+│ 👨‍⚕️ Dr. Smith (Practitioner) - Online     │
+│ 👩‍🔬 Dr. Johnson (Researcher) - Online     │
+│ ┌─────────────────────────────────────┐ │
+│ │ Patient: GS-001                     │ │
+│ │ TNM Stage: [T2N1M0]                │ │
+│ │ Procedure: [Total Gastrectomy]      │ │
+│ │ Notes: Standard procedure...        │ │
+│ │ Research Notes: [Adding...▋]        │ │
+│ └─────────────────────────────────────┘ │
+└─────────────────────────────────────────┘
+```
+
+### Frame 3: Real-time Sync Conflict
+```
+🤝 Collaboration Session: Case GS-001
+┌─────────────────────────────────────────┐
+│ 👨‍⚕️ Dr. Smith ✏️  👩‍🔬 Dr. Johnson ✏️      │
+│ ⚠️ Merge conflict detected              │
+│ ┌─────────────────────────────────────┐ │
+│ │ TNM Stage: T2N1M0                   │ │
+│ │ █ Smith: "Excellent margins"        │ │
+│ │ █ Johnson: "Consider adjuvant"      │ │
+│ │ [Accept Both] [Choose One] [Merge]  │ │
+│ └─────────────────────────────────────┘ │
+└─────────────────────────────────────────┘
+```
+
+### Frame 4: Automatic Resolution
+```
+🤝 Collaboration Session: Case GS-001
+┌─────────────────────────────────────────┐
+│ 👨‍⚕️ Dr. Smith ✅  👩‍🔬 Dr. Johnson ✅      │
+│ ✅ Conflict resolved automatically      │
+│ ┌─────────────────────────────────────┐ │
+│ │ Clinical Notes:                     │ │
+│ │ • Excellent surgical margins        │ │
+│ │ • Consider adjuvant therapy         │ │
+│ │ • Added to research cohort          │ │
+│ │ Last sync: 0.2s ago                │ │
+│ └─────────────────────────────────────┘ │
+└─────────────────────────────────────────┘
+```
+
+### Frame 5: Activity Feed
+```
+🤝 Live Activity Feed
+┌─────────────────────────────────────────┐
+│ 🕐 14:32:15 Dr. Johnson added research  │
+│ 🕐 14:32:12 Dr. Smith updated notes     │
+│ 🕐 14:31:58 CRDT merge completed       │
+│ 🕐 14:31:45 Dr. Johnson joined         │
+│ 🕐 14:30:22 Dr. Smith started session  │
+└─────────────────────────────────────────┘
+
+📊 Session Stats:
+• Active Users: 2
+• Total Edits: 7
+• Conflicts Resolved: 1
+• Sync Latency: 0.2s
+```
+
+## CRDT Features Shown
+- **Real-time synchronization** with sub-second latency
+- **Conflict-free merging** using operational transforms
+- **User presence indicators** showing who's editing what
+- **Automatic conflict resolution** with manual override options
+- **Activity audit trail** for compliance and review
+
+## P2P Network Indicators
+- **Gun.js CRDT** status indicators
+- **Bitchat secure channel** connection status
+- **Offline capability** with sync-on-reconnect
+- **Multi-device support** across desktop/mobile
+
+*Real-time peer synchronization with conflict resolution*

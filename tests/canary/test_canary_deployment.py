@@ -7,8 +7,7 @@ import asyncio
 import json
 import time
 from datetime import datetime
-from typing import Any, Dict, List
-from unittest.mock import Mock, patch
+from typing import Any
 
 import httpx
 import pytest
@@ -47,7 +46,7 @@ class CanaryHealthChecker:
         self.base_url = base_url
         self.client = httpx.AsyncClient(timeout=CanaryTestConfig.API_RESPONSE_TIMEOUT)
 
-    async def check_basic_health(self) -> Dict[str, Any]:
+    async def check_basic_health(self) -> dict[str, Any]:
         """Basic health check endpoint"""
         try:
             response = await self.client.get(f"{self.base_url}/health")
@@ -60,7 +59,7 @@ class CanaryHealthChecker:
         except Exception as e:
             return {"status": "error", "error": str(e), "response_time": None}
 
-    async def check_database_health(self) -> Dict[str, Any]:
+    async def check_database_health(self) -> dict[str, Any]:
         """Database connectivity health check"""
         try:
             response = await self.client.get(f"{self.base_url}/health/database")
@@ -73,7 +72,7 @@ class CanaryHealthChecker:
         except Exception as e:
             return {"status": "error", "error": str(e)}
 
-    async def check_external_dependencies(self) -> Dict[str, Any]:
+    async def check_external_dependencies(self) -> dict[str, Any]:
         """Check external service dependencies"""
         try:
             response = await self.client.get(f"{self.base_url}/health/dependencies")
@@ -86,7 +85,7 @@ class CanaryHealthChecker:
         except Exception as e:
             return {"status": "error", "error": str(e)}
 
-    async def comprehensive_health_check(self) -> Dict[str, Any]:
+    async def comprehensive_health_check(self) -> dict[str, Any]:
         """Run comprehensive health checks"""
         results = await asyncio.gather(
             self.check_basic_health(),
@@ -570,7 +569,7 @@ class CanaryTestRunner:
     """Utility class to run canary tests and generate reports"""
 
     @staticmethod
-    async def run_full_canary_suite() -> Dict[str, Any]:
+    async def run_full_canary_suite() -> dict[str, Any]:
         """Run complete canary test suite and return results"""
         results = {
             "timestamp": datetime.now().isoformat(),

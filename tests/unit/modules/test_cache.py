@@ -9,8 +9,12 @@ from unittest.mock import AsyncMock, Mock, patch
 
 import pytest
 
-from surgify.core.cache import (CacheClient, CacheConfig, cache_response,
-                                generate_cache_key, invalidate_cache)
+from apps.surge.core.cache import (
+    CacheClient,
+    CacheConfig,
+    cache_response,
+    generate_cache_key,
+)
 
 
 class TestCacheClient:
@@ -192,17 +196,14 @@ class TestCacheIntegration:
         """Test cache integration with actual API endpoint"""
         # This would test actual Redis integration
         # Skip if Redis is not available in test environment
-        pass
 
     def test_cache_performance_impact(self):
         """Test cache performance impact on endpoint response times"""
         # Performance testing for cache hit/miss scenarios
-        pass
 
     def test_cache_memory_usage(self):
         """Test cache memory usage patterns"""
         # Memory usage testing for different cache sizes
-        pass
 
 
 class TestCacheConfiguration:
@@ -223,7 +224,6 @@ class TestCacheConfiguration:
             # Test that custom settings are respected
             # This would require modifying the cache implementation
             # to support dynamic configuration
-            pass
 
 
 @pytest.mark.asyncio

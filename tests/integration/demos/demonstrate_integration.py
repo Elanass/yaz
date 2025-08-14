@@ -4,10 +4,9 @@ Universal Research Integration Demonstration
 Shows how the research capabilities enhance existing Surgify functionality
 """
 
-import asyncio
-import json
 import sys
 from pathlib import Path
+
 
 # Add the project root to the Python path
 project_root = Path(__file__).parent.parent.parent.parent
@@ -25,9 +24,9 @@ def demonstrate_backward_compatibility():
     print("\n🔍 Testing Existing Core Services...")
 
     try:
-        from surgify.core.services.ai_service import AIService
-        from surgify.core.services.auth_service import AuthService
-        from surgify.core.services.case_service import CaseService
+        from apps.surge.core.services.ai_service import AIService
+        from apps.surge.core.services.auth_service import AuthService
+        from apps.surge.core.services.case_service import CaseService
 
         print("  ✅ CaseService - Available and unchanged")
         print("  ✅ AuthService - Available and unchanged")
@@ -41,7 +40,7 @@ def demonstrate_backward_compatibility():
     print("\n🔍 Testing Existing Database Models...")
 
     try:
-        from surgify.core.models.database_models import Case, Patient, User
+        from apps.surge.core.models.database_models import Case, Patient, User
 
         print("  ✅ Case model - Available and unchanged")
         print("  ✅ Patient model - Available and unchanged")
@@ -55,10 +54,9 @@ def demonstrate_backward_compatibility():
     print("\n🔍 Testing Existing API Endpoints...")
 
     try:
-        from surgify.api.v1.cases import router as cases_router
-        from surgify.api.v1.dashboard import router as dashboard_router
-        from surgify.api.v1.recommendations import \
-            router as recommendations_router
+        from apps.surge.api.v1.cases import router as cases_router
+        from apps.surge.api.v1.dashboard import router as dashboard_router
+        from apps.surge.api.v1.recommendations import router as recommendations_router
 
         print("  ✅ Cases API - Available with optional research enhancements")
         print("  ✅ Dashboard API - Available with optional research metrics")
@@ -82,14 +80,18 @@ def demonstrate_research_enhancements():
     print("\n🔬 Testing Universal Research Module...")
 
     try:
-        from surgify.modules.universal_research.adapters.surgify_adapter import \
-            SurgifyAdapter
-        from surgify.modules.universal_research.engines.cohort_analyzer import \
-            CohortAnalyzer
-        from surgify.modules.universal_research.engines.outcome_predictor import \
-            OutcomePredictor
-        from surgify.modules.universal_research.engines.research_generator import \
-            ResearchGenerator
+        from apps.surge.modules.universal_research.adapters.surgify_adapter import (
+            SurgifyAdapter,
+        )
+        from apps.surge.modules.universal_research.engines.cohort_analyzer import (
+            CohortAnalyzer,
+        )
+        from apps.surge.modules.universal_research.engines.outcome_predictor import (
+            OutcomePredictor,
+        )
+        from apps.surge.modules.universal_research.engines.research_generator import (
+            ResearchGenerator,
+        )
 
         print("  ✅ SurgifyAdapter - Maps existing cases to research format")
         print("  ✅ CohortAnalyzer - Analyzes surgical cohorts for research")
@@ -105,12 +107,15 @@ def demonstrate_research_enhancements():
     print("\n🔬 Testing Research API Integration...")
 
     try:
-        from surgify.modules.universal_research.integration.api_enhancer import \
-            ResearchAPIEnhancer
-        from surgify.modules.universal_research.integration.auth_integrator import \
-            AuthIntegrator
-        from surgify.modules.universal_research.integration.database_bridge import \
-            DatabaseBridge
+        from apps.surge.modules.universal_research.integration.api_enhancer import (
+            ResearchAPIEnhancer,
+        )
+        from apps.surge.modules.universal_research.integration.auth_integrator import (
+            AuthIntegrator,
+        )
+        from apps.surge.modules.universal_research.integration.database_bridge import (
+            DatabaseBridge,
+        )
 
         print("  ✅ ResearchAPIEnhancer - Adds research endpoints to existing FastAPI")
         print("  ✅ DatabaseBridge - Connects research to existing SQLAlchemy")
@@ -330,12 +335,11 @@ def main():
         print("✅ Universal Research Module successfully integrated!")
         print("🚀 Ready for production deployment!")
         return True
-    else:
-        print(
-            f"\n⚠️ SOME INTEGRATION ISSUES ({success_count}/{len(demonstrations)} successful)"
-        )
-        print("🔧 Review and resolve issues before deployment")
-        return False
+    print(
+        f"\n⚠️ SOME INTEGRATION ISSUES ({success_count}/{len(demonstrations)} successful)"
+    )
+    print("🔧 Review and resolve issues before deployment")
+    return False
 
 
 if __name__ == "__main__":

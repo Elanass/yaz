@@ -1,0 +1,167 @@
+version: '3.8'
+
+services:
+  # API Gateway / Load Balancer
+  nginx:
+    image: nginx:alpine
+    ports:
+      - "80:80"
+      - "443:443"
+    volumes:
+      - ./nginx.cloud.conf:/etc/nginx/nginx.conf
+    depends_on:
+      - surge-api-1
+      - surge-api-2
+    networks:
+      - surge-cloud
+
+  # API Servers (Horizontal scaling)
+  surge-api-1:
+    build: 
+      context: ..
+      dockerfile: deployment/Dockerfile
+    environment:
+      - SURGE_ENV=production
+      - SURGE_PORT=8000
+      - VM_ID=api-1
+      - DATABASE_URL=postgresql://surge:${POSTGRES_PASSWORD}@postgres:5432/surge_prod
+      - REDIS_URL=redis://redis:6379
+      - WORKERS=4
+    volumes:
+      - ../data/cloud:/app/data
+    depends_on:
+      - postgres
+      - redis
+    networks:
+      - surge-cloud
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://localhost:8000/health"]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+
+  surge-api-2:
+    build: 
+      context: ..
+      dockerfile: deployment/Dockerfile
+    environment:
+      - SURGE_ENV=production
+      - SURGE_PORT=8000
+      - VM_ID=api-2
+      - DATABASE_URL=postgresql://surge:${POSTGRES_PASSWORD}@postgres:5432/surge_prod
+      - REDIS_URL=redis://redis:6379
+      - WORKERS=4
+    volumes:
+      - ../data/cloud:/app/data
+    depends_on:
+      - postgres
+      - redis
+    networks:
+      - surge-cloud
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://localhost:8000/health"]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+
+  # Background Workers
+  surge-worker-1:
+    build: 
+      context: ..
+      dockerfile: deployment/Dockerfile
+    command: celery worker -A src.surge.core.tasks --loglevel=info --concurrency=4
+    environment:
+      - SURGE_ENV=production
+      - VM_ROLE=worker
+      - VM_ID=worker-1
+      - DATABASE_URL=postgresql://surge:${POSTGRES_PASSWORD}@postgres:5432/surge_prod
+      - CELERY_BROKER=redis://redis:6379
+    volumes:
+      - ../data/cloud:/app/data
+    depends_on:
+      - postgres
+      - redis
+    networks:
+      - surge-cloud
+
+  # Mesh Network Coordinator
+  surge-mesh:
+    build: 
+      context: ..
+      dockerfile: deployment/Dockerfile
+    command: python -m src.surge.network.mesh_coordinator --port 9000
+    environment:
+      - SURGE_ENV=production
+      - VM_ROLE=mesh
+      - MESH_PORT=9000
+      - DISCOVERY_PORT=9001
+    ports:
+      - "9000:9000"
+      - "9001:9001"
+    volumes:
+      - ../data/cloud:/app/data
+    networks:
+      - surge-cloud
+
+  # Database
+  postgres:
+    image: postgres:15-alpine
+    environment:
+      - POSTGRES_DB=surge_prod
+      - POSTGRES_USER=surge
+      - POSTGRES_PASSWORD=${POSTGRES_PASSWORD}
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
+      - ../data/cloud/backups:/backups
+    ports:
+      - "5432:5432"
+    networks:
+      - surge-cloud
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U surge"]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+
+  # Cache
+  redis:
+    image: redis:7-alpine
+    volumes:
+      - redis_data:/data
+    ports:
+      - "6379:6379"
+    networks:
+      - surge-cloud
+    healthcheck:
+      test: ["CMD", "redis-cli", "ping"]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+
+  # Service Discovery (Optional)
+  consul:
+    image: consul:1.15
+    ports:
+      - "8500:8500"
+    environment:
+      - CONSUL_BIND_INTERFACE=eth0
+    networks:
+      - surge-cloud
+
+  # Monitoring
+  prometheus:
+    image: prom/prometheus
+    ports:
+      - "9090:9090"
+    volumes:
+      - ./prometheus.yml:/etc/prometheus/prometheus.yml
+    networks:
+      - surge-cloud
+
+volumes:
+  postgres_data:
+  redis_data:
+
+networks:
+  surge-cloud:
+    driver: bridge

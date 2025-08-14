@@ -1,0 +1,253 @@
+{% extends "shell.html" %}
+
+{% block title %}Explorer - Indexing Island{% endblock %}
+
+{% block content %}
+<div class="indexing-island max-w-6xl mx-auto" id="indexing-island">
+    <!-- Search Header -->
+    <div class="search-header bg-white rounded-lg shadow-sm p-6 mb-6">
+        <div class="text-center mb-6">
+            <h1 class="text-3xl font-bold text-gray-900 mb-2">Medical Case Explorer</h1>
+            <p class="text-gray-600">Search and discover surgical cases, procedures, and medical insights</p>
+        </div>
+        
+        <!-- Advanced Search Bar -->
+        <div class="search-container">
+            <div class="flex space-x-4 mb-4">
+                <div class="flex-1">
+                    <div class="relative">
+                        <input type="text" 
+                               id="search-input"
+                               placeholder="Search cases, procedures, diagnoses..."
+                               class="w-full pl-12 pr-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+                               hx-post="/api/v1/islands/indexing/search"
+                               hx-target="#search-results"
+                               hx-trigger="keyup changed delay:500ms"
+                               hx-include="[name='filters']">
+                        <i class="fas fa-search absolute left-4 top-1/2 transform -translate-y-1/2 text-gray-400"></i>
+                    </div>
+                </div>
+                <button class="bg-blue-600 text-white px-6 py-3 rounded-lg hover:bg-blue-700 transition-colors"
+                        hx-post="/api/v1/islands/indexing/search"
+                        hx-target="#search-results"
+                        hx-include="#search-input">
+                    <i class="fas fa-search mr-2"></i>Search
+                </button>
+            </div>
+            
+            <!-- Quick Filter Tags -->
+            <div class="flex flex-wrap gap-2 mb-4">
+                <button class="filter-tag px-3 py-1 bg-blue-100 text-blue-700 rounded-full text-sm hover:bg-blue-200 transition-colors"
+                        onclick="setSearchFilter('oncology')">
+                    <i class="fas fa-ribbon mr-1"></i>Oncology
+                </button>
+                <button class="filter-tag px-3 py-1 bg-green-100 text-green-700 rounded-full text-sm hover:bg-green-200 transition-colors"
+                        onclick="setSearchFilter('cardiology')">
+                    <i class="fas fa-heart mr-1"></i>Cardiology
+                </button>
+                <button class="filter-tag px-3 py-1 bg-purple-100 text-purple-700 rounded-full text-sm hover:bg-purple-200 transition-colors"
+                        onclick="setSearchFilter('neurosurgery')">
+                    <i class="fas fa-brain mr-1"></i>Neurosurgery
+                </button>
+                <button class="filter-tag px-3 py-1 bg-orange-100 text-orange-700 rounded-full text-sm hover:bg-orange-200 transition-colors"
+                        onclick="setSearchFilter('orthopedics')">
+                    <i class="fas fa-bone mr-1"></i>Orthopedics
+                </button>
+                <button class="filter-tag px-3 py-1 bg-red-100 text-red-700 rounded-full text-sm hover:bg-red-200 transition-colors"
+                        onclick="setSearchFilter('emergency')">
+                    <i class="fas fa-ambulance mr-1"></i>Emergency
+                </button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Filter Sidebar & Results Layout -->
+    <div class="flex gap-6">
+        <!-- Filters Sidebar -->
+        <div class="w-64 flex-shrink-0">
+            <div class="filters-panel bg-white rounded-lg shadow-sm p-6 sticky top-6">
+                <h3 class="text-lg font-semibold text-gray-900 mb-4">Filters</h3>
+                
+                <!-- Procedure Type Filter -->
+                <div class="filter-group mb-6">
+                    <h4 class="font-medium text-gray-700 mb-2">Procedure Type</h4>
+                    <div class="space-y-2">
+                        <label class="flex items-center">
+                            <input type="checkbox" name="filters" value="laparoscopic" class="mr-2">
+                            <span class="text-sm">Laparoscopic</span>
+                        </label>
+                        <label class="flex items-center">
+                            <input type="checkbox" name="filters" value="open_surgery" class="mr-2">
+                            <span class="text-sm">Open Surgery</span>
+                        </label>
+                        <label class="flex items-center">
+                            <input type="checkbox" name="filters" value="robotic" class="mr-2">
+                            <span class="text-sm">Robotic</span>
+                        </label>
+                        <label class="flex items-center">
+                            <input type="checkbox" name="filters" value="endoscopic" class="mr-2">
+                            <span class="text-sm">Endoscopic</span>
+                        </label>
+                    </div>
+                </div>
+                
+                <!-- Complexity Filter -->
+                <div class="filter-group mb-6">
+                    <h4 class="font-medium text-gray-700 mb-2">Complexity</h4>
+                    <div class="space-y-2">
+                        <label class="flex items-center">
+                            <input type="checkbox" name="filters" value="low" class="mr-2">
+                            <span class="text-sm">Low</span>
+                        </label>
+                        <label class="flex items-center">
+                            <input type="checkbox" name="filters" value="medium" class="mr-2">
+                            <span class="text-sm">Medium</span>
+                        </label>
+                        <label class="flex items-center">
+                            <input type="checkbox" name="filters" value="high" class="mr-2">
+                            <span class="text-sm">High</span>
+                        </label>
+                    </div>
+                </div>
+                
+                <!-- Date Range Filter -->
+                <div class="filter-group mb-6">
+                    <h4 class="font-medium text-gray-700 mb-2">Date Range</h4>
+                    <div class="space-y-2">
+                        <input type="date" name="filters" class="w-full p-2 border border-gray-300 rounded text-sm">
+                        <input type="date" name="filters" class="w-full p-2 border border-gray-300 rounded text-sm">
+                    </div>
+                </div>
+                
+                <!-- Clear Filters -->
+                <button class="w-full bg-gray-100 text-gray-700 py-2 rounded hover:bg-gray-200 transition-colors"
+                        onclick="clearAllFilters()">
+                    Clear All Filters
+                </button>
+            </div>
+        </div>
+        
+        <!-- Search Results -->
+        <div class="flex-1">
+            <div id="search-results" class="search-results">
+                <!-- Default state - no search performed yet -->
+                <div class="text-center py-12">
+                    <i class="fas fa-search text-6xl text-gray-300 mb-4"></i>
+                    <h3 class="text-xl font-medium text-gray-500 mb-2">Ready to Search</h3>
+                    <p class="text-gray-400">Enter keywords or select filters to find medical cases</p>
+                </div>
+            </div>
+            
+            <!-- Search Results Template (hidden, used by HTMX) -->
+            <template id="search-results-template">
+                <div class="results-header flex justify-between items-center mb-6">
+                    <div>
+                        <h3 class="text-lg font-semibold text-gray-900">Search Results</h3>
+                        <p class="text-sm text-gray-600"><span id="results-count">0</span> cases found</p>
+                    </div>
+                    <div class="flex space-x-2">
+                        <select class="border border-gray-300 rounded px-3 py-1 text-sm" onchange="sortResults(this.value)">
+                            <option value="relevance">Sort by Relevance</option>
+                            <option value="date">Sort by Date</option>
+                            <option value="complexity">Sort by Complexity</option>
+                        </select>
+                        <button class="p-2 border border-gray-300 rounded hover:bg-gray-50" onclick="toggleView('grid')">
+                            <i class="fas fa-th"></i>
+                        </button>
+                        <button class="p-2 border border-gray-300 rounded hover:bg-gray-50" onclick="toggleView('list')">
+                            <i class="fas fa-list"></i>
+                        </button>
+                    </div>
+                </div>
+                
+                <div id="results-container" class="results-grid grid md:grid-cols-2 lg:grid-cols-3 gap-6">
+                    <!-- Results will be populated here -->
+                </div>
+                
+                <!-- Pagination -->
+                <div class="pagination flex justify-center mt-8">
+                    <nav class="flex space-x-2">
+                        <button class="px-3 py-2 border border-gray-300 rounded hover:bg-gray-50">Previous</button>
+                        <button class="px-3 py-2 bg-blue-600 text-white rounded">1</button>
+                        <button class="px-3 py-2 border border-gray-300 rounded hover:bg-gray-50">2</button>
+                        <button class="px-3 py-2 border border-gray-300 rounded hover:bg-gray-50">3</button>
+                        <button class="px-3 py-2 border border-gray-300 rounded hover:bg-gray-50">Next</button>
+                    </nav>
+                </div>
+            </template>
+        </div>
+    </div>
+
+    <!-- Recent Searches -->
+    <div class="recent-searches mt-8">
+        <div class="bg-white rounded-lg shadow-sm p-6">
+            <h3 class="text-lg font-semibold text-gray-900 mb-4">Recent Searches</h3>
+            <div class="flex flex-wrap gap-2">
+                <span class="recent-search-tag px-3 py-1 bg-gray-100 text-gray-700 rounded-full text-sm cursor-pointer hover:bg-gray-200"
+                      onclick="setSearch('gastric cancer')">gastric cancer</span>
+                <span class="recent-search-tag px-3 py-1 bg-gray-100 text-gray-700 rounded-full text-sm cursor-pointer hover:bg-gray-200"
+                      onclick="setSearch('laparoscopic surgery')">laparoscopic surgery</span>
+                <span class="recent-search-tag px-3 py-1 bg-gray-100 text-gray-700 rounded-full text-sm cursor-pointer hover:bg-gray-200"
+                      onclick="setSearch('cardiac procedures')">cardiac procedures</span>
+                <span class="recent-search-tag px-3 py-1 bg-gray-100 text-gray-700 rounded-full text-sm cursor-pointer hover:bg-gray-200"
+                      onclick="setSearch('neurosurgery')">neurosurgery</span>
+            </div>
+        </div>
+    </div>
+</div>
+
+<script>
+// Search and filter functions
+function setSearchFilter(filter) {
+    document.getElementById('search-input').value = filter;
+    htmx.trigger('#search-input', 'keyup');
+}
+
+function setSearch(query) {
+    document.getElementById('search-input').value = query;
+    htmx.trigger('#search-input', 'keyup');
+}
+
+function clearAllFilters() {
+    document.querySelectorAll('input[name="filters"]').forEach(input => {
+        if (input.type === 'checkbox') {
+            input.checked = false;
+        } else {
+            input.value = '';
+        }
+    });
+    htmx.trigger('#search-input', 'keyup');
+}
+
+function sortResults(sortBy) {
+    // Trigger re-search with sort parameter
+    htmx.ajax('POST', '/api/v1/islands/indexing/search', {
+        target: '#search-results',
+        values: {
+            query: document.getElementById('search-input').value,
+            sort: sortBy
+        }
+    });
+}
+
+function toggleView(viewType) {
+    const container = document.getElementById('results-container');
+    if (viewType === 'grid') {
+        container.className = 'results-grid grid md:grid-cols-2 lg:grid-cols-3 gap-6';
+    } else {
+        container.className = 'results-list space-y-4';
+    }
+}
+
+// Initialize indexing island
+document.addEventListener('DOMContentLoaded', function() {
+    // Set up real-time search
+    const searchInput = document.getElementById('search-input');
+    
+    // Load popular/trending searches on load
+    htmx.ajax('GET', '/api/v1/islands/indexing/trending', {
+        target: '#trending-searches'
+    });
+});
+</script>
+{% endblock %}

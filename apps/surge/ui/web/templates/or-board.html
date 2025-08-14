@@ -1,0 +1,183 @@
+{% extends "shell.html" %}
+
+{% block title %}OR Board - Surgery Platform{% endblock %}
+
+{% block content %}
+<!-- Page header -->
+<div class="mb-8">
+    <div class="sm:flex sm:items-center sm:justify-between">
+        <div>
+            <h1 class="text-2xl font-bold text-gray-900">OR Board</h1>
+            <p class="mt-1 text-sm text-gray-500">Live operating room status and case tracking</p>
+        </div>
+        <div class="mt-4 sm:mt-0 flex items-center space-x-3">
+            <div class="flex items-center space-x-2 text-sm text-gray-600">
+                <div class="w-3 h-3 bg-green-500 rounded-full"></div>
+                <span>Available</span>
+                <div class="w-3 h-3 bg-yellow-500 rounded-full ml-4"></div>
+                <span>In Use</span>
+                <div class="w-3 h-3 bg-red-500 rounded-full ml-4"></div>
+                <span>Emergency</span>
+            </div>
+            <button type="button" 
+                    class="btn-secondary"
+                    hx-get="/api/v1/or-board/refresh"
+                    hx-target="#or-board-island"
+                    hx-trigger="click">
+                Refresh
+            </button>
+        </div>
+    </div>
+</div>
+
+<!-- OR Board React Island -->
+<div class="card">
+    <div class="p-6">
+        <div id="or-board-island" 
+             data-island="or-board" 
+             data-island-id="main-or-board">
+            <script type="application/json">
+            {
+                "component": "ORBoard",
+                "props": {
+                    "rooms": {{ rooms | tojson if rooms else "[]" }},
+                    "cases": {{ cases | tojson if cases else "[]" }},
+                    "staff": {{ staff | tojson if staff else "[]" }},
+                    "autoRefresh": 30,
+                    "onCaseUpdate": {
+                        "endpoint": "/api/v1/cases/{id}/status",
+                        "target": "#or-board-island"
+                    },
+                    "onRoomChange": {
+                        "endpoint": "/api/v1/rooms/{id}/status",
+                        "target": "#or-board-island"
+                    },
+                    "onEmergency": {
+                        "endpoint": "/api/v1/alerts/emergency",
+                        "target": "#alerts-panel"
+                    }
+                }
+            }
+            </script>
+            <!-- Fallback content -->
+            <div class="fallback-or-board">
+                <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+                    {% for i in range(6) %}
+                    <div class="border rounded-lg p-4">
+                        <div class="animate-pulse">
+                            <div class="h-6 bg-gray-200 rounded mb-3"></div>
+                            <div class="h-4 bg-gray-200 rounded mb-2"></div>
+                            <div class="h-4 bg-gray-200 rounded mb-2"></div>
+                            <div class="h-4 bg-gray-200 rounded"></div>
+                        </div>
+                    </div>
+                    {% endfor %}
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Live Updates Panel -->
+<div class="grid grid-cols-1 lg:grid-cols-3 gap-6 mt-8">
+    <div class="lg:col-span-2">
+        <div class="card">
+            <div class="p-6">
+                <h3 class="text-lg font-semibold text-gray-900 mb-4">Case Timeline</h3>
+                <div id="case-timeline" 
+                     hx-get="/api/v1/cases/timeline" 
+                     hx-trigger="load, every 30s"
+                     hx-swap="innerHTML">
+                    <div class="animate-pulse space-y-4">
+                        <div class="flex items-center space-x-4">
+                            <div class="w-3 h-3 bg-gray-200 rounded-full"></div>
+                            <div class="h-4 bg-gray-200 rounded flex-1"></div>
+                        </div>
+                        <div class="flex items-center space-x-4">
+                            <div class="w-3 h-3 bg-gray-200 rounded-full"></div>
+                            <div class="h-4 bg-gray-200 rounded flex-1"></div>
+                        </div>
+                        <div class="flex items-center space-x-4">
+                            <div class="w-3 h-3 bg-gray-200 rounded-full"></div>
+                            <div class="h-4 bg-gray-200 rounded flex-1"></div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+    
+    <div class="space-y-6">
+        <!-- Alerts Panel -->
+        <div class="card">
+            <div class="p-6">
+                <h3 class="text-lg font-semibold text-gray-900 mb-4">Alerts</h3>
+                <div id="alerts-panel" 
+                     hx-get="/api/v1/alerts/active" 
+                     hx-trigger="load, every 15s">
+                    <div class="text-sm text-gray-500">No active alerts</div>
+                </div>
+            </div>
+        </div>
+        
+        <!-- Quick Actions -->
+        <div class="card">
+            <div class="p-6">
+                <h3 class="text-lg font-semibold text-gray-900 mb-4">Quick Actions</h3>
+                <div class="space-y-2">
+                    <button class="w-full btn-secondary text-left"
+                            hx-get="/api/v1/cases/emergency-form"
+                            hx-target="#emergency-modal"
+                            hx-trigger="click">
+                        Emergency Case
+                    </button>
+                    <button class="w-full btn-secondary text-left"
+                            hx-get="/api/v1/rooms/cleaning-form"
+                            hx-target="#cleaning-modal"
+                            hx-trigger="click">
+                        Room Cleaning
+                    </button>
+                    <button class="w-full btn-secondary text-left"
+                            hx-get="/api/v1/staff/call-team"
+                            hx-target="#call-modal"
+                            hx-trigger="click">
+                        Call Team
+                    </button>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Modals -->
+<div id="emergency-modal"></div>
+<div id="cleaning-modal"></div>
+<div id="call-modal"></div>
+
+<!-- Auto-refresh script -->
+<script>
+document.addEventListener('DOMContentLoaded', function() {
+    // Auto-refresh the entire board every 2 minutes
+    setInterval(function() {
+        htmx.ajax('GET', '/api/v1/or-board/refresh', {
+            target: '#or-board-island'
+        });
+    }, 120000);
+    
+    // Play alert sound for emergencies
+    document.addEventListener('htmx:afterSwap', function(event) {
+        if (event.detail.target.id === 'alerts-panel') {
+            const alerts = event.detail.target.querySelectorAll('.alert-emergency');
+            if (alerts.length > 0) {
+                // Play alert sound (you can customize this)
+                if (window.Audio) {
+                    const audio = new Audio('/static/sounds/alert.mp3');
+                    audio.play().catch(e => console.log('Could not play alert sound'));
+                }
+            }
+        }
+    });
+});
+</script>
+
+{% endblock %}

@@ -1,0 +1,323 @@
+{% extends "shell.html" %}
+
+{% block title %}Dashboard - SURGE Surgery Platform{% endblock %}
+
+{% block content %}
+<!-- Dashboard Header -->
+<div class="mb-6">
+    <h1 class="text-2xl font-bold text-gray-900">Surgery Dashboard</h1>
+    <p class="text-gray-600">High-end perioperative coordination system</p>
+</div>
+
+<!-- Quick Stats with Real-time Updates -->
+<div class="grid grid-cols-1 md:grid-cols-4 gap-4 mb-6">
+    <div class="bg-white p-4 rounded-lg shadow-sm border">
+        <div class="flex items-center justify-between">
+            <div>
+                <p class="text-sm text-gray-500">Active Cases</p>
+                <p class="text-2xl font-bold text-blue-600" hx-get="/api/v1/cases/count" hx-trigger="load, every 30s">0</p>
+            </div>
+            <div class="w-8 h-8 bg-blue-100 rounded-full flex items-center justify-center">
+                <svg class="w-4 h-4 text-blue-600" fill="currentColor" viewBox="0 0 20 20">
+                    <path d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"/>
+                </svg>
+            </div>
+        </div>
+    </div>
+    
+    <div class="bg-white p-4 rounded-lg shadow-sm border">
+        <div class="flex items-center justify-between">
+            <div>
+                <p class="text-sm text-gray-500">OR Efficiency</p>
+                <p class="text-2xl font-bold text-green-600" hx-get="/api/v1/or/efficiency" hx-trigger="load, every 60s">92%</p>
+            </div>
+            <div class="w-8 h-8 bg-green-100 rounded-full flex items-center justify-center">
+                <svg class="w-4 h-4 text-green-600" fill="currentColor" viewBox="0 0 20 20">
+                    <path d="M13 6a3 3 0 11-6 0 3 3 0 016 0zM18 8a2 2 0 11-4 0 2 2 0 014 0zM14 15a4 4 0 00-8 0v3h8v-3z"/>
+                </svg>
+            </div>
+        </div>
+    </div>
+    
+    <div class="bg-white p-4 rounded-lg shadow-sm border">
+        <div class="flex items-center justify-between">
+            <div>
+                <p class="text-sm text-gray-500">Safety Score</p>
+                <p class="text-2xl font-bold text-orange-600" hx-get="/api/v1/safety/score" hx-trigger="load, every 30s">96%</p>
+            </div>
+            <div class="w-8 h-8 bg-orange-100 rounded-full flex items-center justify-center">
+                <svg class="w-4 h-4 text-orange-600" fill="currentColor" viewBox="0 0 20 20">
+                    <path fill-rule="evenodd" d="M10 1.944A11.954 11.954 0 012.166 5C2.056 5.649 2 6.319 2 7c0 5.225 3.34 9.67 8 11.317C14.66 16.67 18 12.225 18 7c0-.682-.057-1.35-.166-2.001A11.954 11.954 0 0110 1.944zM11.207 8.5l-4.5 4.5L5 11.293l1.293-1.293L8 11.707l3.207-3.207L11.207 8.5z"/>
+                </svg>
+            </div>
+        </div>
+    </div>
+    
+    <div class="bg-white p-4 rounded-lg shadow-sm border">
+        <div class="flex items-center justify-between">
+            <div>
+                <p class="text-sm text-gray-500">Alerts</p>
+                <p class="text-2xl font-bold text-red-600" hx-get="/api/v1/alerts/count" hx-trigger="load, every 10s">0</p>
+            </div>
+            <div class="w-8 h-8 bg-red-100 rounded-full flex items-center justify-center">
+                <svg class="w-4 h-4 text-red-600" fill="currentColor" viewBox="0 0 20 20">
+                    <path fill-rule="evenodd" d="M8.257 3.099c.765-1.36 2.722-1.36 3.486 0l5.58 9.92c.75 1.334-.213 2.98-1.742 2.98H4.42c-1.53 0-2.493-1.646-1.743-2.98l5.58-9.92z"/>
+                </svg>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Three-Column Layout for Coordinated Islands -->
+<div class="grid grid-cols-1 xl:grid-cols-3 gap-6 mb-6">
+    <!-- OR Board - Primary Focus -->
+    <div class="xl:col-span-2 bg-white rounded-lg shadow-sm border">
+        <div class="p-4 border-b">
+            <h2 class="text-lg font-semibold">Live OR Board</h2>
+            <p class="text-sm text-gray-600">Real-time operating room status with coordinated workflow</p>
+        </div>
+        <div id="orboard-island" data-island="orboard" class="min-h-[600px]">
+            <div class="flex items-center justify-center h-40 text-gray-500">
+                <div class="text-center">
+                    <div class="animate-spin rounded-full h-8 w-8 border-b-2 border-blue-600 mx-auto mb-2"></div>
+                    <p>Loading OR Board...</p>
+                </div>
+            </div>
+        </div>
+    </div>
+    
+    <!-- Interact Tools - Workflow Management -->
+    <div class="bg-white rounded-lg shadow-sm border">
+        <div class="p-4 border-b">
+            <h2 class="text-lg font-semibold">Workflow Tools</h2>
+            <p class="text-sm text-gray-600">Interactive case management and safety tools</p>
+        </div>
+        <div id="interact-island" data-island="interact" class="min-h-[600px]">
+            <div class="flex items-center justify-center h-40 text-gray-500">
+                <div class="text-center">
+                    <div class="animate-spin rounded-full h-8 w-8 border-b-2 border-green-600 mx-auto mb-2"></div>
+                    <p>Loading Workflow Tools...</p>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Analytics Dashboard - Full Width -->
+<div class="bg-white rounded-lg shadow-sm border mb-6">
+    <div class="p-4 border-b">
+        <h2 class="text-lg font-semibold">Analytics Dashboard</h2>
+        <p class="text-sm text-gray-600">Performance metrics, quality indicators, and predictive analytics</p>
+    </div>
+    <div id="dash-island" data-island="dash" class="min-h-[400px]">
+        <div class="flex items-center justify-center h-40 text-gray-500">
+            <div class="text-center">
+                <div class="animate-spin rounded-full h-8 w-8 border-b-2 border-purple-600 mx-auto mb-2"></div>
+                <p>Loading Analytics...</p>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Coordination Status -->
+<div class="bg-gray-50 rounded-lg p-4">
+    <div class="flex items-center justify-between">
+        <div>
+            <h3 class="text-sm font-semibold text-gray-900">System Coordination</h3>
+            <p class="text-xs text-gray-600">Islands are synchronized for real-time updates</p>
+        </div>
+        <div class="flex items-center space-x-2">
+            <div class="w-2 h-2 bg-green-500 rounded-full animate-pulse"></div>
+            <span class="text-xs text-gray-600">Live</span>
+        </div>
+    </div>
+</div>
+
+<!-- Enhanced Islands Coordination Script -->
+<script>
+document.addEventListener('DOMContentLoaded', function() {
+    // Enhanced coordination configuration
+    window.surgePlatform = window.surgePlatform || {};
+    window.surgePlatform.coordination = {
+        enabled: true,
+        autoSync: true,
+        realTimeUpdates: true,
+        safetyAlerts: true,
+        auditLogging: true
+    };
+    
+    // Island configurations with coordination
+    window.surgePlatform.islands = {
+        orboard: {
+            element: 'orboard-island',
+            component: 'ORBoard',
+            coordination: {
+                emits: ['room_selected', 'case_update', 'phase_change', 'alert'],
+                listens: ['dash:update', 'interact:update', 'surge:case_update']
+            }
+        },
+        interact: {
+            element: 'interact-island', 
+            component: 'InteractApp',
+            coordination: {
+                emits: ['checklist_update', 'instrument_count', 'vitals_update', 'workflow_change'],
+                listens: ['orboard:room_selected', 'orboard:case_update', 'dash:analytics_update']
+            }
+        },
+        dash: {
+            element: 'dash-island',
+            component: 'DashApp', 
+            coordination: {
+                emits: ['metrics_update', 'efficiency_alert', 'analytics_update'],
+                listens: ['orboard:room_update', 'interact:workflow_change', 'surge:performance_update']
+            }
+        }
+    };
+    
+    console.log('🚀 SURGE Dashboard with coordinated islands loading...');
+});
+</script>
+
+<!-- Coordination Test Script for Development -->
+<script src="/static/js/coordination-test.js"></script>
+{% endblock %}
+        <div class="flex items-center">
+            <div class="flex-shrink-0">
+                <div class="w-8 h-8 bg-yellow-100 rounded-md flex items-center justify-center">
+                    <svg class="w-5 h-5 text-yellow-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z"/>
+                    </svg>
+                </div>
+            </div>
+            <div class="ml-4">
+                <h3 class="text-sm font-medium text-gray-500">Scheduled Today</h3>
+                <p class="text-2xl font-semibold text-gray-900">
+                    <span hx-get="/api/v1/cases/stats" hx-trigger="load" hx-select="#scheduled-today" id="scheduled-today">0</span>
+                </p>
+            </div>
+        </div>
+    </div>
+    
+    <div class="card">
+        <div class="flex items-center">
+            <div class="flex-shrink-0">
+                <div class="w-8 h-8 bg-purple-100 rounded-md flex items-center justify-center">
+                    <svg class="w-5 h-5 text-purple-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 19v-6a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2a2 2 0 002-2zm0 0V9a2 2 0 012-2h2a2 2 0 012 2v10m-6 0a2 2 0 002 2h2a2 2 0 002-2m0 0V5a2 2 0 012-2h2a2 2 0 012 2v4a2 2 0 01-2 2h-2a2 2 0 01-2-2z"/>
+                    </svg>
+                </div>
+            </div>
+            <div class="ml-4">
+                <h3 class="text-sm font-medium text-gray-500">OR Utilization</h3>
+                <p class="text-2xl font-semibold text-gray-900">
+                    <span hx-get="/api/v1/analytics/utilization" hx-trigger="load" hx-select="#utilization" id="utilization">--</span>%
+                </p>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Main Dashboard Content -->
+<div class="grid grid-cols-1 lg:grid-cols-3 gap-8">
+    <!-- Recent Cases -->
+    <div class="lg:col-span-2">
+        <div class="card">
+            <div class="flex items-center justify-between mb-6">
+                <h2 class="text-lg font-semibold text-gray-900">Recent Cases</h2>
+                <a href="/cases" class="text-blue-600 hover:text-blue-800 text-sm font-medium">View all</a>
+            </div>
+            <div id="recent-cases" 
+                 hx-get="/api/v1/cases/recent" 
+                 hx-trigger="load, every 30s" 
+                 hx-indicator=".cases-loading">
+                <div class="cases-loading htmx-indicator">
+                    <div class="flex items-center justify-center py-8">
+                        <div class="animate-spin rounded-full h-8 w-8 border-b-2 border-blue-600"></div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+    
+    <!-- Today's Schedule -->
+    <div class="card">
+        <div class="flex items-center justify-between mb-6">
+            <h2 class="text-lg font-semibold text-gray-900">Today's Schedule</h2>
+            <a href="/schedule" class="text-blue-600 hover:text-blue-800 text-sm font-medium">Full schedule</a>
+        </div>
+        <div id="todays-schedule" 
+             hx-get="/api/v1/schedule/today" 
+             hx-trigger="load, every 60s"
+             hx-indicator=".schedule-loading">
+            <div class="schedule-loading htmx-indicator">
+                <div class="flex items-center justify-center py-8">
+                    <div class="animate-spin rounded-full h-6 w-6 border-b-2 border-blue-600"></div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- React Islands Mount Points -->
+{% if islands %}
+    {% for island_id, island_config in islands.items() %}
+        <div data-island="{{ island_config.component or island_config.type }}" 
+             id="island-{{ island_id }}" 
+             class="mt-8">
+            <!-- Island will be mounted here by islands-bootstrap.js -->
+        </div>
+    {% endfor %}
+{% endif %}
+
+<!-- Quick Actions Floating Button -->
+<div class="fixed bottom-6 right-6">
+    <div class="relative">
+        <button id="quick-actions-btn" 
+                class="bg-blue-600 hover:bg-blue-700 text-white rounded-full w-14 h-14 flex items-center justify-center shadow-lg transition-colors">
+            <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 6v6m0 0v6m0-6h6m-6 0H6"/>
+            </svg>
+        </button>
+        
+        <!-- Quick Actions Menu -->
+        <div id="quick-actions-menu" 
+             class="hidden absolute bottom-16 right-0 bg-white rounded-lg shadow-xl border py-2 w-48">
+            <a href="/cases/new" class="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-100">
+                <svg class="w-4 h-4 inline mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5H7a2 2 0 00-2 2v10a2 2 0 002 2h8a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2"/>
+                </svg>
+                New Case
+            </a>
+            <a href="/schedule/new" class="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-100">
+                <svg class="w-4 h-4 inline mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z"/>
+                </svg>
+                Schedule Surgery
+            </a>
+            <a href="/or-board" class="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-100">
+                <svg class="w-4 h-4 inline mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 17V7m0 10a2 2 0 01-2 2H5a2 2 0 01-2-2V7a2 2 0 012-2h2a2 2 0 012 2m0 10a2 2 0 002 2h2a2 2 0 002-2M9 7a2 2 0 012-2h2a2 2 0 012 2m0 10V7m0 10a2 2 0 002 2h2a2 2 0 002-2V7a2 2 0 00-2-2h-2a2 2 0 00-2 2"/>
+                </svg>
+                OR Board
+            </a>
+        </div>
+    </div>
+</div>
+
+<script>
+    // Quick actions menu toggle
+    document.getElementById('quick-actions-btn').addEventListener('click', function() {
+        const menu = document.getElementById('quick-actions-menu');
+        menu.classList.toggle('hidden');
+    });
+    
+    // Close quick actions menu when clicking outside
+    document.addEventListener('click', function(event) {
+        const btn = document.getElementById('quick-actions-btn');
+        const menu = document.getElementById('quick-actions-menu');
+        if (!btn.contains(event.target) && !menu.contains(event.target)) {
+            menu.classList.add('hidden');
+        }
+    });
+</script>
+{% endblock %}

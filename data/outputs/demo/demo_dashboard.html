@@ -1,0 +1,51 @@
+
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Yaz Demo Dashboard</title>
+    <style>
+        body { font-family: Arial, sans-serif; margin: 20px; }
+        .metric { background: #f5f5f5; padding: 15px; margin: 10px 0; border-radius: 5px; }
+        .success { color: #27ae60; }
+        .warning { color: #f39c12; }
+    </style>
+</head>
+<body>
+    <h1>🏥 Yaz Medical Intelligence Platform - Demo Dashboard</h1>
+    <h2>Gastric Surgery Cohort Analysis</h2>
+    
+    <div class="metric">
+        <h3>📊 Dataset Overview</h3>
+        <p><strong>Cases:</strong> 10</p>
+        <p><strong>Domain:</strong> Surgery/Gastric Oncology</p>
+        <p><strong>Generated:</strong> 2025-08-08 19:17:35</p>
+    </div>
+    
+    <div class="metric">
+        <h3>📈 Survival Metrics</h3>
+        <p class="success"><strong>Median Survival:</strong> 845 days</p>
+        <p class="success"><strong>1-Year Survival:</strong> 82%</p>
+        <p class="warning"><strong>2-Year Survival:</strong> 67%</p>
+    </div>
+    
+    <div class="metric">
+        <h3>🎯 Generated Artifacts</h3>
+        <ul>
+            <li><a href="gastric_analysis.pdf">📄 Practitioner Report (PDF)</a></li>
+            <li><a href="gastric_analysis.json">📊 Analytics Data (JSON)</a></li>
+            <li><a href="gastric_cohort_sample.csv">📋 Source Data (CSV)</a></li>
+        </ul>
+    </div>
+    
+    <div class="metric">
+        <h3>🚀 Next Steps</h3>
+        <p>🔄 Real-time collaboration: <code>yaz collab start --case-id demo_001</code></p>
+        <p>📊 Advanced analytics: <code>yaz analyze-gastric --file data.csv</code></p>
+        <p>🎯 Domain detection: <code>yaz detect-domain --file data.csv</code></p>
+    </div>
+    
+    <footer style="margin-top: 50px; color: #666;">
+        <p><em>Yaz - Transforming medical data into actionable intelligence</em></p>
+    </footer>
+</body>
+</html>

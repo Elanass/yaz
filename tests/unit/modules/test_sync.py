@@ -4,16 +4,20 @@ Tests data synchronization and messaging functionality
 """
 
 from datetime import datetime, timedelta
-from typing import List
 from unittest.mock import AsyncMock, Mock, patch
 
 import pytest
 
-from surgify.api.v1.sync import router
-from surgify.core.services.sync_service import (MessageRequest,
-                                                MessageResponse, MessageType,
-                                                SyncRequest, SyncResponse,
-                                                SyncService, SyncStatus)
+from apps.surge.api.v1.sync import router
+from apps.surge.core.services.sync_service import (
+    MessageRequest,
+    MessageResponse,
+    MessageType,
+    SyncRequest,
+    SyncResponse,
+    SyncService,
+    SyncStatus,
+)
 
 
 class TestSyncService:
@@ -276,20 +280,17 @@ class TestSyncIntegration:
         """Test complete sync workflow from creation to completion"""
         # This would be a comprehensive integration test
         # that tests the entire sync process
-        pass
 
     @pytest.mark.asyncio
     async def test_sync_with_real_external_api(self):
         """Test sync with actual external API endpoints"""
         # This would test against real external systems
         # Skip if external systems are not available
-        pass
 
     @pytest.mark.asyncio
     async def test_sync_performance_under_load(self):
         """Test sync performance with large datasets"""
         # Performance testing for sync operations
-        pass
 
 
 class TestSyncAPI:

@@ -1,0 +1,6 @@
+system_id,patient_id,primary_region,involved_regions,functional_status,gastric_emptying_time,acid_production_level,wall_thickness_mm,mucosal_integrity,vascular_supply,prior_interventions,anatomical_variants,assessment_date,assessed_by
+GS001,P001,Antrum,"[""antrum"", ""body""]",Normal,120.5,Normal,3.2,Intact,Good,"[]","[]",2024-01-15T09:00:00,Dr. Smith
+GS002,P002,Body,"[""body"", ""fundus""]",Impaired,180.2,Low,4.1,Compromised,Reduced,"[""Previous biopsy""]","[""Hiatal hernia""]",2024-01-16T10:30:00,Dr. Johnson
+GS003,P003,Antrum,"[""antrum""]",Normal,95.8,Normal,2.9,Intact,Good,"[]","[]",2024-01-17T14:15:00,Dr. Brown
+GS004,P004,Body,"[""body"", ""antrum"", ""pylorus""]",Severely Impaired,220.3,High,5.5,Severely Compromised,Poor,"[""Previous surgery"", ""PPI therapy""]","[""Pyloric stenosis""]",2024-01-18T11:45:00,Dr. Wilson
+GS005,P005,Fundus,"[""fundus"", ""cardia""]",Normal,110.7,Normal,3.0,Intact,Good,"[]","[]",2024-01-19T08:20:00,Dr. Taylor

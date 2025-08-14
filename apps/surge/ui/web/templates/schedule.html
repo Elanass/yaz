@@ -1,0 +1,140 @@
+{% extends "shell.html" %}
+
+{% block title %}OR Schedule - Surgery Platform{% endblock %}
+
+{% block content %}
+<!-- Page header -->
+<div class="mb-8">
+    <div class="sm:flex sm:items-center sm:justify-between">
+        <div>
+            <h1 class="text-2xl font-bold text-gray-900">OR Schedule</h1>
+            <p class="mt-1 text-sm text-gray-500">Operating room scheduling and management</p>
+        </div>
+        <div class="mt-4 sm:mt-0 flex space-x-3">
+            <button type="button" 
+                    class="btn-secondary"
+                    hx-get="/api/v1/schedule/export"
+                    hx-trigger="click">
+                Export Schedule
+            </button>
+            <button type="button" 
+                    class="btn-primary"
+                    hx-get="/api/v1/schedule/new-booking"
+                    hx-target="#booking-modal"
+                    hx-trigger="click">
+                Schedule Case
+            </button>
+        </div>
+    </div>
+</div>
+
+<!-- Calendar React Island -->
+<div class="card">
+    <div class="p-6">
+        <div class="mb-4 flex items-center justify-between">
+            <h2 class="text-lg font-semibold text-gray-900">Weekly Schedule</h2>
+            <div class="flex items-center space-x-2">
+                <button class="btn-sm btn-secondary" 
+                        hx-get="/api/v1/schedule/week/prev"
+                        hx-target="#calendar-island"
+                        hx-trigger="click">
+                    ← Previous
+                </button>
+                <span class="text-sm text-gray-600">{{ current_week | default("Week of " + current_date) }}</span>
+                <button class="btn-sm btn-secondary"
+                        hx-get="/api/v1/schedule/week/next" 
+                        hx-target="#calendar-island"
+                        hx-trigger="click">
+                    Next →
+                </button>
+            </div>
+        </div>
+        
+        <!-- React Calendar Island -->
+        <div id="calendar-island" 
+             data-island="calendar" 
+             data-island-id="schedule-calendar">
+            <script type="application/json">
+            {
+                "component": "Calendar",
+                "props": {
+                    "view": "week",
+                    "rooms": {{ rooms | tojson if rooms else "[]" }},
+                    "cases": {{ cases | tojson if cases else "[]" }},
+                    "currentWeek": "{{ current_week | default('2025-08-11') }}",
+                    "onCaseClick": {
+                        "endpoint": "/api/v1/cases/{id}/details",
+                        "target": "#case-details-modal"
+                    },
+                    "onSlotClick": {
+                        "endpoint": "/api/v1/schedule/book-slot",
+                        "target": "#booking-modal"
+                    }
+                }
+            }
+            </script>
+            <!-- Fallback content for when JS is disabled -->
+            <div class="fallback-calendar">
+                <div class="grid grid-cols-7 gap-4">
+                    <div class="col-span-7 text-center text-gray-500 py-8">
+                        Calendar loading...
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- OR Rooms Status -->
+<div class="grid grid-cols-1 md:grid-cols-3 gap-6 mt-8">
+    <div class="card">
+        <div class="p-6">
+            <h3 class="text-lg font-semibold text-gray-900 mb-4">Room Status</h3>
+            <div id="room-status" 
+                 hx-get="/api/v1/rooms/status" 
+                 hx-trigger="load, every 30s">
+                <div class="animate-pulse">
+                    <div class="h-4 bg-gray-200 rounded mb-2"></div>
+                    <div class="h-4 bg-gray-200 rounded mb-2"></div>
+                    <div class="h-4 bg-gray-200 rounded"></div>
+                </div>
+            </div>
+        </div>
+    </div>
+    
+    <div class="card">
+        <div class="p-6">
+            <h3 class="text-lg font-semibold text-gray-900 mb-4">Today's Cases</h3>
+            <div id="todays-cases" 
+                 hx-get="/api/v1/cases/today" 
+                 hx-trigger="load, every 60s">
+                <div class="animate-pulse">
+                    <div class="h-4 bg-gray-200 rounded mb-2"></div>
+                    <div class="h-4 bg-gray-200 rounded mb-2"></div>
+                    <div class="h-4 bg-gray-200 rounded"></div>
+                </div>
+            </div>
+        </div>
+    </div>
+    
+    <div class="card">
+        <div class="p-6">
+            <h3 class="text-lg font-semibold text-gray-900 mb-4">Upcoming</h3>
+            <div id="upcoming-cases" 
+                 hx-get="/api/v1/cases/upcoming" 
+                 hx-trigger="load">
+                <div class="animate-pulse">
+                    <div class="h-4 bg-gray-200 rounded mb-2"></div>
+                    <div class="h-4 bg-gray-200 rounded mb-2"></div>
+                    <div class="h-4 bg-gray-200 rounded"></div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Modals -->
+<div id="booking-modal"></div>
+<div id="case-details-modal"></div>
+
+{% endblock %}

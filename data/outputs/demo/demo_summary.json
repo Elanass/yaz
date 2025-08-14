@@ -1,0 +1,56 @@
+{
+  "demo_metadata": {
+    "timestamp": "2025-08-08T16:59:26.291644",
+    "surgify_version": "2.0.0",
+    "pipeline_type": "production_demo"
+  },
+  "data_summary": {
+    "total_cases": 50,
+    "columns": [
+      "patient_id",
+      "age",
+      "gender",
+      "tumor_stage",
+      "histology",
+      "flot_cycles",
+      "surgical_outcome",
+      "survival_months"
+    ],
+    "data_types": {
+      "patient_id": "object",
+      "age": "int64",
+      "gender": "object",
+      "tumor_stage": "object",
+      "histology": "object",
+      "flot_cycles": "int64",
+      "surgical_outcome": "object",
+      "survival_months": "int64"
+    }
+  },
+  "statistics": {
+    "summary": {
+      "total_cases": 50,
+      "data_completeness": 100.0,
+      "date_range": null
+    },
+    "staging_stats": {},
+    "treatment_effectiveness": {},
+    "survival_metrics": {}
+  },
+  "insights": [
+    "Dataset contains 50 surgical cases with 8 data fields",
+    "Excellent data completeness: 100.0%"
+  ],
+  "generated_artifacts": [
+    "dashboard.html",
+    "practitioner_report.pdf",
+    "researcher_report.pdf",
+    "community_report.pdf"
+  ],
+  "next_steps": [
+    "Try with your own data: surgify tasks run analyze --file your_data.csv",
+    "Explore domains: surgify domains list",
+    "Check cache status: surgify cache status",
+    "View task pipeline: surgify tasks list"
+  ]
+}

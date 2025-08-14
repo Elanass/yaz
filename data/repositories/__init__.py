@@ -7,34 +7,18 @@ from datetime import date, datetime
 from typing import Dict, List, Optional, Tuple
 from uuid import UUID
 
-from data.models import (
-    ADCIDecision,
-    ADCIDecisionRequest,
-    DecisionStatus,
-    GenderType,
-    Patient,
-    PatientCreateRequest,
-    PatientUpdateRequest,
-    TreatmentPlan,
-    TreatmentPlanRequest,
-    TreatmentProtocol,
-)
-from data.models.orm import (
-    ADCIDecisionORM,
-    AuditLogORM,
-    ClinicalOutcomeORM,
-    ComorbidityORM,
-    LaboratoryResultsORM,
-    PatientORM,
-    PerformanceStatusORM,
-    TreatmentPlanORM,
-    TumorCharacteristicsORM,
-)
+from core.models.base import PaginationMeta, PaginationParams
+from data.models import (ADCIDecision, ADCIDecisionRequest, DecisionStatus,
+                         GenderType, Patient, PatientCreateRequest,
+                         PatientUpdateRequest, TreatmentPlan,
+                         TreatmentPlanRequest, TreatmentProtocol)
+from data.models.orm import (ADCIDecisionORM, AuditLogORM, ClinicalOutcomeORM,
+                             ComorbidityORM, LaboratoryResultsORM, PatientORM,
+                             PerformanceStatusORM, TreatmentPlanORM,
+                             TumorCharacteristicsORM)
 from sqlalchemy import and_, func, or_, select
 from sqlalchemy.ext.asyncio import AsyncSession
 from sqlalchemy.orm import joinedload, selectinload
-
-from core.models.base import PaginationMeta, PaginationParams
 
 
 class PatientRepository(BaseRepository[PatientORM]):

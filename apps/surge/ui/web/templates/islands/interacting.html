@@ -1,0 +1,435 @@
+{% extends "shell.html" %}
+
+{% block title %}Case Workstation - Interacting Island{% endblock %}
+
+{% block content %}
+<div class="interacting-island h-full" id="interacting-island" data-case-id="{{ case_id }}">
+    <!-- Workstation Header -->
+    <div class="workstation-header bg-white border-b p-4 mb-6">
+        <div class="flex justify-between items-center">
+            <div class="flex items-center space-x-4">
+                <button class="text-gray-500 hover:text-gray-700" 
+                        hx-get="/islands/landing" 
+                        hx-target="#main-content" 
+                        hx-push-url="true">
+                    <i class="fas fa-arrow-left"></i>
+                </button>
+                <div>
+                    <h1 class="text-2xl font-bold text-gray-900">Case {{ case_id or 'Analysis' }}</h1>
+                    <p class="text-sm text-gray-600">Interactive surgical analysis workstation</p>
+                </div>
+            </div>
+            
+            <div class="flex items-center space-x-4">
+                <!-- Collaboration Status -->
+                <div class="flex items-center space-x-2">
+                    <div class="w-3 h-3 bg-green-500 rounded-full animate-pulse"></div>
+                    <span class="text-sm text-gray-600">2 collaborators online</span>
+                </div>
+                
+                <!-- Session Controls -->
+                <div class="flex space-x-2">
+                    <button class="bg-blue-600 text-white px-4 py-2 rounded hover:bg-blue-700 transition-colors"
+                            hx-post="/api/v1/islands/interacting/{{ case_id }}/action"
+                            hx-vals='{"action": "save"}'
+                            hx-target="#action-feedback">
+                        <i class="fas fa-save mr-2"></i>Save
+                    </button>
+                    <button class="bg-green-600 text-white px-4 py-2 rounded hover:bg-green-700 transition-colors"
+                            hx-post="/api/v1/islands/interacting/{{ case_id }}/action"
+                            hx-vals='{"action": "export"}'
+                            hx-target="#action-feedback">
+                        <i class="fas fa-download mr-2"></i>Export
+                    </button>
+                    <button class="bg-gray-600 text-white px-4 py-2 rounded hover:bg-gray-700 transition-colors"
+                            onclick="toggleFullscreen()">
+                        <i class="fas fa-expand"></i>
+                    </button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Main Workstation Layout -->
+    <div class="workstation-layout grid grid-cols-12 gap-6 h-full">
+        
+        <!-- Tools Sidebar -->
+        <div class="col-span-3">
+            <div class="tools-panel bg-white rounded-lg shadow-sm p-4 h-full">
+                <h3 class="font-semibold text-gray-900 mb-4">Analysis Tools</h3>
+                
+                <!-- Tool Categories -->
+                <div class="space-y-4">
+                    <!-- AI Analysis -->
+                    <div class="tool-category">
+                        <h4 class="text-sm font-medium text-gray-700 mb-2">AI Analysis</h4>
+                        <div class="space-y-2">
+                            <button class="tool-btn w-full text-left p-3 bg-blue-50 border border-blue-200 rounded hover:bg-blue-100 transition-colors"
+                                    hx-post="/api/v1/islands/interacting/{{ case_id }}/action"
+                                    hx-vals='{"action": "analyze", "tool": "diagnostic_ai"}'
+                                    hx-target="#workspace-content">
+                                <i class="fas fa-brain text-blue-600 mr-2"></i>
+                                <span class="text-sm">Diagnostic AI</span>
+                            </button>
+                            <button class="tool-btn w-full text-left p-3 bg-purple-50 border border-purple-200 rounded hover:bg-purple-100 transition-colors"
+                                    hx-post="/api/v1/islands/interacting/{{ case_id }}/action"
+                                    hx-vals='{"action": "analyze", "tool": "risk_assessment"}'
+                                    hx-target="#workspace-content">
+                                <i class="fas fa-chart-line text-purple-600 mr-2"></i>
+                                <span class="text-sm">Risk Assessment</span>
+                            </button>
+                            <button class="tool-btn w-full text-left p-3 bg-green-50 border border-green-200 rounded hover:bg-green-100 transition-colors"
+                                    hx-post="/api/v1/islands/interacting/{{ case_id }}/action"
+                                    hx-vals='{"action": "analyze", "tool": "outcome_prediction"}'
+                                    hx-target="#workspace-content">
+                                <i class="fas fa-crystal-ball text-green-600 mr-2"></i>
+                                <span class="text-sm">Outcome Prediction</span>
+                            </button>
+                        </div>
+                    </div>
+                    
+                    <!-- Medical Imaging -->
+                    <div class="tool-category">
+                        <h4 class="text-sm font-medium text-gray-700 mb-2">Medical Imaging</h4>
+                        <div class="space-y-2">
+                            <button class="tool-btn w-full text-left p-3 bg-orange-50 border border-orange-200 rounded hover:bg-orange-100 transition-colors"
+                                    hx-get="/tools/image-viewer/{{ case_id }}"
+                                    hx-target="#workspace-content">
+                                <i class="fas fa-images text-orange-600 mr-2"></i>
+                                <span class="text-sm">Image Viewer</span>
+                            </button>
+                            <button class="tool-btn w-full text-left p-3 bg-red-50 border border-red-200 rounded hover:bg-red-100 transition-colors"
+                                    hx-get="/tools/3d-reconstruction/{{ case_id }}"
+                                    hx-target="#workspace-content">
+                                <i class="fas fa-cube text-red-600 mr-2"></i>
+                                <span class="text-sm">3D Reconstruction</span>
+                            </button>
+                        </div>
+                    </div>
+                    
+                    <!-- Collaboration -->
+                    <div class="tool-category">
+                        <h4 class="text-sm font-medium text-gray-700 mb-2">Collaboration</h4>
+                        <div class="space-y-2">
+                            <button class="tool-btn w-full text-left p-3 bg-indigo-50 border border-indigo-200 rounded hover:bg-indigo-100 transition-colors"
+                                    onclick="openCollaborationPanel()">
+                                <i class="fas fa-comments text-indigo-600 mr-2"></i>
+                                <span class="text-sm">Team Chat</span>
+                            </button>
+                            <button class="tool-btn w-full text-left p-3 bg-teal-50 border border-teal-200 rounded hover:bg-teal-100 transition-colors"
+                                    onclick="shareCase()">
+                                <i class="fas fa-share text-teal-600 mr-2"></i>
+                                <span class="text-sm">Share Case</span>
+                            </button>
+                        </div>
+                    </div>
+                </div>
+                
+                <!-- Active Session Info -->
+                <div class="mt-6 p-3 bg-gray-50 rounded">
+                    <h4 class="text-sm font-medium text-gray-700 mb-2">Active Session</h4>
+                    <div class="text-xs text-gray-600">
+                        <div>Started: <span id="session-start-time">{{ session_start_time or '2:30 PM' }}</span></div>
+                        <div>Duration: <span id="session-duration">15 minutes</span></div>
+                        <div>Auto-save: <span class="text-green-600">Enabled</span></div>
+                    </div>
+                </div>
+            </div>
+        </div>
+        
+        <!-- Main Workspace -->
+        <div class="col-span-6">
+            <div class="workspace-content bg-white rounded-lg shadow-sm h-full">
+                <div id="workspace-content" class="p-6 h-full">
+                    <!-- Default Workspace View -->
+                    <div class="default-workspace text-center py-12">
+                        <i class="fas fa-stethoscope text-6xl text-gray-300 mb-4"></i>
+                        <h3 class="text-xl font-medium text-gray-500 mb-2">Ready for Analysis</h3>
+                        <p class="text-gray-400 mb-6">Select a tool from the sidebar to begin your surgical case analysis</p>
+                        
+                        <!-- Quick Start Options -->
+                        <div class="quick-start grid grid-cols-2 gap-4 max-w-md mx-auto">
+                            <button class="bg-blue-600 text-white p-4 rounded-lg hover:bg-blue-700 transition-colors"
+                                    hx-post="/api/v1/islands/interacting/{{ case_id }}/action"
+                                    hx-vals='{"action": "analyze", "tool": "diagnostic_ai"}'
+                                    hx-target="#workspace-content">
+                                <i class="fas fa-brain text-2xl mb-2"></i>
+                                <div class="text-sm">Start AI Analysis</div>
+                            </button>
+                            <button class="bg-green-600 text-white p-4 rounded-lg hover:bg-green-700 transition-colors"
+                                    hx-get="/tools/image-viewer/{{ case_id }}"
+                                    hx-target="#workspace-content">
+                                <i class="fas fa-images text-2xl mb-2"></i>
+                                <div class="text-sm">View Images</div>
+                            </button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+        
+        <!-- Information Panel -->
+        <div class="col-span-3">
+            <div class="info-panel space-y-4">
+                
+                <!-- Case Information -->
+                <div class="case-info bg-white rounded-lg shadow-sm p-4">
+                    <h3 class="font-semibold text-gray-900 mb-4">Case Information</h3>
+                    <div class="space-y-3">
+                        <div>
+                            <label class="text-sm font-medium text-gray-700">Patient ID</label>
+                            <div class="text-sm text-gray-600">{{ patient_id or 'P-2024-001' }}</div>
+                        </div>
+                        <div>
+                            <label class="text-sm font-medium text-gray-700">Procedure Type</label>
+                            <div class="text-sm text-gray-600">{{ procedure_type or 'Laparoscopic Surgery' }}</div>
+                        </div>
+                        <div>
+                            <label class="text-sm font-medium text-gray-700">Complexity</label>
+                            <div class="text-sm text-gray-600">
+                                <span class="inline-block w-2 h-2 bg-yellow-500 rounded-full mr-2"></span>
+                                {{ complexity or 'Medium' }}
+                            </div>
+                        </div>
+                        <div>
+                            <label class="text-sm font-medium text-gray-700">Status</label>
+                            <div class="text-sm">
+                                <span class="bg-blue-100 text-blue-800 px-2 py-1 rounded-full text-xs">
+                                    {{ status or 'In Progress' }}
+                                </span>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                
+                <!-- Collaboration Panel -->
+                <div class="collaboration-panel bg-white rounded-lg shadow-sm p-4">
+                    <h3 class="font-semibold text-gray-900 mb-4">Team Members</h3>
+                    <div class="space-y-3">
+                        <div class="flex items-center space-x-3">
+                            <div class="w-8 h-8 bg-blue-500 rounded-full flex items-center justify-center">
+                                <span class="text-white text-xs font-medium">DS</span>
+                            </div>
+                            <div class="flex-1">
+                                <div class="text-sm font-medium">Dr. Smith</div>
+                                <div class="text-xs text-gray-500">Lead Surgeon</div>
+                            </div>
+                            <div class="w-3 h-3 bg-green-500 rounded-full"></div>
+                        </div>
+                        
+                        <div class="flex items-center space-x-3">
+                            <div class="w-8 h-8 bg-purple-500 rounded-full flex items-center justify-center">
+                                <span class="text-white text-xs font-medium">AI</span>
+                            </div>
+                            <div class="flex-1">
+                                <div class="text-sm font-medium">AI Assistant</div>
+                                <div class="text-xs text-gray-500">Decision Support</div>
+                            </div>
+                            <div class="w-3 h-3 bg-green-500 rounded-full"></div>
+                        </div>
+                        
+                        <div class="flex items-center space-x-3">
+                            <div class="w-8 h-8 bg-gray-400 rounded-full flex items-center justify-center">
+                                <span class="text-white text-xs font-medium">DJ</span>
+                            </div>
+                            <div class="flex-1">
+                                <div class="text-sm font-medium">Dr. Johnson</div>
+                                <div class="text-xs text-gray-500">Radiologist</div>
+                            </div>
+                            <div class="w-3 h-3 bg-gray-400 rounded-full"></div>
+                        </div>
+                    </div>
+                    
+                    <button class="w-full mt-4 bg-blue-600 text-white py-2 rounded hover:bg-blue-700 transition-colors text-sm"
+                            onclick="inviteCollaborator()">
+                        <i class="fas fa-plus mr-2"></i>Invite Member
+                    </button>
+                </div>
+                
+                <!-- Real-time Notes -->
+                <div class="notes-panel bg-white rounded-lg shadow-sm p-4">
+                    <h3 class="font-semibold text-gray-900 mb-4">Shared Notes</h3>
+                    <div class="notes-content mb-4 h-32 overflow-y-auto border border-gray-200 rounded p-2 text-sm">
+                        <div class="note-item mb-2">
+                            <span class="text-blue-600 font-medium">Dr. Smith:</span> 
+                            <span class="text-gray-700">Initial assessment looks promising</span>
+                            <div class="text-xs text-gray-500">2 min ago</div>
+                        </div>
+                        <div class="note-item mb-2">
+                            <span class="text-purple-600 font-medium">AI:</span> 
+                            <span class="text-gray-700">Diagnostic confidence: 87%</span>
+                            <div class="text-xs text-gray-500">5 min ago</div>
+                        </div>
+                    </div>
+                    <div class="flex space-x-2">
+                        <input type="text" 
+                               placeholder="Add a note..." 
+                               class="flex-1 p-2 border border-gray-300 rounded text-sm"
+                               id="new-note-input"
+                               onkeypress="if(event.key==='Enter') addNote()">
+                        <button class="bg-blue-600 text-white px-3 py-2 rounded hover:bg-blue-700 transition-colors"
+                                onclick="addNote()">
+                            <i class="fas fa-plus"></i>
+                        </button>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Action Feedback -->
+    <div id="action-feedback" class="fixed bottom-4 right-4 z-50"></div>
+</div>
+
+<!-- WebSocket connection for real-time collaboration -->
+<script>
+let ws = null;
+let sessionTimer = null;
+
+// Initialize interacting island
+document.addEventListener('DOMContentLoaded', function() {
+    const caseId = document.getElementById('interacting-island').dataset.caseId;
+    
+    // Connect to WebSocket for real-time collaboration
+    connectWebSocket(caseId);
+    
+    // Start session timer
+    startSessionTimer();
+    
+    // Set up auto-save
+    setInterval(autoSave, 30000); // Auto-save every 30 seconds
+});
+
+function connectWebSocket(caseId) {
+    const protocol = window.location.protocol === 'https:' ? 'wss:' : 'ws:';
+    const wsUrl = `${protocol}//${window.location.host}/api/v1/islands/interacting/${caseId}/ws`;
+    
+    ws = new WebSocket(wsUrl);
+    
+    ws.onopen = function() {
+        console.log('WebSocket connected for case:', caseId);
+    };
+    
+    ws.onmessage = function(event) {
+        const data = JSON.parse(event.data);
+        handleRealTimeUpdate(data);
+    };
+    
+    ws.onclose = function() {
+        console.log('WebSocket disconnected, attempting to reconnect...');
+        setTimeout(() => connectWebSocket(caseId), 5000);
+    };
+}
+
+function handleRealTimeUpdate(data) {
+    // Handle different types of real-time updates
+    switch (data.type) {
+        case 'collaboration_update':
+            updateCollaborationStatus(data);
+            break;
+        case 'note_added':
+            addNoteToPanel(data);
+            break;
+        case 'analysis_complete':
+            showAnalysisResults(data);
+            break;
+    }
+}
+
+function startSessionTimer() {
+    const startTime = new Date();
+    sessionTimer = setInterval(() => {
+        const elapsed = new Date() - startTime;
+        const minutes = Math.floor(elapsed / 60000);
+        const seconds = Math.floor((elapsed % 60000) / 1000);
+        document.getElementById('session-duration').textContent = `${minutes}:${seconds.toString().padStart(2, '0')}`;
+    }, 1000);
+}
+
+function autoSave() {
+    // Auto-save workspace state
+    htmx.ajax('POST', `/api/v1/islands/interacting/${document.getElementById('interacting-island').dataset.caseId}/action`, {
+        values: { action: 'auto_save' }
+    });
+}
+
+function addNote() {
+    const input = document.getElementById('new-note-input');
+    const note = input.value.trim();
+    
+    if (note) {
+        // Send note via WebSocket
+        if (ws && ws.readyState === WebSocket.OPEN) {
+            ws.send(JSON.stringify({
+                type: 'note',
+                content: note,
+                timestamp: new Date().toISOString()
+            }));
+        }
+        
+        input.value = '';
+    }
+}
+
+function addNoteToPanel(data) {
+    const notesContent = document.querySelector('.notes-content');
+    const noteItem = document.createElement('div');
+    noteItem.className = 'note-item mb-2';
+    noteItem.innerHTML = `
+        <span class="text-blue-600 font-medium">You:</span> 
+        <span class="text-gray-700">${data.content}</span>
+        <div class="text-xs text-gray-500">now</div>
+    `;
+    notesContent.appendChild(noteItem);
+    notesContent.scrollTop = notesContent.scrollHeight;
+}
+
+function openCollaborationPanel() {
+    // Open collaboration chat in modal or sidebar
+    console.log('Opening collaboration panel');
+}
+
+function shareCase() {
+    // Share case with other users
+    console.log('Sharing case');
+}
+
+function inviteCollaborator() {
+    // Invite new collaborator
+    console.log('Inviting collaborator');
+}
+
+function toggleFullscreen() {
+    const workstation = document.getElementById('interacting-island');
+    if (document.fullscreenElement) {
+        document.exitFullscreen();
+    } else {
+        workstation.requestFullscreen();
+    }
+}
+
+// Clean up on page unload
+window.addEventListener('beforeunload', function() {
+    if (ws) {
+        ws.close();
+    }
+    if (sessionTimer) {
+        clearInterval(sessionTimer);
+    }
+});
+</script>
+
+<style>
+.workstation-layout {
+    height: calc(100vh - 200px);
+}
+
+.fullscreen .workstation-layout {
+    height: calc(100vh - 100px);
+}
+
+.tool-btn:hover {
+    transform: translateY(-1px);
+}
+</style>
+{% endblock %}

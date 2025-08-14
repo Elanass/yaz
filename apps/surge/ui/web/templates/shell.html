@@ -1,0 +1,102 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>{% block title %}SURGE - Surgery Platform{% endblock %}</title>
+    
+    <!-- Critical CSS -->
+    <style>
+        * { box-sizing: border-box; }
+        body { font-family: system-ui, -apple-system, sans-serif; margin: 0; line-height: 1.5; background: #f8fafc; }
+        .sr-only { position: absolute; width: 1px; height: 1px; padding: 0; margin: -1px; overflow: hidden; clip: rect(0,0,0,0); white-space: nowrap; border: 0; }
+        .loading { opacity: 0.6; pointer-events: none; }
+    </style>
+    
+    <!-- Tailwind CSS -->
+    <link rel="stylesheet" href="https://cdn.tailwindcss.com/3.3.0/tailwind.min.css">
+    
+    <!-- PWA Meta -->
+    <meta name="theme-color" content="#2563eb">
+    <meta name="apple-mobile-web-app-capable" content="yes">
+    <meta name="apple-mobile-web-app-title" content="SURGE">
+    
+    <!-- Security headers -->
+    <meta http-equiv="X-Content-Type-Options" content="nosniff">
+    <meta http-equiv="X-Frame-Options" content="DENY">
+</head>
+<body>
+    <!-- Navigation -->
+    <nav class="bg-white shadow-sm border-b">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+            <div class="flex justify-between h-16">
+                <div class="flex items-center">
+                    <h1 class="text-xl font-semibold text-gray-900">SURGE</h1>
+                    <div class="hidden sm:ml-6 sm:flex sm:space-x-8">
+                        <a href="/" class="text-gray-900 hover:text-blue-600 px-3 py-2 text-sm font-medium">Dashboard</a>
+                        <a href="/cases" class="text-gray-500 hover:text-blue-600 px-3 py-2 text-sm font-medium">Cases</a>
+                        <a href="/schedule" class="text-gray-500 hover:text-blue-600 px-3 py-2 text-sm font-medium">Schedule</a>
+                        <a href="/or-board" class="text-gray-500 hover:text-blue-600 px-3 py-2 text-sm font-medium">OR Board</a>
+                    </div>
+                </div>
+                <div class="flex items-center space-x-4">
+                    <span class="text-sm text-gray-500">Surgery Platform</span>
+                </div>
+            </div>
+        </div>
+    </nav>
+
+    <!-- Main Content -->
+    <main class="max-w-7xl mx-auto py-6 sm:px-6 lg:px-8">
+        {% block content %}
+        <div class="px-4 py-6 sm:px-0">
+            <div class="text-center">
+                <h1 class="text-3xl font-bold text-gray-900 mb-4">Welcome to SURGE</h1>
+                <p class="text-gray-600">Advanced Surgery Platform</p>
+            </div>
+        </div>
+        {% endblock %}
+    </main>
+
+    <!-- Essential Scripts -->
+    <script src="https://unpkg.com/htmx.org@1.9.10"></script>
+    
+    <!-- Islands Integration -->
+    {% if islands %}
+    <script type="module">
+        // Essential platform configuration
+        window.surgePlatform = {
+            islands: JSON.parse('{{ islands | tojson | safe }}'),
+            apiBase: '/api/v1',
+            dashConfig: {
+                theme: 'clinical',
+                apiEndpoints: {
+                    base: '/api/v1',
+                    dash: '/api/v1/dash'
+                }
+            },
+            interactConfig: {
+                theme: 'dashboard', 
+                apiEndpoints: {
+                    base: '/api/v1',
+                    interact: '/api/v1/interact'
+                }
+            }
+        };
+        
+        // Load islands coordination
+        document.addEventListener('DOMContentLoaded', async () => {
+            try {
+                const { initializeIslands } = await import('/static/js/islands-coordination.js');
+                await initializeIslands(window.surgePlatform.islands);
+                console.log('Islands initialized');
+            } catch (error) {
+                console.warn('Islands coordination failed:', error);
+            }
+        });
+    </script>
+    {% endif %}
+</body>
+</html>
+</body>
+</html>

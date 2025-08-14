@@ -1,0 +1,179 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Surgify Analytics Dashboard</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <style>
+        .gradient-bg { background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); }
+        .card-hover { transition: transform 0.2s; }
+        .card-hover:hover { transform: translateY(-2px); }
+    </style>
+</head>
+<body class="bg-gray-50">
+    <!-- Header -->
+    <div class="gradient-bg text-white py-8">
+        <div class="container mx-auto px-6">
+            <h1 class="text-4xl font-bold mb-2">🏥 Surgify Analytics Dashboard</h1>
+            <p class="text-xl opacity-90">Production Medical Case Management System</p>
+            <div class="mt-4 flex items-center space-x-4">
+                <span class="bg-green-500 text-white px-3 py-1 rounded-full text-sm">✅ Live Demo</span>
+                <span class="bg-blue-500 text-white px-3 py-1 rounded-full text-sm">🚀 Pipeline Active</span>
+            </div>
+        </div>
+    </div>
+
+    <div class="container mx-auto px-6 py-8">
+        <!-- Key Metrics -->
+        <div class="grid grid-cols-1 md:grid-cols-4 gap-6 mb-8">
+            <div class="bg-white p-6 rounded-lg shadow-md card-hover">
+                <div class="flex items-center justify-between">
+                    <div>
+                        <h3 class="text-sm font-medium text-gray-500">Total Cases</h3>
+                        <p class="text-3xl font-bold text-blue-600">50</p>
+                    </div>
+                    <div class="text-blue-500 text-2xl">📊</div>
+                </div>
+            </div>
+            
+            <div class="bg-white p-6 rounded-lg shadow-md card-hover">
+                <div class="flex items-center justify-between">
+                    <div>
+                        <h3 class="text-sm font-medium text-gray-500">Data Completeness</h3>
+                        <p class="text-3xl font-bold text-green-600">95.0%</p>
+                    </div>
+                    <div class="text-green-500 text-2xl">✅</div>
+                </div>
+            </div>
+            
+            <div class="bg-white p-6 rounded-lg shadow-md card-hover">
+                <div class="flex items-center justify-between">
+                    <div>
+                        <h3 class="text-sm font-medium text-gray-500">Domains Loaded</h3>
+                        <p class="text-3xl font-bold text-purple-600">3</p>
+                    </div>
+                    <div class="text-purple-500 text-2xl">🔌</div>
+                </div>
+            </div>
+            
+            <div class="bg-white p-6 rounded-lg shadow-md card-hover">
+                <div class="flex items-center justify-between">
+                    <div>
+                        <h3 class="text-sm font-medium text-gray-500">Avg Survival</h3>
+                        <p class="text-3xl font-bold text-orange-600">26.4m</p>
+                    </div>
+                    <div class="text-orange-500 text-2xl">📈</div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Charts Section -->
+        <div class="grid grid-cols-1 lg:grid-cols-2 gap-8 mb-8">
+            <div class="bg-white p-6 rounded-lg shadow-md">
+                <h3 class="text-lg font-semibold mb-4">📈 Survival Distribution</h3>
+                <canvas id="survivalChart" width="400" height="200"></canvas>
+            </div>
+            
+            <div class="bg-white p-6 rounded-lg shadow-md">
+                <h3 class="text-lg font-semibold mb-4">🏷️ Stage Distribution</h3>
+                <canvas id="stageChart" width="400" height="200"></canvas>
+            </div>
+        </div>
+
+        <!-- Clinical Insights -->
+        <div class="grid grid-cols-1 lg:grid-cols-2 gap-8">
+            <div class="bg-white p-6 rounded-lg shadow-md">
+                <h3 class="text-lg font-semibold mb-4">🔍 Clinical Insights</h3>
+                <ul class="space-y-3">
+                    <li class="flex items-start">
+                        <span class="text-green-500 mr-3 mt-0.5">✓</span>
+                        <span class="text-gray-700">Dataset contains 50 surgical cases with 8 data fields</span>
+                    </li>
+                    <li class="flex items-start">
+                        <span class="text-green-500 mr-3 mt-0.5">✓</span>
+                        <span class="text-gray-700">Excellent data completeness: 100.0%</span>
+                    </li>
+                </ul>
+            </div>
+            
+            <div class="bg-white p-6 rounded-lg shadow-md">
+                <h3 class="text-lg font-semibold mb-4">🚀 Quick Actions</h3>
+                <div class="space-y-3">
+                    <button class="w-full bg-blue-500 text-white py-2 px-4 rounded hover:bg-blue-600 transition-colors">
+                        📊 Generate Full Report
+                    </button>
+                    <button class="w-full bg-green-500 text-white py-2 px-4 rounded hover:bg-green-600 transition-colors">
+                        📄 Export Data
+                    </button>
+                    <button class="w-full bg-purple-500 text-white py-2 px-4 rounded hover:bg-purple-600 transition-colors">
+                        🔄 Refresh Analysis
+                    </button>
+                </div>
+                
+                <div class="mt-6 p-4 bg-gray-50 rounded">
+                    <h4 class="font-semibold text-gray-700 mb-2">📋 Generated Files</h4>
+                    <ul class="text-sm space-y-1">
+                        <li>📄 practitioner_report.pdf</li>
+                        <li>📄 researcher_report.pdf</li>
+                        <li>📄 community_report.pdf</li>
+                        <li>📊 demo_summary.json</li>
+                    </ul>
+                </div>
+            </div>
+        </div>
+        
+        <!-- Footer -->
+        <div class="mt-12 text-center text-gray-500">
+            <p>🏥 Surgify Production Demo • Generated 2025-08-08 16:59:26</p>
+            <p class="text-sm mt-2">Next: Try 'surgify tasks run analyze --file your_data.csv'</p>
+        </div>
+    </div>
+
+    <script>
+        // Survival Chart
+        const survivalCtx = document.getElementById('survivalChart').getContext('2d');
+        new Chart(survivalCtx, {
+            type: 'bar',
+            data: {
+                labels: ['0-12m', '12-24m', '24-36m', '36-48m', '48m+'],
+                datasets: [{
+                    label: 'Patient Count',
+                    data: [2, 3, 2, 2, 1],
+                    backgroundColor: 'rgba(59, 130, 246, 0.6)',
+                    borderColor: 'rgba(59, 130, 246, 1)',
+                    borderWidth: 1
+                }]
+            },
+            options: {
+                responsive: true,
+                scales: {
+                    y: { beginAtZero: true }
+                }
+            }
+        });
+
+        // Stage Chart
+        const stageCtx = document.getElementById('stageChart').getContext('2d');
+        new Chart(stageCtx, {
+            type: 'doughnut',
+            data: {
+                labels: ['Stage I', 'Stage II', 'Stage III', 'Stage IV'],
+                datasets: [{
+                    data: [2, 4, 3, 1],
+                    backgroundColor: [
+                        'rgba(34, 197, 94, 0.8)',
+                        'rgba(251, 191, 36, 0.8)', 
+                        'rgba(249, 115, 22, 0.8)',
+                        'rgba(239, 68, 68, 0.8)'
+                    ]
+                }]
+            },
+            options: {
+                responsive: true
+            }
+        });
+    </script>
+</body>
+</html>

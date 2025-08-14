@@ -1,0 +1,118 @@
+version: '3.8'
+
+services:
+  # Development Surge Application
+  surge:
+    build: 
+      context: .
+      target: production
+    ports:
+      - "8000:8000"
+    environment:
+      - ENVIRONMENT=development
+      - DEBUG=true
+      - DATABASE_URL=sqlite:///data/database/surge.db
+      - REDIS_URL=redis://redis:6379/0
+      - SURGE_MESH_ENABLED=true
+      - SURGE_BASE_URL=http://localhost:8000
+      - SURGE_PEERS=${SURGE_PEERS:-}
+      - SURGE_MESH_SYNC_FILES=${SURGE_MESH_SYNC_FILES:-false}
+      - MESH_INTERVAL=${MESH_INTERVAL:-30}
+      - ENABLE_REAL_TIME_COLLABORATION=true
+      - ENABLE_ADVANCED_ANALYTICS=true
+      - ENABLE_NOTIFICATIONS=true
+    volumes:
+      - ./data:/app/data
+      - ./logs:/app/logs
+      - ./uploads:/app/uploads
+      - ./model_cache:/app/model_cache
+    restart: unless-stopped
+    depends_on:
+      - redis
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://localhost:8000/health"]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+
+  # Redis for caching and real-time features
+  redis:
+    image: redis:7-alpine
+    ports:
+      - "6379:6379"
+    volumes:
+      - redis_data:/data
+    restart: unless-stopped
+    healthcheck:
+      test: ["CMD", "redis-cli", "ping"]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+
+  # Optional PostgreSQL for production-like development
+  postgres:
+    image: postgres:15-alpine
+    environment:
+      POSTGRES_DB: surge_dev
+      POSTGRES_USER: surge
+      POSTGRES_PASSWORD: surge_dev_password
+    ports:
+      - "5432:5432"
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
+    restart: unless-stopped
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U surge"]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+
+  # Production-like Surge with PostgreSQL
+  surge-prod:
+    build: 
+      context: .
+      target: production
+    ports:
+      - "80:8000"
+    environment:
+      - ENVIRONMENT=production
+      - DEBUG=false
+      - DATABASE_URL=postgresql://surge:surge_password@postgres:5432/surge_prod
+      - REDIS_URL=redis://redis:6379/1
+      - SECRET_KEY=${SECRET_KEY:-$(openssl rand -hex 32)}
+      - ENCRYPTION_KEY=${ENCRYPTION_KEY:-$(openssl rand -base64 32)}
+      - SURGE_MESH_ENABLED=true
+      - SURGE_BASE_URL=http://localhost
+      - SURGE_PEERS=${SURGE_PEERS:-}
+      - SURGE_MESH_SYNC_FILES=${SURGE_MESH_SYNC_FILES:-false}
+      - MESH_INTERVAL=${MESH_INTERVAL:-30}
+      - WORKERS=4
+    volumes:
+      - surge_data:/app/data
+      - surge_logs:/app/logs
+      - surge_uploads:/app/uploads
+      - surge_models:/app/model_cache
+    restart: unless-stopped
+    depends_on:
+      - postgres
+      - redis
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://localhost:8000/health"]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+
+volumes:
+  # Application volumes
+  surge_data:
+  surge_logs:
+  surge_uploads:
+  surge_models:
+  
+  # Database volumes
+  postgres_data:
+  redis_data:
+
+networks:
+  default:
+    driver: bridge

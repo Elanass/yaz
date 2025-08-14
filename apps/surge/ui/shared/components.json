@@ -1,0 +1,116 @@
+{
+  "meta": {
+    "version": "1.0.0",
+    "description": "Unified component definitions for web, mobile, and desktop platforms",
+    "updated": "2025-08-07"
+  },
+  "components": {
+    "Landing": {
+      "type": "page",
+      "description": "Main dashboard/home page",
+      "data": {
+        "title": "Surgify Dashboard",
+        "sections": ["quick-actions", "recent-cases", "statistics"],
+        "actions": ["new-case", "search", "notifications"]
+      },
+      "platforms": {
+        "web": "/templates/islands/landing.html",
+        "mobile": "/screens/LandingScreen.tsx", 
+        "desktop": "/components/LandingView.tsx"
+      }
+    },
+    "Explorer": {
+      "type": "page", 
+      "description": "Browse, search, and discover content",
+      "data": {
+        "title": "Explorer",
+        "sections": ["search-bar", "filters", "results", "categories"],
+        "categories": ["cases", "publications", "events", "journals", "series"]
+      },
+      "platforms": {
+        "web": "/templates/islands/indexing.html",
+        "mobile": "/screens/ExplorerScreen.tsx",
+        "desktop": "/components/ExplorerView.tsx"
+      }
+    },
+    "Cases": {
+      "type": "page",
+      "description": "Case management interface", 
+      "data": {
+        "title": "Cases",
+        "sections": ["case-list", "case-details", "actions"],
+        "actions": ["create", "edit", "delete", "export"]
+      },
+      "platforms": {
+        "web": "/templates/cases.html",
+        "mobile": "/screens/CasesScreen.tsx",
+        "desktop": "/components/CasesView.tsx"
+      }
+    },
+    "Settings": {
+      "type": "page",
+      "description": "Application settings and preferences",
+      "data": {
+        "title": "Settings", 
+        "sections": ["profile", "preferences", "security", "about"],
+        "categories": ["user", "system", "notifications", "privacy"]
+      },
+      "platforms": {
+        "web": "/templates/settings.html",
+        "mobile": "/screens/SettingsScreen.tsx",
+        "desktop": "/components/SettingsView.tsx"
+      }
+    },
+    "Workstation": {
+      "type": "page",
+      "description": "Interactive case workstation",
+      "data": {
+        "title": "Case Workstation",
+        "sections": ["case-viewer", "tools", "notes", "collaboration"],
+        "tools": ["annotations", "measurements", "analysis", "export"]
+      },
+      "platforms": {
+        "web": "/templates/islands/interacting.html",
+        "mobile": "/screens/WorkstationScreen.tsx", 
+        "desktop": "/components/WorkstationView.tsx"
+      }
+    }
+  },
+  "shared_data": {
+    "navigation": {
+      "primary": [
+        {"id": "landing", "label": "Home", "icon": "home", "route": "/"},
+        {"id": "explorer", "label": "Explorer", "icon": "search", "route": "/islands/indexing"},
+        {"id": "cases", "label": "Cases", "icon": "briefcase-medical", "route": "/cases"},
+        {"id": "workstation", "label": "Workstation", "icon": "desktop", "route": "/home"},
+        {"id": "settings", "label": "Settings", "icon": "cog", "route": "/settings"}
+      ]
+    },
+    "theme": {
+      "colors": {
+        "primary": "#3b82f6",
+        "secondary": "#10b981", 
+        "accent": "#f59e0b",
+        "background": "#f8fafc",
+        "surface": "#ffffff",
+        "text": "#1e293b"
+      },
+      "spacing": "8px",
+      "borderRadius": "8px",
+      "fonts": {
+        "primary": "Inter, system-ui, sans-serif",
+        "mono": "JetBrains Mono, monospace"
+      }
+    },
+    "api": {
+      "baseUrl": "/api/v1",
+      "endpoints": {
+        "cases": "/cases",
+        "users": "/users", 
+        "notifications": "/notifications",
+        "search": "/search",
+        "settings": "/settings"
+      }
+    }
+  }
+}

@@ -3,10 +3,9 @@ Database initialization module
 """
 import logging
 
+from core.config.settings import settings
 from sqlalchemy.ext.asyncio import async_sessionmaker, create_async_engine
 from sqlalchemy.orm import declarative_base
-
-from core.config.settings import settings
 
 logger = logging.getLogger(__name__)
 

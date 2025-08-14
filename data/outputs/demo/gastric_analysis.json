@@ -1,0 +1,15 @@
+{
+  "dataset_id": "demo_gastric_001",
+  "cases_analyzed": 10,
+  "survival_metrics": {
+    "median_survival_days": 845,
+    "one_year_survival_rate": 0.82,
+    "two_year_survival_rate": 0.67
+  },
+  "generated_at": "2025-08-08T19:17:35.467363",
+  "artifacts": [
+    "gastric_analysis.pdf",
+    "demo_dashboard.html",
+    "kaplan_meier_curve.png"
+  ]
+}

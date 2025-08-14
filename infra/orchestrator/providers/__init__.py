@@ -7,8 +7,8 @@ from .multipass import MultipassProvider
 
 __all__ = [
     "BaseProvider",
-    "Instance", 
+    "Instance",
     "InstanceStatus",
     "IncusProvider",
-    "MultipassProvider"
+    "MultipassProvider",
 ]

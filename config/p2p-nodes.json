@@ -1,0 +1,24 @@
+{
+  "network_name": "surge-platform",
+  "discovery": {
+    "enabled": true,
+    "broadcast_interval": 30,
+    "max_peers": 10
+  },
+  "nodes": {
+    "main": {
+      "url": "http://localhost:8000",
+      "role": "coordinator",
+      "added_at": 1691654400
+    }
+  },
+  "sync": {
+    "enabled": true,
+    "interval": 60,
+    "batch_size": 100
+  },
+  "security": {
+    "require_auth": false,
+    "trusted_nodes": []
+  }
+}
